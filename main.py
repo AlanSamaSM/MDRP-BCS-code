@@ -3,8 +3,6 @@
 # - requests para hacer solicitudes HTTP (OSRM).
 # - folium y polyline para la generación de mapas y decodificación de rutas.
 # - restaurants y couriers para manejar listas de restaurantes y repartidores.
-# - random, datetime, collections para manejo de datos y fechas.
-# ======================
 import folium
 import polyline
 import restaurantsList as rts
@@ -12,7 +10,7 @@ import couriersList as crs
 from datetime import datetime, timedelta
 from bundling import compute_target_bundle_size, generate_bundles_for_restaurant
 from asignaciontentativa import assign_bundles_to_couriers
-from config import PAY_PER_ORDER, MIN_PAY_PER_HOUR, DELTA_1, DELTA_2
+from config import PAY_PER_ORDER, MIN_PAY_PER_HOUR, ASSIGNMENT_HORIZON, OPTIMIZATION_FREQUENCY
 from collections import deque
 
 
@@ -69,7 +67,7 @@ class Courier:
 # ======================
 
 def run_simulation(orders, couriers, simulation_end):
-    current_time = datetime.min #equivalente a 00:00:00
+    current_time = datetime(2025,1,1,8,0) #equivalente a 00:00:00
     order_queue = deque(sorted(orders, key=lambda o: o.placement_time)) #se ordenan las ordenes por tiempo de colocación
     active_couriers = [] #se inicializa una lista que contendrá los repartidores activos
     
@@ -87,12 +85,12 @@ def run_simulation(orders, couriers, simulation_end):
         if (current_time.minute % 5) == 0: #cada que el tiempo actual sea multiplo de 5 minutos
             available_couriers = [c for c in active_couriers if not c.current_route and c.off_time > current_time] # se filtra la lista de repartidores activos para obtener los que no tienen rutas asignadas y que su tiempo de salida sea mayor al tiempo actual
             
-            orders_ready = [] #se filtran las ordenes que esten listas segun el horizonte de asignación
+            orders_ready = [o for rest in rts.restaurantList for o in rest.orders if o.status == "ready" and o.ready_time <= current_time + ASSIGNMENT_HORIZON] #se filtran las ordenes que esten listas segun el horizonte de asignación
 
-            couriers_available_hor =[] #se filtran los repartidores disponibles segun el horizonte de asignación
+            couriers_available_hor = [c for c in available_couriers if c.off_time >= current_time + ASSIGNMENT_HORIZON] #se filtran los repartidores disponibles segun el horizonte de asignación
             
             #se calcula el valor objetivo de Zt, tamaño de los bundles
-            target_bundle_size = compute_target_bundle_size(orders_ready, couriers_available_hor)
+            target_bundle_size = compute_target_bundle_size(len(orders_ready), len(couriers_available_hor))
             
             all_bundles = []
 
@@ -104,12 +102,12 @@ def run_simulation(orders, couriers, simulation_end):
 
             #se asignan los bundles a los repartidores disponibles
             assign_bundles_to_couriers(available_couriers, all_bundles, current_time)
-
             #asignación
 
             #compensación de repartidores 
 
 
+    current_time += OPTIMIZATION_FREQUENCY
 
 # ======================
 # Visualización de la ruta
@@ -146,7 +144,11 @@ if __name__ == "__main__":
     restaurants = rts.restaurantList
     couriers = crs.courierList
     
-    test_orders = [] #necesitamos agregar instancias de prueba
+    test_orders = [
+        Order(1, restaurants[0], datetime(2025,1,1,8,5), datetime(2025,1,1,8,15), (19.4360,-99.1320)),
+        Order(2, restaurants[1], datetime(2025,1,1,8,10), datetime(2025,1,1,8,20), (19.4370,-99.1310)),
+        Order(3, restaurants[2], datetime(2025,1,1,8,15), datetime(2025,1,1,8,25), (19.4380,-99.1300)),
+    ] #necesitamos agregar instancias de prueba
     
     run_simulation(
         orders=test_orders,
