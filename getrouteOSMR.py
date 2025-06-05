@@ -21,3 +21,4 @@ def get_route_details(start_coords, waypoints):
     except Exception as e:
         print(f"Routing error: {e}")
     return None
+
