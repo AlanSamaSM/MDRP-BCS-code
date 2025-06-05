@@ -92,11 +92,9 @@ def run_simulation(orders, couriers, simulation_end):
             couriers_available_hor = [c for c in available_couriers if c.off_time >= current_time + ASSIGNMENT_HORIZON] #se filtran los repartidores disponibles segun el horizonte de asignación
             
             #se calcula el valor objetivo de Zt, tamaño de los bundles
-            target_bundle_size = compute_target_bundle_size(
-                current_time,
-                orders_ready,
-                couriers_available_hor,
-            )
+
+            target_bundle_size = compute_target_bundle_size(len(orders_ready), len(couriers_available_hor))
+
             
             all_bundles = []
 
@@ -133,6 +131,7 @@ def run_simulation(orders, couriers, simulation_end):
     # imprimir métricas simples
     for c in couriers:
         print(f"Courier {c.id}: orders={c.orders_delivered}, earnings=${c.earnings:.2f}")
+
 
 # ======================
 # Visualización de la ruta
