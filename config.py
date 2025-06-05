@@ -19,4 +19,5 @@ DELTA_2 = timedelta(minutes=20)
 
 # Pago mínimo garantizado
 MIN_PAY_PER_HOUR = 15.0  # p2
-PAY_PER_ORDER = 10.0     # p1
+PAY_PER_ORDER = 10.0  # p1
+

@@ -1,17 +1,29 @@
 from datetime import timedelta
-from config import ASSIGNMENT_HORIZON, MAX_CLICK_TO_DOOR, SERVICE_TIME
+from config import (
+    ASSIGNMENT_HORIZON,
+    MAX_CLICK_TO_DOOR,
+    SERVICE_TIME,
+    DELTA_1,
+    DELTA_2,
+)
 from getrouteOSMR import get_route_details
-from config import GROUP_I_PENALTY, GROUP_II_PENALTY, FRESHNESS_PENALTY_THETA, MAX_CLICK_TO_DOOR, SERVICE_TIME
+from config import GROUP_I_PENALTY, GROUP_II_PENALTY, FRESHNESS_PENALTY_THETA
 # ======================
 # Bundling
 # =====================
 
 #Aquí se define Zt, que es el tamaño objetivo de los bundles
-def compute_target_bundle_size(orders_ready, couriers_available):
-    if couriers_available == 0:
-        return 1 # Evitar división por cero
-    ratio = orders_ready / couriers_available
-    return max(int(ratio), 1) #la funcion max() devuelve el mayor de los argumentos (ej. 0.65 y 1 = 1) evitando que regrese 0 al convertir un decimal en entero
+def compute_target_bundle_size(current_time, orders, couriers):
+    """Compute dynamic target bundle size using DELTA_1 and DELTA_2."""
+
+    orders_ready = [o for o in orders if o.ready_time <= current_time + DELTA_1]
+    couriers_available = [c for c in couriers if c.off_time >= current_time + DELTA_2]
+
+    if not couriers_available:
+        return 1
+
+    ratio = len(orders_ready) / len(couriers_available)
+    return max(int(ratio), 1)
 
 def calculate_bundle_score(bundle, courier, current_time):
     """
@@ -161,3 +173,4 @@ def generate_bundles_for_restaurant(restaurant, current_time, target_bundle_size
             bundles.append([order])
 
     return bundles
+

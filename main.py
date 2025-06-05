@@ -3,8 +3,6 @@
 # - requests para hacer solicitudes HTTP (OSRM).
 # - folium y polyline para la generación de mapas y decodificación de rutas.
 # - restaurants y couriers para manejar listas de restaurantes y repartidores.
-# - random, datetime, collections para manejo de datos y fechas.
-# ======================
 import folium
 import polyline
 import restaurantsList as rts
@@ -12,7 +10,7 @@ import couriersList as crs
 from datetime import datetime, timedelta
 from bundling import compute_target_bundle_size, generate_bundles_for_restaurant
 from asignaciontentativa import assign_bundles_to_couriers
-from config import PAY_PER_ORDER, MIN_PAY_PER_HOUR, DELTA_1, DELTA_2
+from config import PAY_PER_ORDER, MIN_PAY_PER_HOUR, ASSIGNMENT_HORIZON, OPTIMIZATION_FREQUENCY
 from collections import deque
 
 
@@ -62,6 +60,8 @@ class Courier:
         pay_by_minimum = self.shift_duration_hours() * MIN_PAY_PER_HOUR
         if pay_by_orders < pay_by_minimum:
             self.earnings = pay_by_minimum
+        else:
+            self.earnings = pay_by_orders
 
 
 # ======================
@@ -69,7 +69,7 @@ class Courier:
 # ======================
 
 def run_simulation(orders, couriers, simulation_end):
-    current_time = datetime.min #equivalente a 00:00:00
+    current_time = datetime(2025,1,1,8,0) #equivalente a 00:00:00
     order_queue = deque(sorted(orders, key=lambda o: o.placement_time)) #se ordenan las ordenes por tiempo de colocación
     active_couriers = [] #se inicializa una lista que contendrá los repartidores activos
     
@@ -87,12 +87,16 @@ def run_simulation(orders, couriers, simulation_end):
         if (current_time.minute % 5) == 0: #cada que el tiempo actual sea multiplo de 5 minutos
             available_couriers = [c for c in active_couriers if not c.current_route and c.off_time > current_time] # se filtra la lista de repartidores activos para obtener los que no tienen rutas asignadas y que su tiempo de salida sea mayor al tiempo actual
             
-            orders_ready = [] #se filtran las ordenes que esten listas segun el horizonte de asignación
+            orders_ready = [o for rest in rts.restaurantList for o in rest.orders if o.status == "ready" and o.ready_time <= current_time + ASSIGNMENT_HORIZON] #se filtran las ordenes que esten listas segun el horizonte de asignación
 
-            couriers_available_hor =[] #se filtran los repartidores disponibles segun el horizonte de asignación
+            couriers_available_hor = [c for c in available_couriers if c.off_time >= current_time + ASSIGNMENT_HORIZON] #se filtran los repartidores disponibles segun el horizonte de asignación
             
             #se calcula el valor objetivo de Zt, tamaño de los bundles
-            target_bundle_size = compute_target_bundle_size(orders_ready, couriers_available_hor)
+            target_bundle_size = compute_target_bundle_size(
+                current_time,
+                orders_ready,
+                couriers_available_hor,
+            )
             
             all_bundles = []
 
@@ -105,11 +109,30 @@ def run_simulation(orders, couriers, simulation_end):
             #se asignan los bundles a los repartidores disponibles
             assign_bundles_to_couriers(available_couriers, all_bundles, current_time)
 
-            #asignación
+        # actualizar progreso de rutas
+        for c in active_couriers:
+            if c.current_route and current_time >= c.current_route['completion_time']:
+                if c.current_route['commitment_type'] == 'final':
+                    for o in c.current_route['orders']:
+                        o.status = 'delivered'
+                        o.pickup_time = c.current_route['start_time']
+                        o.delivery_time = c.current_route['completion_time']
+                        c.orders_delivered += 1
+                # actualizar ubicación al último punto de la ruta
+                if c.current_route['route']['legs']:
+                    last = c.current_route['route']['legs'][-1]['steps'][-1]['maneuver']['location']
+                    c.location = (last[1], last[0])
+                c.current_route = None
 
-            #compensación de repartidores 
+        current_time += OPTIMIZATION_FREQUENCY
 
+    # calcular compensación final al terminar la simulación
+    for c in couriers:
+        c.final_compensation()
 
+    # imprimir métricas simples
+    for c in couriers:
+        print(f"Courier {c.id}: orders={c.orders_delivered}, earnings=${c.earnings:.2f}")
 
 # ======================
 # Visualización de la ruta
@@ -144,15 +167,19 @@ def visualize_route(courier_route):
 
 if __name__ == "__main__":
     restaurants = rts.restaurantList
-    couriers = crs.courierList
+    couriers = [Courier(*c) for c in crs.courierList]
     
-    test_orders = [] #necesitamos agregar instancias de prueba
+    test_orders = [
+        Order(1, restaurants[0], datetime(2025,1,1,8,5), datetime(2025,1,1,8,15), (19.4360,-99.1320)),
+        Order(2, restaurants[1], datetime(2025,1,1,8,10), datetime(2025,1,1,8,20), (19.4370,-99.1310)),
+        Order(3, restaurants[2], datetime(2025,1,1,8,15), datetime(2025,1,1,8,25), (19.4380,-99.1300)),
+    ] #necesitamos agregar instancias de prueba
     
     run_simulation(
         orders=test_orders,
-        couriers=[Courier(*c) for c in couriers], #lista de repartidores almacenados en couriersList.py
+        couriers=couriers,
         simulation_end=datetime(2025, 1, 1, 12, 0)
-    )        
+    )
     #cisualizador de rutas de repartidor
     active_courier = next((c for c in couriers if c.current_route), None)
     if active_courier and active_courier.current_route:
