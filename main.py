@@ -60,6 +60,8 @@ class Courier:
         pay_by_minimum = self.shift_duration_hours() * MIN_PAY_PER_HOUR
         if pay_by_orders < pay_by_minimum:
             self.earnings = pay_by_minimum
+        else:
+            self.earnings = pay_by_orders
 
 
 # ======================
@@ -90,7 +92,9 @@ def run_simulation(orders, couriers, simulation_end):
             couriers_available_hor = [c for c in available_couriers if c.off_time >= current_time + ASSIGNMENT_HORIZON] #se filtran los repartidores disponibles segun el horizonte de asignación
             
             #se calcula el valor objetivo de Zt, tamaño de los bundles
+
             target_bundle_size = compute_target_bundle_size(len(orders_ready), len(couriers_available_hor))
+
             
             all_bundles = []
 
@@ -102,12 +106,32 @@ def run_simulation(orders, couriers, simulation_end):
 
             #se asignan los bundles a los repartidores disponibles
             assign_bundles_to_couriers(available_couriers, all_bundles, current_time)
-            #asignación
 
-            #compensación de repartidores 
+        # actualizar progreso de rutas
+        for c in active_couriers:
+            if c.current_route and current_time >= c.current_route['completion_time']:
+                if c.current_route['commitment_type'] == 'final':
+                    for o in c.current_route['orders']:
+                        o.status = 'delivered'
+                        o.pickup_time = c.current_route['start_time']
+                        o.delivery_time = c.current_route['completion_time']
+                        c.orders_delivered += 1
+                # actualizar ubicación al último punto de la ruta
+                if c.current_route['route']['legs']:
+                    last = c.current_route['route']['legs'][-1]['steps'][-1]['maneuver']['location']
+                    c.location = (last[1], last[0])
+                c.current_route = None
 
+        current_time += OPTIMIZATION_FREQUENCY
 
-    current_time += OPTIMIZATION_FREQUENCY
+    # calcular compensación final al terminar la simulación
+    for c in couriers:
+        c.final_compensation()
+
+    # imprimir métricas simples
+    for c in couriers:
+        print(f"Courier {c.id}: orders={c.orders_delivered}, earnings=${c.earnings:.2f}")
+
 
 # ======================
 # Visualización de la ruta
@@ -142,7 +166,7 @@ def visualize_route(courier_route):
 
 if __name__ == "__main__":
     restaurants = rts.restaurantList
-    couriers = crs.courierList
+    couriers = [Courier(*c) for c in crs.courierList]
     
     test_orders = [
         Order(1, restaurants[0], datetime(2025,1,1,8,5), datetime(2025,1,1,8,15), (19.4360,-99.1320)),
@@ -152,9 +176,9 @@ if __name__ == "__main__":
     
     run_simulation(
         orders=test_orders,
-        couriers=[Courier(*c) for c in couriers], #lista de repartidores almacenados en couriersList.py
+        couriers=couriers,
         simulation_end=datetime(2025, 1, 1, 12, 0)
-    )        
+    )
     #cisualizador de rutas de repartidor
     active_courier = next((c for c in couriers if c.current_route), None)
     if active_courier and active_courier.current_route:
