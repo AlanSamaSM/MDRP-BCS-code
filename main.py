@@ -3,10 +3,13 @@
 # - requests para hacer solicitudes HTTP (OSRM).
 # - folium y polyline para la generación de mapas y decodificación de rutas.
 # - restaurants y couriers para manejar listas de restaurantes y repartidores.
+
 import folium
 import polyline
+import os
 import restaurantsList as rts
 import couriersList as crs
+
 from datetime import datetime, timedelta
 from bundling import compute_target_bundle_size, generate_bundles_for_restaurant
 from asignaciontentativa import assign_bundles_to_couriers
@@ -58,12 +61,14 @@ class Courier:
 
     def final_compensation(self):
         #para decidor si se paga por hora o por ordenes
+
         pay_by_orders = self.orders_delivered * PAY_PER_ORDER
         pay_by_minimum = self.shift_duration_hours() * MIN_PAY_PER_HOUR
         if pay_by_orders < pay_by_minimum:
             self.earnings = pay_by_minimum
         else:
             self.earnings = pay_by_orders
+
 
 
 # ======================
@@ -95,7 +100,11 @@ def run_simulation(orders, couriers, simulation_end):
             
             #se calcula el valor objetivo de Zt, tamaño de los bundles
 
-            target_bundle_size = compute_target_bundle_size(len(orders_ready), len(couriers_available_hor))
+            target_bundle_size = compute_target_bundle_size(
+                current_time,
+                orders_ready,
+                couriers_available_hor,
+            )
 
             
             all_bundles = []
@@ -107,8 +116,7 @@ def run_simulation(orders, couriers, simulation_end):
                     all_bundles.extend(rst_bundles)
 
             #se asignan los bundles a los repartidores disponibles
-                # almacenar la ruta completada antes de limpiarla
-                c.route_history.append(c.current_route)
+
             assign_bundles_to_couriers(available_couriers, all_bundles, current_time)
 
         # actualizar progreso de rutas
@@ -124,6 +132,10 @@ def run_simulation(orders, couriers, simulation_end):
                 if c.current_route['route']['legs']:
                     last = c.current_route['route']['legs'][-1]['steps'][-1]['maneuver']['location']
                     c.location = (last[1], last[0])
+                # almacenar la ruta completada antes de limpiarla y guardar mapa
+                c.route_history.append(c.current_route)
+                filename = f"courier{c.id}_route{len(c.route_history)}.html"
+                save_route_map(c.current_route, filename)
                 c.current_route = None
 
         current_time += OPTIMIZATION_FREQUENCY
@@ -135,7 +147,6 @@ def run_simulation(orders, couriers, simulation_end):
     # imprimir métricas simples
     for c in couriers:
         print(f"Courier {c.id}: orders={c.orders_delivered}, earnings=${c.earnings:.2f}")
-
 
 # ======================
 # Visualización de la ruta
@@ -164,13 +175,36 @@ def visualize_route(courier_route):
     
     return m
 
+def save_route_map(courier_route, filename):
+    """Save a route visualization to the maps folder."""
+    m = visualize_route(courier_route)
+    os.makedirs("maps", exist_ok=True)
+    filepath = os.path.join("maps", filename)
+    m.save(filepath)
+    return filepath
+
 # ======================
 # Inicialización
 # ======================
 
 if __name__ == "__main__":
     restaurants = rts.restaurantList
+
+    couriers = [Courier(*c) for c in crs.courierList]
+    
+    test_orders = [
+        Order(1, restaurants[0], datetime(2025,1,1,8,5), datetime(2025,1,1,8,15), (19.4360,-99.1320)),
+        Order(2, restaurants[1], datetime(2025,1,1,8,10), datetime(2025,1,1,8,20), (19.4370,-99.1310)),
+        Order(3, restaurants[2], datetime(2025,1,1,8,15), datetime(2025,1,1,8,25), (19.4380,-99.1300)),
+    ] #necesitamos agregar instancias de prueba
+    
+    run_simulation(
+        orders=test_orders,
+        couriers=couriers,
+        simulation_end=datetime(2025, 1, 1, 12, 0)
+    )
     # Visualizar la ultima ruta ejecutada
+    active_courier = next((c for c in couriers if c.current_route), None)
     route_to_show = None
     if active_courier and active_courier.current_route:
         route_to_show = active_courier.current_route
@@ -185,17 +219,3 @@ if __name__ == "__main__":
         map_.save("mdrp_simulation.html")
     else:
         print("No courier route found to visualize.")
-    ] #necesitamos agregar instancias de prueba
-    
-    run_simulation(
-        orders=test_orders,
-        couriers=couriers,
-        simulation_end=datetime(2025, 1, 1, 12, 0)
-    )
-    #cisualizador de rutas de repartidor
-    active_courier = next((c for c in couriers if c.current_route), None)
-    if active_courier and active_courier.current_route:
-        map_ = visualize_route(active_courier.current_route)
-        map_.save("mdrp_simulation.html")
-    else:
-        print("No active courier route found.")
