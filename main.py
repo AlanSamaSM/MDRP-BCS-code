@@ -41,10 +41,12 @@ class Order:
 class Courier:
     def __init__(self, courier_id, on_time, off_time, location):
         self.id = courier_id
-        self.on_time = on_time 
+        self.on_time = on_time
         self.off_time = off_time
         self.location = location
         self.current_route = None
+        # historial de rutas completadas para visualizar despues
+        self.route_history = []
         self.earnings = 0.0
         self.orders_delivered = 0
         self.shift_started = False  # Para controlar el cálculo del tiempo de turno
@@ -105,6 +107,8 @@ def run_simulation(orders, couriers, simulation_end):
                     all_bundles.extend(rst_bundles)
 
             #se asignan los bundles a los repartidores disponibles
+                # almacenar la ruta completada antes de limpiarla
+                c.route_history.append(c.current_route)
             assign_bundles_to_couriers(available_couriers, all_bundles, current_time)
 
         # actualizar progreso de rutas
@@ -166,12 +170,21 @@ def visualize_route(courier_route):
 
 if __name__ == "__main__":
     restaurants = rts.restaurantList
-    couriers = [Courier(*c) for c in crs.courierList]
-    
-    test_orders = [
-        Order(1, restaurants[0], datetime(2025,1,1,8,5), datetime(2025,1,1,8,15), (19.4360,-99.1320)),
-        Order(2, restaurants[1], datetime(2025,1,1,8,10), datetime(2025,1,1,8,20), (19.4370,-99.1310)),
-        Order(3, restaurants[2], datetime(2025,1,1,8,15), datetime(2025,1,1,8,25), (19.4380,-99.1300)),
+    # Visualizar la ultima ruta ejecutada
+    route_to_show = None
+    if active_courier and active_courier.current_route:
+        route_to_show = active_courier.current_route
+    else:
+        # si no hay ruta activa, tomar la ultima completada de cualquier courier
+        for c in couriers:
+            if c.route_history:
+                route_to_show = c.route_history[-1]
+                break
+    if route_to_show:
+        map_ = visualize_route(route_to_show)
+        map_.save("mdrp_simulation.html")
+    else:
+        print("No courier route found to visualize.")
     ] #necesitamos agregar instancias de prueba
     
     run_simulation(
