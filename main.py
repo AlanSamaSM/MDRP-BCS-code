@@ -3,11 +3,13 @@
 # - requests para hacer solicitudes HTTP (OSRM).
 # - folium y polyline para la generación de mapas y decodificación de rutas.
 # - restaurants y couriers para manejar listas de restaurantes y repartidores.
+
 import folium
 import polyline
 import os
 import restaurantsList as rts
 import couriersList as crs
+
 from datetime import datetime, timedelta
 from bundling import compute_target_bundle_size, generate_bundles_for_restaurant
 from asignaciontentativa import assign_bundles_to_couriers
@@ -59,12 +61,14 @@ class Courier:
 
     def final_compensation(self):
         #para decidor si se paga por hora o por ordenes
+
         pay_by_orders = self.orders_delivered * PAY_PER_ORDER
         pay_by_minimum = self.shift_duration_hours() * MIN_PAY_PER_HOUR
         if pay_by_orders < pay_by_minimum:
             self.earnings = pay_by_minimum
         else:
             self.earnings = pay_by_orders
+
 
 
 # ======================
@@ -95,11 +99,13 @@ def run_simulation(orders, couriers, simulation_end):
             couriers_available_hor = [c for c in available_couriers if c.off_time >= current_time + ASSIGNMENT_HORIZON] #se filtran los repartidores disponibles segun el horizonte de asignación
             
             #se calcula el valor objetivo de Zt, tamaño de los bundles
+
             target_bundle_size = compute_target_bundle_size(
                 current_time,
                 orders_ready,
                 couriers_available_hor,
             )
+
             
             all_bundles = []
 
@@ -110,6 +116,7 @@ def run_simulation(orders, couriers, simulation_end):
                     all_bundles.extend(rst_bundles)
 
             #se asignan los bundles a los repartidores disponibles
+
             assign_bundles_to_couriers(available_couriers, all_bundles, current_time)
 
         # actualizar progreso de rutas
@@ -182,6 +189,7 @@ def save_route_map(courier_route, filename):
 
 if __name__ == "__main__":
     restaurants = rts.restaurantList
+
     couriers = [Courier(*c) for c in crs.courierList]
     
     test_orders = [

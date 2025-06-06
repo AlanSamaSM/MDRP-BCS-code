@@ -12,7 +12,7 @@ def get_route_details(start_coords, waypoints):
     coordinates = ";".join([f"{lon},{lat}" for lat, lon in [start_coords] + waypoints])
     url = f"http://router.project-osrm.org/route/v1/driving/{coordinates}"
     params = {"overview": "full", "steps": "true", "annotations": "true"}
-    
+
     try:
         response = requests.get(url, params=params, timeout=5)
         data = response.json()
@@ -21,4 +21,5 @@ def get_route_details(start_coords, waypoints):
     except Exception as e:
         print(f"Routing error: {e}")
     return None
+
 
