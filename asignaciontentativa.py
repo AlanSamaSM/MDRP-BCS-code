@@ -1,5 +1,5 @@
 from datetime import timedelta
-from config import OPTIMIZATION_FREQUENCY, GROUP_I_PENALTY, GROUP_II_PENALTY, TARGET_CLIC_TO_DOOR
+from config import OPTIMIZATION_FREQUENCY, GROUP_I_PENALTY, GROUP_II_PENALTY, TARGET_CLICK_TO_DOOR
 from getrouteOSMR import get_route_details
 from bundling import calculate_bundle_score
 
