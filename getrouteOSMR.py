@@ -3,6 +3,16 @@ import os
 import math
 import polyline
 
+def as_lonlat(pt):
+    """Convert (lat, lon) -> (lon, lat)"""
+    lat, lon = pt
+    return lon, lat
+
+def as_latlon(pt):
+    """Convert (lon, lat) -> (lat, lon)"""
+    lon, lat = pt
+    return lat, lon
+
 # ======================
 # Funcion de ruteo OSRM
 # ======================
@@ -31,7 +41,10 @@ def get_route_details(start_coords, waypoints):
         geometry = polyline.encode(coords)
         return {"distance": distance, "duration": duration_sec, "geometry": geometry, "legs": legs}
 
-    coordinates = ";".join([f"{lon},{lat}" for lat, lon in [start_coords] + waypoints])
+    points = [start_coords] + waypoints
+    coordinates = ";".join(
+        f"{lon},{lat}" for lon, lat in map(as_lonlat, points)
+    )
     url = f"http://router.project-osrm.org/route/v1/driving/{coordinates}"
     params = {"overview": "full", "steps": "true", "annotations": "true"}
 
