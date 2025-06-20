@@ -3,7 +3,7 @@ import config
 import restaurantsList as rts
 from main import run_simulation
 from grubhub_loader import load_instance
-
+import os
 
 def run_instance(instance_path):
     orders, couriers, restaurants, params = load_instance(instance_path)
