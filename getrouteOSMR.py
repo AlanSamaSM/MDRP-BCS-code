@@ -1,6 +1,7 @@
 import requests
 import os
 import math
+import polyline
 
 # ======================
 # Funcion de ruteo OSRM
@@ -27,7 +28,8 @@ def get_route_details(start_coords, waypoints):
             distance += seg
             legs.append({"steps": [{"maneuver": {"location": (b[1], b[0])}}]})
         duration_sec = (distance / speed) * 60.0
-        return {"distance": distance, "duration": duration_sec, "geometry": "", "legs": legs}
+        geometry = polyline.encode(coords)
+        return {"distance": distance, "duration": duration_sec, "geometry": geometry, "legs": legs}
 
     coordinates = ";".join([f"{lon},{lat}" for lat, lon in [start_coords] + waypoints])
     url = f"http://router.project-osrm.org/route/v1/driving/{coordinates}"
