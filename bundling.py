@@ -115,7 +115,7 @@ def generate_bundles_for_restaurant(restaurant, current_time, target_bundle_size
     # 1. Filtrar órdenes pendientes que estén listas dentro del horizonte de asignación (por ejemplo, ASSIGNMENT_HORIZON)
     restaurant_orders = [
         order for order in restaurant.orders
-        if order.status == 'pending' and order.ready_time <= current_time + ASSIGNMENT_HORIZON
+        if order.status == 'ready' and order.ready_time <= current_time + ASSIGNMENT_HORIZON
     ]
     
     # Si no hay órdenes, retorna una lista vacía
