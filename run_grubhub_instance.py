@@ -1,12 +1,16 @@
 import os
 from datetime import timedelta
 import config
+import restaurantsList as rts
 from main import run_simulation
 from grubhub_loader import load_instance
 
 
 def run_instance(instance_path):
     orders, couriers, restaurants, params = load_instance(instance_path)
+
+    # Replace global restaurant list with loaded instance restaurants
+    rts.restaurantList = restaurants
 
     # Override configuration parameters with instance values
     config.PAY_PER_ORDER = params.get('pay per order', config.PAY_PER_ORDER)
