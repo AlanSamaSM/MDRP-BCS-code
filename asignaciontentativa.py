@@ -176,9 +176,10 @@ def earliest_possible_dropoff(bundle, courier, current_time):
 
     # Step 2: earliest pickup
     bundle_ready_time = max(o.ready_time for o in bundle)
+    service_min = SERVICE_TIME.total_seconds() / 60.0
     earliest_pickup = max(
         bundle_ready_time,
-        current_time + timedelta(minutes=time_inbound_min + SERVICE_TIME)
+        current_time + timedelta(minutes=time_inbound_min + service_min)
     )
 
     # Step 3: route from restaurant to each drop-off (in the order they appear).
@@ -191,8 +192,7 @@ def earliest_possible_dropoff(bundle, courier, current_time):
 
     # Step 4: final drop-off time
     #   After picking up, we add time_outbound_min + half-service per order
-    total_drop_service_min = SERVICE_TIME * len(bundle)
-
+    total_drop_service_min = service_min * len(bundle)
     final_dropoff = earliest_pickup + timedelta(minutes=time_outbound_min + total_drop_service_min)
     return final_dropoff
 

@@ -52,16 +52,21 @@ def calculate_bundle_score(bundle, courier, current_time):
 
     # Según Reyes (2018), la hora exacta del pickup es:
     # max(e_o, llegada_repartidor + s_r/2)
-    restaurant_service_time_half = SERVICE_TIME / 2
+    service_half_min = SERVICE_TIME.total_seconds() / 60.0 / 2
     bundle_ready_time = max(o.ready_time for o in bundle)
-    pickup_time = max(bundle_ready_time, courier_arrival_at_restaurant+ timedelta(minutes=restaurant_service_time_half))
-    departure_from_restaurant_time = pickup_time + timedelta(minutes=restaurant_service_time_half)
-
+    pickup_time = max(
+        bundle_ready_time,
+        courier_arrival_at_restaurant + timedelta(minutes=service_half_min)
+    )
+    departure_from_restaurant_time = pickup_time + timedelta(minutes=service_half_min)
+    
     # Tiempo de entrega (drop-off)
     # Tiempo al cliente + s_o/2 por orden entregada
-    customer_service_time_half = SERVICE_TIME / 2
-    delivery_start_time = departure_from_restaurant_time = pickup_time +timedelta(minutes=restaurant_service_time_half)
-    delivery_finish_time = departure_from_restaurant_time + timedelta(minutes=total_travel_time_min + customer_service_time_half * len(bundle))
+    customer_half_min = SERVICE_TIME.total_seconds() / 60.0 / 2
+    delivery_start_time = departure_from_restaurant_time
+    delivery_finish_time = departure_from_restaurant_time + timedelta(
+        minutes=total_travel_time_min + customer_half_min * len(bundle)
+    )
 
     # 2) Calcular pérdidas de frescura
     # Frescura se penaliza sólo si pickup_time > ready_time
@@ -77,10 +82,10 @@ def calculate_bundle_score(bundle, courier, current_time):
         priority_penalty = 0  # Grupo III
 
     # 3) Throughput: Número de órdenes dividido entre tiempo total
-    total_service_time_min = SERVICE_TIME  # Pickup total (único para el restaurante) + SERVICE_TIME * #órdenes entregadas
+    total_service_time_min = SERVICE_TIME.total_seconds() / 60.0
     total_time = total_travel_time_min + total_service_time_min
     throughput = len(bundle) / total_time if total_time > 0 else len(bundle)
-
+    
     # 4) Frescura (considerando la orden con mayor espera)
     freshness_penalty = FRESHNESS_PENALTY_THETA * max(
         max((pickup_time - o.ready_time).total_seconds() / 60.0, 0.0) for o in bundle
@@ -92,12 +97,20 @@ def calculate_bundle_score(bundle, courier, current_time):
     return score
 
 def calculate_cost(route_details, service_delay):
+    """Calculate the cost of a candidate route.
+
+    ``service_delay`` may be provided as a ``timedelta``.  Convert it to minutes
+    before applying the freshness penalty so arithmetic with the travel time
+    (float) works correctly.
     """
-    Calculates the cost of a route, combining travel time and service delay.
-    """
-    travel_time = route_details['duration']/60.0  # Convert to minutes
-    cost = travel_time + FRESHNESS_PENALTY_THETA * service_delay
-    return cost
+    travel_time = route_details['duration'] / 60.0  # seconds -> minutes
+
+    if isinstance(service_delay, timedelta):
+        delay_minutes = service_delay.total_seconds() / 60.0
+    else:
+        delay_minutes = float(service_delay)
+
+    return travel_time + FRESHNESS_PENALTY_THETA * delay_minutes
 
 def generate_bundles_for_restaurant(restaurant, current_time, target_bundle_size, couriers_available):
     """
@@ -172,5 +185,6 @@ def generate_bundles_for_restaurant(restaurant, current_time, target_bundle_size
             # Si no se encontró un bundle (caso raro), se podría crear un nuevo bundle.
             bundles.append([order])
 
-    return bundles
+    # Remove any empty bundles that may have been preallocated but not filled
+    return [b for b in bundles if b]
 
