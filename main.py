@@ -75,8 +75,10 @@ class Courier:
 # simulación
 # ======================
 
-def run_simulation(orders, couriers, simulation_end):
-    current_time = datetime(2025,1,1,8,0) #equivalente a 00:00:00
+def run_simulation(orders, couriers, simulation_end, start_time=None):
+    if start_time is None:
+        start_time = datetime(2025, 1, 1, 8, 0)
+    current_time = start_time  # punto de inicio de la simulación
     order_queue = deque(sorted(orders, key=lambda o: o.placement_time)) #se ordenan las ordenes por tiempo de colocación
     active_couriers = [] #se inicializa una lista que contendrá los repartidores activos
     
@@ -111,7 +113,12 @@ def run_simulation(orders, couriers, simulation_end):
 
             #se busca en los restaurantes y se generan los bundles, se agregan a la lista de bundles all_bundles
             for rest in rts.restaurantList:
-                rst_bundles = generate_bundles_for_restaurant(rest, current_time, target_bundle_size, couriers_available_hor)
+                rst_bundles = generate_bundles_for_restaurant(
+                    rest,
+                    current_time,
+                    target_bundle_size,
+                    len(couriers_available_hor),
+                )
                 if rst_bundles:
                     all_bundles.extend(rst_bundles)
 

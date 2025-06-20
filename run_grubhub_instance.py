@@ -1,12 +1,15 @@
-import os
 from datetime import timedelta
 import config
+import restaurantsList as rts
 from main import run_simulation
 from grubhub_loader import load_instance
 
 
 def run_instance(instance_path):
     orders, couriers, restaurants, params = load_instance(instance_path)
+
+    # Replace global restaurant list with loaded instance restaurants
+    rts.restaurantList = restaurants
 
     # Override configuration parameters with instance values
     config.PAY_PER_ORDER = params.get('pay per order', config.PAY_PER_ORDER)
@@ -19,8 +22,12 @@ def run_instance(instance_path):
     os.environ['USE_EUCLIDEAN'] = '1'
     os.environ['METERS_PER_MINUTE'] = str(params.get('meters_per_minute', 320))
 
+    simulation_start = min(
+        min(c.on_time for c in couriers),
+        min(o.placement_time for o in orders),
+    )
     simulation_end = max(c.off_time for c in couriers) + timedelta(hours=1)
-    run_simulation(orders, couriers, simulation_end)
+    run_simulation(orders, couriers, simulation_end, start_time=simulation_start)
 
 
 if __name__ == "__main__":
