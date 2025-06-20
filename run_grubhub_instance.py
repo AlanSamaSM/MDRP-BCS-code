@@ -1,4 +1,3 @@
-import os
 from datetime import timedelta
 import config
 import restaurantsList as rts
