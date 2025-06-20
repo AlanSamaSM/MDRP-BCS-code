@@ -18,9 +18,8 @@ def run_instance(instance_path):
     config.TARGET_CLICK_TO_DOOR = timedelta(minutes=params.get('target click-to-door', 40))
     config.MAX_CLICK_TO_DOOR = timedelta(minutes=params.get('maximum click-to-door', 90))
 
-    # Use the Euclidean router with the given speed
-    os.environ['USE_EUCLIDEAN'] = '1'
-    os.environ['METERS_PER_MINUTE'] = str(params.get('meters_per_minute', 320))
+    # Enable OSRM routing by default
+    os.environ['USE_EUCLIDEAN'] = '0'
 
     simulation_start = min(
         min(c.on_time for c in couriers),

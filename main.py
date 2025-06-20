@@ -138,7 +138,8 @@ def run_simulation(orders, couriers, simulation_end, start_time=None):
                 # actualizar ubicación al último punto de la ruta
                 if c.current_route['route']['legs']:
                     last = c.current_route['route']['legs'][-1]['steps'][-1]['maneuver']['location']
-                    c.location = (last[1], last[0])
+                    from getrouteOSMR import as_latlon
+                    c.location = as_latlon(last)
                 # almacenar la ruta completada antes de limpiarla y guardar mapa
                 c.route_history.append(c.current_route)
                 filename = f"courier{c.id}_route{len(c.route_history)}.html"
@@ -166,16 +167,16 @@ def visualize_route(courier_route):
     
     m = folium.Map(location=coords[0], zoom_start=13)
     folium.PolyLine(coords, color='blue', weight=2.5, opacity=1).add_to(m)
-    
+
     for order in courier_route['orders']:
         folium.Marker(
-            location=order.restaurant.location[::-1],
+            location=order.restaurant.location,
             popup="Restaurant",
             icon=folium.Icon(color='red')
         ).add_to(m)
-        
+
         folium.Marker(
-            location=order.dropoff_loc[::-1],
+            location=order.dropoff_loc,
             popup=f"Customer: {order.placement_time.strftime('%H:%M')}",
             icon=folium.Icon(color='green')
         ).add_to(m)
