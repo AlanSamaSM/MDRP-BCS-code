@@ -3,6 +3,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 from restaurantsList import Restaurant
 from main import Order, Courier
+from coord_transform import xy_to_latlon
 
 START_TIME = datetime(2025, 1, 1)
 
@@ -19,7 +20,7 @@ def load_instance(path):
     restaurants = []
     rest_map = {}
     for _, row in rest_df.iterrows():
-        r = Restaurant(row['restaurant'], (row['x'], row['y']))
+        r = Restaurant(row['restaurant'], xy_to_latlon(row['x'], row['y']))
         restaurants.append(r)
         rest_map[row['restaurant']] = r
 
@@ -31,7 +32,7 @@ def load_instance(path):
                 rest_map[row['restaurant']],
                 START_TIME + timedelta(minutes=int(row['placement_time'])),
                 START_TIME + timedelta(minutes=int(row['ready_time'])),
-                (row['x'], row['y'])
+                xy_to_latlon(row['x'], row['y'])
             )
         )
 
@@ -42,7 +43,7 @@ def load_instance(path):
                 row['courier'],
                 START_TIME + timedelta(minutes=int(row['on_time'])),
                 START_TIME + timedelta(minutes=int(row['off_time'])),
-                (row['x'], row['y'])
+                xy_to_latlon(row['x'], row['y'])
             )
         )
 
