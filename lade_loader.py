@@ -1,11 +1,7 @@
 import pandas as pd
-from datetime import datetime
 
 from restaurantsList import Restaurant
 from main import Order, Courier
-
-START_TIME = datetime(2025, 1, 1)
-
 
 def load_lade_instance(parquet_path):
     """Load a LaDe delivery parquet file.
@@ -17,9 +13,17 @@ def load_lade_instance(parquet_path):
     """
     df = pd.read_parquet(parquet_path)
 
-    # parse timestamps
-    df['accept_time'] = pd.to_datetime(df['accept_time'])
-    df['delivery_time'] = pd.to_datetime(df['delivery_time'])
+    # parse timestamps using ds (month/day) combined with time fields
+    ds_str = df['ds'].astype(int).astype(str).str.zfill(4)
+    accept_time_str = df['accept_time'].astype(str).str.extract(r'(\d{2}:\d{2}:\d{2})')[0]
+    delivery_time_str = df['delivery_time'].astype(str).str.extract(r'(\d{2}:\d{2}:\d{2})')[0]
+
+    df['accept_time'] = pd.to_datetime(
+        ds_str + ' ' + accept_time_str, format='%m%d %H:%M:%S'
+    ).apply(lambda d: d.replace(year=2025))
+    df['delivery_time'] = pd.to_datetime(
+        ds_str + ' ' + delivery_time_str, format='%m%d %H:%M:%S'
+    ).apply(lambda d: d.replace(year=2025))
 
     restaurants = []
     rest_map = {}

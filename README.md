@@ -22,7 +22,9 @@ python run_lade_instance.py delivery_jl.parquet
 
 The loader approximates each depot using the courier GPS when the order
 was accepted.  Acceptance time is treated as both placement and ready
-time.
+time.  The ``ds`` column stores the month and day for each order, which
+the loader merges with the ``accept_time`` and ``delivery_time`` strings
+to build full datetimes.
 
 ## Metrics for Route Prediction
 
