@@ -1,5 +1,12 @@
 from datetime import timedelta
-from config import OPTIMIZATION_FREQUENCY, GROUP_I_PENALTY, GROUP_II_PENALTY, TARGET_CLICK_TO_DOOR
+import numpy as np
+from scipy.optimize import linear_sum_assignment
+
+from config import (
+    OPTIMIZATION_FREQUENCY,
+    TARGET_CLICK_TO_DOOR,
+    SERVICE_TIME,
+)
 from getrouteOSMR import get_route_details
 from bundling import calculate_bundle_score
 
@@ -140,14 +147,6 @@ def two_stage_commitment(courier, bundle, current_time, X_COMMITMENT=15):
     return False
 
 #def assign_bundles_to_couriers(couriers, bundles, current_time):
-    
-import numpy as np
-from scipy.optimize import linear_sum_assignment
-from datetime import timedelta
-
-from config import MAX_CLICK_TO_DOOR, OPTIMIZATION_FREQUENCY, SERVICE_TIME
-from bundling import calculate_bundle_score
-from asignaciontentativa import two_stage_commitment
 
 ###############################################################################
 # HELPER: earliest_possible_dropoff(bundle, courier, current_time)
@@ -236,7 +235,6 @@ def do_linear_assignment(couriers, candidate_bundles, current_time):
     num_couriers = len(free_couriers)
     num_bundles = len(candidate_bundles)
 
-    import math
     cost_matrix = np.zeros((num_couriers, num_bundles), dtype=float)
 
     for i, courier in enumerate(free_couriers):
