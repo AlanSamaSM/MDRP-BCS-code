@@ -1,5 +1,3 @@
-from datetime import datetime
-
 class Restaurant:
     def __init__(self, rest_id, location):
         self.id = rest_id
