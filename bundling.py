@@ -30,7 +30,6 @@ def calculate_bundle_score(bundle, courier, current_time):
     Calcula el score para asignar un bundle a un courier específico.
     Considera ventanas exactas para pickup y drop-off según Reyes (2018).
     """
-    total_orders = len(bundle)
 
     # 1. Obtener la ruta completa (inbound a restaurante + entregas)
     full_route = get_route_details(
@@ -63,14 +62,12 @@ def calculate_bundle_score(bundle, courier, current_time):
     # Tiempo de entrega (drop-off)
     # Tiempo al cliente + s_o/2 por orden entregada
     customer_half_min = SERVICE_TIME.total_seconds() / 60.0 / 2
-    delivery_start_time = departure_from_restaurant_time
     delivery_finish_time = departure_from_restaurant_time + timedelta(
         minutes=total_travel_time_min + customer_half_min * len(bundle)
     )
 
     # 2) Calcular pérdidas de frescura
     # Frescura se penaliza sólo si pickup_time > ready_time
-    freshness_loss = max((pickup_time - max(o.ready_time for o in bundle)).total_seconds() / 60.0, 0.0)
 
     # 2) Penalizaciones de Prioridad (grupos I, II, III)
     earliest_placement = min(o.placement_time for o in bundle)

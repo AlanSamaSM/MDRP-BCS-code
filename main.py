@@ -10,7 +10,7 @@ import os
 import restaurantsList as rts
 import couriersList as crs
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from bundling import compute_target_bundle_size, generate_bundles_for_restaurant
 from asignaciontentativa import assign_bundles_to_couriers
 from config import PAY_PER_ORDER, MIN_PAY_PER_HOUR, ASSIGNMENT_HORIZON, OPTIMIZATION_FREQUENCY
