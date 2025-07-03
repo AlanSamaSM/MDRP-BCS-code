@@ -30,7 +30,7 @@ df = pd.DataFrame({
     "restaurant_id": rest_idx,
     "created_at":    ts,
     "ready_at":      [t + timedelta(minutes=int(p)) for t, p in zip(ts, prep)],
-    "rest_lat":      gdf_rest.geometry.y.values[rest_idx        º],
+    "rest_lat":      gdf_rest.geometry.y.values[rest_idx],
     "rest_lon":      gdf_rest.geometry.x.values[rest_idx],
     "dest_lat":      [p.y for p in dest_pts],
     "dest_lon":      [p.x for p in dest_pts],
