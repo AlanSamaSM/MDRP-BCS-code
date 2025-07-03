@@ -10,7 +10,10 @@ def run_instance(csv_path):
 
     rts.restaurantList = restaurants
 
-    os.environ.setdefault('USE_EUCLIDEAN', '0')
+    # Use the simple Euclidean routing model by default so that the
+    # simulation does not require network access to OSRM.  Set the
+    # environment variable ``USE_EUCLIDEAN=0`` to enable OSRM routing.
+    os.environ.setdefault('USE_EUCLIDEAN', '1')
 
     simulation_start = min(
         min(c.on_time for c in couriers),

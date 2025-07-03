@@ -38,6 +38,10 @@ to build full datetimes.
 python run_synth_instance.py synthetic_lapaz_orders.csv
 ```
 
+By default the script uses a simple Euclidean routing approximation
+(``USE_EUCLIDEAN=1``).  Set ``USE_EUCLIDEAN=0`` in the environment if you
+want to use the OSRM routing service instead.
+
 ## Metrics for Route Prediction
 
 `lade_metrics.py` implements the performance metrics described in the
