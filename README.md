@@ -1,10 +1,11 @@
 # MDRP-BCS Code
 
 This repository contains a basic simulator and heuristics for courier
-assignment.  Two loaders are provided:
+assignment.  Three loaders are provided:
 
 - **Grubhub benchmark** via `grubhub_loader.py`
 - **LaDe (Jilin subset)** via `lade_loader.py`
+- **Synthetic La Paz** via `synth_loader.py`
 
 ## Running with LaDe
 
@@ -25,6 +26,17 @@ was accepted.  Acceptance time is treated as both placement and ready
 time.  The ``ds`` column stores the month and day for each order, which
 the loader merges with the ``accept_time`` and ``delivery_time`` strings
 to build full datetimes.
+
+## Running the Synthetic Example
+
+1. Generate or obtain ``synthetic_lapaz_orders.csv`` using
+   ``make_synth_orders.py``.
+
+2. Execute the simulation:
+
+```bash
+python run_synth_instance.py synthetic_lapaz_orders.csv
+```
 
 ## Metrics for Route Prediction
 
