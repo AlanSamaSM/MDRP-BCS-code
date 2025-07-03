@@ -1,3 +1,13 @@
-__pycache__/
+# -------------------------------------------------
+# Python artefacts
+# -------------------------------------------------
+# every __pycache__ directory anywhere in the tree
+**/__pycache__/
+# single files that sometimes sneak in
+*.py[cod]
+
+# -------------------------------------------------
+# Your project build artefacts
+# -------------------------------------------------
+# generated maps
 maps/
-/__pycache__

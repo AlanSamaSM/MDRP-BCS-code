@@ -1,0 +1,32 @@
+{
+"type": "FeatureCollection",
+"name": "la_paz_restaurants",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "name": null }, "geometry": { "type": "Point", "coordinates": [ -110.3120003, 24.1539284 ] } },
+{ "type": "Feature", "properties": { "name": "Los Percherones" }, "geometry": { "type": "Point", "coordinates": [ -110.3118747, 24.1508362 ] } },
+{ "type": "Feature", "properties": { "name": "Telcel" }, "geometry": { "type": "Point", "coordinates": [ -110.3084719, 24.1515198 ] } },
+{ "type": "Feature", "properties": { "name": "Baja Ferries" }, "geometry": { "type": "Point", "coordinates": [ -110.3102532, 24.14967 ] } },
+{ "type": "Feature", "properties": { "name": "baja ferries" }, "geometry": { "type": "Point", "coordinates": [ -110.3076485, 24.1530762 ] } },
+{ "type": "Feature", "properties": { "name": "Bambinos" }, "geometry": { "type": "Point", "coordinates": [ -110.3134902, 24.1522007 ] } },
+{ "type": "Feature", "properties": { "name": "La Tropicana" }, "geometry": { "type": "Point", "coordinates": [ -110.3112286, 24.1492468 ] } },
+{ "type": "Feature", "properties": { "name": "Oxxo" }, "geometry": { "type": "Point", "coordinates": [ -110.3124632, 24.1555054 ] } },
+{ "type": "Feature", "properties": { "name": "Eventos Bambinos" }, "geometry": { "type": "Point", "coordinates": [ -110.3130352, 24.155844 ] } },
+{ "type": "Feature", "properties": { "name": "Chedraui" }, "geometry": { "type": "Point", "coordinates": [ -110.3073499, 24.1496899 ] } },
+{ "type": "Feature", "properties": { "name": "Bismark Restaurante" }, "geometry": { "type": "Point", "coordinates": [ -110.3118243, 24.1568093 ] } },
+{ "type": "Feature", "properties": { "name": "Microsistemas Californianos" }, "geometry": { "type": "Point", "coordinates": [ -110.3066404, 24.1502349 ] } },
+{ "type": "Feature", "properties": { "name": "Oxxo" }, "geometry": { "type": "Point", "coordinates": [ -110.3081045, 24.1485734 ] } },
+{ "type": "Feature", "properties": { "name": "Farmacorama" }, "geometry": { "type": "Point", "coordinates": [ -110.3108027, 24.1572701 ] } },
+{ "type": "Feature", "properties": { "name": "Aramburo" }, "geometry": { "type": "Point", "coordinates": [ -110.3110924, 24.1574561 ] } },
+{ "type": "Feature", "properties": { "name": "Oxxo" }, "geometry": { "type": "Point", "coordinates": [ -110.308811, 24.147748 ] } },
+{ "type": "Feature", "properties": { "name": null }, "geometry": { "type": "Point", "coordinates": [ -110.312245, 24.1574957 ] } },
+{ "type": "Feature", "properties": { "name": null }, "geometry": { "type": "Point", "coordinates": [ -110.3103754, 24.1579105 ] } },
+{ "type": "Feature", "properties": { "name": null }, "geometry": { "type": "Point", "coordinates": [ -110.305661, 24.149921 ] } },
+{ "type": "Feature", "properties": { "name": "HSBC" }, "geometry": { "type": "Point", "coordinates": [ -110.308691, 24.1472935 ] } },
+{ "type": "Feature", "properties": { "name": null }, "geometry": { "type": "Point", "coordinates": [ -110.3155258, 24.1501434 ] } },
+{ "type": "Feature", "properties": { "name": null }, "geometry": { "type": "Point", "coordinates": [ -110.3149483, 24.1490742 ] } },
+{ "type": "Feature", "properties": { "name": "Tacos de Pescado Estadio" }, "geometry": { "type": "Point", "coordinates": [ -110.315147, 24.155817 ] } },
+{ "type": "Feature", "properties": { "name": "Taco Fish La Paz" }, "geometry": { "type": "Point", "coordinates": [ -110.3150857, 24.1490409 ] } },
+{ "type": "Feature", "properties": { "name": null }, "geometry": { "type": "Point", "coordinates": [ -110.3058004, 24.1491183 ] } }
+]
+}
