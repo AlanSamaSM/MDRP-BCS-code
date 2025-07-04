@@ -38,6 +38,13 @@ to build full datetimes.
 python run_synth_instance.py synthetic_lapaz_orders.csv
 ```
 
+If the online OSRM service is slow or unreachable, set `USE_EUCLIDEAN=1`
+to compute straight‑line distances instead of requesting routes:
+
+```bash
+USE_EUCLIDEAN=1 python run_synth_instance.py synthetic_lapaz_orders.csv
+```
+
 ## Metrics for Route Prediction
 
 `lade_metrics.py` implements the performance metrics described in the
