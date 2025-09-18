@@ -1,0 +1,990 @@
+The Meal Delivery Routing Problem
+Damian Reyes1
+, Alan Erera1
+, Martin Savelsbergh1
+,
+Sagar Sahasrabudhe2
+, and Ryan O’Neil2
+1H. Milton Stewart School of Industrial Engineering, Georgia Institute of Technology,
+Atlanta, GA 30332-0205
+2Decision Engineering Department, Grubhub, Chicago, IL 60602
+March 1, 2018
+Abstract
+We introduce the Meal Delivery Routing Problem (MDRP) to formalize and study an important
+emerging class of dynamic delivery operations. We develop optimization-based algorithms tailored
+to solve the courier assignment (dynamic vehicle routing) and capacity management (offline shift
+scheduling) problems encountered in meal delivery operations. Extensive computational experiments using instances with realistic size, geography, urgency and dynamism demonstrate that our
+algorithmic ideas provide solid foundations for real-world implementations.
+1 Introduction
+Online restaurant aggregators – on-demand meal-ordering platforms where diners order their favorite
+cravings from an array of restaurants – are growing at a fast pace [5], and with them, the volume of
+meal delivery operations is rising quickly worldwide [10], increasing the potential for new economies of
+scope, scale, and density. According to Morgan Stanley, “online food delivery could grow by 16% annual
+compound rate in [the] next 5 years”[17]. Aiming to capitalize on the market opportunity, emerging
+providers are investing heavily [8] in the deployment of meal delivery networks that promise restaurants
+and diners a reliable, fast and cost-effective delivery process.
+While in the short-term the transition from restaurant-owned delivery services (which for many
+restaurants means no deliveries at all) to integrated meal delivery networks can focus on reliability and
+speed, the long-term sustainability of these networks is contingent on turning the efficiency potential
+into actual profits. For this purpose, appropriate optimization technologies must be developed to solve
+increasingly large dynamic pickup and delivery problems in near-real time, and prescribe high-quality
+decisions able to control costs while satisfying very high service standards.
+The successful deployment and operation of meal delivery networks is difficult not only due to the
+scale of these systems, but also due to the dynamism and urgency of arriving orders [26]. Without
+exaggeration, meal delivery is the ultimate challenge in last mile logistics: a typical order is expected to
+be delivered within an hour (much less if possible), and within minutes of the food becoming ready, thus
+reducing consolidation opportunities and imposing the need for more vehicles operating simultaneously
+and executing shorter routes. Furthermore, meal delivery networks must be able to respond to wide,
+and often abrupt, swings in demand both in spatial and time dimensions.
+In an attempt to achieve the desired responsiveness without the costs linked to employing a sufficiently large permanent fleet of vehicles (and full-time drivers), meal delivery providers have adopted
+1
+“digital marketplace” business models – where the supply of couriers, i.e., independent contractors
+making deliveries [21], is managed indirectly through economic incentives. This strategy, first explored
+in the context of taxi and ride-hailing services, externalizes fixed costs (to couriers) and enhances the
+ability of the system to plan and control capacity levels over time and geography in sync with demand
+fluctuations.
+However, it is worth emphasizing how full reliance on independent-contractors establishes a fundamentally different operating environment than that of traditional vehicle routing applications. In
+exchange for internalizing some of the risks and costs associated with demand uncertainty, couriers
+are entitled to a significant degree of autonomy, thereby adding yet another layer of complexity in the
+design of appropriate optimization technology: company drivers will implement instructions from central planning, whereas independent contractors might do so, thus introducing uncertainty in scheduling
+(couriers have some freedom to choose the hours they work), dispatching (couriers can reject an offered
+assignment), and routing (couriers can disregard the suggested sequence of deliveries).
+In synthesis, meal delivery networks have ushered in dynamic pickup and delivery problems of unprecedented scale, and meal delivery providers are spearheading the adoption of flexible business models,
+like crowd-sourced delivery [23], in the last-mile goods-transportation sector. In this study, we are concerned with laying out solid foundations for the design of optimization technologies that can scale up to
+the challenge. We have adopted a dynamic deterministic framework, even if this means that novel and
+interesting questions (in particular, those related to courier autonomy) are not (yet) explored.
+The main contributions of this paper are: i) a definition of the Meal Delivery Routing Problem
+(MDRP) to model the essential structure of this emerging class of dynamic delivery systems; ii) a
+solution algorithm based on a rolling-horizon repeated matching approach, designed to solve large-scale
+instances of the MDRP; iii) an off-line decision support tool to determine a high-quality schedule of
+courier shifts (which has been used in the instance generation process) iv) the release to the public
+domain of a set of instances built from real-life historic data to facilitate benchmarking of alternative
+solution methodologies; v) an extensive computational study demonstrating, among others, that (a) our
+approach achieves high-quality solutions with respect to multiple service objectives, over a wide spectrum
+of instance characteristics, despite its simplicity and myopism; (b) capacity scheduling decisions have a
+critical impact on reliability and performance; (c) meal preparation time uncertainty has a minor impact
+on reliability and performance..
+We close this section with a brief survey of related literature, contextualizing some of the themes
+of later sections. In Section 2, we define the Meal Delivery Routing Problem, and then describe our
+solution algorithm (together with some possible variations) in Section 3. Next, in Section 4 we present
+and discuss the results of a computational study. Finally, in Section 5 we provide some concluding
+remarks.
+1.1 Related literature
+The MDRP belongs to the large family of dynamic vehicle routing problems (dVRP), more specifically,
+to the class of dynamic pickup and delivery problems (dPDP). A vast number of researchers have studied
+these problems from different angles for decades, and excellent surveys have been produced by Pillac
+et al. [18] and Psaraftis et al. [20], in the case of dVRP, and Berbeglia et al. [6], in the case of dPDP.
+In the next paragraphs we will limit ourselves to mention some recent studies that share some features
+with our work in terms of modeling or solution methodology.
+Recent research in dPDP has focused mainly on the movement of people, e.g., dial-a-ride and ridesharing applications [1, 9], yet, despite the contextual difference, these problems share some important
+similarities with the MDRP: the difficulties posed by the increasingly large size of fully-dynamic instances, and the high urgency and low flexibility of the tasks to be scheduled. A frequently proposed
+strategy to deal with this challenge is the use of a myopic rolling horizon repeated matching approach, a
+scalable framework that has been shown to produce high quality solutions (e.g., [24, 28]), making virtue
+2
+out of necessity thanks to the low visibility of future events and the tight time constraints present in
+taxi and ride-sharing environments.
+But perhaps the most natural label under which to catalogue the MDRP is that of dynamic delivery
+problems, a type of dPDP that has just recently begun to be studied on its own right, as same-day
+delivery services become more and more ubiquitous, in both simplified analytic systems (Archetti et al.
+[2], Klapp et al. [11], Reyes et al. [22]) and more realistic settings (Azi et al. [4], Voccia et al. [27], Klapp
+[12], Archetti et al. [3], Dayarian and Savelsbergh [7]). In dynamic delivery problems, vehicles make
+multiple trips during the operating period to deliver goods locally from a depot (or a small number
+of depots, i.e., restaurants, in the case of the MDRP) to customer locations. Due to the structure
+of the network (one or few depots), and also due to tight time constraints being modeled, dynamic
+delivery solutions have a special structure: once a vehicle is dispatched, modifying the route is highly
+undesirable or impractical. This structure is usually enforced directly in the model formulation, by
+requiring vehicles to be empty before starting additional pickup operations, which, while restrictive, is
+not at all unreasonable when dealing with deliveries of perishable goods, like meals. Ongoing assessments
+by Ulmer et al. [25] on the impact of relaxing this condition in the context of same day delivery suggest
+that allowing more flexible routes (preemptive returns in the single-depot case) may increase the number
+of customers served during the operating period, but the change on the average delivery times has not
+been thoroughly explored (and a trade-off, i.e., an increase in delivery times, is plausible). Our proposed
+MDRP model definition does not impose that restriction, as in a multi-depot problem it is conceivable
+that routes may benefit from a vehicle making pickups while still executing deliveries from a different
+depot. However, the solution algorithm presented in this paper always uses routes that finish all pending
+deliveries before a new pickup.
+Having contextualized the problem, let us introduce a few more works which have informed our
+methods. The use of assignment models in rolling horizon strategies has a long history in the realm of
+dynamic long-haul fleet management. Here we highlight the pivotal work by Yang et al. [29], where the
+authors introduce a dynamic model that captures the essential characteristic of a real-time full truckload dispatching system, and compare a series of rolling horizon policies to assign (and schedule) jobs
+to trucks, under different operating conditions. The value of advanced information is measured by comparing the performance of myopic assignment policies and a policy that uses some stochastic knowledge
+about the expected location of future pickup and delivery points, and uses these expectations to account
+for the cost of moving trucks to serve future uncertain requests in an otherwise myopic algorithm. Beyond the obvious difference in time scales, the full truckload assumption is a significant departure from
+the meal delivery operating environment. However, we opt for defining route delivery segments (i.e.,
+consolidation decisions) before solving the assignment problem, which effectively reinstates a similar
+structure. While we do not use stochastic methods, we do explore the use of uncertain information
+about the future through the assignment of “follow-on” pick-up and delivery chains, where the later
+route segment will likely still change as more orders arrive, but already contains enough information to
+anticipate needed vehicle movements.
+An issue of central importance in the design of dynamic algorithms is how to most effectively balance between the fulfillment of current tasks and the preservation of flexibility to complete future and
+unknown tasks. On this question, we highlight the work of Mitrovic-Minic et al. [16], who propose a
+“double horizon” algorithm that evaluates the cost of actions (pickup or drop-off insertions, in this case)
+using different cost functions if the actions occur in the short-term (within a given horizon) or in the
+long-term (anything beyond the horizon), an approach motivated by applications where time windows
+are wide and deliveries may occur much later than their corresponding pick-up operation (which is not
+the case for on-demand meal delivery). The double horizon heuristic is shown to outperform traditional
+(single) rolling-horizon algorithms, on instances with time windows ranging between 1 hour and 8 hours
+from the release time, but with diminishing returns as the size of instances grows. Our solution algorithm incorporates a bi-objective mechanism with the same spirit, but operating in a different way (after
+3
+all, the time constraints in meal delivery are very tight,e.g., 40 minute target since announcement until
+drop-off, unlike the problems for which “double-horizon” was conceived): we use information from an
+interval possibly different to the “assignment horizon” (i.e., the window of orders to include in routes)
+to determine how intensely should consolidation opportunities be prioritized. At or before busy periods,
+like lunch and dinner time, when many orders arrive in a short time-span, the algorithm attempts to
+create more efficient routes, even at the expense of individual order service quality, while in relatively
+calm periods, the emphasis switches to delivering orders fast.
+Another important question in dynamic routing is when to postpone and went to commit to the
+execution of decisions in order to mitigate uncertainty. On this topic, the work by Mitrovic-Minic and
+Laporte [15] comes to the fore. In [15], the distribution of waiting time for any given route is determined
+through one of 4 “waiting strategies”: Drive First (DF: depart as early as possible), Wait First (WF:
+depart as late as possible), Dynamic Wait (DF within service zones, WF between service zones), and
+Advanced Dynamic Wait (DF within service zones, and slightly less “lazy” than WF between zones),
+where “service zones” are essentially clusters of consecutive stops in a route determined dynamically. In
+opposition to DF, WF tends to lead to more efficient routes, but at the risk of running out of vehicles to
+complete all deliveries by their deadline; as expected, the more complex strategy dominates the rest. In
+the context of meal delivery, service constraints are so restrictive that complex waiting strategies may
+not have a critical impact: it makes little sense for a vehicle to wait idle after delivering an order if there
+is more work to do, so the main question becomes how much to postpone departures from a restaurant.
+Our strategy in this regard is described in detail in Section 3.3, and it can be interpreted as a restricted
+form of WF at restaurants.
+Finally, the concepts of dynamism and urgency are fundamental for the study of dynamic delivery
+systems, where a large majority, if not the totality, of requests are revealed during the operating period
+(dynamic requests), and must be completed within a short time window (urgent requests). Naturally, the
+precise definition of these concepts has evolved throughout the years. Two decades ago, Lund et al. [14],
+proposed to measure the degree of dynamism as the proportion of dynamic requests, a rough measure
+primarily designed for situations where at least part of the requests are “advance requests”. To make
+meaningful comparisons between scenarios with any proportion of dynamic requests, Larsen et al. [13]
+later refined the definition and proposed the effective degree of dynamism, which attempted to capture
+both urgency and evolution of information in a single measure. This definition is the most popular one
+in recent literature. However, van Lon et al. [26] have recently argued that this popular measure has
+significant flaws, and that dynamism and urgency should be measured separately to correct this. After
+defining two independent measures, they empirically observe that dynamism, urgency and “cost” are
+related in a non-linear way: low dynamism and high urgency lead to higher costs, but high dynamism
+and high urgency do not; higher urgency leads to higher costs; and that cost is largely insensitive to
+changes in dynamism, all else equal (except for high urgency scenarios, as previously noted). This
+is consistent with the observations of Lund et al. [14], who noted that “even with a large number of
+dynamic requests, it is possible to produce good solutions, provided that the dispatcher receives the
+requests way ahead of the actual service time.” In this paper, we adopt the definitions of [26].
+2 The meal delivery routing problem
+In this section, we introduce a stylized model of meal delivery operations, with the goal of formalizing
+what we consider to be their main structural features: multiple pick-up points (restaurants), dynamic
+order arrivals, delivery capacity distributed throughout the day in the form of courier shifts, the possibility to pick up multiple orders simultaneously, among others. Being a first attempt to study such
+systems, we have assumed a deterministic dynamic framework. Two important real-life features that
+are not captures are the ability of couriers to turn down delivery assignment offers, and the ability of
+couriers to relocate freely when idling. Having said this, let us introduce the model.
+4
+Let R be a set of restaurants, and let each restaurant r ∈ R have an associated location `r. Let O
+be a set of orders, and let each order o ∈ O have an associated restaurant ro ∈ R, a placement time
+ao, a ready time (i.e. a release date at the restaurant) eo, and an order drop-off location `o. Let C
+be a set of couriers, where each courier c ∈ C has an on-time ec (when the courier goes on duty), an
+on-location `c (where the courier will be at time ec), and an off-time lc > ec (when the courier goes
+off duty). Assume that all information about R and C is known a priori, but information about any
+particular order o ∈ O is revealed only at its placement time ao. The meal delivery routing problem
+consists of determining feasible routes for couriers to complete the pick-up and delivery of orders, with
+the objective to optimize a single or multiple performance measures. The structural assumptions that
+determine feasibility, as well as relevant performance criteria are defined as follows.
+2.1 Structural assumptions
+Orders from the same restaurant may be combined into “bundles” with multiple drop-off locations,
+where the ready time of a bundle is the latest ready time of the constituent orders. There is no limit to
+the number of orders that may be combined into a bundle.
+The travel time between any pair of locations is assumed to be invariant over time. The service time
+associated with the pickup of an order at a restaurant, s
+r
+, represents the time a courier needs to park
+his vehicle, walk to the restaurant, pick up one or more orders, and walk back to his vehicle. The value
+of s
+r
+is invariant over time and independent of the number of orders being picked up. Similarly, s
+o
+,
+represents the service time associated with delivering an order at a customer location, i.e., the time a
+courier needs to park his vehicle, walk to the customer, drop off an order, and walk back to his vehicle.
+The pickup time of an order (or bundle) at a restaurant is not smaller than the maximum of a) the
+order ready time and b) the courier arrival time to the restaurant plus half of the service time at a
+restaurant. The departure time from a restaurant is the pickup time plus half of the service time. The
+drop-off time of an order is the arrival time of the courier at the customer location plus half of the
+service time at a customer location. The departure time after delivering an order is the drop-off time
+plus half of the service time.
+Couriers cannot pick up any orders after their off-time, but are allowed to drop off orders after their
+off-time. More importantly, in this deterministic model, it is assumed that couriers do not execute any
+autonomous decisions while on duty. In particular, they always accept any instruction handed to them,
+and they always wait for (new) instructions at their on-location and at the last location of their active
+assignment. Furthermore, couriers cannot receive instructions while executing an assignment and, thus,
+cannot be diverted while en-route to a restaurant.
+Payments to couriers follow a guaranteed minimum compensation scheme: a courier earns p1 per
+delivered order, or is compensated at the rate of p2 per hour, whichever is higher. Thus a courier collects
+max{p1n, p2(lc − ec)}, where n is the total number of orders served by the courier.
+We consider the following variations in the operating environment:
+• Prepositioning. Without prepositioning, the only instruction that can be sent to a courier is to pick
+up and deliver an order (possibly a bundled-order). With prepositioning, either the instruction to
+move to a restaurant (a prepositioning move) or the instruction to pick up and deliver an order
+can be sent to a courier.
+• Assignment updates. Without assignment updates, once the instruction to pick up and deliver
+an order (possibly a bundled-order) has been communicated to a courier, this assignment has to
+be completed before a courier can receive a new instruction. With assignment updates, when a
+courier arrives at a restaurant to pick up an order (possibly a bundled-order), an instruction can
+be sent to the courier updating the order to be picked up. For example, the initial instruction
+may have indicated that order o1 had to be picked up and delivered, and the update instruction
+may indicate that order o1 and order o2 have to be picked up and delivered (a bundled-order).
+5
+Note that the only assignment update allowed is an update to the set of orders picked up at a
+restaurant.
+2.2 Performance metrics
+Given that meal delivery providers must bring together diners, restaurants and couriers, each with their
+own concerns, a number of performance measures are of interest. Some, like click-to-door, which is the
+difference between the drop-off time of an order and the placement time of an order, involve a target
+value, τ , and a maximum allowed value, τmax. The primary performance measures for the meal delivery
+routing problem are:
+1. Number of orders delivered.
+2. Total courier compensation.
+3. Cost per order: total courier compensation divided by number of orders delivered.
+4. Fraction of couriers receiving guaranteed minimum compensation.
+5. Click-to-door time: the difference between the drop-off time and the placement time of an order.
+6. Click-to-door time overage: the difference between the drop-off time of an order and the placement
+time of an order plus the target click-to-door time.
+7. Ready-to-door time: the difference between the drop-off time of an order and the ready time of
+an order.
+8. Ready-to-pickup time: the difference between the pickup time of an order and its ready time.
+9. Courier utilization: the fraction of the courier duty time that is devoted to driving, pickup service,
+and drop-off service (as opposed to time spent waiting).
+10. Courier delivery earnings: courier earnings when considering only the number of orders served.
+11. Courier compensation: the maximum of the guaranteed minimum compensation (based on the
+length of the duty period) and the delivery earnings.
+12. Orders delivered per hour: for each courier, the number of orders delivered divided by the length
+of the shift.
+13. Bundles picked up per hour: for each courier, the number of order bundles assigned divided by
+the length of the shift.
+14. Orders per bundle: for each assignment, the number of orders to be picked up.
+Relevant summary statistics for measures 5-13 are: average, standard deviation, minimum, 10-th percentile, median, 90-th percentile, and maximum.
+3 A rolling horizon algorithm for the MDRP
+In light of the highly dynamic and urgent nature of meal delivery operations, making a detailed delivery
+plan for orders that will not be ready in the near future is unlikely to be of much advantage. For this
+reason, we propose to solve the MDRP using a rolling horizon matching-based algorithm that every
+f minutes solves a matching problem to prescribe only the next pick-up and delivery assignment for
+each courier. Individual orders may be bundled to be picked-up together and then delivered by a single
+courier following a specified route. After defining tentative courier - order assignments, a commitment
+strategy dictates which of these decisions are postponed and which are communicated to couriers.
+Furthermore, since a bundle cannot be picked up before all orders are ready, the assignment of a
+bundle with a ready time far into the future is likely to be postponed (the most likely outcome of the commitment strategy), our algorithm focuses on finding assignments only for the subset of known upcoming
+orders whose ready time falls within t + ∆u, the assignment horizon, Ut = {o ∈ Ot
+: eo ≤ t + ∆u}. So,
+at optimization time, t, the algorithm determines the best assignment of orders in Ut to the couriers on
+duty.
+6
+3.1 Bundles and routes
+While ideally every order should be picked up at its ready time and delivered by its target drop-off time
+(derived from target click-to-door time), this goal must be reconciled with the reality of a limited set
+of couriers. Especially during busy periods of the day, it may not always be possible to pick up orders
+as they leave the kitchen and deliver them individually. Therefore, to better utilize capacity, couriers
+may pick-up and deliver multiple orders, increasing the utilization of couriers at the expense of some
+freshness loss. At optimization time t, the algorithm determines how many orders should be in a bundle
+(defining a target bundle size), and then defines a satisfactory grouping and sequencing of the individual
+orders that will be assigned to couriers. Since we always define bundles with a unique route associated
+to them, from now on we may refer to bundles as routes indiscriminately.
+System intensity and a target bundle size. A target bundle size may simply be defined as a fixed
+number throughout the whole operating period, or throughout predefined intervals, such as “lunch” and
+“dinner” times. However, to induce robustness and responsiveness in our solution method, we define
+such target in a dynamic fashion, in direct relation to a fraction of the form (#orders ready)/(# couriers available),
+a rough measure of the amount of work that must be completed with the available resources during a
+given period of time. By doing this, we intend to encourage single-order bundles when there are fewer
+orders than couriers, and favor larger bundles when there are more orders than couriers and the system
+is under pressure. A parametric definition of the target bundle size at optimization time t is:
+Zt =
+
+|{o ∈ Ot
+: eo ≤ t + ∆1}|
+|{d ∈ Dt
+: ed ≤ t + ∆2}|
+, ∆1 > 0, ∆2 > 0,
+where eo is the ready time of order o and ed is the time when courier d becomes available for a new
+assignment. Note that it is possible that there are no couriers available before t + ∆2, in which case
+Zt
+is set to some default value. Specific values for ∆u, ∆1 and ∆2 are set through a tuning procedure,
+but, heuristically, for the algorithm to have an anticipatory character, f < ∆u 6 ∆1 and f < ∆u 6 ∆2
+should hold
+Creation of bundles and delivery routes. Once a system-wide target bundle size Zt has been
+determined, the set S =
+S
+r∈R
+Sr of bundles to be assigned is built by processing the upcoming orders at
+each restaurant r, Ut,r, following the steps described in Procedure 1.
+Note that once a bundle reaches its target size, an additional order is inserted only if this increases
+route efficiency, i.e., the time per order delivered in that bundle decreases. Also note that the parameter
+β, which controls the importance of freshness in the construction of bundles, is given beforehand (i.e.,
+it should be tuned off-line).
+3.2 Assignment logic
+At the core of our algorithm, the solution of a bipartite matching problem assigns order bundles to
+couriers, dictating the next delivery route to be executed by each courier. Such a simple model is able
+to capture and balance the trade-off between short-term efficiency and service quality, while ensuring
+that, in practical implementations, optimization is not a significant bottleneck in the overall solution
+process. But, of course, simplicity comes at the cost of expressiveness: the only levers to guide decisions
+in the matching are the weights and feasibility conditions of order-courier pairs, and only so many aspects
+of the problem can be captured by these. In an attempt to retain some more control in the assignment
+process, specifically around the issue of how to avoid service delays for bundles that are already late,
+we introduce a priority scheme: assignments are built by first partitioning the set of relevant bundles
+in priority groups based on their “urgency”, and then finding optimal assignments sequentially for each
+group.
+7
+Procedure 1: Bundle generation using parallel-insertion
+Input: Ut,r, set of upcoming orders at restaurant r,
+Zt
+, target bundle size,
+and k
+r
+t
+, number of couriers that available at r (see Section 3.3).
+Output: Sr, set of bundles from restaurant r to be assigned to couriers.
+/* Initial construction */
+Sort the orders in Ut,r by non-decreasing ready time;
+Compute the target number of bundles to create, mr = max (k
+r
+t
+, d
+|Ut,r|/Zte);
+Initialize empty routes (bundles) s1, s2, . . . , smr
+in Sr;
+for o ∈ Ut,r do
+Find the route s ∈ Sr and the insertion position is for order o into route s which results in
+the minimum increase in route cost, where the route cost of
+P
+s is
+(p,q)∈s
+T ravelT ime(p, q) + β
+P
+p∈s
+ServiceDelay(p);
+if |s| > Zt and insertion decreases route efficiency then
+Disregard s for order o and find the next best route and insertion position (repeat if
+necessary)
+end
+Insert o in route s at position is;
+end
+/* Improvement by ‘‘remove-reinsert’’ local-search */
+for o ∈ Ut,r do
+Remove o from its current route;
+Given the existing routes in Sr, find route s and position is to re-insert o at minimum cost;
+Re-insert o into route s at position is;
+end
+8
+Priority scheme. Orders are classified according to their unavoidable delays in drop-off and pick-up:
+• Group I: orders whose target drop-off time is impossible to achieve.
+• Group II: orders not in Group I which can no longer be picked up at their ready time.
+• Group III: orders not in Group I or II.
+A bundle is assigned the highest priority of any of its constituent individual orders.
+By creating assignments sequentially for these priority groups, urgent deliveries are more likely to
+achieve an earlier pickup time than if all orders were included in one big matching problem, which may
+make a difference at the time of commitment, preventing the postponement of delivery for orders that
+are already late. Similarly, in matchings where there are fewer couriers available than bundles to be
+assigned, a solution obtained with this priority scheme averts situations where orders that are already
+late do not get a courier assigned.
+Three alternative optimization models, with increasing degrees of complexity, are considered.
+3.2.1 Linear assignment model
+The simplest assignment model, and the one used by default in our solution algorithm, is a bipartite
+matching with no side constraints, i.e., a linear program. To define it, we introduce the following
+notation:
+- Ns: number of individual orders in bundle s,
+- θ: constant “penalty” for delays in the pick-up of an order or bundle of orders,
+- πs,d: pick-up time of bundle s if assigned to courier d. Note that, by definition, πs,d ≥ max
+o∈s
+{eo}.
+- δ
+s
+o,d: drop-off time of order o in bundle s if s is assigned to courier d (note that this value depends
+on the time that d can pick up s).
+- xs,d: 0-1 decision variable for the assignment of bundle s to courier d.
+Using these definitions, the problem is:
+max
+x
+X
+d∈Dt
+X
+s∈S
+
+
+Ns
+max
+o∈s
+{δ
+s
+o,d} − ed
+− θ
+
+πs,d − max
+o∈s
+{eo}
+
+
+ xs,d (1a)
+s.t. X
+s∈S
+xs,d 6 1, ∀ d ∈ D (1b)
+X
+d∈D∪{0}
+xs,d = 1, ∀ s ∈ S (1c)
+xs,d ∈ {0, 1}, ∀ s ∈ S, d ∈ D ∪ {0} (1d)
+Observe that the first term in the matching weights captures a “throughput” value, dividing the
+number of orders in a delivery route, Ns, by the time required to execute the assignment, max
+o∈s
+{δ
+s
+o,d}−ed.
+Meanwhile, the second term relates to the pick-up delay, which causes a loss of freshness in meals,
+πs,d − max
+o∈s
+{eo}. The model formulation makes use of an artificial courier collecting excess bundles
+(by defining these artificial assignments to have a value strictly lower than the value of any feasible
+assignments).
+3.2.2 More complex integer programming assignment models
+A relatively simple but powerful departure from the previous formulation is to drop the requirement
+that the set of bundles in the assignment problem be pairwise disjoint with respect to the set U of orders
+to be assigned. Instead, that condition can be enforced as a constraint in the optimization problem.
+The freedom thus gained can be leveraged to mitigate some potential pitfalls inherent in the process of
+assigning (at most) one bundle to each courier in every optimization run.
+9
+Let S be the set of bundles considered for assignment, which can simply be the S of bundles generated
+by Procedure 1, or it may be larger. A simple and effective way to create more routes is to break each
+bundle of S into two pieces, as described in Procedure 2:
+Procedure 2: Split original bundles by their ready times
+Input: Set of bundles S.
+Output: S, ground set of not necessarily order-disjoint bundles.
+Initialize S
+1 ← ∅, S
+2 ← ∅;
+for s ∈ S do
+Sort orders in s by increasing ready time, and relabel as o1, . . . , ok (ok is ready the latest);
+for j ∈ {1, . . . , k − 1} do
+Create bundle s
+1
+j
+, containing o1, . . . , oj
+, the first j orders to be ready from s. Preserve
+sequence of deliveries originally prescribed in s for these orders;
+S
+1 ← S1 ∪ s
+1
+j
+;
+Create bundle s
+2
+j
+, containing oj+1, . . . , ok, which are ready after oj
+. Preserve the
+sequence of deliveries originally prescribed in s for these orders;
+S
+2 ← S2 ∪ s
+2
+j
+;
+end
+end
+S ← S ∪ S1 ∪ S2
+;
+The motivation of Procedure 2 is to prevent the assignment of large bundles in S (which are less
+likely to be ready for immediate pick-up) from unnecessarily delaying the dispatch of orders that could
+be delivered soon (bundles in S
+1
+), while at the same time attempting to find a courier (and, if necessary,
+make a partial commitment) for orders that will not be ready as soon (bundles in S
+2
+).
+Another extension is to allow two bundles to be assigned to a courier, in which case the courier
+completes the bundles one after the other in a prescribed sequence. This can mitigate a potential pitfall
+of the myopic approach, arising when two bundles are assigned to different couriers even though they
+could have been delivered more efficiently by a single courier without degrading service quality. Define
+Q ⊆ S ∪ S × S as the set of one or two bundles that can be assigned to a courier. Q is constructed by
+finding all pairs of bundles in S that can be concatenated in such a way that second bundle does not
+suffer an excessive freshness loss. We define a freshness loss tolerance λ > 0, and follow Procedure 3:
+Procedure 3: Find compatible “follow-on” bundle pairs
+Input: Ground set of bundles S, freshness loss tolerance λ > 0.
+Output: Set Q ⊆ S ∪ S × S of routes to be assigned to couriers.
+Initialize Q ← S;
+for s ∈ S do
+for s
+0 ∈ S \ {s} do
+if s ∩ s
+0 = ∅ then
+Compute πs,s0
+,d;
+if rs
+0 + λ > πs,s0
+,d then
+Q ← Q ∪ {(s, s0
+)};
+end
+end
+end
+end
+Note that if λ = 0, only pairs of bundles where the second pick-up can be done at the earliest possible
+time are considered compatible. In contrast, if λ is large enough, any pair of bundles with no orders in
+10
+common is a compatible “follow-on” pair.
+Assignment model variations. For any order o, denote the set of routes that contain o by Q(o)
+and define variables:
+xq,d ∈ {0, 1} : indicates whether route q is assigned to courier d, for q ∈ Q, d ∈ D ∪ {0}
+yo ∈ {0, 1} : indicates whether order o is assigned to any courier, for o ∈ U
+Using these definitions, the assignment problem can be formulated as:
+max
+x
+X
+d∈D
+X
+q∈Q
+wq,dxq,d +
+X
+o∈O
+p(1 − yo) (2a)
+s.t. X
+q∈Q
+xq,d 6 1 ∀ d ∈ D (2b)
+X
+d∈D∪{0}
+xq,d = 1 ∀ q ∈ Q (2c)
+X
+d∈D
+X
+q∈Q(o)
+xq,d 6 1 ∀ o ∈ U (2d)
+X
+d∈D
+X
+q∈Q(o)
+xq,d > yo ∀ o ∈ U (2e)
+xq,d ∈ {0, 1} ∀ q ∈ Q, d ∈ D ∪ {0} (2f)
+yo ∈ {0, 1} ∀ o ∈ U (2g)
+Constraints (2b) guarantee that each courier is assigned at most one route, while (2c) guarantee that
+each route is assigned to one courier (it may be 0, a “dummy” courier). Constraints (2d) guarantee that
+each order is in exactly one of the routes assigned. If an order o ∈ O is not included in any of the routes
+assigned to real couriers, a value p is added to the objective value (with p < min
+q,d
+{wq,d}, to discourage
+null order assignments if at all possible, i.e. to assign as many orders as possible to real couriers). The
+weight of a (q, d) assignment is wq,d = us,d if q consists of only one bundle s, or wq,d = us,d + vs,s0
+,d if q
+consists of a sequence of bundles (s, s0
+), where u and v are defined as:
+us,d =
+Ns
+max
+o∈s
+{δ
+s
+o,d} − ed
++ θ(πs,d − max
+o∈s
+{eo}) ∀s ∈ S, d ∈ D (3)
+vs,s0
+,d =
+Ns
+0
+max
+o∈s
+0
+{δ
+s,s0
+o,d } − max
+o∈s
+{δ
+s
+o,d}
++ θ(πs,s0
+,d − max
+o∈s
+0
+{eo}) ∀(s, s0
+) ∈ Q, d ∈ D (4)
+Here Ns and Ns
+0 denote the number of orders in bundles s and s
+0
+, respectively; ed denotes the time that
+courier d is available to begin a new route; max
+o∈s
+{δ
+s
+o,d} is the last drop-off time in s if d is assigned to s;
+max
+o∈s
+0
+{δ
+s,s0
+o,d } is the last drop-off time in s
+0
+if this bundle is served by d immediately after completion of
+deliveries of s; max
+o∈s
+{eo} is the time that s is ready for pick-up; πs,d is the earliest possible time that d
+can pick up s; and πs,s0
+,d is the earliest possible time that d can pick up s
+0 after having picked up and
+delivered s.
+We have explored two alternative models in addition to the (basic) linear model:
+(i) A “medium complexity” model, consisting of integer program (2) and Q defined by Procedure 3
+acting on S, the bundles created by Procedure 1.
+(ii) A “high complexity” model, consisting of integer program (2) and Q defined by Procedure 3 acting
+on S, the set of bundles resulting from Procedure 2.
+11
+3.3 Commitment strategy
+One of the ways through which a rolling horizon algorithm attempts to mitigate uncertainty is the
+postponement of decisions that are not time-critical. In light of the characteristics of the MDRP, we
+adopt a “lazy” strategy that decomposes assignments into two travel segments: “inbound” travel to the
+restaurant, and an “outbound” delivery trip (i.e., an open route).
+Two-stage additive commitment. For each tentative assignment (s, d), of order bundle s and
+courier d, in the solution of a matching problem, the commitment strategy dictates:
+1. If d can reach restaurant rs before t + f and all orders in s are estimated to be ready by t + f,
+make a final commitment of d to s: instruct d to travel to rs, pick up and deliver orders in s.
+2. If d cannot reach rs by t + f, but completes its last assignment before t + f, make a partial
+commitment: instruct d to travel to rs and wait there for a finalized order assignment, which is
+guaranteed to include orders in s, and possibly more.
+3. If d cannot start a new assignment by t + f, ignore the assignment.
+4. Exception: If any order in s has been ready for more than x minutes, override the rule and make
+a final commitment.
+The motivation to send a courier to a restaurant without committing the delivery of a specific bundle
+– as would be the case in a simpler single-stage commitment rule – is that, even if travel should begin
+without delay, the courier can be matched again in the next optimization, while en-route, and the
+composition of the bundle to be picked up at the restaurant may change. On the other hand, if the
+courier is busy until t + f, waiting for the next optimization will not delay the pick-up or drop-off of
+any order.
+We call this strategy “additive” because if s is partially committed to d at time t, then at optimization
+time t + f, we force the bundle assigned to d to include s. Hence, orders in a bundle partially assigned
+to d are guaranteed to be the final assignment to d. While this is not the most flexible policy that can
+be conceived (as one could completely decouple inbound and outbound assignments), there are good
+practical arguments for such consistency (e.g., to mitigate the risk of couriers rejecting time-critical
+assignments).
+Two-stage additive commitment logic for assignments with more than one bundle. In the
+more complex assignment models, when dealing with the assignment of courier d to route q = (s1, s2),
+the commitment rule is generalized in a way that delays final decisions on the actions to be taken after
+the completion of s1, so long as this does not generate a decrease in the service quality of orders in
+s2. Concretely, given a tentative assignment of order batch q = (s1, s2) to courier d, our commitment
+strategy dictates:
+1. If d can complete the delivery of s1 and pick up s2 by time t + f, make a final commitment to
+both s1 and s2.
+2. If d can complete the delivery of s1 by t+f but cannot pick up s2 by t+f, make a final commitment
+to s1 and a partial commitment to s2.
+3. If d can only pick up s1 by t + f, i.e., if d can reach restaurant rs1 by t + f and all orders in s are
+estimated to be ready by t + f, make a final commitment of d to s1: instruct d to travel to rs1
+,
+pick up and deliver orders in s1.
+4. If d cannot pick up s1 by t + f, but completes its last assignment before t + f, make a partial
+commitment for d: instruct d to travel to rs1 and wait there for a finalized order assignment
+(guaranteed to include orders in s1.
+5. If d cannot start a new assignment by t + f, ignore the assignment completely.
+6. Exception 1: If any order in s1 has been ready for more than x minutes, make a final commitment
+to s1.
+12
+7. Exception 2: If any order in s2 has been ready for more than x minutes, make a final commitment
+to s1 and s2.
+It is worth noting that our two-stage additive commitment strategy is consistent with the MDRP operating environment that allows assignment updates: a courier may be instructed to move to a restaurant
+as soon as there is at least one order for the courier to pick up, but before a final determination is made
+about the exact set or sequence of orders to be assigned. Furthermore, a single pre-positioning move is
+used by our algorithm: at the beginning of each courier duty time, a randomized instruction is handed
+to the courier, telling him to move to a nearby restaurant (the rest of instructions are deterministic,
+only making use of information already revealed.)
+4 Computational study
+In this section, we describe the design and results of a computational study to assess the quality of
+solutions produced by our algorithm (in its different variations), and how this performance relates to
+instance characteristics and key algorithmic features. In a set of appendices, we present visualizations
+of our instances as well as a cache of experimental results.
+4.1 MDRP instances
+Instances have been crafted to resemble realistic day-long order and courier patterns in metropolitan
+areas, based on real-life historical data from different cities and days. We create a total of 240 instances
+of varying sizes, ranging from 242 to 3213 orders, 54 to 323 restaurants, 53 to 457 couriers, and 123 to
+1542 courier hours. Times are represented as non-negative integers (with zero representing the start of
+business hours). Locations have been anonymized while preserving their overall distribution, and are
+represented as (x, y) coordinates in meters from a reference point. The travel time from `1 = (x1, y1)
+to `2 = (x2, y2) is the product of their Euclidean distance and a multiplier γ, rounded up to the next
+integer: t`1,`2 =
+l
+γ
+p
+(x2 − x1)
+2 + (y2 − y1)
+2
+m
+(i.e.,
+1
+γ
+is the speed of vehicles in the instance). Note that
+rounding may lead to cases where travel times do not satisfy the triangle inequality.
+Service times at all restaurants are set to 4 minutes, and service times at all order delivery locations
+are likewise set to 4 minutes. The click-to-door target is 40 minutes in all instances, and the maximum
+allowed click-to-door is 90 minutes. Couriers are paid $10 per order delivered and are promised a $ 15
+minimum compensation per hour.
+For each “seed” instance, we have prepared a set of 24 variations:
+• Varying size of order and courier sets. Given an order set, two instance variations are
+obtained by sampling 50% of the orders directly (uniform sampling with repetitions) or indirectly,
+through sampling of restaurants (where including a restaurant means including all the orders
+placed at it). Courier sets are reduced in a similar fashion, sampling roughly half of the shifts
+at each start time (rounding up to the nearest integer number of shifts when necessary), while
+ensuring that the scheduled courier hours are reduced by 50%. These variations preserve some of
+the geographical and temporal distribution of orders. A detailed exposition about the reduction
+procedures for order and courier sets is available in Appendix A.
+• Varying travel times. Different location densities can be induced by using different γ multipliers.
+This preserves the relative spatial distribution of orders but, of course, impacts the nature of the
+solutions, as travel time changes (e.g., orders served per courier hour, number of bundled orders,
+etc.). Concretely, to build these instance variations, the original multiplier of each instance is
+reduced by 25%, producing a short travel time version.
+• Varying structure of courier schedules. Schedules can resemble the patterns observed historically, or follow an “optimized” distribution. To ensure fairness in comparisons, optimized schedules
+preserve the total number of courier-hours of their historical counterparts. Details about the con13
+struction of optimized shift schedules are available in Appendix B.
+• Varying preparation times. We can modify the degree of flexibility in the dispatch of upcoming
+orders in an instance by changing the time it takes to prepare each meal, i.e. the difference between
+the time when an order is ready and its placement time: given a target click-to-door time, longer
+preparation times imply that less time is available for a timely pickup once the order becomes
+ready In our instance set, these instance variations are built by increasing the original preparation
+times by 25%.
+To facilitate the study of different algorithms and solution strategies, the MDRP instances, together
+with a script to check feasibility and evaluate performance metrics of a solution, are available online at:
+https://github.com/grubhub/mdrplib
+Details about instance and solution encoding can be found in Appendices C and D.
+4.2 Uncontrolled instance features
+Beyond the features controlled during the instance generation process, we have focused our analysis
+on a set of structural properties whose importance has been long recognized in the dynamic routing
+literature [26]. We measure four features for each instance: geographic dispersion, dynamism, urgency
+and flexibility.
+• Geographic dispersion captures the separation between restaurant and delivery locations over
+the instance geography. Other things equal, the more disperse locations are, the longer it takes to
+complete an average route, and the harder it becomes to build routes that achieve an acceptable
+performance (in order click-to-door, courier utilization, etc.). We measure geographic dispersion
+in terms of the travel time from restaurant to delivery location of any order, and the travel time
+between any pair of restaurants, using the instance mean and standard deviation across all relevant
+distance travel time measures. More precisely, we define the dispersion of an instance as:
+dispersion =
+P
+a∈R,b∈R
+t`a,`b
+|R × R|
++
+P
+o∈O
+t`ro
+,`o
+|O|
+• Dynamism captures the continuity of change in the information available over the planning
+period. Under this definition, an instance where orders arrive in a few “bursts” is considered
+less dynamic than an instance where orders arrive at an even rate over time. For simplicity, we
+measure only the degree of dynamism of the arrival stream of orders (disregarding information
+from courier sign-on and sign-off events), using the method introduced in Van Lon et al. [26],
+which we reproduce below for the sake of completeness. The degree of dynamism of an instance
+is always a number between 0 (no dynamism, i.e., all orders are simultaneously revealed) and 1
+(“maximal” dynamism), computed as follows.
+Let n be the number of orders placed and A be the non-decreasing sequence of order placement
+times. Let H be the sequence of inter-arrival times, H = (η1, η2, . . . , ηn−1) = (a2−a1, . . . , an−an−1).
+Let T = min{max
+c∈C
+{lc}, an} + τmax be regarded as the operating period, and define ϕ =
+T
+n
+as the
+“perfect inter-arrival time” (corresponding to arrivals with maximum dynamism). Define the
+sequence of penalized inter-arrival deviations as
+σ0 = 0, σi = (ϕ − ηi +
+ϕ − ηi
+ϕ
+σi−1)
++ for i = 1, . . . , n − 1
+Note that this measure penalizes “bursts” of arrivals over a short period. Then, the instance
+14
+degree of dynamism is defined as:
+dod = 1 −
+nP−1
+i=1
+σi
+nP−1
+i=1
+σ¯i
+where
+nP−1
+i=1
+σ¯i
+is a normalizing constant defined by ¯σi = ϕ + (ϕ−ηi
+ϕ
+σi)
++ (capturing the maximum
+possible penalized deviations).
+• Urgency captures the range of time available to complete the delivery of orders in a satisfactory
+way. We define “soft” and “hard” measures, relative to target and maximum click-to-door values,
+respectively. For clarity, we use “reaction time” measures, negatively related to urgency: the
+higher the reaction time of orders, the less urgency in the instance. As in [26], we summarize the
+urgency level of an instance by the mean of individual order reaction times:
+reactsof t =
+P
+o∈O
+
+τ − t`ro
+,`o
++
+|O|
+reacthard =
+P
+o∈O
+
+τmax − t`ro
+,`o
++
+|O|
+• Flexibility is closely related to urgency, but not completely equivalent. It captures the effective
+range of time available to dispatch an order, if this is going to be delivered in a satisfactory way.
+Measuring flexibility is important in meal delivery, because relatively long preparation times (with
+respect to service targets and guarantees) can make it hard to deliver an order on time, even if
+there is a large reaction time: if the order is not ready, a part of this reaction time is useless. We
+measure flexibility as follows:
+flexsof t =
+P
+o∈O
+
+(ao + τ ) − (eo + t`ro
+,`o
+)
++
+|O|
+flexhard =
+P
+o∈O
+
+(ao + τmax) − (eo + t`ro
+,`o
+)
++
+|O|
+4.3 Analysis variables
+Apart from categorical identifiers for each set of instance variations, and in addition to dispersion and
+degree of dynamism, we select the most informative measures of urgency, flexibility, and size by exploring
+the correlations in the instance dataset.
+It is not surprising that the soft and hard versions of urgency and flexibility measures are correlated,
+as shown in Table 1. Therefore, to simplify the analysis, we focus only on hard reaction time and soft
+pickup flexibility, the pair of urgency and flexibility measures with the smallest correlation. Similarly,
+number of orders and total courier hours are highly correlated, as shown in Table 2. Since courier hours
+in an instances have been decided in advance, based on forecasts about the number and distribution of
+orders, we decide to measure instance size by the number of orders, discard total courier hours from
+the analysis variables, and include the ratio of orders to courier hours, which indicates how “busy” or
+congested an instance turns out to be (instances with a unusually high ratio suggest that the forecast
+might have been an underestimation, or perhaps there were not enough couriers to keep up with expected
+demand).
+15
+measure soft reaction time hard reaction time soft pickup flex hard pickup flex
+soft reaction time 1.00 0.62 0.89 0.94
+hard reaction time 0.62 1.00 0.41 0.46
+soft pickup flex 0.89 0.41 1.00 0.96
+hard pickup flex 0.94 0.46 0.96 1.00
+Table 1: Correlation matrix of urgency and flexibility measures
+measure orders courier hours orders/courier hour
+orders 1.00 0.90 0.31
+courier hours 0.90 1.00 -0.06
+orders per courier hour 0.31 -0.06 1.00
+Table 2: Correlation matrix of orders, courier hours, and orders per courier hour
+Having defined the analysis variables, let us briefly summarize the structural properties of the instance
+set. The histograms in the diagonal of Figure 1 illustrate the marginal distribution of the adopted key
+instance characteristic measures (aggregated in 8 buckets), and the hexagonal bins in the lower triangle
+of Figure 1 illustrate their pairwise-joint distribution.
+Instances have degrees of dynamism ranging between 0.3 and 0.6, more frequently in the 0.4-0.55
+range, and the most significant interactions of dynamism are with size (largest instances are also the least
+dynamic) and geographic dispersion (less disperse instances tend to be less dynamic). Most instances in
+the set have less than 1000 orders and a relatively dense geography (in most instances, individual-order
+inbound and outbound trips would on average total less than 20 minutes). Hard reaction times values
+range from 80.7 to 84.5 minutes on average, and shows some correlation only with geographic dispersion:
+this is not unexpected, as both measures are a function of direct travel times from restaurant to delivery
+location. Soft pickup flexibility, ranging from 10.4 to 19.4 minutes, exhibits no strong correlation to
+any other feature. The ratio of orders placed to courier hours, ranging from 1.2 to 2.5, shows little
+correlation with all other instance features, but it is important to note that the largest instances (2500
+or more orders) all have a very high ratio.
+4.4 Algorithm configurations
+For each instance, we obtain 21 solutions by running slightly different versions of the rolling horizon
+algorithm: the default algorithm, 5 variations differing in one feature only, and 15 variations with
+alternative values of optimization frequency, assignment horizon, order and courier bundling intensity
+lookaheads. In detail, the algorithm variations explored are defined as follows:
+Different optimization frequencies. Set the time between successive optimizations to f = 5 or
+f = 2 minutes (all other settings at their default values).
+Different order-assignment horizon and myopic lookaheads. Experiment setting a lookahead
+of 2f or 4f (default) minutes for the numerator (orders) of the target size ratio calculation; setting a
+lookahead of 2f or 4f (default) minutes for the denominator (couriers) of the target size ratio calculation;
+and setting a horizon of 2f (default) or 4f minutes to limit the set of orders open for assignment. In
+sum, for each value of f, 8 configurations are considered.
+Bundling intensity rules. Explore two algorithm variations, one using dynamic target bundle
+sizes (default), and the other explicitly forbidding any consolidation (i.e., always assign couriers to
+single orders).
+Assignment prioritization. Enforce three order priority groups in the assignment process (default), or find assignments for all orders in a single matching problem per optimization run.
+16
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  	 
+   
+
+
+
+Figure 1: Distribution of key instance features
+Commitment. Follow the two-stage additive commitment strategy (default), or use a single-stage
+lazy strategy, where no more changes can be made in the “outbound” portion of the assignment as soon
+as couriers begin the“inbound” movement to the restaurant.
+Complexity of assignment model. Consider the three different models described in Section 3.2
+to govern the assignment process.
+Before conducting the experiments, reasonable default values for a series of secondary parameters in the
+algorithm must be found. We tune the algorithm with a hierarchical service objective: first ensure the
+17
+Variation id Description
+0 Default (f = 5, ∆u = 10, ∆1 = 10, ∆2 = 10, two-stage commitment,
+3 priority groups, dynamic bundling, LP assignment model)
+1 f = 5, ∆u = 10, ∆1 = 10, ∆2 = 20
+2 f = 5, ∆u = 10, ∆1 = 20, ∆2 = 10
+3 f = 5, ∆u = 10, ∆1 = 20, ∆2 = 20
+4 f = 5, ∆u = 20, ∆1 = 10, ∆2 = 10
+5 f = 5, ∆u = 20, ∆1 = 10, ∆2 = 20
+6 f = 5, ∆u = 20, ∆1 = 20, ∆2 = 10
+7 f = 5, ∆u = 20, ∆1 = 20, ∆2 = 20
+8 f = 2, ∆u = 4, ∆1 = 4, ∆2 = 4
+9 f = 2, ∆u = 4, ∆1 = 4, ∆2 = 8
+10 f = 2, ∆u = 4, ∆1 = 8, ∆2 = 4
+11 f = 2, ∆u = 4, ∆1 = 8, ∆2 = 8
+12 f = 2, ∆u = 8, ∆1 = 4, ∆2 = 4
+13 f = 2, ∆u = 8, ∆1 = 4, ∆2 = 8
+14 f = 2, ∆u = 8, ∆1 = 8, ∆2 = 4
+15 f = 2, ∆u = 8, ∆1 = 8, ∆2 = 8
+16 single-stage commitment
+17 no priority groups
+18 no bundling
+19 medium complexity assignment model
+20 high complexity assignment model
+Table 3: Algorithm variations
+delivery of a very high proportion of the orders placed, and then minimize average click-to-door. Details
+about the tuning process can be found in Appendix E.

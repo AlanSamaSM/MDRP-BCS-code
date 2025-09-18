@@ -43,7 +43,7 @@ to compute straight‑line distances instead of requesting routes:
 
 ```bash
 USE_EUCLIDEAN=1 python run_synth_instance.py synthetic_lapaz_orders.csv
-```
+``` v
 
 ## Metrics for Route Prediction
 
