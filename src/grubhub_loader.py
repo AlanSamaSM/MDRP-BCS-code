@@ -1,9 +1,8 @@
 import os
 import pandas as pd
 from datetime import datetime, timedelta
-from restaurantsList import Restaurant
-from main import Order, Courier
-from coord_transform import xy_to_latlon
+from src.main import Order, Courier, Restaurant
+from src.coord_transform import xy_to_latlon
 
 START_TIME = datetime(2025, 1, 1)
 

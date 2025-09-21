@@ -1,7 +1,6 @@
 import pandas as pd
 
-from restaurantsList import Restaurant
-from main import Order, Courier
+from src.main import Order, Courier, Restaurant
 
 def load_lade_instance(parquet_path):
     """Load a LaDe delivery parquet file.

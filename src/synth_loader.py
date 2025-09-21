@@ -1,8 +1,7 @@
 import pandas as pd
 from datetime import timedelta
 
-from restaurantsList import Restaurant
-from main import Order, Courier
+from src.main import Order, Courier, Restaurant
 
 
 def load_synth_instance(csv_path, n_couriers=5):

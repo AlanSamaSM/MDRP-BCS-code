@@ -2,6 +2,7 @@ import requests
 import os
 import math
 import polyline
+import time
 
 def as_lonlat(pt):
     """Convert (lat, lon) -> (lon, lat)"""
@@ -49,6 +50,7 @@ def get_route_details(start_coords, waypoints):
     params = {"overview": "full", "steps": "true", "annotations": "true"}
 
     try:
+        time.sleep(0.2)  # Introduce a delay to respect the API rate limit
         response = requests.get(url, params=params, timeout=5)
         data = response.json()
         if data.get("code") == "Ok":

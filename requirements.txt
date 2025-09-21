@@ -1,10 +1,9 @@
 pandas
-pyarrow
 numpy
 folium
 polyline
 requests
-pyflakes
 scipy
 geopandas
 matplotlib
+shapely
