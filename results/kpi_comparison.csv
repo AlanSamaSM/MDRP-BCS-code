@@ -1,0 +1,4 @@
+Dataset,Total Orders Delivered,Cost Per Order,Avg. Click-to-Door (min),Avg. Ready-to-Pickup (min),Orders per Hour,Avg. Courier Utilization (%),Couriers on Guaranteed Pay (%)
+Synthetic,333,$10.06,36.35,28.92,61.67,0.00,0.00
+LaDe,0,0,0,0,0,0,0
+Grubhub,505,$19.85,20.11,3.07,33.67,0.00,1.77

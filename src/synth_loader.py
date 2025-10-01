@@ -1,7 +1,16 @@
 import pandas as pd
 from datetime import timedelta
+import os
+import sys
 
-from src.main import Order, Courier, Restaurant
+# Handle both package and direct script imports
+try:
+    from src.main import Order, Courier, Restaurant
+except ImportError:
+    # Add project root to path when running directly
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    sys.path.insert(0, project_root)
+    from src.main import Order, Courier, Restaurant
 
 
 def load_synth_instance(csv_path, n_couriers=5):
@@ -45,3 +54,32 @@ def load_synth_instance(csv_path, n_couriers=5):
 
     params = {}
     return orders, couriers, restaurants, params
+
+if __name__ == "__main__":
+    # Find the synthetic orders CSV in the data directory
+    csv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 
+                           "data", "synthetic_lapaz_orders.csv")
+    
+    if not os.path.exists(csv_path):
+        print(f"Error: Could not find data file at {csv_path}")
+        sys.exit(1)
+        
+    # Load the synthetic instance
+    orders, couriers, restaurants, _ = load_synth_instance(csv_path, n_couriers=5)
+    
+    # Print summary statistics
+    print(f"Loaded {len(orders)} orders")
+    print(f"Created {len(couriers)} couriers")
+    print(f"Found {len(restaurants)} restaurants")
+    
+    # Show sample data
+    print("\nFirst 3 orders (sample):")
+    for o in orders[:3]:
+        print(f"  id={o.id}, restaurant={o.restaurant.id}, "
+              f"placement={o.placement_time}, ready={o.ready_time}")
+    
+    if couriers:
+        c = couriers[0]
+        print("\nSample courier:")
+        print(f"  id={c.id}, on_time={c.on_time}, "
+              f"off_time={c.off_time}, location={c.location}")

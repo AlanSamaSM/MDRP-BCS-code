@@ -109,6 +109,23 @@ def calculate_cost(route_details, service_delay):
 
     return travel_time + FRESHNESS_PENALTY_THETA * delay_minutes
 
+def calculate_route_efficiency(restaurant_location, bundle):
+    """Calculates the efficiency (average time per order) of a bundle."""
+    if not bundle:
+        return float('inf')
+    
+    dropoff_points = [o.dropoff_loc for o in bundle]
+    route = get_route_details(restaurant_location, dropoff_points)
+    if not route:
+        return float('inf')
+
+    travel_time_min = route['duration'] / 60.0
+    total_service_time_min = (SERVICE_TIME.total_seconds() / 60.0) * len(bundle)
+    total_time = travel_time_min + total_service_time_min
+    
+    return total_time / len(bundle)
+
+
 def generate_bundles_for_restaurant(restaurant, current_time, target_bundle_size, couriers_available):
     """
     Genera bundles (rutas) de órdenes para un restaurante, siguiendo la lógica de inserción paralela.
@@ -161,7 +178,19 @@ def generate_bundles_for_restaurant(restaurant, current_time, target_bundle_size
                         best_position = 0
             else:
                 # Probar todas las posiciones posibles (de 0 a len(bundle))
-                for pos in range(len(bundle) + 1): 
+                for pos in range(len(bundle) + 1):
+                    # --- INICIO DE LA MODIFICACIÓN: Verificación de eficiencia ---
+                    # Si el bundle ya alcanzó el tamaño objetivo, solo se inserta si mejora la eficiencia.
+                    if len(bundle) >= target_bundle_size:
+                        current_efficiency = calculate_route_efficiency(restaurant.location, bundle)
+                        candidate_bundle_for_efficiency = bundle[:pos] + [order] + bundle[pos:]
+                        new_efficiency = calculate_route_efficiency(restaurant.location, candidate_bundle_for_efficiency)
+                        
+                        # Si la nueva eficiencia no es mejor (menor), se ignora esta inserción.
+                        if new_efficiency >= current_efficiency:
+                            continue
+                    # --- FIN DE LA MODIFICACIÓN ---
+
                     candidate_bundle = bundle[:pos] + [order] + bundle[pos:] #concatenación de listas
                     # Calcular la ruta completa para este candidate_bundle.
                     # Suponemos que la ruta inicia en la ubicación del restaurante.
@@ -181,6 +210,41 @@ def generate_bundles_for_restaurant(restaurant, current_time, target_bundle_size
         else:
             # Si no se encontró un bundle (caso raro), se podría crear un nuevo bundle.
             bundles.append([order])
+
+    # --- INICIO DE LA MODIFICACIÓN: Fase de mejora con "remove-reinsert" ---
+    for _ in range(2): # Se puede iterar varias veces para una mejor solución
+        for bundle_idx, bundle in enumerate(list(bundles)):
+            for order_idx, order in enumerate(list(bundle)):
+                # 1. Extraer la orden del bundle actual
+                original_bundle = list(bundle)
+                del original_bundle[order_idx]
+                bundles[bundle_idx] = original_bundle
+
+                # 2. Encontrar la mejor posición para re-insertar la orden en CUALQUIER bundle
+                best_new_bundle_idx = -1
+                best_new_pos = -1
+                min_cost = float('inf')
+
+                for target_bundle_idx, target_bundle in enumerate(bundles):
+                    for pos in range(len(target_bundle) + 1):
+                        candidate_bundle = target_bundle[:pos] + [order] + target_bundle[pos:]
+                        
+                        dropoff_points = [o.dropoff_loc for o in candidate_bundle]
+                        route = get_route_details(restaurant.location, dropoff_points)
+                        
+                        if route:
+                            service_delay = SERVICE_TIME + (SERVICE_TIME * len(candidate_bundle))
+                            cost = calculate_cost(route, service_delay)
+                            
+                            if cost < min_cost:
+                                min_cost = cost
+                                best_new_bundle_idx = target_bundle_idx
+                                best_new_pos = pos
+                
+                # 3. Si se encontró una mejor posición, realizar el cambio
+                if best_new_bundle_idx != -1:
+                    bundles[best_new_bundle_idx].insert(best_new_pos, order)
+    # --- FIN DE LA MODIFICACIÓN ---
 
     # Remove any empty bundles that may have been preallocated but not filled
     return [b for b in bundles if b]
