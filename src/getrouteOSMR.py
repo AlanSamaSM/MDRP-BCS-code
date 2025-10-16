@@ -6,6 +6,26 @@ import time
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
+def haversine_distance(pt1, pt2):
+    """Calculate the great-circle distance in meters between two points
+    on the earth (specified in decimal degrees).
+    """
+    lat1, lon1 = pt1
+    lat2, lon2 = pt2
+    R = 6371e3  # Earth radius in meters
+
+    phi1 = math.radians(lat1)
+    phi2 = math.radians(lat2)
+    delta_phi = math.radians(lat2 - lat1)
+    delta_lambda = math.radians(lon2 - lon1)
+
+    a = math.sin(delta_phi / 2) * math.sin(delta_phi / 2) + \
+        math.cos(phi1) * math.cos(phi2) * \
+        math.sin(delta_lambda / 2) * math.sin(delta_lambda / 2)
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+    return R * c
+
 # Configure a requests Session with retry/backoff to be resilient to
 # transient errors and common server-side rate limiting (HTTP 429).
 _session = None
@@ -42,16 +62,21 @@ def as_latlon(pt):
 # Funcion de ruteo OSRM
 # ======================
 
+_osrm_cache = {}
+
 def get_route_details(start_coords, waypoints):
+    cache_key = (start_coords,) + tuple(waypoints)
+    if cache_key in _osrm_cache:
+        return _osrm_cache[cache_key]
     """Return routing information for start_coords -> waypoints.
 
     If the environment variable ``USE_EUCLIDEAN`` is set to ``1`` the route is
     computed using simple Euclidean distance with constant speed given by the
     ``METERS_PER_MINUTE`` environment variable (default 320).  Otherwise the
-    function queries the public OSRM service as before.
+    If explicitly requested, use Euclidean fallback only and skip HTTP calls.
     """
 
-    use_euclidean = True
+    use_euclidean = os.environ.get('USE_EUCLIDEAN') == '1'
 
     # If explicitly requested, use Euclidean fallback only and skip HTTP calls.
     if use_euclidean:
@@ -60,35 +85,34 @@ def get_route_details(start_coords, waypoints):
         distance = 0.0
         legs = []
         for a, b in zip(coords[:-1], coords[1:]):
-            seg = math.hypot(b[0] - a[0], b[1] - a[1])
+            seg = haversine_distance(a, b)  # Use Haversine for meters
             distance += seg
             legs.append({"steps": [{"maneuver": {"location": (b[1], b[0])}}]})
         duration_sec = (distance / speed) * 60.0
         geometry = polyline.encode(coords)
-        return {"distance": distance, "duration": duration_sec, "geometry": geometry, "legs": legs}
+        result = {"distance": distance, "duration": duration_sec, "geometry": geometry, "legs": legs}
+        _osrm_cache[cache_key] = result
+        return result
 
     points = [start_coords] + waypoints
     coordinates = ";".join(
         f"{lon},{lat}" for lon, lat in map(as_lonlat, points)
     )
-    url = f"http://router.project-osrm.org/route/v1/driving/{coordinates}"
+    url = f"http://localhost:5000/route/v1/driving/{coordinates}"
     params = {"overview": "full", "steps": "true", "annotations": "true"}
 
-    # Respect a small per-request delay (configurable) before calling the
-    # public OSRM instance to be polite and reduce risk of immediate 429s.
-    request_delay = float(os.environ.get('OSRM_REQUEST_DELAY', '0.15'))
-
     try:
-        time.sleep(request_delay)
         session = _get_session()
-        response = session.get(url, params=params, timeout=float(os.environ.get('OSRM_TIMEOUT', '8')))
+        response = session.get(url, params=params, timeout=float(os.environ.get('OSRM_TIMEOUT', '30')))
         # If the server returns a non-200 status this will raise and be
         # handled by the retry logic in the adapter; otherwise continue.
         response.raise_for_status()
         data = response.json()
         code = data.get('code')
         if code == 'Ok' and data.get('routes'):
-            return data['routes'][0]
+            result = data['routes'][0]
+            _osrm_cache[cache_key] = result
+            return result
 
         # Handle situations where OSRM returns an error code (e.g., NoRoute,
         # InvalidUrl, TooBig). In some cases we want to fallback to a simple
@@ -115,7 +139,7 @@ def get_route_details(start_coords, waypoints):
             distance = 0.0
             legs = []
             for a, b in zip(coords[:-1], coords[1:]):
-                seg = math.hypot(b[0] - a[0], b[1] - a[1])
+                seg = haversine_distance(a, b)  # Use Haversine for meters
                 distance += seg
                 legs.append({"steps": [{"maneuver": {"location": (b[1], b[0])}}]})
             duration_sec = (distance / speed) * 60.0

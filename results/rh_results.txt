@@ -1,0 +1,5 @@
+Courier 1: orders=67, earnings=$670.00
+Courier 2: orders=52, earnings=$520.00
+Courier 3: orders=81, earnings=$810.00
+Courier 4: orders=69, earnings=$690.00
+Courier 5: orders=66, earnings=$660.00

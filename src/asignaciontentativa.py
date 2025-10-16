@@ -10,6 +10,38 @@ from src.config import (
 from src.getrouteOSMR import get_route_details
 from src.bundling import calculate_bundle_score
 
+def assign_order_to_nearest_courier(order, couriers, current_time):
+    """
+    Assigns a single order to the nearest available courier (FCFS logic).
+    """
+    best_courier = None
+    min_dist = float('inf')
+
+    for courier in couriers:
+        if courier.current_route is None:
+            # Simplified distance calculation (Euclidean)
+            dist = np.sqrt((courier.location[0] - order.restaurant.location[0])**2 + 
+                         (courier.location[1] - order.restaurant.location[1])**2)
+            if dist < min_dist:
+                min_dist = dist
+                best_courier = courier
+
+    if best_courier:
+        route_data = get_route_details(
+            best_courier.location,
+            [order.restaurant.location, order.dropoff_loc]
+        )
+        if route_data:
+            best_courier.current_route = {
+                'orders': [order],
+                'route': route_data,
+                'start_time': current_time,
+                'completion_time': current_time + timedelta(seconds=route_data['duration']),
+                'commitment_type': 'final'
+            }
+            order.status = 'assigned'
+
+
 ###############################################################################
 # HELPER: classify_bundle(bundle, couriers, current_time)
 #   Returns an integer {1,2,3} for Group I, II, or III.
@@ -234,6 +266,7 @@ def do_linear_assignment(couriers, candidate_bundles, current_time):
 
     num_couriers = len(free_couriers)
     num_bundles = len(candidate_bundles)
+    print(f"      Building cost matrix for {num_couriers} couriers and {num_bundles} bundles...")
 
     cost_matrix = np.zeros((num_couriers, num_bundles), dtype=float)
 
@@ -286,6 +319,7 @@ def assign_bundles_to_couriers(couriers, bundles, current_time):
         return
 
     # 1) Classify each bundle
+    print(f"    Classifying {len(bundles)} bundles...")
     groupI, groupII, groupIII = [], [], []
     for b in bundles:
         g = classify_bundle(b, couriers, current_time)
@@ -295,9 +329,17 @@ def assign_bundles_to_couriers(couriers, bundles, current_time):
             groupII.append(b)
         else:
             groupIII.append(b)
+    
+    print(f"    Group I: {len(groupI)}, Group II: {len(groupII)}, Group III: {len(groupIII)}")
 
     # 2) Solve assignment in that order:
     #    Group I first => then Group II => then Group III
-    do_linear_assignment(couriers, groupI, current_time)
-    do_linear_assignment(couriers, groupII, current_time)
-    do_linear_assignment(couriers, groupIII, current_time)
+    if groupI:
+        print("    Assigning Group I bundles...")
+        do_linear_assignment(couriers, groupI, current_time)
+    if groupII:
+        print("    Assigning Group II bundles...")
+        do_linear_assignment(couriers, groupII, current_time)
+    if groupIII:
+        print("    Assigning Group III bundles...")
+        do_linear_assignment(couriers, groupIII, current_time)

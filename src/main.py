@@ -10,7 +10,7 @@ import os
 import pandas as pd
 from datetime import datetime
 from src.bundling import compute_target_bundle_size, generate_bundles_for_restaurant
-from src.asignaciontentativa import assign_bundles_to_couriers
+from src.asignaciontentativa import assign_bundles_to_couriers, assign_order_to_nearest_courier
 from src.config import PAY_PER_ORDER, MIN_PAY_PER_HOUR, ASSIGNMENT_HORIZON, OPTIMIZATION_FREQUENCY
 from collections import deque
 
@@ -49,6 +49,7 @@ class Courier:
         self.route_history = []
         self.earnings = 0.0
         self.orders_delivered = 0
+        self.total_distance = 0.0
         self.shift_started = False  # Para controlar el cálculo del tiempo de turno
 
     def shift_duration_hours(self):
@@ -71,14 +72,22 @@ class Courier:
 # simulación
 # ======================
 
-def run_simulation(orders, couriers, restaurants, simulation_end, start_time=None):
+def run_simulation(orders, couriers, restaurants, simulation_end, start_time=None, results_path="results/simulation_results.csv", courier_results_path=None):
     if start_time is None:
         start_time = datetime(2025, 1, 1, 8, 0)
     current_time = start_time  # punto de inicio de la simulación
     order_queue = deque(sorted(orders, key=lambda o: o.placement_time)) #se ordenan las ordenes por tiempo de colocación
     active_couriers = [] #se inicializa una lista que contendrá los repartidores activos
     
+    use_fcfs = os.environ.get('FCFS_POLICY') == '1'
+
+    delivered_orders = []
+
+    visualized_deliveries_count = 0
+
     while current_time < simulation_end:
+        print(f"\n--- Simulation time: {current_time} ---")
+
         for c in couriers:  #loop para revisar si un repartidor está disponible
             if c.on_time <= current_time and c not in active_couriers:
                 active_couriers.append(c)
@@ -90,37 +99,39 @@ def run_simulation(orders, couriers, restaurants, simulation_end, start_time=Non
             new_order.restaurant.orders.append(new_order) #se agrega la orden a la lista de ordenes del restaurante
          
         if (current_time.minute % 5) == 0: #cada que el tiempo actual sea multiplo de 5 minutos
+            print(f"[{current_time}] Running assignment logic...")
             available_couriers = [c for c in active_couriers if not c.current_route and c.off_time > current_time] # se filtra la lista de repartidores activos para obtener los que no tienen rutas asignadas y que su tiempo de salida sea mayor al tiempo actual
             
             orders_ready = [o for rest in restaurants for o in rest.orders if o.status == "ready" and o.ready_time <= current_time + ASSIGNMENT_HORIZON] #se filtran las ordenes que esten listas segun el horizonte de asignación
 
-            couriers_available_hor = [c for c in available_couriers if c.off_time >= current_time + ASSIGNMENT_HORIZON] #se filtran los repartidores disponibles segun el horizonte de asignación
-            
-            #se calcula el valor objetivo de Zt, tamaño de los bundles
-
-            target_bundle_size = compute_target_bundle_size(
-                current_time,
-                orders_ready,
-                couriers_available_hor,
-            )
-
-            
-            all_bundles = []
-
-            #se busca en los restaurantes y se generan los bundles, se agregan a la lista de bundles all_bundles
-            for rest in restaurants:
-                rst_bundles = generate_bundles_for_restaurant(
-                    rest,
+            if use_fcfs:
+                # Lógica FCFS: Asignar órdenes una por una al repartidor más cercano
+                for order in orders_ready:
+                    if order.status == 'ready':
+                        assign_order_to_nearest_courier(order, available_couriers, current_time)
+            else:
+                # Lógica de Rolling Horizon (la que ya existía)
+                couriers_available_hor = [c for c in available_couriers if c.off_time >= current_time + ASSIGNMENT_HORIZON] #se filtran los repartidores disponibles segun el horizonte de asignación
+                
+                target_bundle_size = compute_target_bundle_size(
                     current_time,
-                    target_bundle_size,
-                    len(couriers_available_hor),
+                    orders_ready,
+                    couriers_available_hor,
                 )
-                if rst_bundles:
-                    all_bundles.extend(rst_bundles)
 
-            #se asignan los bundles a los repartidores disponibles
+                all_bundles = []
+                for rest in restaurants:
+                    rst_bundles = generate_bundles_for_restaurant(
+                        rest,
+                        current_time,
+                        target_bundle_size,
+                        len(couriers_available_hor),
+                    )
+                    if rst_bundles:
+                        all_bundles.extend(rst_bundles)
 
-            assign_bundles_to_couriers(available_couriers, all_bundles, current_time)
+                assign_bundles_to_couriers(available_couriers, all_bundles, current_time)
+            print(f"[{current_time}] Assignment logic finished.")
 
         # actualizar progreso de rutas
         for c in active_couriers:
@@ -131,15 +142,20 @@ def run_simulation(orders, couriers, restaurants, simulation_end, start_time=Non
                         o.pickup_time = c.current_route['start_time']
                         o.delivery_time = c.current_route['completion_time']
                         c.orders_delivered += 1
+                        delivered_orders.append(o)
+                        print(f"Order {o.id} delivered.")
                 # actualizar ubicación al último punto de la ruta
                 if c.current_route['route']['legs']:
                     last = c.current_route['route']['legs'][-1]['steps'][-1]['maneuver']['location']
                     from src.getrouteOSMR import as_latlon
                     c.location = as_latlon(last)
+                    c.total_distance += c.current_route['route']['distance'] / 1000 # convert to km
                 # almacenar la ruta completada antes de limpiarla y guardar mapa
                 c.route_history.append(c.current_route)
-                filename = f"courier{c.id}_route{len(c.route_history)}.html"
-                save_route_map(c.current_route, filename)
+                if visualized_deliveries_count < 10 and c.current_route['commitment_type'] == 'final':
+                    visualized_deliveries_count += 1
+                    filename = f"delivery_{visualized_deliveries_count}.html"
+                    save_route_map(c.current_route, filename)
                 c.current_route = None
 
         current_time += OPTIMIZATION_FREQUENCY
@@ -148,9 +164,37 @@ def run_simulation(orders, couriers, restaurants, simulation_end, start_time=Non
     for c in couriers:
         c.final_compensation()
 
+    # Guardar resumen de repartidores
+    courier_summary_df = pd.DataFrame.from_records([
+        {
+            'courier_id': c.id,
+            'orders_delivered': c.orders_delivered,
+            'total_distance_km': c.total_distance,
+            'shift_duration_hours': c.shift_duration_hours(),
+        } for c in couriers
+    ])
+    if courier_results_path:
+        courier_summary_df.to_csv(courier_results_path, index=False)
+
     # imprimir métricas simples
     for c in couriers:
-        print(f"Courier {c.id}: orders={c.orders_delivered}, earnings=${c.earnings:.2f}")
+        print(f"Courier {c.id}: orders={c.orders_delivered}, earnings=${c.earnings:.2f}, distance={c.total_distance:.2f}km")
+
+    # Guardar resultados detallados
+    all_orders_df = pd.DataFrame.from_records([
+        {
+            'order_id': o.id,
+            'status': o.status,
+            'placement_time': o.placement_time,
+            'ready_time': o.ready_time,
+            'pickup_time': o.pickup_time,
+            'delivery_time': o.delivery_time,
+            'click_to_door': o.get_click_to_door(),
+            'ready_to_pickup': o.get_ready_to_pickup(),
+            'bundle_size': len(c.current_route['orders']) if c.current_route else 1
+        } for o in orders
+    ])
+    all_orders_df.to_csv(results_path, index=False)
 
 # ======================
 # Visualización de la ruta
@@ -220,7 +264,9 @@ if __name__ == "__main__":
         orders=test_orders,
         couriers=couriers,
         restaurants=restaurants,
-        simulation_end=datetime(2025, 1, 1, 12, 0)
+        simulation_end=datetime(2025, 1, 1, 12, 0),
+        results_path="results/test_results.csv",
+        courier_results_path="results/test_couriers.csv"
     )
     # Visualizar la ultima ruta ejecutada
     active_courier = next((c for c in couriers if c.current_route), None)

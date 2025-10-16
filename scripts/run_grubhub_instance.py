@@ -24,7 +24,22 @@ def run_instance(instance_path):
         min(o.placement_time for o in orders),
     )
     simulation_end = max(c.off_time for c in couriers) + timedelta(hours=1)
-    run_simulation(orders, couriers, restaurants, simulation_end, start_time=simulation_start)
+
+    results_dir = os.path.join(os.path.dirname(__file__), '..\\', 'results', 'raw')
+    os.makedirs(results_dir, exist_ok=True)
+    base_filename = os.path.basename(instance_path).replace('.json', '')
+    results_path = os.path.join(results_dir, f'{base_filename}_rh_results.csv')
+    courier_results_path = os.path.join(results_dir, f'{base_filename}_rh_couriers.csv')
+
+    run_simulation(
+        orders, 
+        couriers, 
+        restaurants, 
+        simulation_end, 
+        start_time=simulation_start, 
+        results_path=results_path, 
+        courier_results_path=courier_results_path
+    )
 
 
 if __name__ == "__main__":

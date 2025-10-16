@@ -1,53 +1,67 @@
-# MDRP-BCS Code
+# Simulación y Optimización del Despacho de Órdenes para Entrega de Comida en La Paz, BCS
 
-This repository contains a basic simulator and heuristics for courier
-assignment.  Three loaders are provided:
+Este repositorio contiene el código fuente y los experimentos para la tesis [**TU TÍTULO DE TESIS AQUÍ**]. El proyecto implementa un simulador para el Problema de Enrutamiento de Entrega de Comida (MDRP) y compara dos políticas de asignación de repartidores:
 
-- **Grubhub benchmark** via `grubhub_loader.py`
-- **LaDe (Jilin subset)** via `lade_loader.py`
-- **Synthetic La Paz** via `synth_loader.py`
+1.  **First-Come, First-Served (FCFS):** Una política base simple donde las órdenes se asignan al repartidor disponible más cercano a medida que están listas.
+2.  **Rolling Horizon (RH):** Una heurística de optimización que agrupa (bundle) órdenes y planifica rutas en intervalos de tiempo periódicos para mejorar la eficiencia.
 
-## Running with LaDe
+El objetivo es demostrar la mejora en la calidad del servicio y la eficiencia operativa del enfoque RH sobre FCFS utilizando un conjunto de datos sintético basado en la ciudad de La Paz, BCS.
 
-1. Install dependencies
+## Requisitos Previos
 
-```bash
-pip install -r requirements.txt
-```
+*   Python 3.8 o superior
+*   Un servidor OSRM local o acceso a uno. El proyecto está configurado para usar el servidor público de OSRM, pero se recomienda uno local para un rendimiento estable. Las instrucciones de configuración de OSRM se pueden encontrar [aquí](http://project-osrm.org/).
 
-2. Execute the simulation
+## Instalación
 
-```bash
-python run_lade_instance.py delivery_jl.parquet
-```
+1.  Clona este repositorio:
+    ```bash
+    git clone [URL-DE-TU-REPOSITORIO]
+    cd MDRP-BCS-code
+    ```
 
-The loader approximates each depot using the courier GPS when the order
-was accepted.  Acceptance time is treated as both placement and ready
-time.  The ``ds`` column stores the month and day for each order, which
-the loader merges with the ``accept_time`` and ``delivery_time`` strings
-to build full datetimes.
+2.  Instala las dependencias de Python:
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-## Running the Synthetic Example
+## Reproducción de Resultados
 
-1. Generate or obtain ``synthetic_lapaz_orders.csv`` using
-   ``make_synth_orders.py``.
-
-2. Execute the simulation:
+Para generar los resultados comparativos presentados en la tesis, ejecuta el siguiente script:
 
 ```bash
-python run_synth_instance.py synthetic_lapaz_orders.csv
+python scripts/generate_results.py
 ```
 
-If the online OSRM service is slow or unreachable, set `USE_EUCLIDEAN=1`
-to compute straight‑line distances instead of requesting routes:
+Este script realizará los siguientes pasos:
+1.  Generará el conjunto de datos de órdenes sintéticas (`synthetic_lapaz_orders.csv`) si no existe.
+2.  Ejecutará la simulación para la política **FCFS**.
+3.  Ejecutará la simulación para la política **Rolling Horizon (RH)**.
+4.  Generará los archivos de resultados en la carpeta `/results`, incluyendo:
+    *   `fcfs_results.txt`: Tiempos de entrega detallados para FCFS.
+    *   `rh_results.txt`: Tiempos de entrega detallados para RH.
+    *   `kpi_comparison.csv`: Una tabla comparativa con las métricas clave de rendimiento (KPIs) de ambas políticas.
 
-```bash
-USE_EUCLIDEAN=1 python run_synth_instance.py synthetic_lapaz_orders.csv
+## Estructura del Proyecto
+
+```
+MDRP-BCS-code/
+├── data/                 # Datos de entrada (restaurantes, repartidores, etc.)
+├── results/              # Resultados generados por las simulaciones
+├── scripts/              # Scripts para ejecutar experimentos y generar datos
+│   ├── generate_results.py # Script principal para reproducir los resultados de la tesis
+│   └── make_synth_orders.py  # Generador de órdenes sintéticas
+├── src/                  # Código fuente principal de la simulación y algoritmos
+│   ├── bundling.py       # Lógica para la agrupación de órdenes (bundling)
+│   ├── getrouteOSMR.py   # Cliente para interactuar con el servidor OSRM
+│   └── main.py           # Lógica central de la simulación
+├── tests/                # Pruebas unitarias
+├── README.md             # Este archivo
+└── requirements.txt      # Dependencias de Python
 ```
 
-## Metrics for Route Prediction
+## Scripts y Módulos Adicionales
 
-`lade_metrics.py` implements the performance metrics described in the
-LaDe paper: Kendall Rank Correlation, Edit Distance, Location Square
-Deviation and Hit Rate@k.  These helpers can be used to evaluate routing
-predictions.
+*   `run_fcfs_instance.py`: Ejecuta una simulación solo con la política FCFS.
+*   `run_synth_instance.py`: Ejecuta una simulación solo con la política RH.
+*   `grubhub_loader.py` / `lade_loader.py`: Módulos para cargar datos de otros benchmarks (Grubhub, LaDe), no utilizados en el experimento principal de la tesis.
