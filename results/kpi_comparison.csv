@@ -1,0 +1,8 @@
+,FCFS,Rolling Horizon,Improvement (%)
+Avg. Click-to-Door (min),44.94,100.96,124.66%
+P95 Click-to-Door (min),110.87,166.20,49.91%
+Avg. Ready-to-Pickup (min),22.88,33.04,44.41%
+% Undelivered Orders,96.10,93.47,-2.74%
+Total Distance (km),573.74,317.49,-44.66%
+Orders per Courier per Hour,2.64,8.41,218.56%
+Avg. Bundle Size,1.00,1.00,0.00%

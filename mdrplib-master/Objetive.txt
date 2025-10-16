@@ -1,0 +1,299 @@
+Absolutamente. Basado en el estado actual de tu tesis y tus preguntas, aquí tienes una evaluación y los siguientes pasos sugeridos.
+
+Evaluación de tu Siguiente Paso (Pedido Secundario)
+Tu idea de comparar tu algoritmo de Rolling Horizon con otra política más simple es correcta y fundamental para la validación de tu tesis. Sin embargo, tu objetivo inmediato no debería ser demostrar que el algoritmo es "agnóstico a la data" (robusto ante diferentes datasets), sino primero demostrar que funciona y es superior a un método de referencia en un entorno controlado.
+
+El flujo lógico es:
+
+Implementar y depurar: Asegurarte de que el código corre sin errores y genera resultados consistentes.
+
+Validar: Demostrar que tu algoritmo es mejor que una alternativa simple (el benchmark o política base).
+
+Generalizar (Opcional): Probar con más datasets para demostrar la robustez o "agnosticidad" que mencionas.
+
+Respuesta corta: Sí, tu siguiente paso es correcto, pero el enfoque debe ser la validación comparativa, no la "agnosticidad" por ahora. Tu idea de usar una política de "asignación a como vayan llegando las órdenes" es un excelente punto de partida. En la literatura, esto se conoce como una política First-Come, First-Served (FCFS).
+
+Métricas y Estadísticos para la Validación (Pedido Primario) 📊
+Para validar tu algoritmo, necesitas métricas que cubran tanto la eficiencia operativa como la calidad del servicio. Basándome en tu propia tesis, el artículo de referencia de Reyes et al. (2018) y estándares en problemas de enrutamiento dinámico, te sugiero el siguiente conjunto de estadísticos:
+
+Métricas Clave de Calidad de Servicio
+Estas son las más importantes para el cliente y el restaurante.
+
+Click-to-Door (CTD) Time: El tiempo total desde que un cliente hace el pedido hasta que lo recibe. Es la métrica más importante de cara al cliente. Deberías medir:
+
+Promedio y Mediana de CTD: Para entender el rendimiento general.
+
+Desviación Estándar de CTD: Mide la consistencia del servicio. Un valor bajo es deseable.
+
+Percentiles de CTD (e.g., 90, 95): Te dice cuál es el tiempo de entrega para el peor 10% o 5% de los casos. Es clave para medir la fiabilidad.
+
+Ready-to-Pickup (RTP) Time: El tiempo que una orden pasa en el restaurante lista para ser recogida. Un tiempo alto indica que los repartidores no están llegando a tiempo, lo que molesta a los restaurantes y enfría la comida.
+
+Promedio y Mediana de RTP.
+
+Percentiles de RTP.
+
+Órdenes Entregadas vs. No Entregadas: El porcentaje de órdenes que tu sistema logra entregar exitosamente dentro de las restricciones de tiempo. Es una métrica fundamental de rendimiento.
+
+Métricas de Eficiencia Operativa
+Estas métricas le importan a la empresa (Mr. Foody) para controlar costos.
+
+Distancia Total Recorrida: Suma de todos los kilómetros recorridos por todos los repartidores. Directamente relacionado con el costo de combustible y mantenimiento.
+
+Número de Órdenes por Repartidor por Hora: Mide la productividad de la flota.
+
+Tamaño Promedio del Bundle (Agrupamiento): El número promedio de órdenes agrupadas en una sola ruta. Un número mayor a 1 indica que tu heurística de bundling está funcionando.
+
+Tiempo de Cómputo: El tiempo que tu algoritmo tarda en cada iteración del Rolling Horizon. Debe ser lo suficientemente bajo para operar en tiempo real (normalmente unos pocos segundos).
+
+Plan de Experimentación Sugerido
+Define tu Política Base (Benchmark): Como sugeriste, una política simple de First-Come, First-Served (FCFS) es un excelente punto de partida.
+
+Lógica FCFS: Cuando una orden está lista (ready_time), se asigna al repartidor disponible más cercano al restaurante. Este repartidor va, recoge la orden y la entrega sin agruparla con otras.
+
+Corre la Simulación: Ejecuta tu simulación con el mismo dataset sintético para ambas políticas:
+
+Experimento A: Política FCFS.
+
+Experimento B: Tu algoritmo de Rolling Horizon.
+
+Recolecta y Compara las Métricas: Para cada experimento, calcula todas las métricas mencionadas anteriormente. Presenta los resultados en una tabla comparativa.
+
+Métrica	Política FCFS (Base)	Tu Algoritmo (Rolling Horizon)	Mejora (%)
+Calidad de Servicio			
+Promedio Click-to-Door (min)	valor	valor	cálculo
+Percentil 95 CTD (min)	valor	valor	cálculo
+Promedio Ready-to-Pickup (min)	valor	valor	cálculo
+% de Órdenes No Entregadas	valor	valor	cálculo
+Eficiencia Operativa			
+Distancia Total Recorrida (km)	valor	valor	cálculo
+Órdenes / Repartidor / Hora	valor	valor	cálculo
+Tamaño Promedio de Bundle	1	valor	cálculo
+
+DOcker results: Windows PowerShell
+Copyright (C) Microsoft Corporation. Todos los derechos reservados.
+
+Prueba la nueva tecnología PowerShell multiplataforma https://aka.ms/pscore6
+
+PS C:\Users\alan_> docker run --rm -t -v "C:\Users\alan_\Documents\GitHub\MDRP-BCS-code:/data" osrm/osrm-backe
+nd osrm-extract -p /opt/car.lua /data/mexico-251010.osm.pbf
+>>
+[info] Parsed 0 location-dependent features with 0 GeoJSON polygons
+[info] Using script /opt/car.lua
+[info] Input file: mexico-251010.osm.pbf
+[info] Profile: car.lua
+[info] Threads: 12
+[info] Parsing in progress..
+[info] input file generated by osmium/1.14.0
+[info] timestamp: 2025-10-10T20:20:41Z
+[info] Using profile api version 4
+[info] Found 3 turn restriction tags:
+[info]   motorcar
+[info]   motor_vehicle
+[info]   vehicle
+[info] Parse relations ...
+[info] Parse ways and nodes ...
+[info] Using profile api version 4
+[info] Using profile api version 4
+[info] Using profile api version 4
+[info] Using profile api version 4
+[info] Using profile api version 4
+[info] Using profile api version 4
+[info] Using profile api version 4
+[info] Using profile api version 4
+[info] Using profile api version 4
+[info] Using profile api version 4
+[info] Using profile api version 4
+[info] Parsing finished after 58.1796 seconds
+[info] Raw input contains 76202197 nodes, 8679458 ways, and 3767 relations, 9526 restrictions
+[info] Collecting way information on 9526 restrictions...ok, after 0.060342s
+[info] Collecting way information on 0 maneuver overrides...ok, after 0.029188s
+[info] Sorting used nodes        ...ok, after 0.383509s
+[info] Erasing duplicate nodes   ...ok, after 0.067861s
+[info] Sorting all nodes         ...ok, after 0.04203s
+[info] Building node id map      ...ok, after 0.107712s
+[info] Confirming/Writing used nodes     ...ok, after 158.418s
+[info] Writing barrier nodes     ...ok, after 0s
+[info] Writing traffic light nodes     ... ok, after 0s
+[info] Processed 34210946 nodes
+[info] Sorting edges by start    ...ok, after 1.71179s
+[info] Setting start coords      ...ok, after 1.80583s
+[info] Sorting edges by target   ...ok, after 1.48889s
+[info] Computing edge weights    ...ok, after 10.2877s
+[info] Sorting edges by renumbered start ...ok, after 1.63378s
+[info] Writing used edges       ... ok, after 7.06266s -- Processed 36540015 edges
+[info] Writing way meta-data     ... ok, after 0.17293s -- Metadata contains << 4102485 entries.
+[info] Collecting node information on 0 maneuver overrides...ok, after 0s
+[info] Collecting node information on 9526 restrictions...ok, after 0.015309s
+[info] writing street name index ...ok, after 0.062785s
+[info] extraction finished after 242.3s
+[info] Generating edge-expanded graph representation
+[info] . 10% . 20% . 30% . 40% . 50% . 60% . 70% . 80% . 90% . 100%
+[info] Node compression ratio: 0.189091
+[info] Edge compression ratio: 0.240678
+[info]  graph compression removed 3719441 annotations of 4102485 in 5.35678 seconds
+[info] Find segregated edges in node-based graph ...
+[info] ok, after 22.6124s
+[info] Segregated edges count = 299403
+[info] Writing nodes for nodes-based and edges-based graphs ...
+[info] Geometry successfully removed:
+  compressed edges: 17586500
+  compressed geometries: 73076798
+  longest chain length: 3169
+  cmpr ratio: 0.240658
+  avg chain length: 4.15528
+[info] Removing invalid restrictions...removed 74 invalid restrictions, after 0.003313s
+[info] Constructing restriction graph on 9284 restrictions...ok, after 0.00186s
+[info] Generating edge expanded nodes ... 
+[info]. 10% . 20% . 30% . 40% . 50% . 60% . 70% . 80% . 90% . 100%
+[info] Expanding via-way turn restrictions ...
+[info]. 10% . 20% . 30% . 40% . 50% . 60% . 70% . 80% . 90% . 100%
+[info] Generated 16352538 nodes (1594 of which are duplicates)  and 36535164 segments in edge-expanded graph  
+[info] Generating edge-expanded edges 
+[info] . 10% . 20% . 30% . 40% . 50% . 60% . 70% . 80% . 90% .
+[info] Sorting and writing 0 maneuver overrides...
+[info] done.
+[info] Renumbering turns
+[info] Writing 0 conditional turn penalties...
+[info] Generated 36535164 edge based node segments
+[info] Node-based graph contains 16350526 edges
+[info] Edge-expanded graph ...
+[info]   contains 33544464 edges
+[info] Timing statistics for edge-expanded graph:
+[info] Renumbering edges: 0.802485s
+[info] Generating nodes: 25.6351s
+[info] Generating edges: 56.7919s
+[info] Generating guidance turns 
+[info] . 10% . 20% . 30% . 40% . 50% . 60% . 70% . 80% . 90% .
+[info] done.
+[info] Created 103 entry classes and 20694 Bearing Classes
+[info] Handled: 4315 of 27448 lanes: 15.7206 %.
+[info] Assigned 37360029 turn instruction types:
+[info]   new name: 929726 (2.49%)
+[info]   continue: 1604835 (4.30%)
+[info]   turn: 16698282 (44.70%)
+[info]   merge: 13411 (0.04%)
+[info]   on ramp: 12101 (0.03%)
+[info]   off ramp: 11111 (0.03%)
+[info]   fork: 192419 (0.52%)
+[info]   end of road: 5293816 (14.17%)
+[info]   notification: 166 (0.00%)
+[info]   enter roundabout: 17754 (0.05%)
+[info]   enter and exit roundabout: 176 (0.00%)
+[info]   enter rotary: 734 (0.00%)
+[info]   enter and exit rotary: 13 (0.00%)
+[info]   enter roundabout turn: 3812 (0.01%)
+[info]   (noturn): 792456 (2.12%)
+[info]   (suppressed): 11712155 (31.35%)
+[info]   roundabout: 178 (0.00%)
+[info]   exit roundabout: 19643 (0.05%)
+[info]   rotary: 44 (0.00%)
+[info]   exit rotary: 850 (0.00%)
+[info]   roundabout turn: 1 (0.00%)
+[info]   exit roundabout turn: 3892 (0.01%)
+[info]   (stay on roundabout): 23621 (0.06%)
+[info]   (sliproad): 28833 (0.08%)
+[info] Assigned 37360029 turn instruction modifiers:
+[info]   uturn: 1352737 (3.62%)
+[info]   sharp right: 712007 (1.91%)
+[info]   right: 10596525 (28.36%)
+[info]   slight right: 815287 (2.18%)
+[info]   straight: 12150637 (32.52%)
+[info]   slight left: 793220 (2.12%)
+[info]   left: 10219034 (27.35%)
+[info]   sharp left: 720582 (1.93%)
+[info] Guidance turn annotations took 63.2944s
+[info] Writing Intersection Classification Data
+[info] ok, after 0.881237s
+[info] Writing Turns and Lane Data...
+[info] ok, after 1.30613s
+[info] Saving edge-based node weights to file.
+[info] Done writing. (1.38821)
+[info] Computing strictly connected components ...
+[info] Found 9091 SCC (2 large, 9089 small)
+[info] SCC run took: 2.49272s
+[info] Building r-tree ...
+[info] Constructing r-tree of 36535164 segments build on-top of 34210946 coordinates
+[info] Writing edge-based-graph edges       ...
+[info] ok, after 238.329s
+[info] Processed 33544464 edges
+[info] Expansion: 79167 nodes/sec and 37841 edges/sec
+[info] To prepare the data for routing, run: ./osrm-contract "/data/mexico-251010.osrm"
+[info] RAM: peak bytes used: 9677574144
+PS C:\Users\alan_> ^C
+PS C:\Users\alan_> docker run --rm -t -v "C:\Users\alan_\Documents\GitHub\MDRP-BCS-code:/data" osrm/osrm-backe
+nd osrm-partition /data/mexico-251010.osrm
+>>
+[info] Computing recursive bisection
+[info] Loaded compressed node based graph: 17586428 edges, 34210946 nodes
+[info]  running partition: 128 1.2 0.25 10 1000 # max_cell_size balance boundary cuts small_component_size
+[info] Found 27744954 SCC (1 large, 27744953 small)
+[info] SCC run took: 1.95709s
+[info] Full bisection done in 109.295s
+[info] Loaded node based graph to edge based graph mapping
+[info] Loaded edge based graph for mapping partition ids: 67083468 edges, 16352538 nodes
+[info] Fixed 4258 unconnected nodes
+[info] Edge-based-graph annotation:
+[info]   level 1 #cells 77085 bit size 17
+[info]   level 2 #cells 6102 bit size 13
+[info]   level 3 #cells 392 bit size 9
+[info]   level 4 #cells 12 bit size 4
+[info] Renumbered data in 86.1699 seconds
+[info] MultiLevelPartition constructed in 3.8629 seconds
+[info] CellStorage constructed in 1.11101 seconds
+[info] MLD data writing took 11.5491 seconds
+[info] Cells statistics per level
+[info] Level 1 #cells 77085 #boundary nodes 1657049, sources: avg. 14, destinations: avg. 20, entries: 3412185
+8 (272974864 bytes)
+60896808 bytes)
+[info] Level 3 #cells 392 #boundary nodes 27224, sources: avg. 46, destinations: avg. 62, entries: 1414756 (11
+318048 bytes)
+[info] Level 4 #cells 12 #boundary nodes 2034, sources: avg. 115, destinations: avg. 151, entries: 268759 (215
+0072 bytes)
+[info] Bisection took 246.586 seconds.
+[info] RAM: peak bytes used: 6257913856
+PS C:\Users\alan_> docker run --rm -t -v "C:\Users\alan_\Documents\GitHub\MDRP-BCS-code:/data" osrm/osrm-backe
+nd osrm-customize /data/mexico-251010.osrm
+>>
+[info] Loaded edge based graph: 67083468 edges, 16352538 nodes
+[info] Loading partition data took 21.5606 seconds
+[info] Cells customization took 22.7404 seconds
+[info] Cells statistics per level
+[info] Level 1 #cells 77085 #boundary nodes 1657049, sources: avg. 14, destinations: avg. 20, entries: 3412185
+8 (272974864 bytes)
+[info] Level 2 #cells 6102 #boundary nodes 228102, sources: avg. 24, destinations: avg. 34, entries: 7612101 (
+60896808 bytes)
+[info] Level 3 #cells 392 #boundary nodes 27224, sources: avg. 46, destinations: avg. 62, entries: 1414756 (11
+318048 bytes)
+[info] Level 4 #cells 12 #boundary nodes 2034, sources: avg. 115, destinations: avg. 151, entries: 268759 (215
+0072 bytes)
+[info] Unreachable nodes statistics per level
+[warn] Level 1 unreachable boundary nodes per cell: 0.00067458 sources, 0.000596744 destinations
+[warn] Level 2 unreachable boundary nodes per cell: 0.00360538 sources, 0.00229433 destinations
+[warn] Level 3 unreachable boundary nodes per cell: 0.0408163 sources, 0.00765306 destinations
+[warn] Level 4 unreachable boundary nodes per cell: 1.25 sources, 0.25 destinations
+[info] Unreachable nodes statistics per level
+[warn] Level 1 unreachable boundary nodes per cell: 0.02566 sources, 0.0260102 destinations
+[warn] Level 2 unreachable boundary nodes per cell: 0.182399 sources, 0.1765 destinations
+[warn] Level 3 unreachable boundary nodes per cell: 1.08673 sources, 1.0051 destinations
+[warn] Level 4 unreachable boundary nodes per cell: 4.75 sources, 3.33333 destinations
+[info] Unreachable nodes statistics per level
+[warn] Level 1 unreachable boundary nodes per cell: 0.065538 sources, 0.068898 destinations
+[warn] Level 2 unreachable boundary nodes per cell: 0.424123 sources, 0.421993 destinations
+[warn] Level 3 unreachable boundary nodes per cell: 2.26276 sources, 2.15816 destinations
+[warn] Level 4 unreachable boundary nodes per cell: 8.16667 sources, 6.33333 destinations
+[warn] Level 1 unreachable boundary nodes per cell: 0.000804307 sources, 0.000882143 destinations
+[warn] Level 2 unreachable boundary nodes per cell: 0.0050803 sources, 0.00458866 destinations
+[warn] Level 3 unreachable boundary nodes per cell: 0.0484694 sources, 0.0229592 destinations
+[warn] Level 4 unreachable boundary nodes per cell: 1.33333 sources, 0.333333 destinations
+[info] MLD customization writing took 31.0746 seconds
+[info] Graph writing took 24.087 seconds
+[info] RAM: peak bytes used: 6145224704
+PS C:\Users\alan_> docker run -t -i -p 5000:5000 -v "C:\Users\alan_\Documents\GitHub\MDRP-BCS-code:/data" osrm
+/osrm-backend osrm-routed --algorithm mld /data/mexico-251010.osrm
+>>
+[info] starting up engines, v5.26.0
+[info] Threads: 12
+[info] IP address: 0.0.0.0
+[info] IP port: 5000
+

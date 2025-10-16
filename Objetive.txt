@@ -1,0 +1,78 @@
+# Objetivos del Proyecto y Plan de Limpieza Final
+
+## 1. Evaluación del Estado Actual
+
+Se ha completado con éxito la fase experimental principal del proyecto. La comparación de métricas clave (calidad de servicio y eficiencia operativa) entre el algoritmo de **Rolling Horizon (RH)** y la política base **First-Come, First-Served (FCFS)** ha sido generada y está disponible en la carpeta `/results`.
+
+El proyecto se encuentra en la etapa de finalización, requiriendo consolidación, limpieza y documentación para su entrega final como parte de la tesis.
+
+## 2. Objetivos para la Finalización de la Tesis
+
+1.  **Consolidar el Código Fuente**: Asegurar que el código sea final, legible y esté bien comentado en las partes críticas.
+2.  **Limpiar y Organizar el Repositorio**: Eliminar todos los archivos, directorios y datos que no son estrictamente necesarios para la ejecución y validación de los experimentos. Un repositorio limpio es señal de un trabajo profesional y facilita la evaluación.
+3.  **Asegurar la Reproducibilidad**: Garantizar que cualquier persona (especialmente un revisor de tesis) pueda clonar el repositorio, instalar las dependencias y ejecutar los experimentos para obtener los mismos resultados.
+4.  **Documentar el Proyecto**: Actualizar el archivo `README.md` para que sirva como una guía central y clara del proyecto, su propósito, su estructura y cómo utilizarlo.
+
+## 3. Plan de Acción: Limpieza y Organización de Archivos
+
+A continuación se detalla un plan para limpiar el repositorio.
+
+### Paso 1: Eliminar Archivos y Directorios Innecesarios
+
+Se recomienda eliminar los siguientes elementos, ya que no son necesarios para la versión final del proyecto:
+
+*   `__pycache__/`: Directorios de caché de Python. Se generan automáticamente y no deben incluirse en el control de versiones.
+*   `session_log.txt`: Archivo de registro de una sesión de trabajo. No es relevante para el proyecto final.
+*   `maps/`: Directorio actualmente vacío.
+*   `cache/`: Contiene datos en caché de ejecuciones anteriores. Para una entrega final limpia, es mejor que los resultados puedan ser regenerados desde cero.
+*   `mdrplib-master/`: **Eliminación recomendada.** Este directorio contiene instancias de prueba y código de referencia del artículo de Reyes et al. (2018). Dado que tu trabajo se centró en **datos sintéticos** generados por `scripts/make_synth_orders.py`, este directorio no es necesario para la ejecución o validación de tus resultados. Eliminarlo simplificará enormemente la estructura del proyecto.
+*   Archivos `.osrm*`: Estos son archivos generados por OSRM para el enrutamiento. Ocupan mucho espacio. Para la entrega, considera si es necesario incluirlos o si es suficiente con proporcionar el archivo base `mexico-251010.osm.pbf` y documentar el proceso de pre-procesamiento de OSRM en el `README.md`. Para una evaluación rápida, es mejor mantenerlos. Para una entrega final ligera, es mejor documentar su generación. **Decisión: Mantener por ahora, pero considerar para la entrega final.**
+
+### Paso 2: Revisar y Actualizar la Documentación
+
+*   **`README.md`**: Actualizarlo para que incluya:
+    *   Una descripción clara del problema que resuelve la tesis.
+    *   Instrucciones de instalación: `pip install -r requirements.txt`.
+    *   Instrucciones precisas para ejecutar los experimentos (p. ej., `python scripts/generate_results.py`).
+    *   Una descripción de la estructura de directorios final (ver abajo).
+    *   Una breve explicación de los scripts principales en la carpeta `scripts/`.
+*   **`requirements.txt`**: Verificar que contiene todas las librerías necesarias y ninguna innecesaria.
+
+### Paso 3: Estructura de Directorios Final Propuesta
+
+Tras la limpieza, el proyecto debería tener una estructura similar a esta:
+
+```
+MDRP-BCS-code/
+├── .git/
+├── .gitignore
+├── data/
+│   ├── couriers.csv
+│   ├── la_paz_restaurants.geojson
+│   └── synthetic_lapaz_orders.csv
+├── results/
+│   ├── fcfs_results.txt
+│   ├── rh_results.txt
+│   └── kpi_comparison.csv
+├── scripts/
+│   ├── generate_results.py
+│   ├── make_synth_orders.py
+│   └── ... (otros scripts de ejecución)
+├── src/
+│   ├── __init__.py
+│   ├── bundling.py
+│   ├── config.py
+│   ├── getrouteOSMR.py
+│   └── ... (resto del código fuente)
+├── tests/
+│   └── test_loaders.py
+├── mdrp_simulation.html
+├── mexico-251010.osm.pbf
+├── mexico-251010.osrm* (archivos de OSRM)
+├── README.md
+└── requirements.txt
+```
+
+### Paso 4: Tarea Pendiente - Corregir Script de Orquestación
+
+*   **`scripts/generate_results.py`**: Este script actualmente **NO** ejecuta las simulaciones. Solo procesa resultados que asume que ya existen. Es necesario modificarlo para que importe y llame a las funciones principales de `scripts/make_synth_orders.py`, `scripts/run_fcfs_instance.py` y `scripts/run_synth_instance.py`. Esto es crucial para que el proyecto sea reproducible con un solo comando, tal como se documentó en el `README.md`.
