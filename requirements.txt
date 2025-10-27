@@ -7,3 +7,4 @@ scipy
 geopandas
 matplotlib
 shapely
+#docker run -d -p 5000:5000 -v "C:\Users\alan_\Documents\GitHub\MDRP-BCS-code:/data" osrm/osrm-backend osrm-routed --algorithm mld /data/mexico-251010.osrm

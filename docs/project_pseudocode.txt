@@ -1,0 +1,109 @@
+
+Pseudocódigo del proyecto y resumen de arquitectura para MDRP-BCS-code
+
+Propósito
+--------
+Simular y comparar políticas de despacho de órdenes para entrega de comida (FCFS vs Rolling Horizon)
+usando conjuntos de datos sintéticos y benchmarks. El sistema incluye cargadores, ruteo vía OSRM (o
+fallback euclidiano), generación de paquetes (bundling), heurísticas de asignación y scripts de evaluación.
+
+Componentes principales
+----------------------
+- scripts/: scripts auxiliares para ejecutar experimentos, generar datos sintéticos y visualizar mapas.
+- src/: código central de simulación y módulos algorítmicos.
+- data/: datasets de entrada (restaurantes, órdenes sintéticas, mapas).
+- results/: salidas (KPIs, mapas, logs).
+
+Tipos de datos principales (conceptual)
+- Order (Orden): {order_id, restaurant_id, created_at, ready_at, rest_lat, rest_lon, dest_lat, dest_lon, status}
+- Courier (Repartidor): {courier_id, location, available_at, assigned_bundle, route}
+- Restaurant (Restaurante): {restaurant_id, location, open/close, prep_time_distribution}
+- Bundle (Paquete): conjunto(orders) + score + route_estimates
+
+Flujo general (scripts de entrada)
+---------------------------------
+1. Elegir dataset (sintético o benchmark)
+2. Iniciar servidor OSRM (opcional) o establecer USE_EUCLIDEAN=1 para usar fallback por distancia
+3. Ejecutar el runner de política:
+   scripts/run_fcfs_instance.py | run_ai_instance.py | run_grubhub_instance.py | run_lade_instance.py
+
+Pseudocódigo del núcleo de simulación (src/main.py: run_simulation)
+
+inicializar entorno: time = start_time
+cargar órdenes, restaurantes, repartidores
+mientras time < end_time o existan órdenes pendientes:
+    # bucle por eventos o discretizado por minuto
+    actualizar ubicaciones de repartidores según rutas (avanzar en caminos)
+    recibir nuevas órdenes creadas y moverlas al pool 'created'
+    marcar órdenes como 'ready' cuando current_time >= ready_at
+
+    si policy == FCFS:
+        por cada orden lista no asignada:
+            asignar al repartidor disponible más cercano (greedy)
+    sino si policy == RH (Rolling Horizon):
+        si time % RH_INTERVAL == 0:
+            # fase de bundling
+            por cada restaurante con órdenes listas:
+                candidate_bundles = generate_bundles_for_restaurant(orders_at_rst)
+                puntuar bundles usando calculate_bundle_score(bundle)
+            # fase de matching (asignación)
+            crear grafo bipartito (repartidores x bundles) con costos
+            resolver assignment lineal (o heurística)
+            comprometer asignaciones siguiendo reglas two-stage commitment
+
+    ejecutar acciones de repartidores (pickup/dropoff) y actualizar estados
+    recolectar métricas (tiempos de entrega, violaciones de SLA, distancia)
+    time = time + time_step
+
+Módulos y funciones clave
+-------------------------
+- src/config.py: parámetros globales (SERVICE_TIME, DELTA_1, DELTA_2, RH_INTERVAL, etc.)
+- src/getrouteOSMR.py: envoltorio para llamar OSRM (/route, /nearest) y fallback a Euclidiana cuando OSRM falla
+- src/bundling.py:
+    - compute_target_bundle_size(current_state)
+    - generate_bundles_for_restaurant(rest_orders)
+    - calculate_bundle_score(bundle)
+- src/asignaciontentativa.py:
+    - build assignment matrix
+    - tentative_assignment (two-stage) y reglas de compromiso
+    - helpers para asignación por repartidor más cercano
+- src/main.py:
+    - clases Order, Courier, Restaurant
+    - run_simulation: bucle principal, manejo de eventos, cambio de política
+- scripts/
+    - make_synth_orders.py: generador de datasets sintéticos
+    - run_*_instance.py: wrappers que cargan datos e invocan run_simulation
+    - plot_synth_on_map.py / plot_synth_points_simple.py: utilidades de visualización
+
+Fallas comunes y consejos de depuración
+------------------------------------
+- Errores de ruteo: asegurarse de que OSRM está corriendo y que los archivos .osrm son accesibles. Probar con curl a localhost:5000/route.
+- Coordenadas fuera del mapa: usar /nearest o restringir el generador sintético a un polígono terrestre.
+- Problemas de memoria/tiempo en la generación de bundles: reducir la combinatoria de candidatos o usar heurísticas greedy.
+
+Dónde añadir componentes de ML
+-----------------------------
+- Puntuación de bundles: reemplazar calculate_bundle_score por un regresor aprendido
+- Corrección de tiempos de viaje: post-procesar tiempos OSRM con un modelo ML
+- Política de asignación: aprender una política que prediga buenos matches repartidor-bundle
+
+Archivos para inspeccionar primero
+-------------------------------
+- src/main.py
+- src/bundling.py
+- src/asignaciontentativa.py
+- src/getrouteOSMR.py
+- scripts/make_synth_orders.py
+- scripts/run_ai_instance.py
+
+Cómo ejecutar un experimento rápido (ejemplo)
+-----------------------------------------
+1. Iniciar OSRM (si se usa): seguir el comando docker en el comentario de requirements.txt
+2. Generar datos sintéticos (o usar los existentes):
+   python scripts/make_synth_orders.py
+3. Ejecutar una instancia con RH:
+   python scripts/run_ai_instance.py data/synthetic_lapaz_orders_limited.csv
+4. Recopilar resultados y graficar con:
+   python scripts/plot_synth_on_map.py data/synthetic_lapaz_orders_limited.csv
+
+Fin del pseudocódigo

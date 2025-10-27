@@ -1,0 +1,39 @@
+# Map Creation Log
+
+## Goal
+Create a smaller map file for Baja California Sur and use it to run the OSRM server.
+
+## Steps
+
+1.  **Create a smaller map file for just Baja California Sur using `osmium-tool`**
+
+    Command:
+    ```
+    osmium extract -b -115.76512,22.890533,-109.4,28.0000 C:\Users\alan_\Documents\GitHub\MDRP-BCS-code\mexico-251010.osm.pbf -o C:\Users\alan_\Documents\GitHub\MDRP-BCS-code\data\bcs-latest.osm.pbf
+    ```
+
+2.  **Process the smaller map file with OSRM using Docker**
+
+    These commands are run in the `data` directory.
+
+    *   **Extract the data:**
+        ```
+        docker run -t -v "C:\Users\alan_\Documents\GitHub\MDRP-BCS-code\data:/data" osrm/osrm-backend osrm-extract -i /data/bcs-latest.osm.pbf -p /opt/car.lua
+        ```
+
+    *   **Partition the data:**
+        ```
+        docker run -t -v "C:\Users\alan_\Documents\GitHub\MDRP-BCS-code\data:/data" osrm/osrm-backend osrm-partition /data/bcs-latest.osrm
+        ```
+
+    *   **Customize the data:**
+        ```
+        docker run -t -v "C:\Users\alan_\Documents\GitHub\MDRP-BCS-code\data:/data" osrm/osrm-backend osrm-customize /data/bcs-latest.osrm
+        ```
+
+3.  **Start the OSRM server with the new, smaller map file**
+
+    Command:
+    ```
+    docker run -d -t -i -p 5000:5000 --name osrm-backend -v "C:\Users\alan_\Documents\GitHub\MDRP-BCS-code\data:/data" osrm/osrm-backend osrm-routed --algorithm mld /data/bcs-latest.osrm
+    ```

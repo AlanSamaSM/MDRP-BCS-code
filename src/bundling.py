@@ -1,3 +1,8 @@
+import os
+import xgboost as xgb
+import numpy as np
+import pandas as pd
+from geopy.distance import geodesic
 from datetime import timedelta
 from src.config import (
     ASSIGNMENT_HORIZON,
@@ -8,6 +13,20 @@ from src.config import (
 )
 from src.getrouteOSMR import get_route_details
 from src.config import GROUP_I_PENALTY, GROUP_II_PENALTY, FRESHNESS_PENALTY_THETA
+
+# AI Model Loading
+USE_AI_BUNDLING = os.environ.get('USE_AI_BUNDLING') == '1'
+model = None
+if USE_AI_BUNDLING:
+    model_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'bundling_model.xgb'))
+    if os.path.exists(model_path):
+        model = xgb.XGBRegressor()
+        model.load_model(model_path)
+        print("AI bundling model loaded successfully.")
+    else:
+        print("AI bundling model not found at", model_path)
+        USE_AI_BUNDLING = False
+
 # ======================
 # Bundling
 # =====================
@@ -166,43 +185,74 @@ def generate_bundles_for_restaurant(restaurant, current_time, target_bundle_size
         
         # Para cada bundle existente, evaluar todas las posiciones de inserción
         for bundle in bundles:
-            # Si el bundle está vacío, la única opción es insertarla en la posición 0.
-            if not bundle: #evalua si el bundle esta vacio
-                # Coste base: calcular ruta desde la ubicación del restaurante del objeto restaurant (o se podría usar restaurant_orders[0].restaurant.location)
-                route = get_route_details(restaurant.location, [order.dropoff_loc])
-                if route!=None:
-                    cost = calculate_cost(route, SERVICE_TIME*2)
+            if USE_AI_BUNDLING and model:
+                for pos in range(len(bundle) + 1):
+                    candidate_bundle_orders = bundle[:pos] + [order] + bundle[pos:]
+                    
+                    # Feature Engineering
+                    num_orders = len(candidate_bundle_orders)
+                    restaurant_loc = (restaurant.location[0], restaurant.location[1])
+                    customer_locs = [(o.dropoff_loc[0], o.dropoff_loc[1]) for o in candidate_bundle_orders]
+                    
+                    distances = [geodesic(restaurant_loc, cl).km for cl in customer_locs]
+                    avg_restaurant_to_customer_dist = np.mean(distances)
+                    
+                    max_customer_age = (current_time - min([o.placement_time for o in candidate_bundle_orders])).total_seconds() / 60
+                    waiting_time_since_ready = (current_time - max([o.ready_time for o in candidate_bundle_orders])).total_seconds() / 60
+
+                    features = pd.DataFrame({
+                        'num_orders': num_orders,
+                        'avg_restaurant_to_customer_dist': avg_restaurant_to_customer_dist,
+                        'max_customer_age': max_customer_age,
+                        'waiting_time_since_ready': waiting_time_since_ready
+                    })
+                    
+                    predicted_travel_time = model.predict(features)[0]
+                    cost = predicted_travel_time
+
+                    # Validate route before considering this bundle
+                    dropoff_points = [o.dropoff_loc for o in candidate_bundle_orders]
+                    if len(dropoff_points) > 15:
+                        continue
+                    route = get_route_details(restaurant.location, dropoff_points)
+                    if not route:
+                        continue
+
                     if cost < best_cost_increase:
                         best_cost_increase = cost
                         best_bundle = bundle
-                        best_position = 0
+                        best_position = pos
             else:
-                # Probar todas las posiciones posibles (de 0 a len(bundle))
-                for pos in range(len(bundle) + 1):
-                    # --- INICIO DE LA MODIFICACIÓN: Verificación de eficiencia ---
-                    # Si el bundle ya alcanzó el tamaño objetivo, solo se inserta si mejora la eficiencia.
-                    if len(bundle) >= target_bundle_size:
-                        current_efficiency = calculate_route_efficiency(restaurant.location, bundle)
-                        candidate_bundle_for_efficiency = bundle[:pos] + [order] + bundle[pos:]
-                        new_efficiency = calculate_route_efficiency(restaurant.location, candidate_bundle_for_efficiency)
-                        
-                        # Si la nueva eficiencia no es mejor (menor), se ignora esta inserción.
-                        if new_efficiency >= current_efficiency:
-                            continue
-                    # --- FIN DE LA MODIFICACIÓN ---
-
-                    candidate_bundle = bundle[:pos] + [order] + bundle[pos:] #concatenación de listas
-                    # Calcular la ruta completa para este candidate_bundle.
-                    # Suponemos que la ruta inicia en la ubicación del restaurante.
-                    dropoff_points = [o.dropoff_loc for o in candidate_bundle]  #asignamos a dropoff_points la ubicacion de entrega del bundle completo con la configuración iterandose
-                    route = get_route_details(restaurant.location, dropoff_points) #se calcula la ruta con la configuración tentativa 
+                # Original logic if AI model is not used
+                if not bundle:
+                    route = get_route_details(restaurant.location, [order.dropoff_loc])
                     if route:
-                        service_delay = SERVICE_TIME + (SERVICE_TIME * len(candidate_bundle)) #Total Service Time=Pickup (once per bundle)+Drop-offs (once per order)=SERVICE_TIME+(SERVICE_TIME×number of orders)
-                        cost = calculate_cost(route, service_delay)
+                        cost = calculate_cost(route, SERVICE_TIME * 2)
                         if cost < best_cost_increase:
                             best_cost_increase = cost
                             best_bundle = bundle
-                            best_position = pos
+                            best_position = 0
+                else:
+                    for pos in range(len(bundle) + 1):
+                        if len(bundle) >= target_bundle_size:
+                            current_efficiency = calculate_route_efficiency(restaurant.location, bundle)
+                            candidate_bundle_for_efficiency = bundle[:pos] + [order] + bundle[pos:]
+                            new_efficiency = calculate_route_efficiency(restaurant.location, candidate_bundle_for_efficiency)
+                            if new_efficiency >= current_efficiency:
+                                continue
+
+                        candidate_bundle = bundle[:pos] + [order] + bundle[pos:]
+                        dropoff_points = [o.dropoff_loc for o in candidate_bundle]
+                        if len(dropoff_points) > 15:
+                            continue
+                        route = get_route_details(restaurant.location, dropoff_points)
+                        if route:
+                            service_delay = SERVICE_TIME + (SERVICE_TIME * len(candidate_bundle))
+                            cost = calculate_cost(route, service_delay)
+                            if cost < best_cost_increase:
+                                best_cost_increase = cost
+                                best_bundle = bundle
+                                best_position = pos
         
         # Si se encontró un bundle adecuado, inserta la orden en la posición óptima.
         if best_bundle is not None and best_position is not None:
@@ -230,6 +280,8 @@ def generate_bundles_for_restaurant(restaurant, current_time, target_bundle_size
                         candidate_bundle = target_bundle[:pos] + [order] + target_bundle[pos:]
                         
                         dropoff_points = [o.dropoff_loc for o in candidate_bundle]
+                        if len(dropoff_points) > 15:
+                            continue
                         route = get_route_details(restaurant.location, dropoff_points)
                         
                         if route:

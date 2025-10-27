@@ -64,6 +64,11 @@ def as_latlon(pt):
 
 _osrm_cache = {}
 
+def clear_osrm_cache():
+    """Clear the OSRM cache."""
+    global _osrm_cache
+    _osrm_cache = {}
+
 def get_route_details(start_coords, waypoints):
     cache_key = (start_coords,) + tuple(waypoints)
     if cache_key in _osrm_cache:
@@ -99,7 +104,7 @@ def get_route_details(start_coords, waypoints):
         f"{lon},{lat}" for lon, lat in map(as_lonlat, points)
     )
     url = f"http://localhost:5000/route/v1/driving/{coordinates}"
-    params = {"overview": "full", "steps": "true", "annotations": "true"}
+    params = {"overview": "simplified"}
 
     try:
         session = _get_session()
@@ -126,7 +131,8 @@ def get_route_details(start_coords, waypoints):
         print(f"OSRM HTTP error: {e} (status={getattr(e.response, 'status_code', None)})")
     except Exception as e:
         # Generic catch-all for connectivity/timeouts/etc.
-        print(f"Routing error: {e}")
+        import traceback
+        traceback.print_exc()
 
     # If we get here the OSRM call failed or returned an error. Respect an
     # environment-driven policy to fallback to Euclidean routing which is

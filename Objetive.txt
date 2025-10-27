@@ -73,6 +73,5 @@ MDRP-BCS-code/
 └── requirements.txt
 ```
 
-### Paso 4: Tarea Pendiente - Corregir Script de Orquestación
+### Paso 4: Tarea Pendiente - Corregir Script de Orquestación-++
 
-*   **`scripts/generate_results.py`**: Este script actualmente **NO** ejecuta las simulaciones. Solo procesa resultados que asume que ya existen. Es necesario modificarlo para que importe y llame a las funciones principales de `scripts/make_synth_orders.py`, `scripts/run_fcfs_instance.py` y `scripts/run_synth_instance.py`. Esto es crucial para que el proyecto sea reproducible con un solo comando, tal como se documentó en el `README.md`.
