@@ -1,34 +1,70 @@
 from datetime import timedelta
+import numpy as np
 from src.config import (
     ASSIGNMENT_HORIZON,
     MAX_CLICK_TO_DOOR,
     SERVICE_TIME,
     DELTA_1,
     DELTA_2,
+    FRESHNESS_PENALTY_BETA,
+    PICKUP_DELAY_THETA,
 )
 from src.getrouteOSMR import get_route_details
-from src.config import GROUP_I_PENALTY, GROUP_II_PENALTY, FRESHNESS_PENALTY_THETA
+from src.config import GROUP_I_PENALTY, GROUP_II_PENALTY
 # ======================
 # Bundling
 # =====================
 
 #Aquí se define Zt, que es el tamaño objetivo de los bundles
 def compute_target_bundle_size(current_time, orders, couriers):
-    """Compute dynamic target bundle size using DELTA_1 and DELTA_2."""
-
-    orders_ready = [o for o in orders if o.ready_time <= current_time + DELTA_1]
-    couriers_available = [c for c in couriers if c.off_time >= current_time + DELTA_2]
-
-    if not couriers_available:
-        return 1
-
-    ratio = len(orders_ready) / len(couriers_available)
-    return max(int(ratio), 1)
+    """
+    Compute Zt as per Reyes et al. (2018), Section 3.1:
+    
+    Zt = ⌈ |{o ∈ Ot : eo ≤ t + Δ1}| / |{d ∈ Dt : ed ≤ t + Δ2}| ⌉
+    
+    where eo is order ready time and ed is courier available time.
+    """
+    # Órdenes que estarán listas en los próximos Δ1 minutos
+    orders_ready = [
+        o for o in orders 
+        if o.ready_time <= current_time + DELTA_1
+    ]
+    
+    # Couriers que estarán disponibles (terminarán su asignación actual) en los próximos Δ2 minutos
+    # available_time es cuando el courier termina su ruta actual, o current_time si está libre
+    def get_available_time(courier):
+        if courier.current_route is None:
+            return current_time
+        return courier.current_route.get('completion_time', current_time)
+    
+    couriers_soon_available = [
+        c for c in couriers 
+        if get_available_time(c) <= current_time + DELTA_2
+    ]
+    
+    if not couriers_soon_available:
+        # Si ningún courier estará disponible pronto, usar cualquier courier activo en turno
+        couriers_soon_available = [
+            c for c in couriers 
+            if c.off_time >= current_time  # aún en turno
+        ]
+    
+    if not couriers_soon_available:
+        return 1  # Fallback: no hay couriers disponibles
+    
+    # Cálculo según paper (con ceiling)
+    ratio = len(orders_ready) / len(couriers_soon_available)
+    target = max(int(np.ceil(ratio)), 1)
+    
+    return target
 
 def calculate_bundle_score(bundle, courier, current_time):
     """
-    Calcula el score para asignar un bundle a un courier específico.
-    Considera ventanas exactas para pickup y drop-off según Reyes (2018).
+    Calculate matching weight as per Reyes (2018), Equation (1a):
+    
+    weight = Ns / (max_dropoff - courier_available) - θ × (pickup_time - bundle_ready)
+    
+    where θ (PICKUP_DELAY_THETA) penalizes pickup delay.
     """
 
     # 1. Obtener la ruta completa (inbound a restaurante + entregas)
@@ -47,7 +83,14 @@ def calculate_bundle_score(bundle, courier, current_time):
         return float('-inf')
 
     inbound_duration_min = inbound_route['duration'] / 60.0
-    courier_arrival_at_restaurant = current_time + timedelta(minutes=inbound_duration_min)
+    
+    # Determinar cuando el courier está disponible para empezar nueva asignación
+    if courier.current_route is None:
+        courier_available_time = current_time
+    else:
+        courier_available_time = courier.current_route.get('completion_time', current_time)
+    
+    courier_arrival_at_restaurant = courier_available_time + timedelta(minutes=inbound_duration_min)
 
     # Según Reyes (2018), la hora exacta del pickup es:
     # max(e_o, llegada_repartidor + s_r/2)
@@ -66,10 +109,7 @@ def calculate_bundle_score(bundle, courier, current_time):
         minutes=total_travel_time_min + customer_half_min * len(bundle)
     )
 
-    # 2) Calcular pérdidas de frescura
-    # Frescura se penaliza sólo si pickup_time > ready_time
-
-    # 2) Penalizaciones de Prioridad (grupos I, II, III)
+    # 2) Penalizaciones de Prioridad (grupos I, II, III) - para clasificación solamente
     earliest_placement = min(o.placement_time for o in bundle)
     if delivery_finish_time > earliest_placement + MAX_CLICK_TO_DOOR:
         priority_penalty = GROUP_I_PENALTY  # No se puede cumplir entrega a tiempo
@@ -78,27 +118,26 @@ def calculate_bundle_score(bundle, courier, current_time):
     else:
         priority_penalty = 0  # Grupo III
 
-    # 3) Throughput: Número de órdenes dividido entre tiempo total
-    total_service_time_min = SERVICE_TIME.total_seconds() / 60.0
-    total_time = total_travel_time_min + total_service_time_min
-    throughput = len(bundle) / total_time if total_time > 0 else len(bundle)
+    # 3) Throughput component (Ns / delivery_time)
+    delivery_time_hours = (delivery_finish_time - courier_available_time).total_seconds() / 3600.0
+    throughput = len(bundle) / max(delivery_time_hours, 0.01)
     
-    # 4) Frescura (considerando la orden con mayor espera)
-    freshness_penalty = FRESHNESS_PENALTY_THETA * max(
-        max((pickup_time - o.ready_time).total_seconds() / 60.0, 0.0) for o in bundle
-    )
+    # 4) Pickup delay penalty (θ term from Equation 1a)
+    pickup_delay_min = max(0, (pickup_time - bundle_ready_time).total_seconds() / 60.0)
+    pickup_penalty = PICKUP_DELAY_THETA * pickup_delay_min
 
-    # 3) Score Final
-    score = throughput - freshness_penalty - priority_penalty
+    # Score final (matching weight)
+    score = throughput - pickup_penalty - priority_penalty
 
     return score
 
 def calculate_cost(route_details, service_delay):
-    """Calculate the cost of a candidate route.
-
-    ``service_delay`` may be provided as a ``timedelta``.  Convert it to minutes
-    before applying the freshness penalty so arithmetic with the travel time
-    (float) works correctly.
+    """
+    Calculate route cost as per Reyes (2018) Procedure 1:
+    
+    cost = travel_time + β × service_delay
+    
+    where β (FRESHNESS_PENALTY_BETA) is the weight for service delay in bundle construction.
     """
     travel_time = route_details['duration'] / 60.0  # seconds -> minutes
 
@@ -107,7 +146,7 @@ def calculate_cost(route_details, service_delay):
     else:
         delay_minutes = float(service_delay)
 
-    return travel_time + FRESHNESS_PENALTY_THETA * delay_minutes
+    return travel_time + FRESHNESS_PENALTY_BETA * delay_minutes
 
 def calculate_route_efficiency(restaurant_location, bundle):
     """Calculates the efficiency (average time per order) of a bundle."""

@@ -1,8 +1,25 @@
 ,FCFS,Rolling Horizon,Improvement (%)
-Avg. Click-to-Door (min),44.94,100.96,124.66%
-P95 Click-to-Door (min),110.87,166.20,49.91%
-Avg. Ready-to-Pickup (min),22.88,33.04,44.41%
-% Undelivered Orders,96.10,93.47,-2.74%
-Total Distance (km),573.74,317.49,-44.66%
-Orders per Courier per Hour,2.64,8.41,218.56%
+Avg. Click-to-Door (min),35.63,33.08,-7.16%
+P10 Click-to-Door (min),4.27,6.68,56.44%
+P50 Click-to-Door (min),17.01,29.60,74.02%
+P90 Click-to-Door (min),91.95,67.61,-26.47%
+P95 Click-to-Door (min),102.33,75.35,-26.37%
+Avg. Ready-to-Pickup (min),24.23,22.07,-8.91%
+P10 Ready-to-Pickup (min),-7.00,-5.00,N/A
+P50 Ready-to-Pickup (min),7.00,18.00,157.14%
+P90 Ready-to-Pickup (min),78.60,56.00,-28.75%
+Avg. Ready-to-Door (min),28.19,25.51,-9.51%
+P10 Ready-to-Door (min),-3.52,-1.13,N/A
+P50 Ready-to-Door (min),11.01,21.60,96.19%
+P90 Ready-to-Door (min),83.66,58.90,-29.60%
+% Undelivered Orders,50.11,33.33,-33.49%
+Total Distance (km),485.04,357.61,-26.27%
+Orders per Courier per Hour,4.86,9.46,94.65%
+Bundles per Hour,4.86,4.88,0.41%
 Avg. Bundle Size,1.00,1.00,0.00%
+Total Courier Compensation,2350.00,4570.00,94.47%
+Cost per Order,10.00,10.00,0.00%
+Fraction of Couriers with Minimum Compensation,0.00,0.00,N/A
+Click-to-Door Overage (min),13.29,7.10,-46.58%
+Courier Utilization (%),32.12,26.68,-16.94%
+Courier Delivery Earnings,2350.00,4570.00,94.47%

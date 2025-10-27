@@ -23,7 +23,7 @@ if gdf_rest is None:
 
 # 1. Parámetros de generación
 start     = datetime(2025, 7, 3, 11, 0, 0)   # arranque a las 11 am
-duration  = 3 * 60                           # 180 min
+duration  = 60                               # 60 min (reducido para testing rápido)
 lam       = 8                                # λ del Poisson
 
 # jitter/sampling configuration
