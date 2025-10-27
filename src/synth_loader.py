@@ -20,7 +20,9 @@ def load_synth_instance(csv_path, n_couriers=5):
     and dropoff coordinates as well as order timestamps.  Since the dataset
     does not include couriers, a small fleet is generated automatically.
     """
+    print(f"  [synth_loader] Reading CSV: {csv_path}")
     df = pd.read_csv(csv_path, parse_dates=["created_at", "ready_at"])
+    print(f"  [synth_loader] Loaded {len(df)} orders from CSV")
 
     restaurants = []
     rest_map = {}
@@ -30,6 +32,8 @@ def load_synth_instance(csv_path, n_couriers=5):
         r = Restaurant(int(rest_id), (lat, lon))
         restaurants.append(r)
         rest_map[rest_id] = r
+    
+    print(f"  [synth_loader] Created {len(restaurants)} restaurants")
 
     orders = []
     for _, row in df.iterrows():
@@ -42,6 +46,8 @@ def load_synth_instance(csv_path, n_couriers=5):
                 (row["dest_lat"], row["dest_lon"]),
             )
         )
+    
+    print(f"  [synth_loader] Created {len(orders)} order objects")
 
     start = df["created_at"].min() - timedelta(minutes=15)
     end = df["ready_at"].max() + timedelta(hours=1)
@@ -51,6 +57,9 @@ def load_synth_instance(csv_path, n_couriers=5):
         Courier(i + 1, start, end, depot)
         for i in range(n_couriers)
     ]
+    
+    print(f"  [synth_loader] Created {n_couriers} couriers")
+    print(f"  [synth_loader] Courier shift: {start} to {end}")
 
     params = {}
     return orders, couriers, restaurants, params

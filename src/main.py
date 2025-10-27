@@ -51,6 +51,8 @@ class Courier:
         self.orders_delivered = 0
         self.total_distance = 0.0
         self.shift_started = False  # Para controlar el cálculo del tiempo de turno
+        self.bundles_picked_up = 0  # Número de bundles recogidos
+        self.driving_time = 0.0  # Tiempo total conduciendo en minutos
 
     def shift_duration_hours(self):
         #aqui se calcula la duracion del turno del repartidor en HORAS
@@ -73,20 +75,33 @@ class Courier:
 # ======================
 
 def run_simulation(orders, couriers, restaurants, simulation_end, start_time=None, results_path="results/simulation_results.csv", courier_results_path=None):
+    print(f"=== ENTERING run_simulation ===")
+    print(f"  Orders: {len(orders)}, Couriers: {len(couriers)}, Restaurants: {len(restaurants)}")
+    
     if start_time is None:
         start_time = datetime(2025, 1, 1, 8, 0)
     current_time = start_time  # punto de inicio de la simulación
+    
+    print(f"  Start time: {start_time}, End time: {simulation_end}")
+    
     order_queue = deque(sorted(orders, key=lambda o: o.placement_time)) #se ordenan las ordenes por tiempo de colocación
     active_couriers = [] #se inicializa una lista que contendrá los repartidores activos
     
     use_fcfs = os.environ.get('FCFS_POLICY') == '1'
+    print(f"  Policy: {'FCFS' if use_fcfs else 'Rolling Horizon'}")
 
     delivered_orders = []
 
     visualized_deliveries_count = 0
+    
+    print(f"=== STARTING SIMULATION LOOP ===")
+    
+    iteration_count = 0
 
     while current_time < simulation_end:
-        print(f"\n--- Simulation time: {current_time} ---")
+        iteration_count += 1
+        if iteration_count % 10 == 0:  # Print every 10 iterations to reduce noise
+            print(f"\n--- Simulation time: {current_time} (iteration {iteration_count}) ---")
 
         for c in couriers:  #loop para revisar si un repartidor está disponible
             if c.on_time <= current_time and c not in active_couriers:
@@ -113,11 +128,14 @@ def run_simulation(orders, couriers, restaurants, simulation_end, start_time=Non
                 # Lógica de Rolling Horizon (la que ya existía)
                 couriers_available_hor = [c for c in available_couriers if c.off_time >= current_time + ASSIGNMENT_HORIZON] #se filtran los repartidores disponibles segun el horizonte de asignación
                 
+                print(f"  RH: {len(orders_ready)} orders ready, {len(couriers_available_hor)} couriers in horizon")
+                
                 target_bundle_size = compute_target_bundle_size(
                     current_time,
                     orders_ready,
                     couriers_available_hor,
                 )
+                print(f"  RH: target_bundle_size = {target_bundle_size}")
 
                 all_bundles = []
                 for rest in restaurants:
@@ -129,8 +147,11 @@ def run_simulation(orders, couriers, restaurants, simulation_end, start_time=Non
                     )
                     if rst_bundles:
                         all_bundles.extend(rst_bundles)
+                
+                print(f"  RH: Generated {len(all_bundles)} bundles from {len(restaurants)} restaurants")
 
                 assign_bundles_to_couriers(available_couriers, all_bundles, current_time)
+                print(f"  RH: Bundle assignment complete")
             print(f"[{current_time}] Assignment logic finished.")
 
         # actualizar progreso de rutas
@@ -144,12 +165,16 @@ def run_simulation(orders, couriers, restaurants, simulation_end, start_time=Non
                         c.orders_delivered += 1
                         delivered_orders.append(o)
                         print(f"Order {o.id} delivered.")
+                    # Incrementar bundles recogidos (una ruta = un bundle)
+                    c.bundles_picked_up += 1
                 # actualizar ubicación al último punto de la ruta
                 if c.current_route['route']['legs']:
                     last = c.current_route['route']['legs'][-1]['steps'][-1]['maneuver']['location']
                     from src.getrouteOSMR import as_latlon
                     c.location = as_latlon(last)
                     c.total_distance += c.current_route['route']['distance'] / 1000 # convert to km
+                    # Sumar tiempo de conducción (duration en segundos -> minutos)
+                    c.driving_time += c.current_route['route']['duration'] / 60.0
                 # almacenar la ruta completada antes de limpiarla y guardar mapa
                 c.route_history.append(c.current_route)
                 if visualized_deliveries_count < 10 and c.current_route['commitment_type'] == 'final':
@@ -171,6 +196,8 @@ def run_simulation(orders, couriers, restaurants, simulation_end, start_time=Non
             'orders_delivered': c.orders_delivered,
             'total_distance_km': c.total_distance,
             'shift_duration_hours': c.shift_duration_hours(),
+            'bundles_picked_up': c.bundles_picked_up,
+            'driving_time_minutes': c.driving_time,
         } for c in couriers
     ])
     if courier_results_path:

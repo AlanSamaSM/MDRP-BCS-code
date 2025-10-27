@@ -149,6 +149,8 @@ def generate_bundles_for_restaurant(restaurant, current_time, target_bundle_size
     if not restaurant_orders:
         return []
     
+    print(f"    Bundling: Restaurant has {len(restaurant_orders)} ready orders")
+    
     # 2. Ordenar las órdenes por su ready_time (de menor a mayor)
     restaurant_orders.sort(key=lambda o: o.ready_time)
     
@@ -247,5 +249,7 @@ def generate_bundles_for_restaurant(restaurant, current_time, target_bundle_size
     # --- FIN DE LA MODIFICACIÓN ---
 
     # Remove any empty bundles that may have been preallocated but not filled
-    return [b for b in bundles if b]
+    final_bundles = [b for b in bundles if b]
+    print(f"    Bundling: Returning {len(final_bundles)} bundles after optimization")
+    return final_bundles
 

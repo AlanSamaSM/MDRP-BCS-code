@@ -10,7 +10,8 @@ from src.synth_loader import load_synth_instance
 
 
 def run_instance(csv_path):
-    orders, couriers, restaurants, _ = load_synth_instance(csv_path)
+    # Use 20 couriers instead of default 5 for better performance with large datasets
+    orders, couriers, restaurants, _ = load_synth_instance(csv_path, n_couriers=20)
 
     
 
