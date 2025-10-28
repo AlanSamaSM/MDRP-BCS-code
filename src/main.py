@@ -25,6 +25,8 @@ class Order:
         self.pickup_time = None
         self.delivery_time = None
         self.id = order_id
+        self.courier_id = None
+        self.bundle_size = 1
 
     def get_click_to_door(self):
         #calcula el click to door en minutos, que es la diferencia entre delivery_time y placement_time
@@ -88,6 +90,7 @@ def run_simulation(orders, couriers, restaurants, simulation_end, start_time=Non
     active_couriers = [] #se inicializa una lista que contendrá los repartidores activos
     
     use_fcfs = os.environ.get('FCFS_POLICY') == '1'
+    policy_label = 'fcfs' if use_fcfs else 'rh'
     print(f"  Policy: {'FCFS' if use_fcfs else 'Rolling Horizon'}")
 
     delivered_orders = []
@@ -162,6 +165,8 @@ def run_simulation(orders, couriers, restaurants, simulation_end, start_time=Non
                         o.status = 'delivered'
                         o.pickup_time = c.current_route['start_time']
                         o.delivery_time = c.current_route['completion_time']
+                        o.courier_id = c.id
+                        o.bundle_size = len(c.current_route['orders'])
                         c.orders_delivered += 1
                         delivered_orders.append(o)
                         print(f"Order {o.id} delivered.")
@@ -179,8 +184,11 @@ def run_simulation(orders, couriers, restaurants, simulation_end, start_time=Non
                 c.route_history.append(c.current_route)
                 if visualized_deliveries_count < 10 and c.current_route['commitment_type'] == 'final':
                     visualized_deliveries_count += 1
-                    filename = f"delivery_{visualized_deliveries_count}.html"
-                    save_route_map(c.current_route, filename)
+                    save_route_map(
+                        c.current_route,
+                        policy_label,
+                        visualized_deliveries_count,
+                    )
                 c.current_route = None
 
         current_time += OPTIMIZATION_FREQUENCY
@@ -218,7 +226,8 @@ def run_simulation(orders, couriers, restaurants, simulation_end, start_time=Non
             'delivery_time': o.delivery_time,
             'click_to_door': o.get_click_to_door(),
             'ready_to_pickup': o.get_ready_to_pickup(),
-            'bundle_size': len(c.current_route['orders']) if c.current_route else 1
+            'courier_id': o.courier_id,
+            'bundle_size': o.bundle_size
         } for o in orders
     ])
     all_orders_df.to_csv(results_path, index=False)
@@ -250,12 +259,16 @@ def visualize_route(courier_route):
     
     return m
 
-def save_route_map(courier_route, filename):
-    """Save a route visualization to the maps folder."""
+def save_route_map(courier_route, policy_label, delivery_number):
+    """Save a route visualization to results/maps/<policy>/delivery_<n>.html."""
     m = visualize_route(courier_route)
-    os.makedirs("maps", exist_ok=True)
-    filepath = os.path.join("maps", filename)
+    base_dir = os.path.join(os.path.dirname(__file__), '..', 'results', 'maps', policy_label)
+    os.makedirs(base_dir, exist_ok=True)
+    filename = f"delivery_{delivery_number:02d}.html"
+    filepath = os.path.join(base_dir, filename)
     m.save(filepath)
+    rel_path = os.path.join('results', 'maps', policy_label, filename)
+    print(f"    Saved route map: {rel_path}")
     return filepath
 
 # ======================

@@ -37,10 +37,11 @@ def _get_session():
 
     s = requests.Session()
     retries = Retry(
-        total=int(os.environ.get('OSRM_MAX_RETRIES', '3')),
-        backoff_factor=float(os.environ.get('OSRM_BACKOFF_FACTOR', '0.5')),
+        total=int(os.environ.get('OSRM_MAX_RETRIES', '5')),
+        backoff_factor=float(os.environ.get('OSRM_BACKOFF_FACTOR', '1.0')),
         status_forcelist=[429, 500, 502, 503, 504],
-        allowed_methods=["GET", "POST"]
+        allowed_methods=["GET", "POST"],
+        raise_on_status=False  # Don't raise on HTTP errors, let us handle them
     )
     adapter = HTTPAdapter(max_retries=retries)
     s.mount('http://', adapter)
@@ -103,7 +104,7 @@ def get_route_details(start_coords, waypoints):
 
     try:
         session = _get_session()
-        response = session.get(url, params=params, timeout=float(os.environ.get('OSRM_TIMEOUT', '30')))
+        response = session.get(url, params=params, timeout=float(os.environ.get('OSRM_TIMEOUT', '60')))
         # If the server returns a non-200 status this will raise and be
         # handled by the retry logic in the adapter; otherwise continue.
         response.raise_for_status()

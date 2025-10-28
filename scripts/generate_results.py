@@ -250,7 +250,6 @@ def analyze_results():
     csv_path = os.path.join(results_dir, "kpi_comparison.csv")
     comparison_df.to_csv(csv_path)
     
-    print(f"\n✓ Results saved to {csv_path}")
 
 if __name__ == "__main__":
     import argparse
