@@ -1,4 +1,5 @@
 from datetime import timedelta
+import math
 import numpy as np
 from src.config import (
     ASSIGNMENT_HORIZON,
@@ -10,7 +11,12 @@ from src.config import (
     PICKUP_DELAY_THETA,
 )
 from src.getrouteOSMR import get_route_details
-from src.config import GROUP_I_PENALTY, GROUP_II_PENALTY
+from src.config import (
+    GROUP_I_PENALTY,
+    GROUP_II_PENALTY,
+    MAX_TARGET_BUNDLE_SIZE,
+    MAX_BUNDLE_SIZE,
+)
 # ======================
 # Bundling
 # =====================
@@ -55,6 +61,8 @@ def compute_target_bundle_size(current_time, orders, couriers):
     # Cálculo según paper (con ceiling)
     ratio = len(orders_ready) / len(couriers_soon_available)
     target = max(int(np.ceil(ratio)), 1)
+    if MAX_TARGET_BUNDLE_SIZE:
+        target = min(target, MAX_TARGET_BUNDLE_SIZE)
     
     return target
 
@@ -194,7 +202,15 @@ def generate_bundles_for_restaurant(restaurant, current_time, target_bundle_size
     restaurant_orders.sort(key=lambda o: o.ready_time)
     
     # 3. Calcular el número objetivo de bundles a crear para este restaurante.
-    target_bundles = max(len(restaurant_orders) // target_bundle_size, couriers_available)
+    safe_bundle_size = max(target_bundle_size, 1)
+    if safe_bundle_size <= 0:
+        safe_bundle_size = 1
+
+    desired_bundle_count = max(1, math.ceil(len(restaurant_orders) / safe_bundle_size))
+    if couriers_available:
+        desired_bundle_count = min(desired_bundle_count, couriers_available)
+
+    target_bundles = max(1, desired_bundle_count)
     
     # 4. Inicializar mr bundles vacíos.
     bundles = [[] for _ in range(target_bundles)]
@@ -207,6 +223,8 @@ def generate_bundles_for_restaurant(restaurant, current_time, target_bundle_size
         
         # Para cada bundle existente, evaluar todas las posiciones de inserción
         for bundle in bundles:
+            if MAX_BUNDLE_SIZE and len(bundle) >= MAX_BUNDLE_SIZE:
+                continue
             # Si el bundle está vacío, la única opción es insertarla en la posición 0.
             if not bundle: #evalua si el bundle esta vacio
                 # Coste base: calcular ruta desde la ubicación del restaurante del objeto restaurant (o se podría usar restaurant_orders[0].restaurant.location)
@@ -233,6 +251,8 @@ def generate_bundles_for_restaurant(restaurant, current_time, target_bundle_size
                     # --- FIN DE LA MODIFICACIÓN ---
 
                     candidate_bundle = bundle[:pos] + [order] + bundle[pos:] #concatenación de listas
+                    if MAX_BUNDLE_SIZE and len(candidate_bundle) > MAX_BUNDLE_SIZE:
+                        continue
                     # Calcular la ruta completa para este candidate_bundle.
                     # Suponemos que la ruta inicia en la ubicación del restaurante.
                     dropoff_points = [o.dropoff_loc for o in candidate_bundle]  #asignamos a dropoff_points la ubicacion de entrega del bundle completo con la configuración iterandose
@@ -267,8 +287,12 @@ def generate_bundles_for_restaurant(restaurant, current_time, target_bundle_size
                 min_cost = float('inf')
 
                 for target_bundle_idx, target_bundle in enumerate(bundles):
+                    if MAX_BUNDLE_SIZE and len(target_bundle) >= MAX_BUNDLE_SIZE:
+                        continue
                     for pos in range(len(target_bundle) + 1):
                         candidate_bundle = target_bundle[:pos] + [order] + target_bundle[pos:]
+                        if MAX_BUNDLE_SIZE and len(candidate_bundle) > MAX_BUNDLE_SIZE:
+                            continue
                         
                         dropoff_points = [o.dropoff_loc for o in candidate_bundle]
                         route = get_route_details(restaurant.location, dropoff_points)

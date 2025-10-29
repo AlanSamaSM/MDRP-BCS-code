@@ -1,25 +1,27 @@
 ,FCFS,Rolling Horizon,Improvement (%)
-Avg. Click-to-Door (min),38.43,32.67,-14.99%
-P10 Click-to-Door (min),5.23,9.59,83.37%
-P50 Click-to-Door (min),38.42,29.92,-22.12%
-P90 Click-to-Door (min),77.08,68.88,-10.64%
-P95 Click-to-Door (min),89.10,76.46,-14.19%
-Avg. Ready-to-Pickup (min),26.34,21.65,-17.81%
-P10 Ready-to-Pickup (min),-6.70,-1.00,N/A
-P50 Ready-to-Pickup (min),25.50,17.00,-33.33%
-P90 Ready-to-Pickup (min),64.70,58.00,-10.36%
-Avg. Ready-to-Door (min),30.91,25.18,-18.54%
-P10 Ready-to-Door (min),-2.57,1.84,N/A
-P50 Ready-to-Door (min),31.26,21.64,-30.77%
-P90 Ready-to-Door (min),69.28,61.33,-11.48%
-% Undelivered Orders,25.00,27.59,10.36%
-Total Distance (km),419.91,279.75,-33.38%
-Orders per Courier per Hour,4.54,6.83,50.44%
-Bundles per Hour,4.54,4.72,3.96%
-Avg. Bundle Size,1.00,1.79,79.00%
-Total Courier Compensation,1740.00,2620.00,50.57%
-Cost per Order,10.00,10.00,0.00%
-Fraction of Couriers with Minimum Compensation,0.00,0.00,N/A
-Click-to-Door Overage (min),12.06,6.19,-48.67%
-Courier Utilization (%),34.55,26.47,-23.39%
-Courier Delivery Earnings,1740.00,2620.00,50.57%
+Avg. Click-to-Door (min),5.25,18.08,244.38%
+P10 Click-to-Door (min),3.06,11.51,276.14%
+P50 Click-to-Door (min),5.16,17.28,234.88%
+P90 Click-to-Door (min),7.48,27.05,261.63%
+P95 Click-to-Door (min),8.12,30.09,270.57%
+Avg. Ready-to-Pickup (min),-9.58,3.52,N/A
+P10 Ready-to-Pickup (min),-13.87,-1.45,N/A
+P50 Ready-to-Pickup (min),-9.52,2.83,N/A
+P90 Ready-to-Pickup (min),-5.37,10.63,N/A
+Avg. Ready-to-Door (min),-6.83,6.00,N/A
+P10 Ready-to-Door (min),-11.14,0.87,N/A
+P50 Ready-to-Door (min),-6.97,4.86,N/A
+P90 Ready-to-Door (min),-2.57,14.15,N/A
+% Undelivered Orders,0.00,0.00,N/A
+Total Distance (km),1175.74,2238.54,90.39%
+Distance per Order (km),1.13,1.08,-4.42%
+Orders per Courier per Hour,1.44,2.87,99.31%
+Bundles per Hour,1.44,1.97,36.81%
+Avg. Bundle Size,1.00,1.77,77.00%
+% Orders in Multi-Bundles,0.00,52.60,N/A
+Total Courier Compensation,12111.14,20750.00,71.33%
+Cost per Order,11.67,10.00,-14.31%
+Fraction of Couriers with Minimum Compensation,0.52,0.00,-100.00%
+Click-to-Door Overage (min),0.00,0.00,N/A
+Courier Utilization (%),6.58,11.64,76.90%
+Courier Delivery Earnings,10380.00,20750.00,99.90%

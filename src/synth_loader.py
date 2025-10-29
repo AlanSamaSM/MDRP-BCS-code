@@ -1,3 +1,4 @@
+import math
 import pandas as pd
 from datetime import timedelta
 import os
@@ -6,14 +7,21 @@ import sys
 # Handle both package and direct script imports
 try:
     from src.main import Order, Courier, Restaurant
+    from src.config import TARGET_ORDERS_PER_COURIER
 except ImportError:
     # Add project root to path when running directly
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     sys.path.insert(0, project_root)
     from src.main import Order, Courier, Restaurant
+    from src.config import TARGET_ORDERS_PER_COURIER
 
 
-def load_synth_instance(csv_path, n_couriers=5):
+def load_synth_instance(
+    csv_path,
+    n_couriers=None,
+    orders_per_courier=None,
+    min_couriers=15,
+):
     """Load the synthetic La Paz orders CSV.
 
     The file is produced by ``make_synth_orders.py`` and contains restaurant
@@ -23,6 +31,19 @@ def load_synth_instance(csv_path, n_couriers=5):
     print(f"  [synth_loader] Reading CSV: {csv_path}")
     df = pd.read_csv(csv_path, parse_dates=["created_at", "ready_at"])
     print(f"  [synth_loader] Loaded {len(df)} orders from CSV")
+
+    if orders_per_courier is None:
+        orders_per_courier = TARGET_ORDERS_PER_COURIER
+
+    if n_couriers is None:
+        if orders_per_courier <= 0:
+            raise ValueError("orders_per_courier must be positive when computing fleet size")
+        computed = math.ceil(len(df) / orders_per_courier) if len(df) else min_couriers
+        n_couriers = max(min_couriers, computed)
+        print(
+            f"  [synth_loader] Auto-selected {n_couriers} couriers "
+            f"(~{orders_per_courier} orders/courier)"
+        )
 
     restaurants = []
     rest_map = {}
@@ -74,7 +95,7 @@ if __name__ == "__main__":
         sys.exit(1)
         
     # Load the synthetic instance
-    orders, couriers, restaurants, _ = load_synth_instance(csv_path, n_couriers=5)
+    orders, couriers, restaurants, _ = load_synth_instance(csv_path)
     
     # Print summary statistics
     print(f"Loaded {len(orders)} orders")

@@ -1,3 +1,4 @@
+import argparse
 import os
 import sys
 from datetime import timedelta
@@ -9,9 +10,16 @@ from src.main import run_simulation, Restaurant
 from src.synth_loader import load_synth_instance
 
 
-def run_instance(csv_path):
-    # Use 20 couriers instead of default 5 for better performance with large datasets
-    orders, couriers, restaurants, _ = load_synth_instance(csv_path, n_couriers=20)
+def run_instance(csv_path, orders_per_courier=None, min_couriers=25):
+    if orders_per_courier is None:
+        orders_per_courier = config.TARGET_ORDERS_PER_COURIER
+
+    orders, couriers, restaurants, _ = load_synth_instance(
+        csv_path,
+        n_couriers=None,
+        orders_per_courier=orders_per_courier,
+        min_couriers=min_couriers,
+    )
 
     
 
@@ -33,10 +41,25 @@ def run_instance(csv_path):
 
     run_simulation(orders, couriers, restaurants, simulation_end, start_time=simulation_start, results_path=results_path, courier_results_path=courier_results_path)
 
-
 if __name__ == "__main__":
-    import sys
-    if len(sys.argv) < 2:
-        print("Usage: python run_synth_instance.py <orders.csv>")
-        sys.exit(1)
-    run_instance(sys.argv[1])
+    parser = argparse.ArgumentParser(description="Run FCFS simulation on synthetic data")
+    parser.add_argument("csv_path", help="Path to the synthetic orders CSV")
+    parser.add_argument(
+        "--orders-per-courier",
+        type=float,
+        default=None,
+        help="Target number of orders per courier shift (defaults to config.TARGET_ORDERS_PER_COURIER)",
+    )
+    parser.add_argument(
+        "--min-couriers",
+        type=int,
+        default=25,
+        help="Minimum fleet size to instantiate",
+    )
+    args = parser.parse_args()
+
+    run_instance(
+        args.csv_path,
+        orders_per_courier=args.orders_per_courier,
+        min_couriers=args.min_couriers,
+    )

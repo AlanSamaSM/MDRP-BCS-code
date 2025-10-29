@@ -27,7 +27,7 @@ Flujo general (scripts de entrada)
 2. Iniciar servidor OSRM (opcional) o establecer USE_EUCLIDEAN=1 para usar fallback por distancia
 3. Ejecutar el pipeline completo:
    python scripts/generate_results.py
-   
+   º
    O ejecutar políticas individualmente:
    python scripts/run_fcfs_instance.py <csv>
    python scripts/run_synth_instance.py <csv>  # Rolling Horizon

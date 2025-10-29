@@ -27,9 +27,11 @@ def calculate_kpis(df, policy_name, total_orders, courier_df):
             'P90 Ready-to-Door (min)': 0,
             '% Undelivered Orders': 100,
             'Total Distance (km)': 0,
+            'Distance per Order (km)': 0,
             'Orders per Courier per Hour': 0,
             'Bundles per Hour': 0,
             'Avg. Bundle Size': 0,
+            '% Orders in Multi-Bundles': 0,
             'Total Courier Compensation': 0,
             'Cost per Order': 0,
             'Fraction of Couriers with Minimum Compensation': 0,
@@ -105,6 +107,12 @@ def calculate_kpis(df, policy_name, total_orders, courier_df):
     
     total_delivery_earnings = courier_df['delivery_earnings'].sum()
 
+    # Nuevas métricas solicitadas
+    distance_per_order = total_distance / total_delivered_orders if total_delivered_orders > 0 else 0
+    
+    multi_bundle_orders = delivered_df[delivered_df['bundle_size'] > 1]
+    percentage_multi_bundle = (len(multi_bundle_orders) / len(delivered_df)) * 100 if len(delivered_df) > 0 else 0
+
     return {
         'Policy': policy_name,
         'Avg. Click-to-Door (min)': f'{avg_ctd:.2f}',
@@ -122,9 +130,11 @@ def calculate_kpis(df, policy_name, total_orders, courier_df):
         'P90 Ready-to-Door (min)': f'{p90_rtd:.2f}',
         '% Undelivered Orders': f'{undelivered_orders_percentage:.2f}',
         'Total Distance (km)': f'{total_distance:.2f}',
+        'Distance per Order (km)': f'{distance_per_order:.2f}',
         'Orders per Courier per Hour': f'{orders_per_courier_hour:.2f}',
         'Bundles per Hour': f'{bundles_per_hour:.2f}',
         'Avg. Bundle Size': f'{avg_bundle_size:.2f}',
+        '% Orders in Multi-Bundles': f'{percentage_multi_bundle:.2f}',
         'Total Courier Compensation': f'{total_compensation:.2f}',
         'Cost per Order': f'{cost_per_order:.2f}',
         'Fraction of Couriers with Minimum Compensation': f'{fraction_min_comp:.2f}',

@@ -8,6 +8,11 @@ TARGET_CLICK_TO_DOOR = timedelta(minutes=40) #Objetivo en la calidad del servici
 MAX_CLICK_TO_DOOR = timedelta(minutes=90) #Límite en la calidad del servicio
 SERVICE_TIME = timedelta(minutes=4)  # minutos (tiempo que incluye pickup + drop-off)
 
+# Límites operativos derivados de LaDe (Wu et al., 2025)
+MAX_TARGET_BUNDLE_SIZE = 5  # Evita bundles irreales bajo alta demanda
+MAX_BUNDLE_SIZE = 6         # Límite duro para inserciones paralelas
+TARGET_ORDERS_PER_COURIER = 18  # Promedio de pedidos por courier por turno
+
 # Penalizaciones para clasificación de grupos (Section 3.2)
 GROUP_I_PENALTY = 100   
 GROUP_II_PENALTY = 50   
