@@ -2,28 +2,42 @@ import os
 import sys
 import pandas as pd
 import numpy as np
+import subprocess
+from datetime import datetime
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 def calculate_kpis(df, policy_name, total_orders, courier_df):
+    """Calcula KPIs completos según Reyes (2018) y métricas adicionales."""
     if df.empty:
         return {
             'Policy': policy_name,
             'Avg. Click-to-Door (min)': 0,
+            'P10 Click-to-Door (min)': 0,
+            'P50 Click-to-Door (min)': 0,
+            'P90 Click-to-Door (min)': 0,
             'P95 Click-to-Door (min)': 0,
             'Avg. Ready-to-Pickup (min)': 0,
+            'P10 Ready-to-Pickup (min)': 0,
+            'P50 Ready-to-Pickup (min)': 0,
+            'P90 Ready-to-Pickup (min)': 0,
+            'Avg. Ready-to-Door (min)': 0,
+            'P10 Ready-to-Door (min)': 0,
+            'P50 Ready-to-Door (min)': 0,
+            'P90 Ready-to-Door (min)': 0,
             '% Undelivered Orders': 100,
             'Total Distance (km)': 0,
+            'Distance per Order (km)': 0,
             'Orders per Courier per Hour': 0,
+            'Bundles per Hour': 0,
             'Avg. Bundle Size': 0,
+            '% Orders in Multi-Bundles': 0,
             'Total Courier Compensation': 0,
             'Cost per Order': 0,
             'Fraction of Couriers with Minimum Compensation': 0,
-            'Click-to-Door Overage': 0,
-            'Ready-to-Door Time': 0,
-            'Courier Utilization': 0,
+            'Click-to-Door Overage (min)': 0,
+            'Courier Utilization (%)': 0,
             'Courier Delivery Earnings': 0,
-            'Bundles picked up per Hour': 0,
         }
 
     # Convert time columns to datetime
@@ -32,10 +46,25 @@ def calculate_kpis(df, policy_name, total_orders, courier_df):
 
     delivered_df = df[df['status'] == 'delivered'].copy()
 
-    # Calculate metrics
+    # Calculate Click-to-Door metrics (percentiles)
     avg_ctd = delivered_df['click_to_door'].mean()
+    p10_ctd = delivered_df['click_to_door'].quantile(0.10)
+    p50_ctd = delivered_df['click_to_door'].quantile(0.50)
+    p90_ctd = delivered_df['click_to_door'].quantile(0.90)
     p95_ctd = delivered_df['click_to_door'].quantile(0.95)
+    
+    # Calculate Ready-to-Pickup metrics
     avg_rtp = delivered_df['ready_to_pickup'].mean()
+    p10_rtp = delivered_df['ready_to_pickup'].quantile(0.10)
+    p50_rtp = delivered_df['ready_to_pickup'].quantile(0.50)
+    p90_rtp = delivered_df['ready_to_pickup'].quantile(0.90)
+    
+    # Calculate Ready-to-Door metrics
+    delivered_df['ready_to_door'] = (delivered_df['delivery_time'] - delivered_df['ready_time']).dt.total_seconds() / 60
+    avg_rtd = delivered_df['ready_to_door'].mean()
+    p10_rtd = delivered_df['ready_to_door'].quantile(0.10)
+    p50_rtd = delivered_df['ready_to_door'].quantile(0.50)
+    p90_rtd = delivered_df['ready_to_door'].quantile(0.90)
     
     undelivered_orders = total_orders - len(delivered_df)
     undelivered_orders_percentage = (undelivered_orders / total_orders) * 100 if total_orders > 0 else 0
@@ -46,11 +75,17 @@ def calculate_kpis(df, policy_name, total_orders, courier_df):
     total_distance = courier_df['total_distance_km'].sum()
     total_hours = courier_df['shift_duration_hours'].sum()
     total_delivered_orders = courier_df['orders_delivered'].sum()
+    total_bundles = courier_df['bundles_picked_up'].sum()
+    total_driving_time_hours = courier_df['driving_time_minutes'].sum() / 60.0
     
     if total_hours > 0:
         orders_per_courier_hour = total_delivered_orders / total_hours
+        bundles_per_hour = total_bundles / total_hours
+        courier_utilization = (total_driving_time_hours / total_hours) * 100
     else:
         orders_per_courier_hour = 0
+        bundles_per_hour = 0
+        courier_utilization = 0
 
     # New metrics from reyes2018.txt
     PAY_PER_ORDER = 10
@@ -70,49 +105,113 @@ def calculate_kpis(df, policy_name, total_orders, courier_df):
     delivered_df['click_to_door_overage'] = (delivered_df['click_to_door'] - TARGET_CLICK_TO_DOOR).clip(lower=0)
     avg_ctd_overage = delivered_df['click_to_door_overage'].mean()
     
-    delivered_df['ready_to_door'] = (delivered_df['delivery_time'] - delivered_df['ready_time']).dt.total_seconds() / 60
-    avg_rtd = delivered_df['ready_to_door'].mean()
-    
-    # Courier utilization is not directly available, so we need to estimate it.
-    # For now, we'll use a placeholder value.
-    courier_utilization = 0 
-
     total_delivery_earnings = courier_df['delivery_earnings'].sum()
+
+    # Nuevas métricas solicitadas
+    distance_per_order = total_distance / total_delivered_orders if total_delivered_orders > 0 else 0
     
-    # Bundles picked up per hour requires information not present in the current dataframes.
-    # We will use a placeholder for now.
-    bundles_per_hour = 0
+    multi_bundle_orders = delivered_df[delivered_df['bundle_size'] > 1]
+    percentage_multi_bundle = (len(multi_bundle_orders) / len(delivered_df)) * 100 if len(delivered_df) > 0 else 0
 
     return {
         'Policy': policy_name,
         'Avg. Click-to-Door (min)': f'{avg_ctd:.2f}',
+        'P10 Click-to-Door (min)': f'{p10_ctd:.2f}',
+        'P50 Click-to-Door (min)': f'{p50_ctd:.2f}',
+        'P90 Click-to-Door (min)': f'{p90_ctd:.2f}',
         'P95 Click-to-Door (min)': f'{p95_ctd:.2f}',
         'Avg. Ready-to-Pickup (min)': f'{avg_rtp:.2f}',
+        'P10 Ready-to-Pickup (min)': f'{p10_rtp:.2f}',
+        'P50 Ready-to-Pickup (min)': f'{p50_rtp:.2f}',
+        'P90 Ready-to-Pickup (min)': f'{p90_rtp:.2f}',
+        'Avg. Ready-to-Door (min)': f'{avg_rtd:.2f}',
+        'P10 Ready-to-Door (min)': f'{p10_rtd:.2f}',
+        'P50 Ready-to-Door (min)': f'{p50_rtd:.2f}',
+        'P90 Ready-to-Door (min)': f'{p90_rtd:.2f}',
         '% Undelivered Orders': f'{undelivered_orders_percentage:.2f}',
         'Total Distance (km)': f'{total_distance:.2f}',
+        'Distance per Order (km)': f'{distance_per_order:.2f}',
         'Orders per Courier per Hour': f'{orders_per_courier_hour:.2f}',
+        'Bundles per Hour': f'{bundles_per_hour:.2f}',
         'Avg. Bundle Size': f'{avg_bundle_size:.2f}',
+        '% Orders in Multi-Bundles': f'{percentage_multi_bundle:.2f}',
         'Total Courier Compensation': f'{total_compensation:.2f}',
         'Cost per Order': f'{cost_per_order:.2f}',
         'Fraction of Couriers with Minimum Compensation': f'{fraction_min_comp:.2f}',
-        'Click-to-Door Overage': f'{avg_ctd_overage:.2f}',
-        'Ready-to-Door Time': f'{avg_rtd:.2f}',
-        'Courier Utilization': f'{courier_utilization:.2f}',
+        'Click-to-Door Overage (min)': f'{avg_ctd_overage:.2f}',
+        'Courier Utilization (%)': f'{courier_utilization:.2f}',
         'Courier Delivery Earnings': f'{total_delivery_earnings:.2f}',
-        'Bundles picked up per Hour': f'{bundles_per_hour:.2f}',
     }
 
-def main():
+def run_full_pipeline(synthetic_csv_path='data/synthetic_lapaz_orders_limited.csv', skip_data_generation=False):
+    """
+    Orquestador completo del pipeline de experimentación:
+    1. Genera datos sintéticos (opcional)
+    2. Ejecuta simulación FCFS
+    3. Ejecuta simulación Rolling Horizon
+    4. Calcula y compara KPIs
+    """
+    base_path = os.path.dirname(os.path.dirname(__file__))
+    
+    print("="*60)
+    print("PIPELINE DE EXPERIMENTACIÓN MDRP-BCS")
+    print("="*60)
+    
+    # Paso 1: Generar datos sintéticos
+    if not skip_data_generation:
+        print("\n[1/4] Generando datos sintéticos...")
+        import subprocess
+        synth_script = os.path.join(base_path, 'scripts', 'make_synth_orders.py')
+        result = subprocess.run([sys.executable, synth_script], cwd=base_path, capture_output=True, text=True)
+        if result.returncode == 0:
+            print(f"✓ Datos sintéticos generados: {result.stdout.strip()}")
+        else:
+            print(f"✗ Error generando datos: {result.stderr}")
+            return
+    else:
+        print(f"\n[1/4] Saltando generación de datos (usando: {synthetic_csv_path})")
+    
+    # Paso 2: Ejecutar FCFS
+    print("\n[2/4] Ejecutando simulación FCFS...")
+    fcfs_script = os.path.join(base_path, 'scripts', 'run_fcfs_instance.py')
+    result = subprocess.run([sys.executable, fcfs_script, synthetic_csv_path], cwd=base_path, capture_output=True, text=True)
+    if result.returncode == 0:
+        print("✓ Simulación FCFS completada")
+    else:
+        print(f"✗ Error en simulación FCFS: {result.stderr}")
+        return
+    
+    # Paso 3: Ejecutar Rolling Horizon
+    print("\n[3/4] Ejecutando simulación Rolling Horizon...")
+    rh_script = os.path.join(base_path, 'scripts', 'run_synth_instance.py')
+    # No capturar output para ver los prints en tiempo real
+    result = subprocess.run([sys.executable, rh_script, synthetic_csv_path], cwd=base_path)
+    if result.returncode == 0:
+        print("✓ Simulación Rolling Horizon completada")
+    else:
+        print(f"✗ Error en simulación RH (returncode: {result.returncode})")
+        return
+    
+    # Paso 4: Calcular y comparar KPIs
+    print("\n[4/4] Calculando KPIs y generando comparación...")
+    analyze_results()
+    
+    print("\n" + "="*60)
+    print("PIPELINE COMPLETADO")
+    print("="*60)
+
+def analyze_results():
+    """Analiza los resultados de las simulaciones y genera comparación de KPIs."""
     base_path = os.path.dirname(os.path.dirname(__file__))
     raw_results_path = os.path.join(base_path, 'results', 'raw')
 
     # Define paths for order results
-    fcfs_path = os.path.join(raw_results_path, 'synthetic_lapaz_orders_fcfs_results.csv')
-    rh_path = os.path.join(raw_results_path, 'synthetic_lapaz_orders_rh_results.csv')
+    fcfs_path = os.path.join(raw_results_path, 'synthetic_lapaz_orders_limited_fcfs_results.csv')
+    rh_path = os.path.join(raw_results_path, 'synthetic_lapaz_orders_limited_rh_results.csv')
 
     # Define paths for courier summaries
-    fcfs_courier_path = os.path.join(raw_results_path, 'synthetic_lapaz_orders_fcfs_couriers.csv')
-    rh_courier_path = os.path.join(raw_results_path, 'synthetic_lapaz_orders_rh_couriers.csv')
+    fcfs_courier_path = os.path.join(raw_results_path, 'synthetic_lapaz_orders_limited_fcfs_couriers.csv')
+    rh_courier_path = os.path.join(raw_results_path, 'synthetic_lapaz_orders_limited_rh_couriers.csv')
 
     # Load dataframes
     fcfs_df = pd.read_csv(fcfs_path)
@@ -152,7 +251,7 @@ def main():
     comparison_df = comparison_df.T
     comparison_df['Improvement (%)'] = pd.Series(improvement)
 
-    print("--- KPI Comparison ---")
+    print("\n--- KPI Comparison ---")
     print(comparison_df.to_markdown())
 
     # Save to CSV
@@ -161,7 +260,16 @@ def main():
     csv_path = os.path.join(results_dir, "kpi_comparison.csv")
     comparison_df.to_csv(csv_path)
     
-    print(f"\nResults saved to {csv_path}")
 
 if __name__ == "__main__":
-    main()
+    import argparse
+    parser = argparse.ArgumentParser(description='Execute full MDRP experimentation pipeline or analyze existing results')
+    parser.add_argument('--analyze-only', action='store_true', help='Only analyze existing results without running simulations')
+    parser.add_argument('--csv', default='data/synthetic_lapaz_orders_limited.csv', help='Path to synthetic orders CSV')
+    args = parser.parse_args()
+    
+    if args.analyze_only:
+        print("Analyzing existing results...")
+        analyze_results()
+    else:
+        run_full_pipeline(synthetic_csv_path=args.csv)

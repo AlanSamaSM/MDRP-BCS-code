@@ -1,0 +1,1091 @@
+LaDe: The First Comprehensive Last-mile Delivery
+Dataset from Industry
+Lixia Wu1,†
+, Haomin Wen1,†
+, Haoyuan Hu1
+, Xiaowei Mao2,1
+, Yutong Xia3
+,
+Ergang Shan1
+, Jianbin Zheng1
+, Junhong Lou1
+, Yuxuan Liang4∗
+,
+Liuqing Yang4
+, Roger Zimmermann3
+, Youfang Lin2
+, Huaiyu Wan2
+1Cainiao Network 2Beijing Jiaotong University 3National University of Singapore
+4Hong Kong University of Science and Technology (Guangzhou)
+{wallace.wulx,wenhaomin.whm,haoyuan.huhy,ergang.se}@cainiao.com
+yuxliang@outlook.com;lqyang@ust.hk;yutong.xia@u.nus.edu
+rogerz@comp.nus.edu.sg;{maoxiaowei,hywan,yflin}@bjtu.edu.cn
+Abstract
+Real-world last-mile delivery datasets are crucial for research in logistics, supply
+chain management, and spatio-temporal data mining. Despite a plethora of algorithms developed to date, no widely accepted, publicly available last-mile delivery
+dataset exists to support research in this field. In this paper, we introduce LaDe, the
+first publicly available last-mile delivery dataset with millions of packages from
+the industry. LaDe has three unique characteristics: (1) Large-scale. It involves
+10,677k packages of 21k couriers over 6 months of real-world operation. (2) Comprehensive information. It offers original package information, such as its location
+and time requirements, as well as task-event information, which records when
+and where the courier is while events such as task-accept and task-finish events
+happen. (3) Diversity. The dataset includes data from various scenarios, including package pick-up and delivery, and from multiple cities, each with its unique
+spatio-temporal patterns due to their distinct characteristics such as populations.
+We verify LaDe on three tasks by running several classical baseline models per
+task. We believe that the large-scale, comprehensive, diverse feature of LaDe can
+offer unparalleled opportunities to researchers in the supply chain community, data
+mining community, and beyond. The dataset homepage is publicly available at
+https://huggingface.co/datasets/Cainiao-AI/LaDe.
+1 Introduction
+Driven by increasing urbanization and e-commerce development, last-mile delivery has emerged as a
+critical research area with growing interest from scholars and practitioners. Last-Mile Delivery, as
+illustrated in Figure 1, is the package transport process that connects the depot and the customers,
+including both the package pick-up [1, 2] and delivery [3, 4] process. In addition to being a key to
+customer satisfaction, last-mile delivery is both the most expensive and time-consuming part of the
+shipping process [5, 6]. Consequently, researchers from different fields, from logistics operation
+management to spatio-temporal data mining, have been consistently shedding light on problems in
+last-mile delivery in recent years. These problems include route planning [7, 8, 9], Estimated Time
+of Arrival (ETA) prediction [10, 11, 12], and route prediction [13, 14, 15], etc. A quick search for
+“last-mile delivery” on Google Scholar returns over 19,400 papers since 2018.
+∗
+†: Equal contribution. Y. Liang is the corresponding author of this paper. Email: yuxliang@outlook.com
+Submitted to the 37th Conference on Neural Information Processing Systems (NeurIPS 2023) Track on Datasets
+and Benchmarks. Do not distribute.
+arXiv:2306.10675v3 [cs.DB] 5 Jan 2025
+Logistics
+Network
+courier
+depot
+customer
+pick-up
+package
+(receiver)
+courier
+depot
+deliver
+package
+customer
+(sender)
+Last-mile: Pickup Last-mile: Delivery
+package ID
+time window
+latitude &
+longitude
+AOI ID&type
+courier ID
+accept time
+pickup time
+courier’s
+location when
+accept/pick up
+package ID
+latitude &
+longitude
+AOI ID&type
+courier ID
+accept time
+delivery time
+courier’s
+location when
+accept/delivery
+LaDe-P LaDe-D
+AOI
+Figure 1: Overview of LaDe from last-mile delivery (better viewed in color), which includes two
+sub-datasets: LaDe-P from package pick-up process (i.e., couriers pick up packages from sender
+customers and return the depot) and LaDe-D from delivery process (i.e., couriers deliver packages
+from the depot to receiver customers).
+Recent endeavors [10, 11, 12] focus on leveraging machine/deep learning techniques for problems
+in last-mile delivery research. A critical prerequisite for those researches is the availability of
+high-quality, large-scale datasets. Since such datasets have the potential to significantly accelerate
+advancements in specific fields, such as ImageNet [16] for computer vision and GLUE [17] for natural
+language processing. Nonetheless, in the domain of last-mile background research, a multitude of
+algorithms have been devised, but there is still an absence of a widely recognized, publicly accessible
+dataset. Consequently, research in this field has become concentrated within a limited number of
+industrial research laboratories, thereby restricting transparency and hindering research progress.
+Moreover, the lack of public datasets also poses a hurdle for industry practitioners to develop advanced
+algorithms for last-mile delivery.
+To meet the rising calling for a public dataset, we propose LaDe, the first comprehensive Last-mile
+Delivery dataset collected by Cainiao. It contains both package pick-up and delivery data as depicted
+in Figure 1. LaDe has several merits: (1) Large-scale, covering 10,677k packages of 21k couriers
+across 6 months. To the best of our knowledge, this is the largest publicly available dataset. (2)
+Comprehensive, providing detailed information on package, location, task-event, and courier. (3)
+Diverse, collecting data from both pick-up and delivery processes across various cities. By virtue
+of these advantages, LaDe can be employed to evaluate a wide spectrum of last-mile-related tasks.
+In this paper, we investigate its properties by three tasks, including route prediction [13, 14, 15],
+estimated time of arrival prediction [10, 11, 12], and spatio-temporal graph forecasting [18, 19, 20].
+Beyond these tasks, it is easy to integrate some of the aforementioned features to support additional
+tasks. We believe that such a large-scale dataset like LaDe is a critical resource for developing
+advanced algorithms under the context of last-mile delivery, as well as for providing critical training
+and benchmarking data for learning-based algorithms. Overall, we identify three key contributions of
+this work:
+• A New Dataset. We collect, process, and release LaDe. The dataset boasts large-scale,
+comprehensive, and diverse characteristics. To the best of our knowledge, it is the first
+exhaustive, industry-scale last-mile delivery dataset. The dataset is publicly accessible at
+https://huggingface.co/datasets/Cainiao-AI/LaDe.
+• Comprehensive Data Analysis. Extensive data analysis is conducted to depict and highlight the
+properties of the dataset. Based on the analysis, we introduce potential tasks supported by LaDe,
+from logistics operation management to spatio-temporal data mining, and beyond.
+• Benchmark on Real-World Tasks. We benchmark this dataset by performing three representative
+tasks, including service route prediction, estimated time of arrival prediction, and spatio-temporal
+graph forecasting. The source codes for these tasks are provided to promote research in this field.
+The remainder of this paper is structured as follows. Section 2 discusses related work, and Section 3
+introduces the details of the dataset, including the methodology used to construct the dataset, and the
+statistics and properties of the dataset. In Section 4, we benchmark the dataset on three tasks and
+discuss the potential use of the data in related research fields.
+2
+2 Related Work
+Dataset Perspective. To the best of our knowledge, there is no publicly available last-mile dataset
+containing both package pick-up and delivery data. The most relative effort comes from Amazon
+[21] (named AmazonData in this paper). It is a courier-operated sequence dataset proposed for a
+last-mile routing research challenge hosted by Amazon. Specifically, this dataset contains 9,184
+historical routes performed by Amazon couriers in 2018 in five metropolitan areas in the United
+States. Despite the contribution of AmazonData to the research field, it still has three limitations:
+1) Without pick-up data, it only contains data generated in the package delivery process; 2) Small
+scale, in terms of spatio-temporal range and the number of trajectories; 3) Lack of courier-related and
+task-event-related information, which prevents it from benefiting a wider group of researchers with
+different interests. In light of the above issues, we introduce an industry-scale, comprehensive dataset
+(i.e., LaDe) for researchers to develop and evaluate new ideas on real-world instances in last-mile
+delivery. The scale of LaDe is 5 times of AamazonData in terms of package number and 50 times in
+terms of trajectory number. We provide a detailed comparison of AamazonData and LaDe in Table 1.
+Table 1: Comparison between LaDe and the related dataset.
+Dataset Time span #Trajectories #Couriers #Packages Delivery Data Pick-up Data Courier Info Task-event Info
+AmazonData 4 months 9k - 2,182k ✓ × × ×
+LaDe 6 months 619k 21k 10,677k ✓ ✓ ✓ ✓
+Application Perspective. Overall, last-mile logistics is an emerging interdisciplinary research area
+connecting transportation and AI technology, in which deep learning methods have long been the
+most popular model [5]. Broadly speaking, there are four branches in this field: 1) Emerging trends
+and technologies, which focus on technological solutions and innovations in last-mile logistics, such
+as courier’s route and arrival time prediction [15, 12], self-service technologies [22], drone-assisted
+delivery [23]. 2) Last-mile-related data mining [24, 25], which aims to excavate the underlying
+patterns of knowledge from data generated by real-world operations for better logistics management.
+3) Operational optimization, which focuses on optimizing last-mile operations and making better
+operational decisions, such as vehicle routing problem [7, 26], delivery scheduling [27], and facility
+location selection [28, 29]. 4) Supply chain structures, which focused on designing structures for last
+mile logistics, such as the network design [30]. We refer readers to the paper [5] for a more detailed,
+systematic classification of last-mile-related research. The proposed LaDe contains instances based
+on real operational data that researchers can use to advance the state-of-the-art in their fields and to
+expand its applications to industry settings.
+3 Proposed Dataset: LaDe
+In this section, we formally introduce the LaDe Dataset. First, we describe the data collection process,
+followed by a detailed discussion of LaDe’s data fields and dataset statistics. Finally, we conduct a
+comprehensive analysis to highlight its unique properties. The dataset can be freely downloaded at
+https://huggingface.co/datasets/Cainiao-AI/LaDe and noncommercially used with a custom license
+CC BY-NC 4.02
+.
+3.1 Data Collection
+This dataset is collected by Cainiao Network3
+, one of China’s largest logistics platforms, which
+handles a tremendous volume of packages each day. A typical process for shipping a package involves
+the following steps: 1) The customer (sender) places a package pick-up order through the online
+platform. 2) The platform dispatches the order to an appropriate courier. 3) The courier picks up
+the package within the specified time window and returns to the depot (this constitutes the package
+2
+https://creativecommons.org/licenses/by-nc/4.0/
+3
+https://global.cainiao.com/
+3
+pick-up process). 4) The package departs from the depot and traverses the logistics network until
+it reaches the target depot. 5) At the target depot, the delivery courier retrieves the package and
+delivers it to the recipient customer (known as the package delivery process). Among these steps,
+step 3 and 5 are referred to as the last-mile delivery, where couriers pick up/deliver packages from/to
+customers. Note that there is a notable difference between the pick-up and delivery scenarios. In
+the package delivery process, packages assigned to a particular courier are determined prior to the
+courier’s departure from the depot. Conversely, in the pick-up process, packages assigned to a courier
+are not settled at the beginning. Rather, they are revealed over time, as customers can request pick-ups
+at any time. The dynamic nature of package pick-up presents substantial challenges in the research
+field. To advocate more efforts for the challenge and make the data more diverse, LaDe contains two
+sub-datasets in both pick-up and delivery scenarios, named LaDe-P and LaDe-D, respectively.
+Region-Level
+AOI
+Courier 1
+Courier 1
+AOI-Level
+Courier 2
+Figure 2: Region-level and
+AOI-level data.
+Specifically, we collect millions of package pick-up/delivery data
+generated in 6 months from different cities in China. To increase
+the diversity, we carefully selected 5 cities - Shanghai, Hangzhou,
+Chongqing, Jilin, and Yantai - which possess distinct characteristics
+such as populations, more details can be found in Table 11 of Appendix A.2. A city contains different regions, with each region composed of several AOIs (Area of Interest) for logistics management.
+And a courier is responsible for picking up / delivering packages in
+several assigned AOIs. We give a simple illustration of the regionlevel and AOI-level segmentation of a city in Figure 2. To collect
+the data for each city, we first randomly select 30 regions in the city.
+Subsequently, we randomly sample couriers in each region and pick out all the selected couriers’
+picked-up/delivery packages during the 6 months. To safeguard the privacy of both customers and
+couriers, we applied perturbations to the latitude and longitude points collected in the data. The
+accuracy of the latitude and longitude is limited to 10 meters. The data must not be assumed to
+indicate any of Cainiao’s business interests.
+3.2 Dataset Details & Statistics
+In this subsection, we present the dataset details and its basic statistics. The detailed data field
+description of LaDe-P and LaDe-D can be found in Table 7 and Table 8 in Appendix A.1.
+To facilitate the utilization and analysis of the dataset, we transform and arrange each sub-dataset
+into tabular data presented in CSV format. Each record in this format contains relevant information
+pertaining to a picked-up or delivered package, primarily addressing the “who, where, when” aspects.
+Specifically, the record specifies which courier picked up or delivered the package, the location of the
+package, and the corresponding time. The recorded information can be broadly categorized into four
+types: 1) package information, which records the package ID and time windows requirements (if
+applicable); 2) stop information, recording the package’s location information such as coordinates,
+AOI ID, and AOI type; 3) courier information, recording the courier’s ID, and each courier is equipped
+with a personal digital assistant (PDA), which will consistently report the status of a courier (e.g.,
+GPS) to the platform; 4) task-event information, recording the features of package accept, pick-up or
+delivery event, including when the event happens and the courier’s location.
+Overall, the package and task-event information can be recorded once the courier accepts the order, or
+finishes the order. Information about the stop comes from the geo-decoding system used in Cainiao,
+which can parse the input location address into its corresponding coordinates with a given accuracy.
+Table 2 shows the statistics of the LaDe-P. Due to the page limitation, please refer to Table 13 in
+Appendix A.2 for the statistics of the LaDe-D. Moreover, to intuitively illustrate the spatio-temporal
+characteristics of the dataset, we draw the spatial and temporal distribution of one city (Shanghai) in
+Figure 3 for one sub-dataset LaDe-P. From the Figure, we have the following observations. Obs1:
+Figure 3(a) shows that couriers’ work time starts from 8:00 and ends at 19:00. The volume of package
+pick-up has a peak at 9:00 am and 5:00 pm, respectively. Obs2: Figure 3(b) and Figure 3(c) shows the
+spatial distribution of packages, where the distance between consecutive packages in a courier’s route
+4
+Table 2: Statistics of LaDe-P. AvgETA stands for the average arrival time per package. AvgPackage
+means the average package number of a courier per day. The unit of AvgETA is minute.
+City Time span Spatial span #Trajectories #Couriers #Packages #GPS points AvgETA AvgPackage
+Shanghai 6 months 20km×20km 96k 4,502 1,450k 1,785k 151 15.0
+Hangzhou 6 months 20km×20km 119k 5,347 2,130k 2,427k 146 17.8
+Chongqing 6 months 20km×20km 83k 2,982 1,172k 1,475k 140 14.0
+Yantai 6 months 20km×20km 71k 2,593 1,146k 1,641k 137 16.0
+Jilin 6 months 20km×20km 18k 665 261k 399k 123 13.8
+(d) (e) (f)
+data
+profile
+Finish Time Distribution
+Top-5 AOI Type Distribution
+Spatial Distribution
+Arrival Time Distribution of 10 Couriers Feature of Couriers
+(a) (b) (c)
+Distance Distribution
+(minute)
+(m)
+(m/min)
+Figure 3: Spatial and temporal distribution of data in Shanghai of LaDe-P.
+is usually within 1km. Obs3: Figure 3(d) shows the distribution of the top 5 AOI types in the data,
+illustrating that over 70% packages come from type 1. Obs4: Figure 3(e) shows the actual arrival
+time of 10 randomly selected couriers, from which we observed differences in the work efficiency
+of different couriers. It also shows that a majority of packages are picked up within 3 hours. Obs5:
+Figure 3(f) depicts the profile of two couriers in the dataset, where different characteristics such as
+work days, and average orders per day are observed.
+3.3 Dataset Properties & Challenges
+In this subsection, we present our primary data analysis to highlight its properties and the challenges
+they entail.
+Large scale. LaDe contains in total 10,667k packages and 619k trajectories that consist of 16,755k
+GPS pings generated by 21k couriers, covering 5 cities over a total span of 6 months. The maximal
+package number of a courier one trip in the pick-up scenario and delivery scenario reaches 95 and 121,
+respectively. Such large scale brings a significant challenge to algorithms in last-mile delivery. To the
+best of our knowledge, this is the largest clean delivery dataset available to the research community,
+in terms of spatio-temporal coverage, the total number of packages, and the number of couriers’
+trajectories.
+Comprehensity. LaDe aims to offer a wealth of information pertaining to last-mile delivery, encompassing various types of data such as detailed package information, task-event logs, courier trajectory
+details, and contextual features. The objective is to facilitate a broader range of research endeavors.
+How to effectively leverage these comprehensive features to improve existing or inspire new tasks
+remains an open problem for researchers from different communities.
+Diversity. We increase the data’s diversity from two perspectives: (1) scenario diversity – we
+introduce scenario diversity by collecting two sub-datasets representing both pick-up and delivery
+5
+scenarios; (2) city diversity – we collect data from different cities to increase the diversity of the
+dataset. The cities in the dataset have different characteristics, leading to various spatio-temporal
+patterns in the dataset, where we give an illustration in Figure 4. For more information about the
+selected cities, please refer to Table 11 in Appendix A.1. Such diversity brings the challenge of
+designing advanced models that can generalize well under cities with different characteristics.
+(a) (b) (c)
+Figure 4: Diversity of cities. We select two cities, Hangzhou and Jilin, as an example to reveal
+their different spatio-temporal distributions. (a) The time distribution of packages in a day; (b) The
+ETA distribution of packages; (c) The distribution of the average distance between two consecutive
+packages in a courier’s route. A significant difference is observed in the above illustration.
+Dynamism (only for LaDe-P). Compared to LaDe-D, the tasks of a courier in LaDe-P are not settled
+at the beginning of the day. Rather, they are revealed along with the pick-up process as customers can
+place an order at any time. Such dynamism in courier tasks poses significant technical challenges in
+various research areas, with one notable example being dynamic route optimization [31, 8].
+Eqquiped with the above unique properties, LaDe offers the most extensive compilation of data for
+various research purposes background by last-mile delivery. It encompasses a variety of information
+across multiple domains, such as package details, event-based information, and courier information.
+Our aspiration is to make this abundant resource accessible to a broad spectrum of researchers,
+enabling them to undertake diverse and innovative studies.
+4 Applications
+To prove LaDe’s ability to support multiple tasks, we benchmark the dataset in three learning-based
+tasks, including route prediction, estimated time of arrival prediction, and spatio-temporal graph
+forecasting. Those tasks all come from the real-world application and we illustrate them in Figure 5.
+The code of relevant baselines in each task is released at https://huggingface.co/datasets/CainiaoAI/LaDe. Note that the dataset can support far more than the three tasks, which we envision more
+possible applications from different research fields at the end of the section.
+4.1 Route Prediction
+A crucial task in last-mile delivery services (such as logistics and food delivery) is service route
+prediction [12, 15], which aims to estimate the future service route of a worker given his unfinished
+tasks at the request time.
+Problem Definition. Formally, at a certain time t, a worker (i.e., courier) w can have n unfinished
+tasks, denoted by Xw
+t = {x1, x2, . . . , xn}, where xi corresponds to the feature vector of a task i.
+Given a worker w’s unfinished tasks at time t and route constraints C (such as pick-up then delivery
+constraints), route prediction aims to learn a mapping function FC to predict the worker’s future ser6
+courier
+unpicked-up
+package
+customer
+Appointment Time 15:30-17:30
+Notify recipient Change order
+Cancel order Pay
+ETA
+Expected to come around 17:00
+The tracking number will be
+displayed after the parcel is picked.
+Code 3004
+Save to photos album
+（a）Route Prediction
+predict
+（b）ETA Prediction （c）STG Forecasting
+AOI / region
+32
+29
+21
+10
+5
+（20m, 5 minutes）
+distance
+to courier
+time
+window
+aoi_type
+…
+1km
+9:30-
+10:30
+school
+…
+distance
+…
+distance
+…
+query time
+9:00
+query time
+9:00
+Future
+Pickup Route
+Figure 5: Illustration of three real-world applications. (a): Route prediction predicts the future
+pick-up route of a courier. (b): ETA prediction estimates the courier’s arrival time for picking up or
+delivering packages. (c): STG forecasting predicts the future package number in given regions/AOIs.
+vice route πˆ which can satisfy the given route constraints C, formulated as: FC(Xw
+t
+) = [π1, π2 · · · πn],
+where πi means that the i-th node in the route is task πi
+. And πi ∈ {1, · · · n} and πi ̸= πj if i ̸= j.
+Dataset. We choose LaDe-P as the dataset to conduct the experiment. The training, validation, and
+test set is split chronologically using a ratio of 6:2:2. Due to the space limit, we select three out of the
+five cities for conducting experiments, including Shanghai, Chongqing, and Yantai.
+Baselines & Hyperparameters. We run six baselines on LaDe. 1) Basic methods: TimeGreedy
+[13] and DistanceGreedy [13]. 2) Machine learning method: Osqure [13]. 3) Deep learning models:
+DeepRoute [14], FDNET [12], and Graph2Route [15]. Hyperparameters search is performed on the
+validation set by evaluating hidden size in {16, 32, 64, 128}. We set the learning rate to 0.0001 and
+batch size to 64 for all deep-learning models. More details about the baselines and metrics can be
+found in Appendix B.1.
+Results. Following [15], we adopt HR@k, KRC, LMD, and ED to evaluate model performance.
+Higher KRC, HR@k, and lower LSD and ED mean better performance. The number of packages in
+each sample is in (0, 25]. Table 3 shows the results of different methods on LaDe. It can be observed
+that basic models perform poorly since they can only make use of distance or time information. Deep
+models generally achieve better performance than shallow models, because of their ability to model
+abundant spatial and temporal features. This further proves the importance of the comprehensive
+information provided by LaDe for building more powerful models. Among deep models, Graph2Route
+performs the best due to its ability to model the underlying graph correlation of different packages.
+Table 3: Experiment Results of Route Prediction.
+Method Chongqing Shanghai Yantai
+HR@3 KRC LSD ED HR@3 KRC LSD ED HR@3 KRC LSD ED
+Time-Greedy 63.86 ±0.00 44.16 ±0.00 3.91 ±0.00 1.74 ±0.00 59.81 ±0.00 39.93 ±0.00 5.20 ±0.00 2.24 ±0.00 61.23 ±0.00 39.64 ±0.00 4.62 ±0.00 1.85 ±0.00
+Distance-Greedy 62.99 ±0.00 41.48 ±0.00 4.22 ±0.00 1.60 ±0.00 61.07 ±0.00 42.84 ±0.00 5.35 ±0.00 1.94 ±0.00 62.34 ±0.00 40.82 ±0.00 4.49 ±0.00 1.64 ±0.00
+Or-Tools 64.19 ±0.00 43.09 ±0.00 3.67 ±0.00 1.55 ±0.00 62.50 ±0.00 44.81 ±0.00 4.69 ±0.00 1.88 ±0.00 63.27 ±0.00 42.31 ±0.00 3.94 ±0.00 1.59 ±0.00
+LightGBM 71.55 ±0.00 54.53 ±0.00 2.63 ±0.00 1.54 ±0.00 70.63 ±0.00 54.48 ±0.00 3.27 ±0.00 1.92 ±0.00 70.41 ±0.00 52.90 ±0.00 2.87 ±0.00 1.59 ±0.00
+FDNET 69.98 ±0.32 52.07 ±0.38 3.36 ±0.04 1.51 ±0.01 69.05 ±1.23 52.72 ±1.72 4.08 ±0.25 1.86 ±0.03 69.08 ±0.61 50.62 ±1.20 3.60 ±0.15 1.57 ±0.02
+DeepRoute 72.09 ±0.39 55.72 ±0.40 2.66 ±0.06 1.51 ±0.01 71.66 ±0.10 56.20 ±0.23 3.26 ±0.07 1.86 ±0.01 71.44 ±0.28 54.74 ±0.49 2.80 ±0.02 1.53 ±0.02
+CPRoute 72.55 ±0.23 55.76 ±0.32 2.70 ±0.01 1.49 ±0.02 71.73 ±0.08 56.17 ±0.04 3.39 ±0.02 1.84 ±0.00 71.76 ±0.04 54.84 ±0.03 2.99 ±0.01 1.53 ±0.00
+Graph2Route 72.31 ±0.20 56.08 ±0.14 2.53 ±0.01 1.50 ±0.01 71.69 ±0.10 56.53 ±0.10 3.12 ±0.01 1.86 ±0.00 71.52 ±0.14 55.02 ±0.10 2.71 ±0.01 1.54 ±0.00
+M2G4RTP 72.44 ±0.11 56.15 ±0.04 2.55 ±0.03 1.50 ±0.00 71.73 ±0.06 56.34 ±0.08 3.16 ±0.02 1.86 ±0.01 71.73 ±0.01 55.02 ±0.17 2.78 ±0.00 1.53 ±0.01
+DRL4Route 73.12 ±0.06 57.23 ±0.12 2.43 ±0.01 1.48 ±0.01 72.18 ±0.15 57.20 ±0.18 3.06 ±0.02 1.84 ±0.01 72.07 ±0.06 55.94 ±0.10 2.62 ±0.00 1.51 ±0.00
+4.2 Estimated Time of Arrival Prediction
+Estimated Time of Arrival (ETA) prediction aims to forecast when the task is going to be finished,
+e.g., the delivery time of a package. It is one of the most important tasks in many delivery platforms
+since it directly influences customers’ experience [10].
+Problem Definition. Given an ETA query of worker w at time t, i.e., q = {t, Xw
+t }, where Xw
+t =
+{x1, x2, . . . , xn} is the courier’s unfinished packages, ETA prediction aims to build a model F that
+7
+can map the input query to the arrival time (i.e., pick-up/delivery time) Y for the unfinished package
+set: F(q) 7→ Y = {y1, . . . , yn}, where yi = t
+actual
+i − t and t
+actual is the actual arrival time of task i.
+Dataset. LaDe-D is utilized for this experiment (note that LaDe-P can also be used for this task). We
+split the data into training, validation, and test sets chronologically in a ratio of 6:2:2.
+Baselines & Hyperparameters. Five baselines are evaluated for the task, including a simple speedbased method SPEED, machine learning methods LightGBM [32] and KNN [33], and deep models
+Multi-Layer Perceptron (MLP) and FDNET [12]. We also perform hyperparameters search on the
+validation set by hidden size in {16, 32, 64, 128} for all deep models. The learning rate and batch
+size are set to 0.00005 and 32 for all models. See more details in Appendix B.2.
+Results. MAE, RMSE, and ACC@20(%) are used to evaluate the performance of time prediction
+models. Higher ACC@20 and lower MAE and RMSE indicate better performance. From the
+results shown in Table 4, we can see that learning-based models outperform SPEED by a large
+margin because of their ability to model multiple spatio-temporal factors. We also observe a huge
+performance gap of the same method in different cities. For example, the best model, RANKETPA,
+achieves 73.67% in terms of ACC@20 in Shanghai, while it gets a much lower accuracy of 57.83%
+and 54.45% in the other two datasets. It deserves further study to build a more powerful model that
+can generalize well in cities with different properties.
+Table 4: Experiment results of ETA prediction.
+Method Shanghai Yantai Chongqing
+MAE ↓ RMSE ↓ ACC@20 ↑ MAE ↓ RMSE ↓ ACC@20 ↑ MAE ↓ RMSE ↓ ACC@20 ↑
+SPEED 26.68 ±0.00 31.31 ±0.00 52.57 ±0.00 33.97 ±0.00 40.27 ±0.00 42.03 ±0.00 35.55 ±0.00 42.06 ±0.00 41.10 ±0.00
+KNN 25.22 ±0.00 29.57 ±0.00 65.71 ±0.00 28.10 ±0.00 33.80 ±0.00 45.33 ±0.00 29.45 ±0.00 35.19 ±0.00 43.68 ±0.00
+LightGBM 17.24 ±0.00 20.40 ±0.00 67.44 ±0.00 23.32 ±0.00 27.82 ±0.00 51.22 ±0.00 24.22 ±0.00 27.99 ±0.00 48.80 ±0.00
+MLP 16.16 ±0.02 19.31 ±0.01 72.17 ±0.10 22.18 ±0.06 26.38 ±0.06 54.98 ±0.17 23.82 ±0.02 28.24 ±0.02 52.74 ±0.16
+FDNET 18.81 ±1.23 21.15 ±2.47 64.30 ±1.43 22.41 ±0.50 26.00 ±0.63 54.67 ±1.55 22.54 ±0.91 24.53 ±0.92 46.65 ±4.82
+RankETPA 15.76 ±0.05 19.13 ±0.08 73.67 ±0.15 21.36 ±0.07 25.52 ±0.08 57.83 ±0.07 23.37 ±0.01 27.93 ±0.04 54.45 ±0.10
+M2G4RTP 8.23 ±0.02 9.59 ±0.03 91.01 ±0.51 17.21 ±1.57 19.71 ±1.88 69.20 ±0.39 17.96 ±0.25 19.74 ±0.31 65.97 ±0.32
+4.3 Spatio-Temporal Graph (STG) Forecasting
+LaDe contains the package data with information that records when and where the package order is
+placed. Based on this, the package number of a region within a certain period can be calculated. In
+this way, LaDe also contributes as a new dataset to another well-known task – spatio-temporal graph
+forecasting [18, 19, 34], which aims to predict future graph signals given its historical observations.
+Problem Definition. Let G = {V, E, A} represent a graph with V nodes, where V, E are the node
+set and edge set, respectively. A ∈ R
+V ×V
+is a weighted adjacency matrix to describe the graph
+topology. For V = {v1, . . . , vV }, let xt ∈ R
+F ×V denote F-dimentional signals generated by the V
+nodes at time t. Given historical graph signals x
+h = [x1, · · · , xTh
+] of Th time steps and the graph G
+as inputs, STG forcasting aims at learning a function F to predict future graph signals x
+p
+, formulated
+as: F : (x
+h
+; G) → [xTh+1, · · · , xTh+Tp
+] := x
+p
+, where Tp is the forecasting horizon.
+Dataset. LaDe-P is used to conduct this experiment. More experiment details can be found in
+Appendix B.3. Each node corresponds to a region within the city. The signal of each node represents
+the number of packages picked up during a particular time stamp. We set the time interval to be 1
+hour. Our objective is to leverage the data from the previous 24 hours to predict the package volume
+for the subsequent 24 hours. We use the ratio of 6:2:2 for training, evaluation, and testing sets based
+on the chronological order of the timestamps.
+Baselines & Hyperparameters. We evaluate eight baselines, including a traditional method (i.e.,
+HA [35]), and recent deep learning models, including DCRNN [18], STGCN [36], GWNET [37],
+ASTGCN [38], MTGNN [39], AGCRN [20] and STGNCDE [40]. We set the hidden size, learning
+rate, and batch size to 32, 0.001, and 32 for all models.
+8
+Results. MAE and RMSE are used as the metrics, and results are shown in Table 5. Comparing
+the methods, we can observe that the baseline method, HA (Historical Average), achieves relatively
+higher MAE and RMSE values across all three cities. This indicates that simply using historical
+averages to predict future spatio-temporal graph data is not as effective as the other methods. The
+results of the different methods may vary slightly depending on the city. For instance, in Shanghai,
+GWNET, ASTGCN, and MTGNN exhibit similar performance, while in Hangzhou and Chongqing,
+MTGNN and ASTGCN achieve the lowest errors, respectively.
+Table 5: Experimental results of spatio-temporal graph prediction.
+Method Shanghai Hangzhou Chongqing
+MAE ↓ RMSE ↓ MAE ↓ RMSE ↓ MAE ↓ RMSE ↓
+HA [35] 4.63 9.91 4.78 10.53 2.44 5.30
+DCRNN [18] 3.69 ± 0.09 7.08 ± 0.12 4.14 ± 0.02 7.35 ± 0.07 2.75 ± 0.07 5.11 ± 0.12
+STGCN [36] 3.04 ± 0.02 6.42 ± 0.05 3.01 ± 0.04 5.98 ± 0.10 2.16 ± 0.01 4.38 ± 0.03
+GWNET [37] 3.16 ± 0.06 6.56 ± 0.11 3.22 ± 0.03 6.32 ± 0.04 2.22 ± 0.03 4.45 ± 0.05
+ASTGCN [38] 3.12 ± 0.06 6.48 ± 0.14 3.09 ± 0.04 6.06 ± 0.10 2.11 ± 0.02 4.24 ± 0.03
+MTGNN [39] 3.13 ± 0.04 6.51 ± 0.13 3.01 ± 0.01 5.83 ± 0.03 2.15 ± 0.01 4.28 ± 0.05
+AGCRN [20] 3.93 ± 0.03 7.99 ± 0.08 4.00 ± 0.03 7.88 ± 0.06 2.46 ± 0.00 4.87 ± 0.01
+STGNCDE [40] 3.74 ± 0.15 7.27 ± 0.16 3.55 ± 0.04 6.88 ± 0.10 2.32 ± 0.07 4.52 ± 0.07
+4.4 Disscussion of Other Potential Tasks
+In addition to primary tasks, the dataset can provide substantial support for a wide range of other
+tasks within the context of last-mile delivery. In the future, we plan to explore a wider range of
+applications on LaDe. Here we present a list of tasks supported by LaDe in Table 6, highlighting
+the minimal required information necessary for performing each task using LaDe. This effectively
+showcases LaDe’s remarkable multi-task support capability.
+Table 6: Supported tasks with the minimal required information.
+Task Package Info Stop Info Courier Info Task-event Info Context
+Vehicle Routing [7] ✓ ✓ ✓
+Delivery Scheduling [27] ✓ ✓ ✓
+Last-Mile Data Mining [41, 24] ✓ ✓ ✓ ✓ ✓
+Spatial Crowdsourcing [42, 27, 43] ✓ ✓ ✓ ✓
+Time Prediction [44, 45] ✓ ✓ ✓ ✓
+Route Prediction [12, 15] ✓ ✓ ✓ ✓
+STG Forecasting [19, 34] ✓ ✓ ✓
+4.5 Data Limitations
+In this subsection, we introduce two potential limitations associated with the utilization of LaDe. The
+first one is the limited country coverage. LaDe is collected from the last-mile delivery data in the
+Cainiao logistic platform, which majorly targets the cities in China. The second limitation arises from
+the absence of parts of the courier’s trajectory point. In the actual operation process, the platform
+cannot locate the location of couriers due to the problems of PDA (personal digital device) or GPS
+locating problems. As a result, there are some missing values in the courier’s location at the accept
+time and pick-up/delivery time. The missing location rate when accepting orders is about 40%, and
+the missing rate of GPS when picking up is 29% in LaDe-P.
+5 Conclusion
+In this paper, we introduced LaDe, the first comprehensive industry-scale last-mile delivery dataset,
+addressing the lack of a widely accepted, publicly available dataset for last-mile delivery research.
+LaDe provides a critical resource for researchers and practitioners to develop advanced algorithms
+in the context of last-mile delivery, with its large-scale, comprehensive, diverse, and dynamic
+characteristics enabling it to serve as a new and challenging benchmark dataset. We have also
+9
+demonstrated the versatility of LaDe by benchmarking it on three real-world tasks, showcasing its
+potential applications in various research fields. The source code is released along with the dataset
+to drive the development of this area. By releasing LaDe, we aim to promote further research and
+collaboration among researchers from different fields, encouraging them to utilize it for developing
+novel algorithms and models, as well as comparing and validating their methods against state-ofthe-art approaches. We believe that LaDe will significantly contribute to ongoing efforts to improve
+efficiency, cost-effectiveness, and customer satisfaction in last-mile delivery, ultimately benefiting the
+research community and logistics industry.
+References
+[1] E. Macioszek, “First and last mile delivery–problems and issues,” in Advanced Solutions of
+Transport Systems for Growing Mobility: 14th Scientific and Technical Conference" Transport
+Systems. Theory & Practice 2017" Selected Papers. Springer, 2018, pp. 147–154.
+[2] M. Ranathunga, A. Wijayanayake, and D. Niwunhella, “Solution approaches for combining
+first-mile pickup and last-mile delivery in an e-commerce logistic network: A systematic
+literature review,” in 2021 International Research Conference on Smart Computing and Systems
+Engineering (SCSE), vol. 4. IEEE, 2021, pp. 267–275.
+[3] N. Boysen, S. Fedtke, and S. Schwerdfeger, “Last-mile delivery concepts: a survey from an
+operational research perspective,” Or Spectrum, vol. 43, pp. 1–58, 2021.
+[4] M. Ratnagiri, C. O’Dwyer, L. E. Beaver, H. Bang, B. Chalaki, and A. A. Malikopoulos, “A
+scalable last-mile delivery service: From simulation to scaled experiment,” in 2022 IEEE 25th
+International Conference on Intelligent Transportation Systems (ITSC). IEEE, 2022, pp.
+4163–4168.
+[5] J. Olsson, D. Hellström, and H. Pålsson, “Framework of last mile logistics research: A systematic review of the literature,” Sustainability, vol. 11, no. 24, p. 7131, 2019.
+[6] R. Mangiaracina, A. Perego, A. Seghezzi, and A. Tumino, “Innovative solutions to increase
+last-mile delivery efficiency in b2c e-commerce: a literature review,” International Journal of
+Physical Distribution & Logistics Management, 2019.
+[7] Y. Zeng, Y. Tong, and L. Chen, “Last-mile delivery made practical: An efficient route planning
+framework with theoretical guarantees,” Proceedings of the VLDB Endowment, vol. 13, no. 3,
+pp. 320–333, 2019.
+[8] X. Li, W. Luo, M. Yuan, J. Wang, J. Lu, J. Wang, J. Lü, and J. Zeng, “Learning to optimize industry-scale dynamic pickup and delivery problems,” in 2021 IEEE 37th International
+Conference on Data Engineering (ICDE). IEEE, 2021, pp. 2511–2522.
+[9] P. Almasan, J. Suárez-Varela, K. Rusek, P. Barlet-Ros, and A. Cabellos-Aparicio, “Deep
+reinforcement learning meets graph neural networks: exploring a routing optimization use case,”
+Computer Communications, vol. 196, pp. 184–194, 2022.
+[10] F. Wu and L. Wu, “DeepETA: A spatial-temporal sequential neural network model for estimating
+time of arrival in package delivery system,” in Proceedings of the AAAI Conference on Artificial
+Intelligence, 2019, pp. 774–781.
+[11] A. C. de Araujo and A. Etemad, “End-to-end prediction of parcel delivery time with deep
+learning for smart-city applications,” IEEE Internet of Things Journal, 2021.
+[12] C. Gao, F. Zhang, G. Wu, Q. Hu, Q. Ru, J. Hao, R. He, and Z. Sun, “A deep learning method
+for route and time prediction in food delivery service,” in KDD, 2021, pp. 2879–2889.
+[13] Y. Zhang, Y. Liu, G. Li, Y. Ding, N. Chen, H. Zhang, T. He, and D. Zhang, “Route prediction
+for instant delivery,” Proceedings of the ACM on Interactive, Mobile, Wearable and Ubiquitous
+Technologies, vol. 3, no. 3, p. Article 124, 2019.
+[14] H. Wen, Y. Lin, F. Wu, H. Wan, S. Guo, L. Wu, C. Song, and Y. Xu, “Package pick-up route
+prediction via modeling couriers’ spatial-temporal behaviors,” in ICDE. IEEE, 2021, pp.
+2141–2146.
+10
+[15] H. Wen, Y. Lin, X. Mao, F. Wu, Y. Zhao, H. Wang, J. Zheng, L. Wu, H. Hu, and H. Wan,
+“Graph2route: A dynamic spatial-temporal graph neural network for pick-up and delivery route
+prediction,” in Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery
+and Data Mining, 2022, pp. 4143–4152.
+[16] J. Deng, W. Dong, R. Socher, L.-J. Li, K. Li, and L. Fei-Fei, “Imagenet: A large-scale hierarchical image database,” in 2009 IEEE conference on computer vision and pattern recognition.
+Ieee, 2009, pp. 248–255.
+[17] A. Wang, A. Singh, J. Michael, F. Hill, O. Levy, and S. R. Bowman, “Glue: A multitask benchmark and analysis platform for natural language understanding,” arXiv preprint
+arXiv:1804.07461, 2018.
+[18] Y. Li, R. Yu, C. Shahabi, and Y. Liu, “Diffusion convolutional recurrent neural network: Datadriven traffic forecasting,” in International Conference on Learning Representations, 2018.
+[19] H. Yao, F. Wu, J. Ke, X. Tang, Y. Jia, S. Lu, P. Gong, J. Ye, and Z. Li, “Deep multi-view
+spatial-temporal network for taxi demand prediction,” in Proceedings of the AAAI conference
+on artificial intelligence, vol. 32, no. 1, 2018.
+[20] L. Bai, L. Yao, C. Li, X. Wang, and C. Wang, “Adaptive graph convolutional recurrent network
+for traffic forecasting,” Advances in neural information processing systems, vol. 33, pp. 17 804–
+17 815, 2020.
+[21] D. Merchán, J. Arora, J. Pachon, K. Konduri, M. Winkenbach, S. Parks, and J. Noszek, “2021
+amazon last mile routing research challenge: Data set,” Transportation Science, 2022.
+[22] Y. Vakulenko, D. Hellström, and K. Hjort, “What’s in the parcel locker? exploring customer
+value in e-commerce last mile delivery,” journal of Business Research, vol. 88, pp. 421–427,
+2018.
+[23] E. Taniguchi, R. G. Thompson, and A. G. Qureshi, “Modelling city logistics using recent
+innovative technologies,” Transportation Research Procedia, vol. 46, pp. 3–12, 2020.
+[24] S. Ruan, C. Long, X. Yang, T. He, R. Li, J. Bao, Y. Chen, S. Wu, J. Cui, and Y. Zheng,
+“Discovering actual delivery locations from mis-annotated couriers’ trajectories,” in 2022 IEEE
+38th International Conference on Data Engineering (ICDE). IEEE, 2022, pp. 3241–3253.
+[25] S. Ruan, C. Long, J. Bao, C. Li, Z. Yu, R. Li, Y. Liang, T. He, and Y. Zheng, “Learning to
+generate maps from trajectories,” in Proceedings of the AAAI conference on artificial intelligence,
+vol. 34, no. 01, 2020, pp. 890–897.
+[26] U. Breunig, R. Baldacci, R. F. Hartl, and T. Vidal, “The electric two-echelon vehicle routing
+problem,” Computers & Operations Research, vol. 103, pp. 198–210, 2019.
+[27] S. Han, L. Zhao, K. Chen, Z.-w. Luo, and D. Mishra, “Appointment scheduling and routing
+optimization of attended home delivery system with random customer behavior,” European
+Journal of Operational Research, vol. 262, no. 3, pp. 966–980, 2017.
+[28] M. Jahangiriesmaili, S. Bahrami, and M. J. Roorda, “Solution of two-echelon facility location
+problems by approximation methods,” Transportation Research Record, vol. 2610, no. 1, pp.
+1–9, 2017.
+[29] A. Kedia, D. Kusumastuti, and A. Nicholson, “Locating collection and delivery points for goods’
+last-mile travel: A case study in new zealand,” Transportation Research Procedia, vol. 46, pp.
+85–92, 2020.
+[30] S. F. W. Lim and J. S. Srai, “Examining the anatomy of last-mile distribution in e-commerce
+omnichannel retailing: A supply network configuration approach,” International Journal of
+Operations & Production Management, 2018.
+[31] B. Yao, C. McLean, and H. Yang, “Robust optimization of dynamic route planning in same-day
+delivery networks with one-time observation of new demand,” Networks, vol. 73, no. 4, pp.
+434–452, 2019.
+11
+[32] G. Ke, Q. Meng, T. Finley, T. Wang, W. Chen, W. Ma, Q. Ye, and T.-Y. Liu, “Lightgbm: A
+highly efficient gradient boosting decision tree,” Advances in neural information processing
+systems, vol. 30, 2017.
+[33] J. Song, R. Wen, C. Xu, and J. W. E. Tay, “Service time prediction for last-yard delivery,” in
+2019 IEEE International Conference on Big Data (Big Data). IEEE, 2019, pp. 3933–3938.
+[34] J. Simeunovic, B. Schubnel, P.-J. Alet, and R. E. Carrillo, “Spatio-temporal graph neural ´
+networks for multi-site pv power forecasting,” IEEE Transactions on Sustainable Energy,
+vol. 13, no. 2, pp. 1210–1220, 2021.
+[35] J. Zhang, Y. Zheng, and D. Qi, “Deep spatio-temporal residual networks for citywide crowd
+flows prediction,” in AAAI, 2017, pp. 1655–1661.
+[36] B. Yu, H. Yin, and Z. Zhu, “Spatio-temporal graph convolutional networks: A deep learning
+framework for traffic forecasting,” in IJCAI, 2018.
+[37] Z. Wu, S. Pan, G. Long, J. Jiang, and C. Zhang, “Graph wavenet for deep spatial-temporal
+graph modeling,” in IJCAI, 7 2019, pp. 1907–1913.
+[38] S. Guo, Y. Lin, N. Feng, C. Song, and H. Wan, “Attention based spatial-temporal graph
+convolutional networks for traffic flow forecasting,” in Proceedings of the AAAI conference on
+artificial intelligence, vol. 33, no. 01, 2019, pp. 922–929.
+[39] Z. Wu, S. Pan, G. Long, J. Jiang, X. Chang, and C. Zhang, “Connecting the dots: Multivariate
+time series forecasting with graph neural networks,” in Proceedings of the 26th ACM SIGKDD
+International Conference on Knowledge Discovery & Data Mining, 2020, pp. 753–763.
+[40] J. Choi, H. Choi, J. Hwang, and N. Park, “Graph neural controlled differential equations for
+traffic forecasting,” in Proceedings of the AAAI Conference on Artificial Intelligence, vol. 36,
+no. 6, 2022, pp. 6367–6374.
+[41] S. Ji, Y. Zheng, Z. Wang, and T. Li, “Alleviating users’ pain of waiting: Effective task grouping
+for online-to-offline food delivery services,” in The World Wide Web Conference, 2019, pp.
+773–783.
+[42] C. Chen, D. Zhang, X. Ma, B. Guo, L. Wang, Y. Wang, and E. Sha, “Crowddeliver: Planning citywide package delivery paths leveraging the crowd of taxis,” IEEE Transactions on Intelligent
+Transportation Systems, vol. 18, no. 6, pp. 1478–1496, 2016.
+[43] C. Chen, S. Yang, Y. Wang, B. Guo, and D. Zhang, “Crowdexpress: a probabilistic framework
+for on-time crowdsourced package deliveries,” IEEE transactions on big data, vol. 8, no. 3, pp.
+827–842, 2020.
+[44] S. Ruan, Z. Xiong, C. Long, Y. Chen, J. Bao, T. He, R. Li, S. Wu, Z. Jiang, and Y. Zheng,
+“Doing in one go: delivery time inference based on couriers’ trajectories,” in Proceedings of the
+26th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining, 2020,
+pp. 2813–2821.
+[45] S. Ruan, C. Long, Z. Ma, J. Bao, T. He, R. Li, Y. Chen, S. Wu, and Y. Zheng, “Service
+time prediction for delivery tasks via spatial meta-learning,” in Proceedings of the 28th ACM
+SIGKDD Conference on Knowledge Discovery and Data Mining, 2022, pp. 3829–3837.
+[46] M. G. Kendall, “A new measure of rank correlation,” Biometrika, vol. 30, no. 1/2, pp. 81–93,
+1938.
+[47] J. Nerbonne, W. Heeringa, and P. Kleiweg, “Edit distance and dialect proximity,” Time Warps,
+String Edits and Macromolecules: The theory and practice of sequence comparison, vol. 15,
+1999.
+[48] M.-C. Popescu, V. E. Balas, L. Perescu-Popescu, and N. Mastorakis, “Multilayer perceptron
+and neural networks,” WSEAS Transactions on Circuits and Systems, vol. 8, no. 7, pp. 579–588,
+2009.
+12
+Checklist
+The checklist follows the references. Please read the checklist guidelines carefully for information on
+how to answer these questions. For each question, change the default [TODO] to [Yes] , [No] , or
+[N/A] . You are strongly encouraged to include a justification to your answer, either by referencing
+the appropriate section of your paper or providing a brief inline description. For example:
+• Did you include the license to the code and datasets? [Yes] See Section ??.
+• Did you include the license to the code and datasets? [No] The code and the data are
+proprietary.
+• Did you include the license to the code and datasets? [N/A]
+Please do not modify the questions and only use the provided macros for your answers. Note that the
+Checklist section does not count towards the page limit. In your paper, please delete this instructions
+block and only keep the Checklist section heading above along with the questions/answers below.
+1. For all authors...
+(a) Do the main claims made in the abstract and introduction accurately reflect the paper’s
+contributions and scope? [Yes]
+(b) Did you describe the limitations of your work? [Yes] See Section 4.5.
+(c) Did you discuss any potential negative societal impacts of your work? [Yes] See
+Section3.1
+(d) Have you read the ethics review guidelines and ensured that your paper conforms to
+them? [Yes]
+2. If you are including theoretical results...
+(a) Did you state the full set of assumptions of all theoretical results? [N/A]
+(b) Did you include complete proofs of all theoretical results? [N/A]
+3. If you ran experiments (e.g. for benchmarks)...
+(a) Did you include the code, data, and instructions needed to reproduce the main experimental results (either in the supplemental material or as a URL)? [Yes] See Introduction.
+(b) Did you specify all the training details (e.g., data splits, hyperparameters, how they
+were chosen)? [Yes] See Section 4.
+(c) Did you report error bars (e.g., with respect to the random seed after running experiments multiple times)? [Yes]
+(d) Did you include the total amount of compute and the type of resources used (e.g., type
+of GPUs, internal cluster, or cloud provider)? [N/A]
+4. If you are using existing assets (e.g., code, data, models) or curating/releasing new assets...
+(a) If your work uses existing assets, did you cite the creators? [Yes]
+(b) Did you mention the license of the assets? [Yes] See Section 1.
+(c) Did you include any new assets either in the supplemental material or as a URL? [Yes]
+See Section 1
+(d) Did you discuss whether and how consent was obtained from people whose data you’re
+using/curating? [Yes] See Section 3.1.
+(e) Did you discuss whether the data you are using/curating contains personally identifiable
+information or offensive content? [Yes] See Section 3.1.
+5. If you used crowdsourcing or conducted research with human subjects...
+(a) Did you include the full text of instructions given to participants and screenshots, if
+applicable? [N/A]
+(b) Did you describe any potential participant risks, with links to Institutional Review
+Board (IRB) approvals, if applicable? [N/A]
+13
+(c) Did you include the estimated hourly wage paid to participants and the total amount
+spent on participant compensation? [N/A]
+14
+Appendix
+A Detailed Dataset Description
+A.1 Data Field
+Table 7: Description of data fields of LaDe-P.
+Data field Description Unit/format
+Package information
+package_id Unique identifier of each package Id
+time_window_start start of the required time window Time
+time_window_end end of the required time window Time
+Stop information
+lng/lat Coordinates of each stop Float
+city City String
+region_id Id of the Region String
+aoi_id Id of the AOI (Area of Interest) Id
+aoi_type Type of the AOI Categorical
+Courier Information
+courier_id Id of the courier Id
+Task-event Information
+accept_time The time when the courier accepts the task Time
+accept_gps_time The time of the GPS point whose time is the closest to accept time Time
+accept_gps_lng/accept_gps_lat Coordinates when the courier accept the task Float
+pickup_time The time when the courier picks up the task Time
+pickup_gps_time The time of the GPS point whose time is the closest to the pickup_time Time
+pickup_gps_lng/got_gps_lat Coordinates when the courier picks up the task Float
+Context information
+ds the date of the package pickup Date
+Table 8: Description of data fields of LaDe-D.
+Data field Description Unit/format
+Package information
+package_id Unique identifier of each package Id
+Stop information
+lng/lat Coordinates of each stop Float
+city City String
+region_id Id of the region Id
+aoi_id Id of the AOI Id
+aoi_type Type of the AOI Categorical
+Courier Information
+courier_id Id of the courier Id
+Task-event Information
+accept_time The time when the courier accept the task Time
+accept_gps_time The time of the GPS point whose time is the closest to accept time Time
+accept_gps_lng/accept_gps_lat Coordinates when the courier accept the task Float
+delivery_time The time when courier finishes delivering the task Time
+delivery_gps_time The time of the GPS point whose time is the closest to the got time Time
+delivery_gps_lng/delivery_gps_lat Coordinates when the courier finish the task Float
+Context information
+ds the date of the package delivery Date
+15
+Table 9: Description of data fields of Detailed Trajectory.
+Data field Description Unit/format
+ds The date of the trajectory Date
+courier_id Id of the courier Id
+gps_time The time when the trajectory point is recorded Time
+lng/lat Coordinates of the courier Float
+Table 10: Description of data fields of Road Network.
+Data field Description Unit/format
+id Unique identifier of the road Id
+road_id Id of a street or place name Id
+code 4 digit code (between 1000 and 9999) defining the geographical features of a road Id
+fclass Class name of the road String
+ref Reference number of the road String
+oneway Whether the road is a oneway road String
+maxspeed Max allowed speed in km/h Int
+layer Relative layering of roads Int
+bridge Whether the road is on a bridge String
+tunnel Whether the road is in a tunnel String
+city City of the road String
+geometry A geometry type composed of one or more line segments String
+A.2 Data Statistics
+Table 13 shows the detailed statistics of LaDe-D.
+B Experiments Details
+B.1 Experiment Details of Route Prediction
+Methods. We adopt the following methods for experiments:
+• TimeGreedy [13]: A greedy algorithm, which ranks all the candidate tasks by sorting their remaining
+time.
+• DistanceGreedy [13]: A greedy algorithm, which chooses to take the nearest package at each step,
+regardless of time requirements and other factors.
+• Osqure [13]: A machine learning method, which predicts the next package at each time step through
+a machine learning algorithm, by considering it as a multi-class classification problem.
+• DeepRoute [14]: A deep learning method, equipped with a Transformer encoder and Pointer Net
+decoder.
+• FDNET [12]: A deep learning method, equipped with a Bi-LSTM encoder and Pointer Net decoder.
+• Graph2Route [15]: A deep learning method, equipped with a dynamic graph encoder and personalized route decoder.
+Table 11: Information of different selected cities.
+City Description
+Shanghai One of the most prosperous cities in China, with a large number of orders per day.
+Hangzhou A big city with well-developed online e-commerce and a large number of orders per day.
+Chongqing A big city with complicated road conditions in China, with a large number of orders.
+Jilin A middle-size city in China, with a small number of orders each day.
+Yantai A small city in China, with a small number of orders every day.
+16
+Table 12: Statistics of LaDe-D. AvgETA stands for the average arrival time per package. AvgPackage
+means the average package number of a courier per day. The unit of AvgETA is minute.
+City Time span Spatial span #Trajectories #Couriers #Packages #GPS points AvgETA AvgPackage
+Shanghai 6 months 20km×20km 70k 1,733 1,483k 2,967k 102 21.1
+Hangzhou 6 months 20km×20km 71k 1,392 1,861k 3,723k 147 25.9
+Chongqing 6 months 20km×20km 68k 1,494 931k 1,862k 182 13.5
+Yantai 6 months 20km×20km 17k 205 206k 410k 244 11.5
+Jilin 6 months 20km×20km 2k 57 31k 61k 203 16.2
+Table 13: Statistics of Detailed Trajectory.
+City Time span Spatial span #GPS points #Couriers
+Shanghai 1 month 77km×73km 9727k 245
+Hangzhou 1 months 211km×142km 17900k 443
+Chongqing 1 months 403km×267km 13520k 658
+Yantai 1 months 155km×114km 6616k 245
+Jilin 1 months 105km×165km 2849k 613
+Metrics. Following the setting in [15], the following metrics are utilized to evaluate the performance
+of route prediction methods:
+• KRC: Kendall Rank Correlation [46] is a statistical metric to measure the ordinal association
+between two sequences. Let Yˆ and Y be two sequences and RYˆ (i) ∈ [1, |Y |] be the position
+of item i in Y , a node pair (i, j) is said to be concordant if and only if both RYˆ (i) > RYˆ (j)
+and RY (i) > RY (j), or both RYˆ (i) < RYˆ (j) and RY (i) < RY (j). Otherwise, it is said to
+be discordant. To calculate this metric, nodes in the prediction are first divided into two sets:
+i) nodes in label Vin = {yˆi
+|yˆi ∈ Y }, and ii) nodes not in label Vnot = {yˆi
+|yˆi ̸∈ Y }. The
+order of items in Vin is available, while it is hard to tell the order of items in Vnot. Still, we
+know that all items in Vin are ahead of that in Vnot. Therefore, we compare the nodes pairs
+{(i, j)|i, j ∈ Vin and i ̸= j} ∪ {(i, j)|i ∈ Vin and j ∈ Vnot}. To this end, KRC is defined as:
+KRC = Nc − Nd
+Nc + Nd
+, (1)
+where Nc is the number of concordant pairs, and Nd is the number of discordant pairs.
+• ED: Edit Distance [47] (ED) is an indicator to quantify how dissimilar two sequences Y and Yˆ are
+to one another, by counting the minimum number of required operations to transform one sequence
+into another.
+• LSD: Location Square Deviation (LSD) measures the degree that the prediction deviates from the
+label, formulated as:
+LMD = 1
+m
+Xm
+i=1
+|(RY (i) − RYˆ (i))|. (2)
+• HR@k: Hit-Rate@k quantifies the similarity between the top-k items of two sequences. It
+describes how many of the first k predictions are in the label, which is formulated as follows:
+HR@k =
+Yˆ
+[1:k] ∩ Y[1:k]
+k
+. (3)
+B.2 Experiment Details of Time Prediction
+Methods. The following methods are chosen for experiments:
+• SPEED, a simple speed-based method that utilizes distance/speed as the prediction value, where
+speed is calculated based on each worker’s history trajectories. We set the speed for workers
+without previous trajectories as the average speed calculated by all workers.
+17
+• LightGBM [32], a popular machine-learning method for regression tasks.
+• KNN [33], a machine-learning method that trains a regressor based on K-Nearest Neighbors
+algorithm to predict the arrival time.
+• MLP [48], a deep neural network model with 2 layers of MLPs.
+• FDNet [12], a deep model that predicts both route and time of unfinished tasks.
+Metrics. MAE (Mean Absolute Error) and RMSE (Root Mean Squared Error), and ACC@30
+are utilized as metrics. Note that delivery platforms usually provide an interval of arrival time
+for customer notification. Thus we compute the ratio of prediction where the time difference
+between predicted time and true time is less than 30 minutes (ACC@30), formulated as ACC@30 =
+1
+N
+PN
+i=1 I(|yˆi − yi
+| < 30).
+B.3 Experiment Details of Spatio-temporal Graph Forecasting
+Methods. For our Spatio-temporal Graph Forecasting experimental setup, we have selected the
+following methods:
+• HA [35]: HA predicts future values of a time series by calculating the mean of past observations
+that correspond to the same time periods.
+• DCRNN [18]: DCRNN employs a neural network architecture that incorporates diffusion convolution and sequence-to-sequence mechanisms. This enables the model to effectively learn spatial
+dependencies and temporal relations within the data.
+• STGCN [36]: STGCN is a specialized spatio-temporal graph convolution network that synergistically merges spectral graph convolution with 1D convolution. This unique combination allows
+the model to effectively capture correlations between spatial and temporal dimensions, enabling a
+comprehensive understanding of the interplay between space and time in the data.
+• GWNET [37]: GWNET creates an adaptive adjacency matrix to capture spatial correlations and
+uses 1D dilated causal convolution to capture temporal dependence.
+• ASTGCN [38]: ASTGCN leverages the power of attention-based mechanisms and a spatiotemporal convolution system to dynamically capture spatio-temporal correlations within the data.
+By incorporating attention, the model can focus on relevant information and effectively model
+various temporal properties of traffic flows.
+• MTGNN [39]: MTGNN adopts a message-passing framework to effectively model the temporal
+dynamics of graph-structured data. It achieves this by aggregating information from spatially
+neighboring nodes and past time steps. By leveraging this approach, MTGNN captures the
+interdependencies and changes over time, enabling a comprehensive understanding of the data’s
+temporal dynamics.
+• AGCRN [20]: AGCRN incorporates two key modules, namely Node Adaptive Parameter Learning
+and Data Adaptive Graph Generation, to automatically infer inter-dependencies in traffic series and
+capture node-specific patterns.
+• STGNCDE [40]: STGNCDE is an innovative spatio-temporal graph neural controlled differential
+equation model that leverages two neural control differential equations to process both spatial and
+sequential data.
+Metrics. To assess the performance of the above-mentioned models in spatio-temporal graph
+forecasting on our dataset, we employ the metrics of Mean Absolute Error (MAE) and Root Mean
+Squared Error (RMSE).
+18
+C Datasheet of Dataset
+C.1 Motivation
+• For what purpose was the dataset created? Was there a specific task in mind? Was there a
+specific gap that needed to be filled? Please provide a description.
+To meet the rising calling for datasets in the field of last-mile delivery research, we propose LaDe,
+the first industry-scale multipurpose real-world dataset. Compared with existing public datasets,
+LaDe has serval merits: (1) large-scale, it consists of millions of packages, which can serve as a data
+foundation for learning-based algorithms in last-mile delivery. (2) Comprehensive information, the
+dataset contains more comprehensive features, which enables the data to support multiple research
+tasks. (3) Scenario diversity, it contains the data from both the package pick-up and delivery scenarios.
+Researchers can use the two sub-datasets to study the different work patterns of couriers in different
+scenarios.
+• Who created the dataset (e.g., which team, research group) and on behalf of which entity (e.g.,
+company, institution, organization)?
+The dataset was created by Artificial Intelligence Department, Cainiao Network.
+• Who funded the creation of the dataset? If there is an associated grant, please provide the name
+of the grantor and the grant name and number.
+No.
+C.2 Composition
+• What do the instances that comprise the dataset represent (e.g., documents, photos, people,
+countries)? Are there multiple types of instances (e.g., movies, users, and ratings; people and
+interactions between them; nodes and edges)? Please provide a description.
+The instances are packages picked up/delivered in the last-mile delivery.
+• How many instances are there in total (of each type, if appropriate)?
+There are 10,667k instances in LaDe, where an instance represents the features of a package.
+• Does the dataset contain all possible instances or is it a sample (not necessarily random)
+of instances from a larger set? If the dataset is a sample, then what is the larger set? Is the
+sample representative of the larger set (e.g., geographic coverage)? If so, please describe how
+this representativeness was validated/verified. If it is not representative of the larger set, please
+describe why not (e.g., to cover a more diverse range of instances, because instances were withheld
+or unavailable).
+The dataset is a sample of instances. We first randomly select serval regions in a city, then collect all
+the packages in that region within a certain period. Note that for each region, the dataset contains all
+possible instances within the given time period. To further increase the diversity of the dataset, five
+cities with different populations are selected and recorded.
+• What data does each instance consist of? “Raw” data (e.g., unprocessed text or images) or
+features? In either case, please provide a description.
+The format of each instance in LaDe-P is (package_id, time_window_start, time_window_end, lng,
+lat, city, aoi_id, aoi_type, courier_id, accept_time, accept_gps_time, accept_gps_lng, accept_gps_lat,
+pickup_time, pickup_gps_time, pickup_gps_lng, pickup_gps_lat, ds).
+19
+The format of each instance in LaDe-D is (package_id, lng, lat, city, aoi_id, aoi_type, courier_id,
+accept_time, accept_gps_time, accept_gps_lng, accept_gps_lat, delivery_time, delivery_gps_time,
+delivery_gps_lng, delivery_gps_lat, ds).
+For the detailed description of each field, please refer to Table 7 and Table 8 in Appendix A.1.
+• Is there a label or target associated with each instance? If so, please provide a description.
+Since the dataset is proposed to support multiple tasks in last-mile delivery, for easy use and flexibility,
+a label for a specific task is not contained in one instance. However, it is easy to construct the label for
+different research purposes from the raw information. Take the estimated time of arrival prediction
+as an example. The actual arrival time (in this case, the label) can be calculated by the difference
+between the got_time and query_time.
+• Is any information missing from individual instances? If so, please provide a description,
+explaining why this information is missing (e.g., because it was unavailable). This does not include
+intentionally removed information, but might include, e.g., redacted text.
+Some instances lack the courier’s location when accepting/finishing the package, i.e., accept_gps_lng,
+accept_gps_lat. The corresponding information is massing in the real system.
+• Are there recommended data splits (e.g., training, development/validation, testing)? If so,
+please provide a description of these splits, explaining the rationale behind them.
+For all the tasks conducted in the paper (i.e., route prediction, time prediction, and spatio-temporal
+graph forecasting), we split the data into 6:2:2 according to the time as the training set, validation set,
+and test set.
+• Are there any errors, sources of noise, or redundancies in the dataset? If so, please provide a
+description.
+No.
+• Is the dataset self-contained, or does it link to or otherwise rely on external resources (e.g.,
+websites, tweets, other datasets)? If it links to or relies on external resources, a) are there
+guarantees that they will exist, and remain constant, over time; b) are there official archival versions
+of the complete dataset (i.e., including the external resources as they existed at the time the dataset
+was created); c) are there any restrictions (e.g., licenses, fees) associated with any of the external
+resources that might apply to a dataset consumer? Please provide descriptions of all external
+resources and any restrictions associated with them, as well as links or other access points, as
+appropriate.
+The dataset is entirely self-contained.
+• Does the dataset contain data that might be considered confidential (e.g., data that is protected
+by legal privilege or by doctor–patient confidentiality, data that includes the content of
+individuals’ nonpublic communications)? If so, please provide a description.
+No.
+• Does the dataset contain data that, if viewed directly, might be offensive, insulting, threatening,
+or might otherwise cause anxiety? If so, please describe why.
+No.
+Does the dataset identify any subpopulations (e.g., by age, gender)? If so, please describe how
+these subpopulations are identified and provide a description of their respective distributions within
+the dataset.
+20
+No.
+Is it possible to identify individuals (i.e., one or more natural persons), either directly or
+indirectly (i.e., in combination with other data) from the dataset? If so, please describe how.
+Our data has been strictly desensitized and cannot be linked to real individuals.
+• Does the dataset contain data that might be considered sensitive in any way (e.g., data that
+reveals race or ethnic origins, sexual orientations, religious beliefs, political opinions or union
+memberships, or locations; financial or health data; biometric or genetic data; forms of
+government identification, such as social security numbers; criminal history)? If so, please
+provide a description.
+No.
+C.3 Collection Process
+• How was the data associated with each instance acquired? Was the data directly observable
+(e.g., raw text, movie ratings), reported by subjects (e.g., survey responses), or indirectly
+inferred/derived from other data (e.g., part-of-speech tags, model-based guesses for age or
+language)? If the data was reported by subjects or indirectly inferred/derived from other data, was
+the data validated/verified? If so, please describe how.
+The data was observable from the courier’s pick-up/delivery data on the Cainiao platform.
+• What mechanisms or procedures were used to collect the data (e.g., hardware apparatuses
+or sensors, manual human curation, software programs, software APIs)? How were these
+mechanisms or procedures validated?
+The data is collected by the software program in the Cainiao platform.
+• If the dataset is a sample from a larger set, what was the sampling strategy (e.g., deterministic,
+probabilistic with specific sampling probabilities)?
+We pick out serval cities and randomly select regions in different cities.
+• Who was involved in the data collection process (e.g., students, crowd workers, contractors)
+and how were they compensated (e.g., how much were crowdworkers paid)?
+The employees in Cainiao.
+• Over what timeframe was the data collected? Does this timeframe match the creation timeframe
+of the data associated with the instances (e.g., recent crawl of old news articles)? If not, please
+describe the timeframe in which the data associated with the instances was created.
+This data was extracted from the Cainiao platform between May and November of a recent year.
+• Did you collect the data from the individuals in question directly, or obtain it via third parties
+or other sources (e.g., websites)?
+The data was collected from the Cainiao platform.
+C.4 Preprocessing/cleaning/labeling
+• Was any preprocessing/cleaning/labeling of the data done (e.g., discretization or bucketing,
+tokenization, part-of-speech tagging, SIFT feature extraction, removal of instances, processing
+of missing values)? If so, please provide a description. If not, you may skip the remaining questions
+in this section.
+21
+We anonymize the courier’s ID and package ID to protect user privacy. And we applied perturbations
+to the latitude and longitude points collected in the data. The accuracy of the latitude and longitude is
+limited to 10 meters.
+• Was the “raw” data saved in addition to the preprocessed/cleaned/labeled data (e.g., to
+support unanticipated future uses)? If so, please provide a link or other access point to the “raw”
+data.
+No.
+C.5 Uses
+• Has the dataset been used for any tasks already? If so, please provide a description.
+No.
+• Is there a repository that links to any or all papers or systems that use the dataset? If so,
+please provide a link or other access point.
+Yes.
+• What (other) tasks could the dataset be used for?
+The dataset can be used for route prediction, estimated time of arrival prediction, spatio-temporal
+graph forcasting, and route optimization. See section 4.4 for more details.
+C.6 Distribution
+• How will the dataset will be distributed (e.g., tarball on website, API, GitHub)? Does the dataset
+have a digital object identifier (DOI)?
+The dataset will be made available on the internet. There will be a corresponding Hugging Face
+repository associated with the dataset, and code on how to use the dataset and baseline methods.
+• When will the dataset be distributed?
+The dataset is available to the reviewers and the public along with the submission with a companion
+Hugging Face repository.
+• Will the dataset be distributed under a copyright or other intellectual property (IP) license,
+and/or under applicable terms of use (ToU)? If so, please describe this license and/or ToU, and
+provide a link or other access point to, or otherwise reproduce, any relevant licensing terms or ToU,
+as well as any fees associated with these restrictions.
+This dataset is licensed under a CC BY-NC 4.0 International License 4
+. There is a request to cite the
+corresponding paper if the dataset is used.
+Have any third parties imposed IP-based or other restrictions on the data associated with
+the instances? If so, please describe these restrictions, and provide a link or other access point
+to, or otherwise reproduce, any relevant licensing terms, as well as any fees associated with these
+restrictions.
+No.
+Do any export controls or other regulatory restrictions apply to the dataset or to individual
+instances? If so, please describe these restrictions, and provide a link or other access point to, or
+otherwise reproduce, any supporting documentation.
+No.
+4
+https://creativecommons.org/licenses/by-nc/4.0/
+22
+C.7 Maintenance
+• Who will be supporting/hosting/maintaining the dataset?
+The employee in Cainiao will host the dataset on Hugging Face.
+• How can the owner/curator/manager of the dataset be contacted (e.g., email address)?
+The authors can be contacted via their emails mentioned in the paper.
+• Is there an erratum? If so, please provide a link or other access point.
+Not to our best knowledge.
+• Will the dataset be updated (e.g., to correct labeling errors, add new instances, delete instances)? If so, please describe how often, by whom, and how updates will be communicated to
+dataset consumers (e.g., mailing list, GitHub)?
+The corresponding Hugging Face page will be updated regularly.
+• Will older versions of the dataset continue to be supported/hosted/maintained? If so, please
+describe how. If not, please describe how its obsolescence will be communicated to dataset
+consumers.
+The old versions of the dataset will not be maintained. If we update the version of the dataset, we
+will put the specific details of the dataset update on the relevant Hugging Face.
+• If others want to extend/augment/build on/contribute to the dataset, is there a mechanism for
+them to do so? If so, please provide a description. Will these contributions be validated/verified?
+If so, please describe how. If not, why not? Is there a process for communicating/distributing these
+contributions to dataset consumers? If so, please provide a description.
+If others want to extend/augment/build on/contribute to the dataset, please contact the original authors
+about incorporating fixes/extensions.
+23

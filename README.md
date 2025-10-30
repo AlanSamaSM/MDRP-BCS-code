@@ -1,6 +1,6 @@
 # Simulación y Optimización del Despacho de Órdenes para Entrega de Comida en La Paz, BCS
 
-Este repositorio contiene el código fuente y los experimentos para la tesis [**TU TÍTULO DE TESIS AQUÍ**]. El proyecto implementa un simulador para el Problema de Enrutamiento de Entrega de Comida (MDRP) y compara dos políticas de asignación de repartidores:
+Este repositorio contiene el código fuente y los experimentos para la tesis de optimización de despacho de órdenes en sistemas de entrega de comida. El proyecto implementa un simulador para el Problema de Enrutamiento de Entrega de Comida (MDRP) y compara dos políticas de asignación de repartidores:
 
 1.  **First-Come, First-Served (FCFS):** Una política base simple donde las órdenes se asignan al repartidor disponible más cercano a medida que están listas.
 2.  **Rolling Horizon (RH):** Una heurística de optimización que agrupa (bundle) órdenes y planifica rutas en intervalos de tiempo periódicos para mejorar la eficiencia.
@@ -10,13 +10,14 @@ El objetivo es demostrar la mejora en la calidad del servicio y la eficiencia op
 ## Requisitos Previos
 
 *   Python 3.8 o superior
-*   Un servidor OSRM local o acceso a uno. El proyecto está configurado para usar el servidor público de OSRM, pero se recomienda uno local para un rendimiento estable. Las instrucciones de configuración de OSRM se pueden encontrar [aquí](http://project-osrm.org/).
+*   Docker (para ejecutar servidor OSRM local)
+*   Un servidor OSRM local corriendo en `localhost:5000`. El proyecto incluye archivos `.osrm` precompilados para La Paz.
 
 ## Instalación
 
 1.  Clona este repositorio:
     ```bash
-    git clone [URL-DE-TU-REPOSITORIO]
+    git clone https://github.com/AlanSamaSM/MDRP-BCS-code.git
     cd MDRP-BCS-code
     ```
 
@@ -25,43 +26,155 @@ El objetivo es demostrar la mejora en la calidad del servicio y la eficiencia op
     pip install -r requirements.txt
     ```
 
+3.  Inicia el servidor OSRM local (requerido para ruteo):
+    ```bash
+    docker run -d -p 5000:5000 -v "${PWD}:/data" osrm/osrm-backend osrm-routed --algorithm mld /data/mexico-251010.osrm
+    ```
+    
+    Para Windows PowerShell:
+    ```powershell
+    docker run -d -p 5000:5000 -v "${PWD}:/data" osrm/osrm-backend osrm-routed --algorithm mld /data/mexico-251010.osrm
+    ```
+
 ## Reproducción de Resultados
 
-Para generar los resultados comparativos presentados en la tesis, ejecuta el siguiente script:
+### Pipeline Completo (Recomendado)
+
+Para generar los resultados comparativos presentados en la tesis, ejecuta el pipeline completo:
 
 ```bash
 python scripts/generate_results.py
 ```
 
-Este script realizará los siguientes pasos:
-1.  Generará el conjunto de datos de órdenes sintéticas (`synthetic_lapaz_orders.csv`) si no existe.
+Este script realizará automáticamente los siguientes pasos:
+1.  Generará el conjunto de datos de órdenes sintéticas (`data/synthetic_lapaz_orders_limited.csv`).
 2.  Ejecutará la simulación para la política **FCFS**.
 3.  Ejecutará la simulación para la política **Rolling Horizon (RH)**.
-4.  Generará los archivos de resultados en la carpeta `/results`, incluyendo:
-    *   `fcfs_results.txt`: Tiempos de entrega detallados para FCFS.
-    *   `rh_results.txt`: Tiempos de entrega detallados para RH.
-    *   `kpi_comparison.csv`: Una tabla comparativa con las métricas clave de rendimiento (KPIs) de ambas políticas.
+4.  Calculará y comparará los KPIs de ambas políticas.
+5.  Generará los archivos de resultados en la carpeta `results/`.
+
+### Solo Análisis (sin ejecutar simulaciones)
+
+Si ya ejecutaste las simulaciones y solo quieres recalcular los KPIs:
+
+```bash
+python scripts/generate_results.py --analyze-only
+```
+
+### Ejecución Manual de Políticas
+
+También puedes ejecutar cada política individualmente:
+
+```bash
+# Generar datos sintéticos
+python scripts/make_synth_orders.py
+
+# Ejecutar FCFS
+python scripts/run_fcfs_instance.py data/synthetic_lapaz_orders_limited.csv
+
+# Ejecutar Rolling Horizon
+python scripts/run_synth_instance.py data/synthetic_lapaz_orders_limited.csv
+
+# Analizar resultados
+python scripts/generate_results.py --analyze-only
+```
+
+## Resultados Generados
+
+Tras ejecutar el pipeline, encontrarás los siguientes archivos en la carpeta `results/`:
+
+*   `raw/synthetic_lapaz_orders_limited_fcfs_results.csv`: Resultados detallados de órdenes (FCFS)
+*   `raw/synthetic_lapaz_orders_limited_fcfs_couriers.csv`: Métricas de repartidores (FCFS)
+*   `raw/synthetic_lapaz_orders_limited_rh_results.csv`: Resultados detallados de órdenes (RH)
+*   `raw/synthetic_lapaz_orders_limited_rh_couriers.csv`: Métricas de repartidores (RH)
+*   `kpi_comparison.csv`: Tabla comparativa con todas las métricas clave de rendimiento
+
+### Métricas Calculadas
+
+El sistema calcula las siguientes métricas según Reyes et al. (2018):
+
+**Calidad de Servicio:**
+- Click-to-Door: promedio, P10, P50, P90, P95
+- Ready-to-Pickup: promedio, P10, P50, P90
+- Ready-to-Door: promedio, P10, P50, P90
+- Click-to-Door Overage (sobretiempo respecto a target de 40 min)
+- Porcentaje de órdenes no entregadas
+
+**Eficiencia Operativa:**
+- Órdenes por courier-hora
+- Bundles por hora
+- Tamaño promedio de bundle
+- Distancia total recorrida (km)
+- Utilización de couriers (% tiempo conduciendo)
+
+**Costos:**
+- Compensación total de couriers
+- Costo por orden
+- Ganancias de couriers por entregas
+- Fracción de couriers con compensación mínima
 
 ## Estructura del Proyecto
 
 ```
 MDRP-BCS-code/
-├── data/                 # Datos de entrada (restaurantes, repartidores, etc.)
-├── results/              # Resultados generados por las simulaciones
-├── scripts/              # Scripts para ejecutar experimentos y generar datos
-│   ├── generate_results.py # Script principal para reproducir los resultados de la tesis
-│   └── make_synth_orders.py  # Generador de órdenes sintéticas
-├── src/                  # Código fuente principal de la simulación y algoritmos
-│   ├── bundling.py       # Lógica para la agrupación de órdenes (bundling)
-│   ├── getrouteOSMR.py   # Cliente para interactuar con el servidor OSRM
-│   └── main.py           # Lógica central de la simulación
+├── data/                 # Datos de entrada
+│   ├── couriers.csv                        # Definición de repartidores
+│   ├── restaurants.csv                     # Restaurantes base
+│   ├── la_paz_restaurants.geojson         # Restaurantes de La Paz
+│   └── synthetic_lapaz_orders_limited.csv # Órdenes sintéticas generadas
+├── results/              # Resultados de simulaciones
+│   ├── raw/              # Resultados detallados por política
+│   ├── maps/             # Mapas de visualización de rutas
+│   └── kpi_comparison.csv # Comparación final de métricas
+├── scripts/              # Scripts de ejecución
+│   ├── generate_results.py    # Orquestador principal del pipeline
+│   ├── make_synth_orders.py   # Generador de órdenes sintéticas
+│   ├── run_fcfs_instance.py   # Ejecutor de política FCFS
+│   ├── run_synth_instance.py  # Ejecutor de política Rolling Horizon
+│   ├── plot_synth_on_map.py   # Visualizador de órdenes en mapa
+│   └── validate_datasets.py   # Validador de conjuntos de datos
+├── src/                  # Código fuente principal
+│   ├── main.py           # Simulador principal y clases de dominio
+│   ├── bundling.py       # Algoritmos de agrupación de órdenes
+│   ├── asignaciontentativa.py # Algoritmos de asignación
+│   ├── getrouteOSMR.py   # Cliente OSRM y cálculo de rutas
+│   ├── config.py         # Parámetros de configuración global
+│   ├── synth_loader.py   # Cargador de datos sintéticos
+│   ├── grubhub_loader.py # Cargador de benchmark Grubhub
+│   └── lade_loader.py    # Cargador de benchmark LaDe
+├── docs/                 # Documentación
+│   └── project_pseudocode.txt # Pseudocódigo del proyecto
 ├── tests/                # Pruebas unitarias
+├── mexico-251010.osm.pbf # Mapa base de México (OSRM)
+├── mexico-251010.osrm*   # Archivos precompilados de OSRM
 ├── README.md             # Este archivo
 └── requirements.txt      # Dependencias de Python
 ```
 
-## Scripts y Módulos Adicionales
+## Visualización
 
-*   `run_fcfs_instance.py`: Ejecuta una simulación solo con la política FCFS.
-*   `run_synth_instance.py`: Ejecuta una simulación solo con la política RH.
-*   `grubhub_loader.py` / `lade_loader.py`: Módulos para cargar datos de otros benchmarks (Grubhub, LaDe), no utilizados en el experimento principal de la tesis.
+Para visualizar las órdenes sintéticas generadas en un mapa interactivo:
+
+```bash
+python scripts/plot_synth_on_map.py data/synthetic_lapaz_orders_limited.csv
+```
+
+Esto generará un archivo HTML en `results/maps/` que puedes abrir en tu navegador.
+
+## Documentación Adicional
+
+- **Pseudocódigo del proyecto:** Ver `docs/project_pseudocode.txt` para una descripción detallada de la arquitectura y flujo del sistema.
+- **Paper de referencia:** Reyes et al. (2018) - "The Meal Delivery Routing Problem"
+
+## Contribuciones
+
+Este proyecto es parte de una tesis de maestría. Para preguntas o sugerencias, contacta al autor.
+
+## Licencia
+
+[Especificar licencia]
+
+## Autor
+
+Alan Sama
+Universidad Autónoma de Baja California Sur

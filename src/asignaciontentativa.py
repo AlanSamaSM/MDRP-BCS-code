@@ -6,6 +6,7 @@ from src.config import (
     OPTIMIZATION_FREQUENCY,
     TARGET_CLICK_TO_DOOR,
     SERVICE_TIME,
+    MAX_WAIT_BEFORE_FORCED_COMMIT,
 )
 from src.getrouteOSMR import get_route_details
 from src.bundling import calculate_bundle_score
@@ -108,26 +109,24 @@ def tentative_assignment(route_data, current_time):
     arrival_time = current_time + timedelta(minutes=duracion_min) 
     return arrival_time <= current_time + OPTIMIZATION_FREQUENCY #Bool donde si el tiempo de llegada es menor al horizonte se considera true en el return
 
-def two_stage_commitment(courier, bundle, current_time, X_COMMITMENT=15):
+def two_stage_commitment(courier, bundle, current_time):
     """
-    Compromiso final: Si el repartidor puede llegar al restaurante antes de current_time + OPTIMIZATION_FREQUENCY 
-    y todos los pedidos están listos, se hace un compromiso final (el repartidor recibe instrucciones para viajar al restaurante, recoger y entregar los pedidos).
-
-    Compromiso parcial:
-    Si el repartidor no puede cumplir la condición anterior, pero termina su última asignación antes 
-    de current_time + OPTIMIZATION_FREQUENCY, entonces se hace un compromiso parcial (se instruye al 
-    repartidor a viajar al restaurante y esperar allí una asignación definitiva).
-
-    Ignorar la asignación:
-    Si el repartidor no puede iniciar una nueva asignación antes de current_time + OPTIMIZATION_FREQUENCY
-    la asignación se ignora.
-
-    Excepción:
-    Si alguno de los pedidos en el paquete lleva listo más de 15 minutos (X_COMMITMENT), se omiten las reglas anteriores y se fuerza un compromiso final.
+    Two-stage additive commitment as per Reyes (2018), Section 3.3:
+    
+    1. Final commitment: Si el repartidor puede llegar al restaurante antes de current_time + OPTIMIZATION_FREQUENCY 
+       y todos los pedidos están listos, se hace un compromiso final.
+    
+    2. Partial commitment: Si el repartidor no puede cumplir la condición anterior, pero termina su última 
+       asignación antes de current_time + OPTIMIZATION_FREQUENCY, se hace un compromiso parcial (viajar al restaurante).
+    
+    3. Ignore: Si el repartidor no puede iniciar antes de current_time + OPTIMIZATION_FREQUENCY, se ignora.
+    
+    4. Exception: Si alguno de los pedidos lleva listo más de MAX_WAIT_BEFORE_FORCED_COMMIT, se fuerza compromiso final.
     """
-    # variable que revisa si alguna orden lleva lista más de 15 minutos
+    # Excepción: Verificar si alguna orden lleva demasiado tiempo lista (forced commit)
+    max_wait_minutes = MAX_WAIT_BEFORE_FORCED_COMMIT.total_seconds() / 60.0
     ready_too_long = any(
-        (current_time - o.ready_time).total_seconds() / 60.0 > X_COMMITMENT for o in bundle
+        (current_time - o.ready_time).total_seconds() / 60.0 > max_wait_minutes for o in bundle
     )
     
     # obtener la ruta del buldle
@@ -294,8 +293,8 @@ def do_linear_assignment(couriers, candidate_bundles, current_time):
         if courier.current_route is not None:
             continue
 
-        # Attempt to assign
-        success = two_stage_commitment(courier, bundle, current_time, X_COMMITMENT=15)
+        # Attempt to assign (using config parameter instead of hardcoded value)
+        success = two_stage_commitment(courier, bundle, current_time)
         if success:
             # The courier now has current_route set (partial or final).
             # If partial, the route can be updated in next optimization iteration.

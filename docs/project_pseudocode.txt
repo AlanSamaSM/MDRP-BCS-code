@@ -13,6 +13,7 @@ Componentes principales
 - src/: código central de simulación y módulos algorítmicos.
 - data/: datasets de entrada (restaurantes, órdenes sintéticas, mapas).
 - results/: salidas (KPIs, mapas, logs).
+- docs/: documentación del proyecto.
 
 Tipos de datos principales (conceptual)
 - Order (Orden): {order_id, restaurant_id, created_at, ready_at, rest_lat, rest_lon, dest_lat, dest_lon, status}
@@ -24,8 +25,12 @@ Flujo general (scripts de entrada)
 ---------------------------------
 1. Elegir dataset (sintético o benchmark)
 2. Iniciar servidor OSRM (opcional) o establecer USE_EUCLIDEAN=1 para usar fallback por distancia
-3. Ejecutar el runner de política:
-   scripts/run_fcfs_instance.py | run_ai_instance.py | run_grubhub_instance.py | run_lade_instance.py
+3. Ejecutar el pipeline completo:
+   python scripts/generate_results.py
+   º
+   O ejecutar políticas individualmente:
+   python scripts/run_fcfs_instance.py <csv>
+   python scripts/run_synth_instance.py <csv>  # Rolling Horizon
 
 Pseudocódigo del núcleo de simulación (src/main.py: run_simulation)
 
@@ -52,7 +57,7 @@ mientras time < end_time o existan órdenes pendientes:
             comprometer asignaciones siguiendo reglas two-stage commitment
 
     ejecutar acciones de repartidores (pickup/dropoff) y actualizar estados
-    recolectar métricas (tiempos de entrega, violaciones de SLA, distancia)
+    recolectar métricas (tiempos de entrega, violaciones de SLA, distancia, bundles, utilización)
     time = time + time_step
 
 Módulos y funciones clave
@@ -72,8 +77,27 @@ Módulos y funciones clave
     - run_simulation: bucle principal, manejo de eventos, cambio de política
 - scripts/
     - make_synth_orders.py: generador de datasets sintéticos
-    - run_*_instance.py: wrappers que cargan datos e invocan run_simulation
+    - run_fcfs_instance.py: ejecuta política FCFS
+    - run_synth_instance.py: ejecuta política Rolling Horizon
+    - generate_results.py: orquestador completo del pipeline (NUEVO)
     - plot_synth_on_map.py / plot_synth_points_simple.py: utilidades de visualización
+
+Métricas calculadas (según Reyes 2018 + extensiones)
+---------------------------------------------------
+- Click-to-Door: promedio, P10, P50, P90, P95
+- Ready-to-Pickup: promedio, P10, P50, P90
+- Ready-to-Door: promedio, P10, P50, P90
+- Órdenes no entregadas (%)
+- Distancia total (km)
+- Órdenes por courier-hora
+- Bundles por hora
+- Tamaño promedio de bundle
+- Compensación total de couriers
+- Costo por orden
+- Fracción de couriers con compensación mínima
+- Click-to-Door overage (sobretiempo)
+- Utilización de couriers (% tiempo conduciendo)
+- Ganancias de couriers por entregas
 
 Fallas comunes y consejos de depuración
 ------------------------------------
@@ -94,16 +118,20 @@ Archivos para inspeccionar primero
 - src/asignaciontentativa.py
 - src/getrouteOSMR.py
 - scripts/make_synth_orders.py
-- scripts/run_ai_instance.py
+- scripts/generate_results.py (orquestador)
 
-Cómo ejecutar un experimento rápido (ejemplo)
------------------------------------------
-1. Iniciar OSRM (si se usa): seguir el comando docker en el comentario de requirements.txt
-2. Generar datos sintéticos (o usar los existentes):
-   python scripts/make_synth_orders.py
-3. Ejecutar una instancia con RH:
-   python scripts/run_ai_instance.py data/synthetic_lapaz_orders_limited.csv
-4. Recopilar resultados y graficar con:
+Cómo ejecutar un experimento completo
+-------------------------------------
+1. Iniciar OSRM (si se usa):
+   docker run -d -p 5000:5000 -v "C:\Users\alan_\Documents\GitHub\MDRP-BCS-code:/data" osrm/osrm-backend osrm-routed --algorithm mld /data/mexico-251010.osrm
+
+2. Ejecutar pipeline completo (genera datos, corre FCFS, corre RH, analiza):
+   python scripts/generate_results.py
+
+3. O solo analizar resultados existentes:
+   python scripts/generate_results.py --analyze-only
+
+4. Visualizar órdenes generadas:
    python scripts/plot_synth_on_map.py data/synthetic_lapaz_orders_limited.csv
 
 Fin del pseudocódigo
