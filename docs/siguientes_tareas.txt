@@ -1,0 +1,21 @@
+-agregar y describir la cita de nuestro dataset y como sigue las caractristicas presentadas en LaDeç
+
+
+Trabajo futuro
+-comentar sobre el GreedRL: 
+@inproceedings{Lin2018GreedRL,
+    author    = {Lin, Kaixiang and Zhao, Renyu and Xu, Zhaodong and Zhou, Jiayu},
+    title     = {Efficient Large-Scale Fleet Management via Multi-Agent Deep Reinforcement Learning},
+    booktitle = {Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery \& Data Mining (KDD '18)},
+    year      = {2018},
+    pages     = {1774--1783},
+    doi       = {10.1145/3219819.3220003}
+}
+
+
+Anexos
+-Citar las librerias que brindaron apoyo
+Pandas: McKinney, W. (2010). Data Structures for Statistical Computing in Python. In Proceedings of the 9th Python in Science Conference (Vol. 445, pp. 51-56).
+NumPy: Harris, C. R., Millman, K. J., van der Walt, S. J., et al. (2020). Array programming with NumPy. Nature, 585(7825), 357-362.
+Folium: Mencionar que se usa para la visualización de mapas interactivos, basado en la librería Leaflet.js.
+SciPy: Virtanen, P., Gommers, R., Oliphant, T. E., et al. (2020). SciPy 1.0: fundamental algorithms for scientific computing in Python. Nature methods, 17(3), 261-272.

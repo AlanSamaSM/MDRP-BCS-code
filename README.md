@@ -177,4 +177,4 @@ Este proyecto es parte de una tesis de maestría. Para preguntas o sugerencias, 
 ## Autor
 
 Alan Sama
-Universidad Autónoma de Baja California Sur
+ITLP
