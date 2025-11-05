@@ -662,7 +662,7 @@ docker run -t -v C:\Users\alan_\Documents\GitHub\MDRP-BCS-code\osrm_data:/data o
 docker run -t -v C:\Users\alan_\Documents\GitHub\MDRP-BCS-code\osrm_data:/data osrm/osrm-backend osrm-customize /data/mexico-251010.osrm
 
 # 2. Servidor OSRM (cada sesión de trabajo)
-docker run -t -i -p 5000:5000 -v C:\Users\alan_\Documents\GitHub\MDRP-BCS-code\osrm_data:/data osrm/osrm-backend osrm-routed --algorithm mld /data/mexico-251010.osrm
+docker run -t -i -p 5000:5000 -v "c:\Users\Alan Sama\Desktop\MDRP RH\MDRP-BCS-code\osrm_data:/data" osrm/osrm-backend osrm-routed --algorithm mld /data/bcs-latest.osrm  (sustituir la ruta del folder osrm_data)
 
 # 3. Test rápido
 curl "http://localhost:5000/route/v1/driving/-110.31,24.14;-110.29,24.16?overview=false"
