@@ -45,7 +45,10 @@ class Courier:
         self.id = courier_id
         self.on_time = on_time
         self.off_time = off_time
+        # current location (updates during simulation)
         self.location = location
+        # base / start location (depot) — preserved for map visualizations
+        self.start_location = location
         self.current_route = None
         # historial de rutas completadas para visualizar despues
         self.route_history = []
@@ -189,10 +192,21 @@ def run_simulation(orders, couriers, restaurants, simulation_end, start_time=Non
                         policy_label,
                         visualized_deliveries_count,
                     )
+                
+                # NUEVO: Guardar mapa COMPLETO con base del courier para TODOS los bundlings
+                # (Se filtrarán después con generate_complete_bundles_index.py)
+                if c.current_route['commitment_type'] == 'final':
+                    save_complete_route_map(
+                        c.current_route,
+                        courier_base=c.start_location,
+                        courier_id=c.id,
+                        policy_label=policy_label,
+                        bundling_number=c.bundles_picked_up  # número secuencial del bundle para este courier
+                    )
+                
                 c.current_route = None
 
         current_time += OPTIMIZATION_FREQUENCY
-
     # calcular compensación final al terminar la simulación
     for c in couriers:
         c.final_compensation()
@@ -259,6 +273,60 @@ def visualize_route(courier_route):
     
     return m
 
+def visualize_complete_route(courier_route, courier_base):
+    """Genera un mapa COMPLETO incluyendo la base del courier y la ruta completa.
+    
+    Mostrará:
+    - Base del courier (azul)
+    - Ruta completa desde base → restaurantes → clientes → base
+    - Restaurantes (rojo)
+    - Clientes (verde)
+    """
+    route = courier_route['route']
+    coords = polyline.decode(route['geometry'])
+    
+    # Centro del mapa en la primera coordenada
+    m = folium.Map(location=coords[0], zoom_start=13)
+    
+    # Dibujar ruta principal (azul)
+    folium.PolyLine(coords, color='blue', weight=3, opacity=0.8, popup='Ruta del Bundle').add_to(m)
+    
+    # Marcador de la base del courier (azul)
+    folium.Marker(
+        location=courier_base,
+        popup="Courier Base",
+        icon=folium.Icon(color='blue', prefix='fa', icon='warehouse')
+    ).add_to(m)
+    
+    # Marcadores de órdenes
+    for i, order in enumerate(courier_route['orders'], 1):
+        # Restaurante (rojo)
+        folium.Marker(
+            location=order.restaurant.location,
+            popup=f"Restaurant #{i}",
+            icon=folium.Icon(color='red', prefix='fa', icon='utensils')
+        ).add_to(m)
+        
+        # Cliente (verde)
+        folium.Marker(
+            location=order.dropoff_loc,
+            popup=f"Customer #{i}: {order.placement_time.strftime('%H:%M')}",
+            icon=folium.Icon(color='green', prefix='fa', icon='map-pin')
+        ).add_to(m)
+    
+    # Línea conectando base al primer punto de la ruta
+    if coords and courier_base:
+        folium.PolyLine(
+            [courier_base, coords[0]], 
+            color='gray', 
+            weight=2, 
+            opacity=0.5, 
+            dash_array='5, 5',
+            popup='Salida de base'
+        ).add_to(m)
+    
+    return m
+
 def save_route_map(courier_route, policy_label, delivery_number):
     """Save a route visualization to results/maps/<policy>/delivery_<n>.html."""
     m = visualize_route(courier_route)
@@ -269,6 +337,47 @@ def save_route_map(courier_route, policy_label, delivery_number):
     m.save(filepath)
     rel_path = os.path.join('results', 'maps', policy_label, filename)
     print(f"    Saved route map: {rel_path}")
+    return filepath
+
+def save_complete_route_map(courier_route, courier_base, courier_id, policy_label, bundling_number):
+    """Guarda un mapa COMPLETO del bundling incluyendo base del courier.
+    
+    Se guarda en: results/maps/<policy>/complete_bundles/courier_<id>_bundle_<n>.html
+    """
+    m = visualize_complete_route(courier_route, courier_base)
+    base_dir = os.path.join(
+        os.path.dirname(__file__), '..', 'results', 'maps', 
+        policy_label, 'complete_bundles'
+    )
+    os.makedirs(base_dir, exist_ok=True)
+    
+    # Información del bundling
+    num_orders = len(courier_route['orders'])
+    total_distance = courier_route['route']['distance'] / 1000  # convertir a km
+    total_time = courier_route['route']['duration'] / 60  # convertir a minutos
+    
+    filename = f"courier_{courier_id}_bundle_{bundling_number:03d}.html"
+    filepath = os.path.join(base_dir, filename)
+    
+    # Agregar información en el título
+    m.get_root().html.add_child(folium.Element(f"""
+    <div style="position: fixed; 
+                bottom: 50px; left: 50px; width: 280px; 
+                background-color: white; border:2px solid grey; z-index:9999; 
+                font-size: 12px; padding: 10px; border-radius: 5px;
+                box-shadow: 2px 2px 6px rgba(0,0,0,0.3);">
+        <b>Bundle #{bundling_number}</b><br>
+        Courier ID: {courier_id}<br>
+        Órdenes: {num_orders}<br>
+        Distancia: {total_distance:.2f} km<br>
+        Tiempo: {total_time:.1f} min<br>
+        <i style="color: #666; font-size: 10px;">Ruta completa desde base</i>
+    </div>
+    """))
+    
+    m.save(filepath)
+    rel_path = os.path.join('results', 'maps', policy_label, 'complete_bundles', filename)
+    print(f"    💾 Saved complete bundle map: {rel_path}")
     return filepath
 
 # ======================

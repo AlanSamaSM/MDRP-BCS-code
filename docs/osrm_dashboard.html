@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSRM Interactive - Dashboard con Mapa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3f 100%);
+            color: #e0e0e0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            color: #888;
+            font-size: 1.1em;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+            background: #00c851;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0, 200, 81, 0.7); }
+            50% { opacity: 0.9; box-shadow: 0 0 0 10px rgba(0, 200, 81, 0.1); }
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(0, 212, 255, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
+        }
+        
+        .card-title {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #00d4ff;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-content {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        
+        .card-unit {
+            font-size: 0.9em;
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        .icon {
+            font-size: 1.5em;
+        }
+        
+        .info-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .section-title {
+            font-size: 1.5em;
+            color: #00d4ff;
+            margin-bottom: 20px;
+            font-weight: bold;
+            border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+            padding-bottom: 10px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .info-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid #00d4ff;
+        }
+        
+        .info-label {
+            color: #888;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            color: #fff;
+            font-size: 1.2em;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+        }
+        
+        .log-container {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.6;
+        }
+        
+        .log-line {
+            color: #0f0;
+            margin: 3px 0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 212, 255, 0.2);
+            border-radius: 4px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #0099ff);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .network-info {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid #0099ff;
+            margin-top: 10px;
+        }
+        
+        .network-info h4 {
+            color: #0099ff;
+            margin-bottom: 8px;
+        }
+        
+        .network-info p {
+            margin: 5px 0;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .endpoint-code {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #0099ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #0f0;
+            overflow-x: auto;
+        }
+        
+        .footer {
+            text-align: center;
+            color: #666;
+            margin-top: 40px;
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .map-container {
+                grid-column: 1 !important;
+            }
+        }
+        
+        .blink {
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0.5; }
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2.5fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .map-container {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        #map {
+            width: 100%;
+            height: 700px;
+            border-radius: 12px;
+        }
+        
+        .controls-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .control-section {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #00d4ff;
+        }
+        
+        .control-label {
+            color: #00d4ff;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+        
+        .marker-button {
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 6px;
+        }
+        
+        .marker-button.restaurant {
+            background: linear-gradient(135deg, #ff6b6b, #ff5252);
+            color: white;
+        }
+        
+        .marker-button.restaurant:hover {
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+            transform: scale(1.05);
+        }
+        
+        .marker-button.customer {
+            background: linear-gradient(135deg, #4ecdc4, #44bfb3);
+            color: white;
+        }
+        
+        .marker-button.customer:hover {
+            box-shadow: 0 0 15px rgba(78, 205, 196, 0.5);
+            transform: scale(1.05);
+        }
+        
+        .marker-button.reset {
+            background: linear-gradient(135deg, #ffd93d, #ffb800);
+            color: #333;
+        }
+        
+        .marker-button.reset:hover {
+            box-shadow: 0 0 15px rgba(255, 217, 61, 0.5);
+            transform: scale(1.05);
+        }
+        
+        .marker-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .mode-indicator {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.9em;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+        
+        .mode-indicator.active {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: rgba(0, 212, 255, 0.8);
+            color: #00d4ff;
+            font-weight: bold;
+        }
+        
+        .route-info {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(78, 205, 196, 0.5);
+        }
+        
+        .route-info-title {
+            color: #4ecdc4;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+        
+        .route-metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 6px 0;
+            padding: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+        
+        .route-metric-label {
+            color: #888;
+            font-size: 0.85em;
+        }
+        
+        .route-metric-value {
+            color: #4ecdc4;
+            font-weight: bold;
+            font-size: 1em;
+        }
+        
+        .coordinates-display {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75em;
+            margin-top: 8px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .coord-item {
+            margin: 5px 0;
+            padding: 5px;
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 2px solid #0099ff;
+            border-radius: 2px;
+        }
+        
+        .coord-label {
+            color: #888;
+            font-size: 0.8em;
+        }
+        
+        .coord-value {
+            color: #0f0;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-top: 2px solid #00d4ff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid rgba(255, 107, 107, 0.5);
+            color: #ff6b6b;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+        
+        .success-message {
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid rgba(78, 205, 196, 0.5);
+            color: #4ecdc4;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 OSRM Interactive - La Paz Routing</h1>
+            <p>Docker Container: OSRM Backend v5.26.0 | Click en mapa para crear ruta</p>
+            <div class="status-badge">🟢 RUNNING</div>
+        </div>
+        
+        <!-- Grid Principal: Mapa + Controles -->
+        <div class="main-grid">
+            <!-- MAPA -->
+            <div class="map-container">
+                <div id="map"></div>
+            </div>
+            
+            <!-- PANEL DE CONTROLES -->
+            <div class="controls-panel">
+                <div class="control-section">
+                    <div class="control-label">📍 Modo de Marcadores</div>
+                    <button class="marker-button restaurant" id="restaurantBtn" onclick="setMode('restaurant')">
+                        🍽️ Marcar Restaurante (Rojo)
+                    </button>
+                    <button class="marker-button customer" id="customerBtn" onclick="setMode('customer')">
+                        👤 Marcar Cliente (Azul)
+                    </button>
+                    <button class="marker-button reset" onclick="resetMap()">
+                        🔄 Limpiar Mapa
+                    </button>
+                    <div class="mode-indicator" id="modeIndicator">
+                        Selecciona un modo para comenzar
+                    </div>
+                </div>
+                
+                <div class="control-section">
+                    <div class="control-label">📍 Marcadores Colocados</div>
+                    <div class="coordinates-display" id="markerCoords">
+                        Haz click en el mapa para agregar marcadores...
+                    </div>
+                </div>
+                
+                <div class="control-section" id="routeSection" style="display: none;">
+                    <div class="control-label">🛣️ Información de Ruta</div>
+                    <div class="route-info">
+                        <div class="route-info-title">Ruta Calculada por OSRM</div>
+                        <div class="route-metric">
+                            <span class="route-metric-label">Distancia:</span>
+                            <span class="route-metric-value" id="distanceValue">-</span>
+                        </div>
+                        <div class="route-metric">
+                            <span class="route-metric-label">Duración:</span>
+                            <span class="route-metric-value" id="durationValue">-</span>
+                        </div>
+                        <div class="route-metric">
+                            <span class="route-metric-label">Velocidad Promedio:</span>
+                            <span class="route-metric-value" id="speedValue">-</span>
+                        </div>
+                    </div>
+                    <div id="errorMsg"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Información del Motor OSRM -->
+        <div class="grid">
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">💾</span>
+                    Memoria Usada
+                </div>
+                <div class="card-content">98.8 MiB</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 2.55%;"></div>
+                </div>
+                <div class="card-unit">de 3.785 GiB disponible (2.55%)</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">⚡</span>
+                    CPU Uso
+                </div>
+                <div class="card-content">0.00%</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%;"></div>
+                </div>
+                <div class="card-unit">En espera de requests</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">🔗</span>
+                    Procesos
+                </div>
+                <div class="card-content">10</div>
+                <div class="card-unit">Threads activos en container</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">📡</span>
+                    Puerto
+                </div>
+                <div class="card-content">5000</div>
+                <div class="card-unit">TCP - localhost:5000</div>
+            </div>
+        </div>
+        
+        <!-- Cómo Funciona -->
+        <div class="info-section">
+            <div class="section-title">📖 Cómo Usar</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                <div class="info-item">
+                    <div class="info-label">1️⃣ Click "Marcar Restaurante"</div>
+                    <div class="info-value" style="color: #ff6b6b;">Luego clickea en el mapa</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">2️⃣ Click "Marcar Cliente"</div>
+                    <div class="info-value" style="color: #4ecdc4;">Luego clickea en el mapa</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">3️⃣ Ruta Automática</div>
+                    <div class="info-value" style="color: #0f0;">OSRM calcula la ruta más corta</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">4️⃣ Resultados</div>
+                    <div class="info-value" style="color: #ffd93d;">Distancia, duración, velocidad</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>🎯 Motor OSRM listo para calcular rutas interactivas</p>
+            <p style="margin-top: 10px; color: #666; font-size: 0.85em;">
+                La Paz, Baja California Sur | Región: 24.12-24.16°N, -110.29 a -110.35°W
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // ============= VARIABLES GLOBALES =============
+        let map;
+        let currentMode = null;
+        let restaurantMarker = null;
+        let customerMarker = null;
+        let routeLine = null;
+        let restaurantCoords = null;
+        let customerCoords = null;
+        
+        const LAPAZ_CENTER = [24.1409, -110.3125];
+        const LAPAZ_BOUNDS = [
+            [24.124041, -110.335855],  // SW
+            [24.159317, -110.292893]   // NE
+        ];
+        
+        // ============= INICIALIZAR MAPA =============
+        function initMap() {
+            map = L.map('map').setView(LAPAZ_CENTER, 14);
+            
+            // Añadir capa base
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19,
+                minZoom: 12
+            }).addTo(map);
+            
+            // Dibujar área de La Paz
+            const lapazPolygon = L.polygon([
+                [24.124041, -110.311612],
+                [24.133011, -110.335855],
+                [24.159317, -110.309647],
+                [24.147104, -110.292893]
+            ], {
+                color: '#00d4ff',
+                weight: 2,
+                opacity: 0.5,
+                fillColor: '#00d4ff',
+                fillOpacity: 0.1,
+                dashArray: '5, 5'
+            }).addTo(map);
+            
+            // Click en el mapa
+            map.on('click', onMapClick);
+            
+            // Zoom a La Paz
+            map.fitBounds(LAPAZ_BOUNDS);
+        }
+        
+        // ============= CAMBIAR MODO =============
+        function setMode(mode) {
+            currentMode = mode;
+            const indicator = document.getElementById('modeIndicator');
+            
+            if (mode === 'restaurant') {
+                indicator.textContent = '🍽️ Modo: Seleccionar Restaurante';
+                indicator.classList.add('active');
+                document.getElementById('restaurantBtn').style.transform = 'scale(1.1)';
+                document.getElementById('customerBtn').style.transform = 'scale(1)';
+            } else if (mode === 'customer') {
+                indicator.textContent = '👤 Modo: Seleccionar Cliente';
+                indicator.classList.add('active');
+                document.getElementById('customerBtn').style.transform = 'scale(1.1)';
+                document.getElementById('restaurantBtn').style.transform = 'scale(1)';
+            }
+        }
+        
+        // ============= CLICK EN MAPA =============
+        function onMapClick(e) {
+            if (!currentMode) {
+                alert('Selecciona primero "Restaurante" o "Cliente"');
+                return;
+            }
+            
+            const lat = e.latlng.lat;
+            const lon = e.latlng.lng;
+            
+            if (currentMode === 'restaurant') {
+                if (restaurantMarker) map.removeLayer(restaurantMarker);
+                restaurantMarker = L.marker([lat, lon], {
+                    icon: L.icon({
+                        iconUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjEyIiByPSI4IiBmaWxsPSIjZmY2YjZiIi8+PGNpcmNsZSBjeD0iMTYiIGN5PSIxMiIgcj0iNCIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==',
+                        iconSize: [32, 32],
+                        iconAnchor: [16, 16]
+                    })
+                }).addTo(map);
+                restaurantCoords = [lat, lon];
+                updateMarkerCoords();
+            } else if (currentMode === 'customer') {
+                if (customerMarker) map.removeLayer(customerMarker);
+                customerMarker = L.marker([lat, lon], {
+                    icon: L.icon({
+                        iconUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjEyIiByPSI4IiBmaWxsPSIjNGVjZGM0Ii8+PGNpcmNsZSBjeD0iMTYiIGN5PSIxMiIgcj0iNCIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==',
+                        iconSize: [32, 32],
+                        iconAnchor: [16, 16]
+                    })
+                }).addTo(map);
+                customerCoords = [lat, lon];
+                updateMarkerCoords();
+            }
+            
+            currentMode = null;
+            document.getElementById('modeIndicator').classList.remove('active');
+            document.getElementById('modeIndicator').textContent = 'Selecciona un modo para comenzar';
+            
+            // Si tenemos ambos marcadores, calcular ruta
+            if (restaurantCoords && customerCoords) {
+                calculateRoute();
+            }
+        }
+        
+        // ============= ACTUALIZAR COORDENADAS =============
+        function updateMarkerCoords() {
+            let html = '';
+            if (restaurantCoords) {
+                html += `<div class="coord-item"><span class="coord-label">🍽️ Restaurante:</span><br><span class="coord-value">${restaurantCoords[0].toFixed(6)}, ${restaurantCoords[1].toFixed(6)}</span></div>`;
+            }
+            if (customerCoords) {
+                html += `<div class="coord-item"><span class="coord-label">👤 Cliente:</span><br><span class="coord-value">${customerCoords[0].toFixed(6)}, ${customerCoords[1].toFixed(6)}</span></div>`;
+            }
+            if (!restaurantCoords && !customerCoords) {
+                html = 'Haz click en el mapa para agregar marcadores...';
+            }
+            document.getElementById('markerCoords').innerHTML = html;
+        }
+        
+        // ============= CALCULAR RUTA CON OSRM =============
+        async function calculateRoute() {
+            const [restLat, restLon] = restaurantCoords;
+            const [custLat, custLon] = customerCoords;
+            
+            // OSRM espera lon,lat no lat,lon
+            const url = `http://localhost:5000/route/v1/driving/${restLon},${restLat};${custLon},${custLat}?overview=full&geometries=geojson`;
+            
+            const errorMsg = document.getElementById('errorMsg');
+            errorMsg.innerHTML = '<div class="loading"></div> Calculando ruta...';
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.code !== 'Ok') {
+                    errorMsg.innerHTML = `<div class="error-message">❌ Error: ${data.code}</div>`;
+                    return;
+                }
+                
+                const route = data.routes[0];
+                const distance = (route.distance / 1000).toFixed(2); // km
+                const duration = (route.duration / 60).toFixed(1); // minutos
+                const speed = (route.distance / route.duration * 3.6).toFixed(1); // km/h
+                
+                // Dibujar ruta en mapa
+                if (routeLine) map.removeLayer(routeLine);
+                routeLine = L.geoJSON(route.geometry, {
+                    style: {
+                        color: '#00d4ff',
+                        weight: 4,
+                        opacity: 0.8,
+                        dashArray: '0'
+                    }
+                }).addTo(map);
+                
+                // Mostrar información
+                document.getElementById('routeSection').style.display = 'block';
+                document.getElementById('distanceValue').textContent = `${distance} km`;
+                document.getElementById('durationValue').textContent = `${duration} min`;
+                document.getElementById('speedValue').textContent = `${speed} km/h`;
+                
+                errorMsg.innerHTML = '<div class="success-message">✅ Ruta calculada correctamente</div>';
+                
+                // Zoom a la ruta
+                map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+                
+            } catch (error) {
+                errorMsg.innerHTML = `<div class="error-message">❌ Error: ${error.message}<br>¿Está OSRM ejecutando en puerto 5000?</div>`;
+            }
+        }
+        
+        // ============= LIMPIAR MAPA =============
+        function resetMap() {
+            if (restaurantMarker) map.removeLayer(restaurantMarker);
+            if (customerMarker) map.removeLayer(customerMarker);
+            if (routeLine) map.removeLayer(routeLine);
+            
+            restaurantMarker = null;
+            customerMarker = null;
+            routeLine = null;
+            restaurantCoords = null;
+            customerCoords = null;
+            
+            document.getElementById('markerCoords').innerHTML = 'Haz click en el mapa para agregar marcadores...';
+            document.getElementById('routeSection').style.display = 'none';
+            document.getElementById('errorMsg').innerHTML = '';
+            document.getElementById('modeIndicator').textContent = 'Selecciona un modo para comenzar';
+            document.getElementById('modeIndicator').classList.remove('active');
+            currentMode = null;
+            
+            map.fitBounds(LAPAZ_BOUNDS);
+        }
+        
+        // ============= INICIAR CUANDO CARGUE LA PÁGINA =============
+        window.addEventListener('load', initMap);
+    </script>
+</body>
+</html>
+        
+        <!-- Métricas Principales -->
+        <div class="grid">
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">💾</span>
+                    Memoria Usada
+                </div>
+                <div class="card-content">98.8 MiB</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 2.55%;"></div>
+                </div>
+                <div class="card-unit">de 3.785 GiB disponible (2.55%)</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">⚡</span>
+                    CPU Uso
+                </div>
+                <div class="card-content">0.00%</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%;"></div>
+                </div>
+                <div class="card-unit">En espera de requests</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">🔗</span>
+                    Procesos
+                </div>
+                <div class="card-content">10</div>
+                <div class="card-unit">Threads activos en container</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">📡</span>
+                    Puerto
+                </div>
+                <div class="card-content">5000</div>
+                <div class="card-unit">TCP - localhost:5000</div>
+            </div>
+        </div>
+        
+        <!-- Información del Container -->
+        <div class="info-section">
+            <div class="section-title">🐳 Información del Container</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Container ID</div>
+                    <div class="info-value">cbe1d6afc649</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Nombre</div>
+                    <div class="info-value">sad_hodgkin</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Imagen</div>
+                    <div class="info-value">osrm/osrm-backend</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Versión OSRM</div>
+                    <div class="info-value">5.26.0</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Algoritmo</div>
+                    <div class="info-value">MLD (Multi-Level Dijkstra)</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Archivo de Datos</div>
+                    <div class="info-value">bcs-latest.osrm</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Creado</div>
+                    <div class="info-value">2025-11-05 16:12:01 UTC</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Runtime</div>
+                    <div class="info-value">runc</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Configuración de Red -->
+        <div class="info-section">
+            <div class="section-title">🌐 Configuración de Red</div>
+            <div class="network-info">
+                <h4>📍 Dirección IP (Docker Bridge)</h4>
+                <p>IP Interna: 172.17.0.2</p>
+                <p>Gateway: 172.17.0.1</p>
+                <p>Red: bridge</p>
+            </div>
+            <div class="network-info">
+                <h4>🔌 Port Binding</h4>
+                <p>Host Port: 5000 (0.0.0.0:5000)</p>
+                <p>Container Port: 5000</p>
+                <p>Protocol: TCP</p>
+            </div>
+            <div class="network-info">
+                <h4>📤 Tráfico de Red</h4>
+                <p>Entrada: 1.17 kB</p>
+                <p>Salida: 126 B</p>
+            </div>
+        </div>
+        
+        <!-- Volume Mount -->
+        <div class="info-section">
+            <div class="section-title">📁 Volume Mount (Shared Storage)</div>
+            <div class="info-item">
+                <div class="info-label">Host Path (Windows)</div>
+                <div class="info-value">c:\Users\Alan Sama\Desktop\MDRP RH\MDRP-BCS-code\osrm_data</div>
+            </div>
+            <div class="info-item" style="margin-top: 15px;">
+                <div class="info-label">Container Path (Linux)</div>
+                <div class="info-value">/data</div>
+            </div>
+            <div class="info-item" style="margin-top: 15px;">
+                <div class="info-label">Modo</div>
+                <div class="info-value">Read-Write (RW)</div>
+            </div>
+        </div>
+        
+        <!-- Logs del Motor -->
+        <div class="info-section">
+            <div class="section-title">📋 Logs del Motor OSRM</div>
+            <div class="log-container">
+                <div class="log-line">[info] starting up engines, v5.26.0</div>
+                <div class="log-line">[info] Threads: 8</div>
+                <div class="log-line">[info] IP address: 0.0.0.0</div>
+                <div class="log-line">[info] IP port: 5000</div>
+                <div class="log-line">[info] http 1.1 compression handled by zlib version 1.2.8</div>
+                <div class="log-line">[info] Listening on: 0.0.0.0:5000</div>
+                <div class="log-line" style="color: #0f0; font-weight: bold;"><span class="blink">●</span> [info] running and waiting for requests</div>
+            </div>
+        </div>
+        
+        <!-- Cómo Conectarse -->
+        <div class="info-section">
+            <div class="section-title">🔗 Cómo Conectarse desde Python</div>
+            <div class="endpoint-code">
+# Endpoint disponible:
+GET http://localhost:5000/route/v1/driving/{lon1},{lat1};{lon2},{lat2}?overview=false
+
+# Ejemplo:
+curl "http://localhost:5000/route/v1/driving/-110.3115,24.1440;-110.2980,24.1560?overview=false"
+
+# Response esperada:
+{
+  "code": "Ok",
+  "routes": [{
+    "distance": 4231.5,
+    "duration": 305.2
+  }]
+}
+            </div>
+        </div>
+        
+        <!-- Comando Docker -->
+        <div class="info-section">
+            <div class="section-title">🐳 Comando Docker Ejecutado</div>
+            <div class="endpoint-code">
+docker run -t -i -p 5000:5000 \
+  -v "c:\Users\Alan Sama\Desktop\MDRP RH\MDRP-BCS-code\osrm_data:/data" \
+  osrm/osrm-backend \
+  osrm-routed --algorithm mld /data/bcs-latest.osrm
+            </div>
+        </div>
+        
+        <!-- Estado del Sistema -->
+        <div class="info-section">
+            <div class="section-title">✅ Estado del Sistema</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Container Status</div>
+                    <div class="info-value" style="color: #0f0;">🟢 Running</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">OSRM Engine</div>
+                    <div class="info-value" style="color: #0f0;">🟢 Ready</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Network</div>
+                    <div class="info-value" style="color: #0f0;">🟢 Connected</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Data Files</div>
+                    <div class="info-value" style="color: #0f0;">🟢 Mounted</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Memory Status</div>
+                    <div class="info-value" style="color: #0f0;">🟢 Optimal</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">CPU Status</div>
+                    <div class="info-value" style="color: #0f0;">🟢 Idle</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>🎯 Motor OSRM listo para recibir requests desde Python</p>
+            <p style="margin-top: 10px; color: #666; font-size: 0.85em;">
+                Última actualización: 2025-11-05 16:12:01 UTC
+            </p>
+        </div>
+    </div>
+</body>
+</html>
