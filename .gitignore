@@ -13,7 +13,7 @@
 maps/
 
 # -------------------------------------------------
-# OSRM data files
+# OSRM data files (large files - not tracked)
 # -------------------------------------------------
-/mexico-251010.osm.pbf
-/mexico-251010.osrm*
+/osrm_data/*.pbf
+/osrm_data/mexico-251010.osrm*

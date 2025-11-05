@@ -28,12 +28,12 @@ El objetivo es demostrar la mejora en la calidad del servicio y la eficiencia op
 
 3.  Inicia el servidor OSRM local (requerido para ruteo):
     ```bash
-    docker run -d -p 5000:5000 -v "${PWD}:/data" osrm/osrm-backend osrm-routed --algorithm mld /data/mexico-251010.osrm
+    docker run -d -p 5000:5000 -v "${PWD}/osrm_data:/data" osrm/osrm-backend osrm-routed --algorithm mld /data/mexico-251010.osrm
     ```
     
     Para Windows PowerShell:
     ```powershell
-    docker run -d -p 5000:5000 -v "${PWD}:/data" osrm/osrm-backend osrm-routed --algorithm mld /data/mexico-251010.osrm
+    docker run -d -p 5000:5000 -v "${PWD}/osrm_data:/data" osrm/osrm-backend osrm-routed --algorithm mld /data/mexico-251010.osrm
     ```
 
 ## Reproducción de Resultados
@@ -122,6 +122,10 @@ MDRP-BCS-code/
 │   ├── restaurants.csv                     # Restaurantes base
 │   ├── la_paz_restaurants.geojson         # Restaurantes de La Paz
 │   └── synthetic_lapaz_orders_limited.csv # Órdenes sintéticas generadas
+├── osrm_data/            # Datos geoespaciales y OSRM
+│   ├── mexico-251010.osm.pbf    # Mapa base de México (OpenStreetMap)
+│   ├── mexico-251010.osrm       # Archivo OSRM principal
+│   └── mexico-251010.osrm.*     # Archivos de índice y recursos OSRM
 ├── results/              # Resultados de simulaciones
 │   ├── raw/              # Resultados detallados por política
 │   ├── maps/             # Mapas de visualización de rutas
@@ -145,8 +149,6 @@ MDRP-BCS-code/
 ├── docs/                 # Documentación
 │   └── project_pseudocode.txt # Pseudocódigo del proyecto
 ├── tests/                # Pruebas unitarias
-├── mexico-251010.osm.pbf # Mapa base de México (OSRM)
-├── mexico-251010.osrm*   # Archivos precompilados de OSRM
 ├── README.md             # Este archivo
 └── requirements.txt      # Dependencias de Python
 ```
@@ -164,6 +166,8 @@ Esto generará un archivo HTML en `results/maps/` que puedes abrir en tu navegad
 ## Documentación Adicional
 
 - **Pseudocódigo del proyecto:** Ver `docs/project_pseudocode.txt` para una descripción detallada de la arquitectura y flujo del sistema.
+- **Setup de OSRM en otra computadora:** Ver `README_OSRM_SETUP.md` para instrucciones de transferencia de archivos `.osrm` via USB u otras opciones.
+- **Manual técnico de OSRM:** Ver `docs/osrm_manual.md` para detalles de preprocesamiento, endpoints y troubleshooting.
 - **Paper de referencia:** Reyes et al. (2018) - "The Meal Delivery Routing Problem"
 
 ## Contribuciones

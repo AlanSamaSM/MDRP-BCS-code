@@ -106,9 +106,10 @@ Para áreas pequeñas (ciudad), usa [BBBike Extract Service](https://extract.bbb
 **Ubicación en el repositorio:**
 ```
 MDRP-BCS-code/
-├── mexico-251010.osm.pbf          # Datos OSM originales
-├── mexico-251010.osrm              # Datos procesados (no borrar)
-├── mexico-251010.osrm.*            # Archivos auxiliares OSRM
+├── osrm_data/
+│   ├── mexico-251010.osm.pbf      # Datos OSM originales
+│   ├── mexico-251010.osrm         # Datos procesados (no borrar)
+│   └── mexico-251010.osrm.*       # Archivos auxiliares OSRM
 ```
 
 ---
@@ -127,7 +128,7 @@ Este proyecto usa **MLD** por su balance entre velocidad y flexibilidad.
 ### Paso 1: Extract (Convertir OSM a formato OSRM)
 
 ```powershell
-docker run -t -v C:\Users\alan_\Documents\GitHub\MDRP-BCS-code:/data osrm/osrm-backend osrm-extract -p /opt/car.lua /data/mexico-251010.osm.pbf
+docker run -t -v C:\Users\alan_\Documents\GitHub\MDRP-BCS-code\osrm_data:/data osrm/osrm-backend osrm-extract -p /opt/car.lua /data/mexico-251010.osm.pbf
 ```
 
 **Parámetros:**
@@ -142,7 +143,7 @@ docker run -t -v C:\Users\alan_\Documents\GitHub\MDRP-BCS-code:/data osrm/osrm-b
 ### Paso 2: Partition (para MLD)
 
 ```powershell
-docker run -t -v C:\Users\alan_\Documents\GitHub\MDRP-BCS-code:/data osrm/osrm-backend osrm-partition /data/mexico-251010.osrm
+docker run -t -v C:\Users\alan_\Documents\GitHub\MDRP-BCS-code\osrm_data:/data osrm/osrm-backend osrm-partition /data/mexico-251010.osrm
 ```
 
 **Salida:**
@@ -154,7 +155,7 @@ docker run -t -v C:\Users\alan_\Documents\GitHub\MDRP-BCS-code:/data osrm/osrm-b
 ### Paso 3: Customize (para MLD)
 
 ```powershell
-docker run -t -v C:\Users\alan_\Documents\GitHub\MDRP-BCS-code:/data osrm/osrm-backend osrm-customize /data/mexico-251010.osrm
+docker run -t -v C:\Users\alan_\Documents\GitHub\MDRP-BCS-code\osrm_data:/data osrm/osrm-backend osrm-customize /data/mexico-251010.osrm
 ```
 
 **Salida:**
@@ -203,7 +204,7 @@ mexico-251010.osrm.turn_weight_penalties
 ### Comando Básico
 
 ```powershell
-docker run -t -i -p 5000:5000 -v C:\Users\alan_\Documents\GitHub\MDRP-BCS-code:/data osrm/osrm-backend osrm-routed --algorithm mld /data/mexico-251010.osrm
+docker run -t -i -p 5000:5000 -v C:\Users\alan_\Documents\GitHub\MDRP-BCS-code\osrm_data:/data osrm/osrm-backend osrm-routed --algorithm mld /data/mexico-251010.osrm
 ```
 
 **Parámetros:**
@@ -235,7 +236,7 @@ curl "http://localhost:5000/route/v1/driving/-110.31,24.14;-110.29,24.16?overvie
 
 ```powershell
 # Con -d (detached)
-docker run -d -p 5000:5000 -v C:\Users\alan_\Documents\GitHub\MDRP-BCS-code:/data osrm/osrm-backend osrm-routed --algorithm mld /data/mexico-251010.osrm
+docker run -d -p 5000:5000 -v C:\Users\alan_\Documents\GitHub\MDRP-BCS-code\osrm_data:/data osrm/osrm-backend osrm-routed --algorithm mld /data/mexico-251010.osrm
 
 # Ver logs
 docker logs <container_id>
@@ -656,12 +657,12 @@ total_edges: ~95M
 
 ```powershell
 # 1. Preprocesamiento (una sola vez)
-docker run -t -v C:\Users\alan_\Documents\GitHub\MDRP-BCS-code:/data osrm/osrm-backend osrm-extract -p /opt/car.lua /data/mexico-251010.osm.pbf
-docker run -t -v C:\Users\alan_\Documents\GitHub\MDRP-BCS-code:/data osrm/osrm-backend osrm-partition /data/mexico-251010.osrm
-docker run -t -v C:\Users\alan_\Documents\GitHub\MDRP-BCS-code:/data osrm/osrm-backend osrm-customize /data/mexico-251010.osrm
+docker run -t -v C:\Users\alan_\Documents\GitHub\MDRP-BCS-code\osrm_data:/data osrm/osrm-backend osrm-extract -p /opt/car.lua /data/mexico-251010.osm.pbf
+docker run -t -v C:\Users\alan_\Documents\GitHub\MDRP-BCS-code\osrm_data:/data osrm/osrm-backend osrm-partition /data/mexico-251010.osrm
+docker run -t -v C:\Users\alan_\Documents\GitHub\MDRP-BCS-code\osrm_data:/data osrm/osrm-backend osrm-customize /data/mexico-251010.osrm
 
 # 2. Servidor OSRM (cada sesión de trabajo)
-docker run -t -i -p 5000:5000 -v C:\Users\alan_\Documents\GitHub\MDRP-BCS-code:/data osrm/osrm-backend osrm-routed --algorithm mld /data/mexico-251010.osrm
+docker run -t -i -p 5000:5000 -v C:\Users\alan_\Documents\GitHub\MDRP-BCS-code\osrm_data:/data osrm/osrm-backend osrm-routed --algorithm mld /data/mexico-251010.osrm
 
 # 3. Test rápido
 curl "http://localhost:5000/route/v1/driving/-110.31,24.14;-110.29,24.16?overview=false"
@@ -672,9 +673,3 @@ docker logs <container_id>
 # 5. Detener servidor
 docker stop <container_id>
 ```
-
----
-
-**Última actualización:** Octubre 27, 2025  
-**Versión del documento:** 1.0  
-**Autor:** Alan Sama (MDRP-BCS Project)
