@@ -1,0 +1,299 @@
+
+	author  = {Reyes, Damian and Erera, Alan and Savelsbergh, Martin and Sahasrabudhe, Sagar and O'Neil, Ryan},
+	title   = {The Meal Delivery Routing Problem},
+	journal = {Optimization Online},
+	year    = {2018},
+	month   = {March},
+	url     = {http://www.optimization-online.org/DB_FILE/2018/03/6512.pdf}
+Análisis: Este trabajo es la publicación ancla de la tesis. Sus contribuciones, que deben ser extraídas y discutidas en detalle en el Marco Teórico (Capítulo 6), son:
+
+La definición formal del MDRP: Establece el MDRP como una nueva e importante clase de sistemas de entrega dinámica.   
+
+El algoritmo de solución: Introduce explícitamente un "algoritmo de solución basado en un enfoque de rolling-horizon repeated matching (coincidencia repetida en horizonte rodante)". Esta es la justificación metodológica directa para el núcleo de la tesis.   
+
+Benchmarking: Publicaron un conjunto de instancias (benchmarks) basadas en datos históricos reales (de Grubhub) para facilitar la comparación de metodologías. Esto se alinea perfectamente con los objetivos de reproducibilidad y evaluación comparativa de la tesis
+El diseño experimental de la tesis (FCFS vs. RH) es metodológicamente sólido. Sin embargo, el marco teórico para el RH puede fortalecerse significativamente al explicitar un componente implícito: la agrupación de pedidos (order batching).
+El Enfoque de Horizonte Rodante (Rolling Horizon - RH)
+El Rolling Horizon (RH) es una técnica de descomposición temporal estándar para resolver problemas dinámicos de gran escala. Se aplica en diversos campos, desde la programación de la producción  hasta la gestión de energía.   
+•	Fuente Clave: Reyes et al. (2018).   
+•	Análisis: La política de RH, como se describe en Reyes et al. (2018), es un "enfoque de matching repetido". Esto implica que la política no se ejecuta continuamente. En su lugar, el problema dinámico se divide en una serie de subproblemas estáticos.   
+•	Implicación Metodológica (Insight Crítico): Una implementación de RH no está completa sin una estrategia de agrupación de pedidos (Order Batching o Bundling). Un RH funciona en olas (epochs):
+1.	El sistema espera un período de tiempo (el horizonte) y acumula pedidos.
+2.	Agrupa (batches) todos los pedidos nuevos y pendientes.
+3.	Resuelve este grupo como un problema VRP estático (el "matching").
+4.	"Comete" (asigna) la primera parte de esa solución óptima.
+5.	Repite el proceso.
+Refuerzo de la política Rolling Horizon (RH)
+Tu análisis sobre la necesidad de una estrategia de agrupación (bundling o batching) es crucial. Además de las fuentes que identificaste, considera esta referencia que formaliza la idea de descomposición temporal en problemas dinámicos.
+
+Cita Sugerida:
+
+@article{Pillac2013,    author  = {Pillac, Victor and Gendreau, Michel and Guéret, Christelle and Medaglia, Andrés L.},    title   = {A review of dynamic vehicle routing problems},    journal = {European Journal of Operational Research},    year    = {2013},    volume  = {225},    number  = {1},    pages   = {1--11},    doi     = {10.1016/j.ejor.2012.08.015}}
+Análisis y Ubicación: Este review es una referencia clave para problemas de ruteo dinámico. En la sección del Marco Teórico donde discutes el RH, puedes citar a Pillac et al. (2013) para establecer que las políticas de reoptimización periódica (como el RH) son un enfoque estándar y bien establecido para manejar la naturaleza dinámica del DVRP y, por extensión, del MDRP. Esto le da un respaldo académico más amplio a tu elección metodológica, más allá del paper de Reyes2018.
+
+
+
+@article{Laporte1992,
+	    author  = {Gilbert Laporte},
+	    title   = {The Traveling Salesman Problem: An Overview of Exact and Approximate Algorithms},
+	    journal = {European Journal of Operational Research},
+	    year    = {1992},
+	    volume  = {59},
+	    pages   = {345--358}
+•		  }Análisis: Ambas referencias son excelentes. El trabajo de 1992 es una revisión exhaustiva de los métodos algorítmicos. Sin embargo, el artículo de 2009 es particularmente simbólico, ya que conmemora el 50 aniversario del artículo de Dantzig & Ramser. Laporte (2009) ofrece el contexto histórico y la evolución del campo, situando al VRP como un pilar de la optimización combinatoria.   
+Para el Capítulo 7: Metodología
+ Justificación del uso de un simulador
+Tu metodología se basa en un simulador para evaluar las políticas. Es importante justificar por qué la simulación es el método apropiado para este problema.
+
+Cita Sugerida:
+
+@article{Juan2015,    author  = {Juan, Angel A. and Faulin, Javier and Grasman, Scott E. and Rabe, Markus and Figueira, Gonçalo},    title   = {A review of simheuristics: Extending metaheuristics to deal with stochastic VRPs},    journal = {Operations Research Perspectives},    year    = {2015},    volume  = {2},    pages   = {62--72},    doi     = {10.1016/j.orp.2015.03.001}}
+Análisis y Ubicación: Aunque este artículo se enfoca en "simheuristics", su introducción y justificación son perfectas para tu propósito. Juan et al. (2015) argumentan que para problemas de ruteo con componentes estocásticos o dinámicos (como la llegada de nuevos pedidos), los enfoques puramente analíticos son insuficientes. La simulación se vuelve indispensable para evaluar el rendimiento de una política en condiciones realistas. Puedes usar esta cita en la introducción de tu capítulo de Metodología para validar el enfoque general de construir un pipeline de simulación.
+3. Para el Capítulo 2: Descripción del Problema
+Refuerzo del realismo de la red vial
+Para enfatizar la importancia de no usar simplificaciones como las distancias euclidianas, puedes citar un trabajo que compare directamente los resultados.
+
+Cita Sugerida:
+
+@article{Figliozzi2007,    author  = {Figliozzi, Miguel A.},    title   = {Analysis of the efficiency of urban commercial vehicle tours: Data collection, methodology, and policy implications},    journal = {Transportation Research Part B: Methodological},    year    = {2007},    volume  = {41},    number  = {9},    pages   = {1014--1032},    doi     = {10.1016/j.trb.2007.04.005}}
+Análisis y Ubicación: Figliozzi (2007) analiza datos reales de tours de vehículos comerciales y demuestra que las estimaciones de tiempo de viaje basadas en distancias de red son significativamente diferentes (y más precisas) que las basadas en distancias euclidianas, especialmente en redes urbanas congestionadas. Citar este trabajo en la sección 2.2.2 Simplificaciones de red vial y realismo proporciona evidencia empírica contundente de por qué tu decisión de usar OSRM y OSM es una mejora metodológica crítica sobre enfoques más simples.
+
+6. Para "Ruteo realista en redes viales" - Validación de OSM
+@article{Haklay2010,
+    author  = {Haklay, Muki and Weber, Patrick},
+    title   = {OpenStreetMap: User-Generated Street Maps},
+    journal = {IEEE Pervasive Computing},
+    year    = {2010},
+    volume  = {7},
+    number  = {4},
+    pages   = {12--18},
+    doi     = {10.1109/MPRV.2008.62}
+}
+@article{Haklay2010,    author  = {Haklay, Muki and Weber, Patrick},    title   = {OpenStreetMap: User-Generated Street Maps},    journal = {IEEE Pervasive Computing},    year    = {2010},    volume  = {7},    number  = {4},    pages   = {12--18},    doi     = {10.1109/MPRV.2008.62}}
+Por qué: Clásico sobre calidad y confiabilidad de OSM. Legitima OSM como fuente de datos para investigación.
+9. Para "Brecha de reproducibilidad" - Docker y Containerización
+@article{Merkel2014,
+    author  = {Merkel, Dirk},
+    title   = {Docker: Lightweight Linux Containers for Consistent Development and Deployment},
+    journal = {Linux Journal},
+    year    = {2014},
+    volume  = {2014},
+    number  = {239},
+    pages   = {2}
+}
+@article{Merkel2014,    author  = {Merkel, Dirk},    title   = {Docker: Lightweight Linux Containers for Consistent Development and Deployment},    journal = {Linux Journal},    year    = {2014},    volume  = {2014},    number  = {239},    pages   = {2}}
+Por qué: Valida Docker como herramienta estándar para reproducibilidad en investigación.
+
+@article{Jazemi2023,
+	    author  = {Reza Jazemi and Ensieh Alidadiani and Kwangseog Ahn and Jaejin Jang},
+	    title   = {A Review of Literature on Vehicle Routing Problems of Last-Mile Delivery in Urban Areas},
+	    journal = {Applied Sciences},
+	    year    = {2023},
+	    volume  = {13},
+	    number  = {2413015}
+	  }
+@inproceedings{Lin2018GreedRL,
+	author    = {Lin, Kaixiang and Zhao, Renyu and Xu, Zhaodong and Zhou, Jiayu},
+	title     = {Efficient Large-Scale Fleet Management via Multi-Agent Deep Reinforcement Learning},
+	booktitle = {Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery \& Data Mining (KDD '18)},
+	year      = {2018},
+	pages     = {1774--1783},
+	doi       = {10.1145/3219819.3220003}
+}
+	  %------------------ VRP citas--------------------
+@article{Dantzig1959,
+	  	author  = {George B. Dantzig and John H. Ramser},
+	  	title   = {The Truck Dispatching Problem},
+	  	journal = {Management Science},
+	  	year    = {1959},
+	  	volume  = {6},
+	  	number  = {1},
+	  	pages   = {80--91},
+	  	doi     = {10.1287/mnsc.6.1.80}
+•		  } Análisis: Este artículo es universalmente reconocido como la primera formulación de lo que hoy se conoce como el Vehicle Routing Problem (VRP). Citarlo es esencial para demostrar la comprensión de los fundamentos del campo.   
+
+	  
+@article{Lenstra1981,
+	  	author  = {Jan Karel Lenstra and Alexander H. G. Rinnooy Kan},
+	  	title   = {Complexity of Vehicle Routing and Scheduling Problems},
+	  	journal = {Networks},
+	  	year    = {1981},
+	  	volume  = {11},
+	  	number  = {2},
+	  	pages   = {221--227},
+	  	doi     = {10.1002/net.3230110204}
+	  }
+	  
+@article{Letchford2004,
+	  	author  = {Adam N. Letchford and Jesper Lysgaard and Richard W. Eglese},
+	  	title   = {A Branch-and-Cut Algorithm for the Capacitated Vehicle Routing Problem},
+	  	journal = {Mathematical Programming},
+	  	year    = {2004},
+	  	volume  = {100},
+	  	number  = {2},
+	  	pages   = {423--445},
+	  	doi     = {10.1007/s10107-003-0470-y}
+	  }
+	  
+@incollection{Toth2014RichVRP,
+	  	author    = {Paolo Toth and Daniele Vigo},
+	  	title     = {Rich Vehicle Routing Problems},
+	  	booktitle = {Vehicle Routing: Problems, Methods, and Applications},
+	  	editor    = {Paolo Toth and Daniele Vigo},
+	  	publisher = {SIAM},
+	  	address   = {Philadelphia},
+	  	year      = {2014},
+	  	pages     = {241--271},
+	  	doi       = {10.1137/1.9781611973594.ch9}
+	  }
+	  
+@article{Laporte2009VRPSurvey,
+	  	author  = {Gilbert Laporte},
+	  	title   = {Fifty Years of Vehicle Routing},
+	  	journal = {Transportation Science},
+	  	year    = {2009},
+	  	volume  = {43},
+	  	number  = {4},
+	  	pages   = {408--416},
+	  	doi     = {10.1287/trsc.1090.0301}
+•		  }Análisis: Ambas referencias son excelentes. El trabajo de 1992 es una revisión exhaustiva de los métodos algorítmicos. Sin embargo, el artículo de 2009 es particularmente simbólico, ya que conmemora el 50 aniversario del artículo de Dantzig & Ramser. Laporte (2009) ofrece el contexto histórico y la evolución del campo, situando al VRP como un pilar de la optimización combinatoria.   
+
+	  
+@inproceedings{Geisberger2008,
+	  	author    = {Robert Geisberger and Peter Sanders and Dominik Schultes and Daniel Delling},
+	  	title     = {Contraction Hierarchies: Faster and Simpler Hierarchical Routing in Road Networks},
+	  	booktitle = {Proceedings of the 7th International Workshop on Experimental Algorithms (WEA 2008)},
+	  	series    = {Lecture Notes in Computer Science},
+	  	volume    = {5038},
+	  	pages     = {319--333},
+	  	year      = {2008},
+	  	publisher = {Springer},
+	  	address   = {Berlin, Heidelberg},
+	  	doi       = {10.1007/978-3-540-68552-4_24}
+	  }La tesis utiliza OSRM. La pregunta académica clave es: ¿Por qué OSRM es adecuado para esta simulación dinámica? La respuesta es su velocidad, y esa velocidad proviene de un algoritmo específico.
+
+Fuente Clave a Agregar (Obligatoria): Geisberger, R., Sanders, P., Schultes, D., & Delling, D. (2008). "Contraction Hierarchies: Faster and Simpler Hierarchical Routing in Road Networks".   
+
+Análisis: OSRM (Open Source Routing Machine)  es una implementación del algoritmo de Contraction Hierarchies (CH). El artículo de Geisberger et al. (2008) es el trabajo seminal que introduce este algoritmo. CH es una técnica que pre-procesa la red de carreteras (el mapa de OSM) de forma jerárquica, añadiendo "atajos".   
+
+Implicación (El Insight de Viabilidad): Este pre-procesamiento permite que las consultas de ruta (encontrar el camino más corto) sean más rápidas en órdenes de magnitud que el algoritmo de Dijkstra estándar. Una simulación de Rolling Horizon requiere recalcular rutas repetidamente (potencialmente una matriz de distancias completa) en cada "ola" de despacho. Si cada consulta de ruta tomara segundos (como con una API comercial o un Dijkstra simple), la simulación sería computacionalmente inviable. OSRM, usando CH, puede realizar estas consultas en milisegundos. Por lo tanto, Geisberger (2008) no es solo una cita; es la justificación teórica de viabilidad para todo el pipeline de OSRM en un contexto dinámico
+}
+	 
+%---- problemas de transporte de pasajeros----
+
+
+@article{Psaraftis1980,
+	author  = {Psaraftis, Harilaos N.},
+	title   = {A Dynamic Programming Approach for the Single‐Vehicle Many‐to‐Many Immediate‐Request Dial‐a‐Ride Problem},
+	journal = {Transportation Science},
+	year    = {1980},
+	volume  = {14},
+	number  = {2},
+	pages   = {130--154},
+	doi     = {10.1287/trsc.14.2.130}
+}Análisis: Este es el trabajo seminal en ruteo dinámico. Psaraftis fue el primero en abordar formalmente un problema donde las solicitudes de clientes (viajeros en el dial-a-ride) llegan en tiempo real y deben ser atendidas de inmediato. El MDRP es, en esencia, un DARP con características específicas (alimentos perecederos, tiempos de preparación en restaurantes). Las políticas de despacho que la tesis evalúa (FCFS vs. RH) son, de hecho, dos respuestas diferentes al problema fundamental planteado por Psaraftis: FCFS es una política de asignación "inmediata", mientras que RH es una política "anticipatoria" que planifica sobre un conjunto de solicitudes conocidas.   
+
+
+@article{Jaw1986,
+	author  = {Jaw, Jo‐Yang and Odoni, Amedeo R. and Psaraftis, H.~N. and Wilson, Nigel H.~M.},
+	title   = {A Heuristic Algorithm for the Multi‐Vehicle Dial‐a‐Ride Problem},
+	journal = {Transportation Research Part B},
+	year    = {1986},
+	volume  = {20},
+	number  = {3},
+	pages   = {243--257},
+	doi     = {10.1016/0191-2615(86)90019-6}
+}
+
+@article{Cordeau2003DARP,
+	author  = {Cordeau, Jean‐François and Laporte, Gilbert},
+	title   = {The Dial‐a‐Ride Problem: Models and Algorithms},
+	journal = {Annals of Operations Research},
+	year    = {2003},
+	volume  = {153},
+	pages   = {29--46},
+	doi     = {10.1023/A:1025108001217}
+}
+
+
+@article{Larsen2000DVRP,
+	author  = {Larsen, Jesper},
+	title   = {The Dynamic Vehicle Routing Problem: Survey of Classifications},
+	journal = {Computers \& Operations Research},
+	year    = {2000},
+	volume  = {27},
+	number  = {10},
+	pages   = {103--122},
+	doi     = {10.1016/S0305-0548(99)00100-X}
+}
+@article{Ichoua2006DDARP,
+	author  = {Ichoua, Soumia and Gendreau, Michel and Potvin, Jean‐Yves},
+	title   = {Exploiting Knowledge about Future Demands for Real‐Time Vehicle Dispatching},
+	journal = {Transportation Science},
+	year    = {2006},
+	volume  = {40},
+	number  = {2},
+	pages   = {211--225},
+	doi     = {10.1287/trsc.1050.0111}
+}
+
+@inproceedings{Wu2023LaDe,
+	author    = {Wu, Lin and Wen, Haotian and Hu, Hai and Wang, Yong and Li, Yiran and Wang, Jian and Ye, Jieping and Zhang, Haoyu and Xu, Meng},
+	title     = {LaDe: The First Comprehensive Last-mile Delivery Dataset from Industry},
+	booktitle = {Proceedings of the 32nd ACM International Conference on Information and Knowledge Management (CIKM '23)},
+	year      = {2023},
+	pages     = {2619–2628},
+	doi       = {10.1145/3583780.3614820}
+}
+
+Adición Crítica: 
+Estrategias de Agrupación (Order Batching/Bundling)
+Dado que el batching es un componente metodológico esencial del RH, el marco teórico y la metodología (Capítulo 7) deben incluir una sección sobre este tema.
+•	Fuentes Clave a Agregar:
+•	Zhou, L., Ye, A., & Hu, S. (2022). "A Four-stage Heuristic Algorithm for Solving On-demand Meal Delivery Routing Problem". Esta es una adición crítica. Su algoritmo heurístico de cuatro etapas para el MDRP explícitamente "primero genera bundles (grupos) según la distribución espacial y temporal de los pedidos". Esto proporciona un precedente directo para la implementación de la tesis.   
+•	Literatura de soporte: Otros trabajos confirman la importancia del batching. Deonde (2024) define el batching como la agrupación de pedidos geográficamente cercanos o con ventanas de tiempo similares para minimizar el tiempo de viaje. Chen and Hu (2020)  y Ulmer et al. (2021)  demuestran que entregar múltiples pedidos por viaje (es decir, batching) es beneficioso y fundamental para la eficiencia.   
+
+El Baseline: First-Come-First-Served (FCFS)
+La elección de FCFS como política de baseline (línea de base) es excelente. Es simple, intuitiva y ampliamente utilizada en la práctica. Sin embargo, su validez académica puede reforzarse.
+•	Fuente Clave (Validación): Asadi, A., et al. (2025). "Optimizing On-Demand Food Delivery Using a Multi-step Decision-Making Approach Incorporating Deep Reinforcement Learning".   
+•	Análisis: Este artículo de 2025 se sitúa en la frontera absoluta del conocimiento (usando Aprendizaje por Refuerzo Profundo, DRL). De manera crucial, para evaluar su agente de RL avanzado, los autores lo comparan contra "múltiples políticas de benchmark estáticas", incluyendo explícitamente First-Come-First-Served (FCFS).   
+•	Implicación: Esto proporciona una justificación poderosa para la defensa de la tesis. El baseline (FCFS) seleccionado no es simplemente una heurística ingenua; es el estándar aceptado por la academia contra el cual se miden incluso los enfoques de IA más avanzados. Esto valida rigurosamente el diseño experimental de la tesis.
+
+
+Reemplazo de OSMWiki2025: La Justificación de la Reproducibilidad
+La tesis utiliza OSM. La pregunta académica es: ¿Por qué OSM es una fuente de datos válida para la investigación?
+•	Fuente Clave a Agregar: Giraud, T. (2022). "osrm: Interface Between R and the OpenStreetMap-Based Routing Service OSRM".   
+•	Análisis: Aunque este artículo describe un paquete de R, su sección "Statement of need" (Declaración de necesidad) proporciona la justificación académica perfecta. Argumenta que la mayoría de los motores de ruteo son comerciales, limitan las solicitudes o restringen el uso de datos.   
+•	Implicación: Giraud (2022) establece explícitamente que la combinación de OSRM (software de código abierto) y OSM (datos de código abierto) "ofrece un alto nivel de transparencia" que es "útil para los trabajos de investigación que apuntan a la reproducibilidad". Esto se alinea directamente con uno de los problemas centrales identificados en el Capítulo 2 de la tesis: la "Falta de pipelines reproducibles".   
+
+
+Justificación del Estudio de Caso (La Paz, B.C.S.)
+El uso de datos de OSM para un contexto geográfico específico (La Paz) es una contribución válida. La literatura respalda este enfoque de estudio de caso.
+•	Fuentes Clave a Agregar: Se deben citar otros estudios de VRP que utilicen OSM para contextos del mundo real:
+•	Un estudio de caso sobre la optimización de rutas para trabajadores de la salud en Madagascar, que aplica algoritmos VRP a datos de OSM.   
+•	El sistema "RouteIQ" (2025), que utiliza OSRM y OSM para la optimización de rutas logísticas del mundo real.   
+•	Tutoriales prácticos que demuestran la solución del VRP usando OSRM/OSM y herramientas de optimización.   
+•	Implicación: Estas citas demuestran que el enfoque de la tesis (aplicar métodos de VRP a datos de OSM de un área específica) es una metodología de investigación establecida. La novedad radica en aplicar esta metodología al MDRP en un contexto no estudiado (La Paz), cuyos resultados diferirán de los benchmarks estándar (ej. Manhattan) debido a la topología única de la red vial.
+
+
+V. La Frontera de la Investigación: Contextualizando su Contribución
+El anteproyecto menciona brevemente el Aprendizaje por Refuerzo (RL) como una visión a futuro. Esta es una intuición excelente y debe ser la conclusión estratégica de la tesis. El trabajo realizado (FCFS vs. RH) establece la línea de base y el valor de la optimización que los enfoques de RL intentan automatizar.
+La Jerarquía de Políticas
+La tesis puede enmarcarse en una narrativa de complejidad creciente de políticas de despacho:
+1.	FCFS (Línea de Base): Una política reactiva y miope. Asigna los pedidos a medida que llegan, sin optimización.   
+2.	Rolling Horizon (Metodología de la Tesis): Una política proactiva y miope. Es "proactiva" porque optimiza un batch de pedidos , pero "miope" porque optimiza perfectamente solo para el futuro conocido (los pedidos en el batch actual), ignorando el futuro desconocido (pedidos que llegarán después).   
+3.	Reinforcement Learning (Estado del Arte): Una política estocástica y anticipatoria. Intenta aprender el valor de las decisiones actuales (ej. "posponer" un pedido) basándose en cómo afectarán al sistema en el futuro, incluso sin información perfecta.   
+El Estado del Arte (2022-2025)
+La investigación más reciente en MDRP se centra en el RL para gestionar esta incertidumbre.
+•	Fuentes Clave del Estado del Arte:
+•	Asadi et al. (2025) : Formula el problema de despacho como un Proceso de Decisión de Markov (MDP) y utiliza un agente de RL (PPO) para decidir dinámicamente cuántos pedidos asignar en cada paso, superando a las políticas estáticas como FCFS.   
+•	Bozanta et al. (2022) : Utiliza RL para la asignación y ruteo de repartidores en el servicio de entrega de comidas.   
+•	Paper de Meituan (2025) : Un influyente artículo de la plataforma de entrega china Meituan. Utiliza RL (SARSA) para el despacho de pedidos y demuestra una reducción de costos del 12%, destacando el valor de la postergación estratégica de pedidos (una decisión que un RH simple no puede tomar).   
+Implicación Estratégica
+La tesis debe concluir afirmando que no solo ha cuantificado el valor de la optimización proactiva (RH) sobre la reactiva (FCFS) en un entorno realista (La Paz), sino que también ha construido y validado un pipeline de simulación de alta fidelidad. Este pipeline (OSRM + OSM + Docker + Simulador) puede servir ahora como un entorno de simulación (un "gimnasio" de OpenAI) para entrenar, probar y evaluar las políticas de RL de próxima generación, como las descritas en Asadi (2025) y Meituan (2025). Esto le da al trabajo una conclusión poderosa y una clara vía de investigación futura.
+
+VII. Conclusiones Estratégicas para su Defensa de Tesis
+Al adoptar esta estrategia bibliográfica, la tesis puede presentar una narrativa coherente y poderosa:
+•	La Narrativa Coherente: "Mi tesis aborda el MDRP (definido por Reyes 2018) implementando una política de optimización estándar (Rolling Horizon, que incluye batching como en Zhou 2022) y comparándola con el baseline aceptado por la industria y la academia (FCFS), validado por la literatura de RL más reciente (como Asadi 2025)."
+•	La Contribución de Ingeniería como Ciencia: "Mi contribución clave es un pipeline de simulación de código abierto y reproducible. A diferencia de trabajos anteriores que dependen de APIs comerciales (cajas negras) o redes irreales (Euclideanas), mi trabajo utiliza OSRM (basado en el algoritmo Geisberger 2008) y datos de OSM (validados para investigación reproducible por Giraud 2022) para evaluar estas políticas en la red vial real de La Paz, B.C.S."
+•	El Futuro: "El pipeline que he construido no solo responde a mi pregunta de investigación (cuantificando el beneficio de RH sobre FCFS), sino que también sirve como un entorno de simulación validado para trabajos futuros, específicamente para el desarrollo y prueba de políticas de despacho basadas en Aprendizaje por Refuerzo (RL)."
