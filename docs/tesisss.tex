@@ -102,17 +102,79 @@
 	\mainmatter
 	
 	\chapter{Antecedentes}
+
 	\section{De TSP a VRP}
+	El Problema del Vendedor Viajero (TSP, por sus siglas en inglés) es uno de los problemas de 
+	optimización combinatoria más estudiados y fundamentales en la investigación de operaciones. 
+	En su forma más simple, el problema busca determinar el recorrido más corto posible que visita 
+	un conjunto de ciudades exactamente una vez, comenzando y terminando en la misma ciudad. 
+	
+	A pesar de su sencilla definición, el TSP es NP-duro, lo que significa que el tiempo requerido 
+	para encontrar una solución óptima crece exponencialmente con el número de ciudades, haciendo 
+	que las instancias de gran tamaño sean computacionalmente intratables para métodos exactos \citep{Laporte1992}.
+
+	El TSP sirve como pilar para una clase más amplia y práctica de problemas de logística: 
+	el Problema de Enrutamiento de Vehículos (VRP). La transición conceptual del TSP al VRP o
+	currió con el trabajo seminal de \citet{Dantzig1959}, quienes formularon "The Truck Dispatching 
+	Problem". Este trabajo generalizó el TSP al considerar una flota de vehículos con capacidad 
+	limitada, con el objetivo de servir a un conjunto de clientes desde un depósito central. 
+	Esta generalización marcó el nacimiento del VRP, que busca minimizar el costo total de las 
+	rutas (usualmente en términos de distancia o tiempo) para una flota de vehículos que atiende 
+	a un conjunto de clientes con demandas conocidas.
+
+	Al igual que el TSP, el VRP es NP-duro \citep{Lenstra1981}, pero su estructura es significativamente
+	 más rica y compleja. La complejidad no solo reside en encontrar las secuencias óptimas de visitas 
+	 (como en el TSP), sino también en asignar clientes a vehículos y rutas de manera eficiente. A lo 
+	 largo de cinco décadas, el VRP ha evolucionado para incorporar una gran variedad de restricciones 
+	 del mundo real, dando lugar a los llamados "Rich VRPs" \citep{Toth2014RichVRP}. Estas extensiones 
+	 incluyen, entre otras:
+
+	\begin{itemize}
+		\item \textbf{Capacidades de los vehículos (CVRP)}: Donde cada vehículo tiene una capacidad 
+		máxima de carga que no puede ser excedida. En el contexto de entrega de comida, esta restricción
+		 es fundamental: cada courier tiene una capacidad limitada por la capacidad térmica de sus 
+		 contenedores o mochilas de entrega. El CVRP introduce la decisión adicional de no solo 
+		 \textit{dónde ir}, sino también \textit{cuánto llevar}, lo que aumenta significativamente 
+		 la complejidad computacional del problema. Este componente es esencial en el MDRP, donde la 
+		 capacidad de los couriers debe ser considerada para asegurar que las órdenes empaquetadas no 
+		 excedan la capacidad de transporte disponible.
+		
+		\item \textbf{Ventanas de tiempo (VRPTW)}: Donde cada cliente debe ser atendido dentro de un 
+		intervalo de tiempo específico. Esta restricción es particularmente crítica en entrega de 
+		comida, donde los clientes esperan recibir sus órdenes dentro de un SLA (Service Level 
+		Agreement) específico. Las ventanas de tiempo añaden complejidad porque no solo se optimiza 
+		la distancia de las rutas, sino también el tiempo, considerando que los vehículos pueden llegar 
+		temprano y deben esperar, o llegar tarde y incurrir en penalizaciones. El VRPTW es la base 
+		conceptual para entender cómo el MDRP maneja los compromisos de entrega con tiempo de preparación
+		 en restaurantes y tiempo de entrega en domicilios.
+		
+		\item \textbf{Múltiples depósitos (MDVRP)}: Donde los vehículos pueden iniciar y terminar sus rutas
+		 desde diferentes ubicaciones. En sistemas de entrega de comida como LaDe o Grubhub, los couriers 
+		 no siempre comienzan desde un único depósito central; en su lugar, pueden reunirse en múltiples 
+		 puntos de recogida o restaurantes. El MDVRP permite modelar esta heterogeneidad geográfica, lo 
+		 que es especialmente relevante en ciudades medianas como La Paz, donde la distribución de 
+		 restaurantes no es uniforme y los couriers pueden iniciar sus jornadas en diferentes zonas urbanas.
+	\end{itemize}
+
+	Más allá de estas extensiones fundamentales, la literatura identificada en \citet{Laporte2009VRPSurvey} documenta otras variantes relevantes, como problemas con pickup y delivery (recogida y entrega en diferentes ubicaciones), problemas con splits de demanda (dividir la demanda de un cliente entre múltiples vehículos) y problemas con tiempos de servicio variables. Cada una de estas extensiones añade dimensiones de realismo operacional, pero también incrementa exponencialmente la dificultad de encontrar soluciones óptimas.
+
+	La progresión desde el VRP clásico hacia variantes más complejas establece el contexto para entender el Problema de Enrutamiento de Entrega de Comida (MDRP). El MDRP no es simplemente una combinación de estas restricciones estáticas; es un problema fundamentalmente \textit{dinámico} en el que nuevas órdenes arriban continuamente durante el día operativo, requiriendo que las decisiones de ruteo se reoptimicen periódicamente. Este cambio de paradigma de problemas estáticos a dinámicos, junto con la necesidad de considerar redes viales reales (en lugar de distancias euclidianas), sitúa la motivación y relevancia del presente trabajo.
+	
 	\subsection{TSP: formulación y complejidad} % Lawler1985, Laporte1992
-	\subsection{VRP clásico y variantes ricas} % Dantzig1959, Toth2014RichVRP, Laporte2009VRPSurvey
+	\subsection{VRP clásico y extensiones con restricciones } % Dantzig1959, Toth2014RichVRP, Laporte2009VRPSurvey
+	
 	\section{Última milla y contexto urbano} % Jazemi2023
-    \section{Ruteo dinámico: DVRP y DARP} % Larsen2000DVRP, Psaraftis1980, Cordeau2003DARP
+    
+	\section{Ruteo dinámico: DVRP y DARP} % Larsen2000DVRP, Psaraftis1980, Cordeau2003DARP
+	
 	\section{MDRP y políticas de despacho} % Reyes2018
 	\subsection{FCFS (baseline) vs Rolling Horizon (RH)} % idea general y motivación
 	\subsection{Conocimiento futuro y decisiones en tiempo real} % Ichoua2006DDARP
+	
 	\section{Ruteo realista en redes viales}
 	\subsection{OpenStreetMap (OSM): datos abiertos} % OSMWiki2025
 	\subsection{OSRM: consultas rápidas y CH} % OSRMWiki2025, Geisberger2008
+	
 	\section{Brecha de reproducibilidad y motivación del pipeline}
 	
 	
