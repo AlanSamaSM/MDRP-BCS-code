@@ -129,6 +129,8 @@
 	 del mundo real, dando lugar a los llamados "Rich VRPs" \citep{Toth2014RichVRP}. Estas extensiones 
 	 incluyen, entre otras:
 
+	\subsection{VRP clásico y extensiones con restricciones } % Dantzig1959, Toth2014RichVRP, Laporte2009VRPSurvey
+
 	\begin{itemize}
 		\item \textbf{Capacidades de los vehículos (CVRP)}: Donde cada vehículo tiene una capacidad 
 		máxima de carga que no puede ser excedida. En el contexto de entrega de comida, esta restricción
@@ -156,15 +158,67 @@
 		 restaurantes no es uniforme y los couriers pueden iniciar sus jornadas en diferentes zonas urbanas.
 	\end{itemize}
 
-	Más allá de estas extensiones fundamentales, la literatura identificada en \citet{Laporte2009VRPSurvey} documenta otras variantes relevantes, como problemas con pickup y delivery (recogida y entrega en diferentes ubicaciones), problemas con splits de demanda (dividir la demanda de un cliente entre múltiples vehículos) y problemas con tiempos de servicio variables. Cada una de estas extensiones añade dimensiones de realismo operacional, pero también incrementa exponencialmente la dificultad de encontrar soluciones óptimas.
+	Más allá de estas extensiones fundamentales, la literatura identificada en \citet{Laporte2009VRPSurvey} 
+	documenta otras variantes relevantes, como problemas con pickup y delivery (recogida y entrega en diferentes 
+	ubicaciones), problemas con splits de demanda (dividir la demanda de un cliente entre múltiples vehículos) y 
+	problemas con tiempos de servicio variables. Cada una de estas extensiones añade dimensiones de realismo 
+	operacional, pero también incrementa exponencialmente la dificultad de encontrar soluciones óptimas.
 
-	La progresión desde el VRP clásico hacia variantes más complejas establece el contexto para entender el Problema de Enrutamiento de Entrega de Comida (MDRP). El MDRP no es simplemente una combinación de estas restricciones estáticas; es un problema fundamentalmente \textit{dinámico} en el que nuevas órdenes arriban continuamente durante el día operativo, requiriendo que las decisiones de ruteo se reoptimicen periódicamente. Este cambio de paradigma de problemas estáticos a dinámicos, junto con la necesidad de considerar redes viales reales (en lugar de distancias euclidianas), sitúa la motivación y relevancia del presente trabajo.
+	La progresión desde el VRP clásico hacia variantes más complejas establece el contexto para entender el 
+	Problema de Enrutamiento de Entrega de Comida (MDRP). El MDRP no es simplemente una combinación de estas 
+	restricciones estáticas; es un problema fundamentalmente \textit{dinámico} en el que nuevas órdenes arriban 
+	continuamente durante el día operativo, requiriendo que las decisiones de ruteo se reoptimicen periódicamente. 
+	Este cambio de paradigma de problemas estáticos a dinámicos, junto con la necesidad de considerar redes viales 
+	reales (en lugar de distancias euclidianas), sitúa la motivación y relevancia del presente trabajo.
 	
-	\subsection{TSP: formulación y complejidad} % Lawler1985, Laporte1992
-	\subsection{VRP clásico y extensiones con restricciones } % Dantzig1959, Toth2014RichVRP, Laporte2009VRPSurvey
 	
 	\section{Última milla y contexto urbano} % Jazemi2023
-    
+	
+	La última milla de entrega---el segmento final desde un centro de distribución o 
+	punto de recogida hasta el domicilio del cliente---representa el componente más 
+	costoso, complejo y crítico en logística urbana. Jazemi et al. (2023) documentan 
+	que la última milla puede representar entre el 30\% y el 60\% del costo total de 
+	una operación de envío, dependiendo de la densidad urbana, la dispersión geográfica 
+	de clientes y la volatilidad de la demanda \cite{Jazemi2023}.
+	
+	En el contexto de entrega de comida rápida, la última milla presenta desafíos 
+	específicos adicionales: (1) urgencia extrema---los clientes esperan entregas 
+	en ventanas de 30-60 minutos desde la orden, significativamente más restrictivas 
+	que en logística general; (2) perecedibilidad---la comida debe mantener 
+	temperatura, frescura y presentación, implicando rutas directas sin desviaciones 
+	innecesarias; (3) demanda dinámica y bursátil---los flujos de órdenes no son 
+	uniformes sino que presentan picos pronunciados (horas de almuerzo, cena), 
+	requiriendo reoptimización continua de asignaciones; (4) topografía urbana 
+	compleja---en ciudades medianas como La Paz, la infraestructura vial no es 
+	euclidiana sino que sigue topografía accidentada, con limitaciones de acceso 
+	y congestión variable por hora.
+	
+	Estas características transforman la última milla de comida en un problema 
+	distinto del VRP clásico: es inherentemente dinámico, con ventanas de tiempo 
+	estrictas, demanda estocástica y requisitos de precisión geográfica. La 
+	literatura de ruteo dinámico ha abordado subcomponentes de este problema. 
+	Psaraftis (1980) planteó el primer modelo formal de un problema dinámico de 
+	asignación (dial-a-ride), donde solicitudes llegan en tiempo real y deben 
+	atenderse con políticas de despacho inmediato \cite{Psaraftis1980}. 
+	Cordeau y Laporte (2003) extendieron este trabajo formalizando el Dial-a-Ride 
+	Problem (DARP) y sus heurísticas asociadas, incluyendo estrategias de agrupación 
+	temporal de solicitudes \cite{Cordeau2003DARP}. Sin embargo, estos trabajos se 
+	enfocaban en transporte de pasajeros (donde los tiempos de servicio y las 
+	restricciones de acceso eran críticos) en lugar de bienes.
+	
+	Larsen (2000) y Ichoua et al. (2006) avanzaron la teoría al estudiar cómo las 
+	políticas de despacho pueden explotar información futura (predicciones de demanda 
+	próxima) en lugar de decisiones puramente miopes. Ichoua et al. (2006) demostraron 
+	específicamente que una política anticipatoria que conoce las solicitudes futuras 
+	en un horizonte de 30 minutos puede mejorar significativamente sobre FCFS 
+	\cite{Ichoua2006DDARP}. Este es el germen conceptual del Rolling Horizon de 
+	Reyes et al. (2018): en lugar de asignar órdenes inmediatamente al courier más 
+	cercano (FCFS), el sistema espera un período definido (horizonte), acumula 
+	solicitudes, resuelve un problema de agrupación y asignación, y luego ejecuta 
+	la primera etapa de la solución optimizada. Este enfoque es particularmente 
+	adecuado para entrega de comida, donde los tiempos de preparación del restaurante 
+	crean naturalmente un "buffer" temporal que permite la reoptimización sin 
+	comprometer SLAs.
 	\section{Ruteo dinámico: DVRP y DARP} % Larsen2000DVRP, Psaraftis1980, Cordeau2003DARP
 	
 	\section{MDRP y políticas de despacho} % Reyes2018
