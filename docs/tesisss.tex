@@ -219,15 +219,376 @@
 	adecuado para entrega de comida, donde los tiempos de preparación del restaurante 
 	crean naturalmente un "buffer" temporal que permite la reoptimización sin 
 	comprometer SLAs.
-	\section{Ruteo dinámico: DVRP y DARP} % Larsen2000DVRP, Psaraftis1980, Cordeau2003DARP
+	\section{Ruteo dinámico: DVRP y DARP} % Larsen2000DVRP, Psaraftis1980, Cordeau2003DARP, Ichoua2006DDARP
+	
+	Mientras que el VRP clásico y sus extensiones (CVRP, VRPTW, MDVRP) asumen que todas las demandas de clientes 
+	son conocidas \textit{ex-ante} (antes de la ejecución), la realidad operacional de los sistemas de entrega 
+	urbana es fundamentalmente distinta: nuevas órdenes llegan continuamente durante el día, y las decisiones de 
+	despacho deben reoptimizarse en tiempo real. Este cambio de paradigma de lo \textit{estático} a lo \textit{dinámico} 
+	define una nueva clase de problemas de ruteo que requieren políticas de despacho adaptativas.
+	
+	\subsection{DVRP: Definición y características fundamentales}
+	
+	Larsen (2000) proporciona la taxonomía fundamental del Problema de Ruteo de Vehículos Dinámico (DVRP), 
+	definiéndolo como una clase de problemas donde, en contraste con el VRP estático, ``nuevas solicitudes 
+	de clientes arriban en tiempo real durante la operación, y el conjunto de clientes a atender no es conocido 
+	completamente en el inicio'' \cite{Larsen2000DVRP}. Formalmente, el DVRP se caracteriza por:
+	
+	\begin{itemize}
+		\item \textbf{Llegada estocástica de solicitudes}: Las órdenes no existe como conjunto fijo, sino que 
+		arriban según un proceso estocástico (típicamente Poisson en modelado académico, pero con patrones 
+		burátiles reales en sistemas operacionales reales).
+		
+		\item \textbf{Reoptimización periódica}: El plan de ruteo no es estático sino que debe recalcularse 
+		continuamente. Las decisiones previas (couriers ya en ruta) no pueden revertirse completamente, pero 
+		las nuevas decisiones pueden considerar órdenes recién llegadas.
+		
+		\item \textbf{Incertidumbre temporal}: No solo la demanda es incierta, sino también los tiempos de 
+		viaje pueden variar por congestión u otros factores, lo que crea desviaciones entre el plan y la ejecución.
+		
+		\item \textbf{Tradeoff decisión-información}: Cada política de despacho enfrenta un dilema: decidir 
+		inmediatamente (riesgo de decisiones subóptimas) vs. esperar más información (riesgo de incumplir SLAs).
+	\end{itemize}
+	
+	Esta caracterización es central para entender la última milla de entrega urbana: cada vez que un cliente 
+	coloca una orden en una aplicación (Grubhub, Uber Eats, LaDe), el sistema de despacho enfrenta una decisión 
+	urgente: asignar esa orden a un courier para que sea recogida y entregada. La decisión no puede posponerse 
+	indefinidamente (los clientes esperan entregas en 30-60 minutos), pero tampoco puede hacerse de forma 
+	completamente miope sin consideración del contexto futuro.
+	
+	\subsection{DARP: Del transporte de pasajeros a la entrega de bienes}
+	
+	Un problema históricamente relacionado pero conceptualmente distinto es el Dial-a-Ride Problem (DARP). 
+	Las raíces del DARP se encuentran en Psaraftis (1980), quien formuló el primer modelo dinámico de 
+	dial-a-ride: en sistemas de transporte compartido (típicamente para pasajeros), usuarios solicitan 
+	recogida en una ubicación y entrega en otra ubicación diferente, y ambas solicitudes llegan en tiempo 
+	real. Psaraftis (1980) abordó la pregunta central: ¿cómo asignar dinámicamente los pasajeros a vehículos 
+	y secuenciar sus viajes de forma óptima bajo políticas de despacho inmediato? \cite{Psaraftis1980}
+	
+	Cordeau y Laporte (2003) extendieron significativamente este trabajo, formalizando matemáticamente el 
+	Dial-a-Ride Problem y desarrollando heurísticas de solución prácticas \cite{Cordeau2003DARP}. Su 
+	contribución fue crítica para la investigación en ruteo dinámico. Definieron explícitamente las 
+	restricciones estructurales del DARP:
+	
+	\begin{itemize}
+		\item \textbf{Restricción de capacidad}: Cada vehículo tiene límite de pasajeros simultáneos.
+		
+		\item \textbf{Restricción de secuencia temporal}: Un pasajero debe ser recogido antes de ser entregado, 
+		con límite temporal máximo entre recogida y entrega (típicamente 90 minutos para servicio de paratránsito).
+		
+		\item \textbf{Ventanas de tiempo}: Tanto recogida como entrega pueden tener ventanas horarias de disponibilidad.
+		
+		\item \textbf{Criterios de optimización}: Minimización de distancia total o tiempo total de espera, 
+		frecuentemente con penalizaciones por incumplimiento de compromisos de tiempo.
+	\end{itemize}
+	
+	Aunque el DARP fue originalmente formulado para transporte de pasajeros, su estructura conceptual es 
+	directamente transferible a problemas de entrega de bienes. De hecho, la semántica es casi idéntica: 
+	en lugar de ``recoger un pasajero en ubicación A y entregar en ubicación B'', se tiene ``recoger una 
+	orden en restaurante A y entregar en domicilio B''. Sin embargo, existen diferencias operacionales críticas:
+	
+	\begin{itemize}
+		\item En transporte de pasajeros, la restricción de secuencia es rígida (recogida antes de entrega), 
+		mientras que en entrega de comida existe más flexibilidad: múltiples órdenes de diferentes restaurantes 
+		pueden incluirse en una sola ruta.
+		
+		\item En transporte de pasajeros, el tiempo entre recogida y entrega es determinístico (depende de la 
+		ruta), mientras que en comida existe heterogeneidad: tiempo de preparación varía por restaurante, 
+		impactando cuando la orden está disponible para recogida.
+		
+		\item En transporte de pasajeros, la experiencia del cliente es inmediata (espera observable), mientras 
+		que en comida, el cliente está dispuesto a esperar mientras el pedido se prepara, reduciendo la presión 
+		sobre latencia de decisión de despacho.
+	\end{itemize}
+	
+	\subsection{La pregunta de anticipación: Hacia el Rolling Horizon}
+	
+	A pesar de la diferencia entre DVRP y DARP, ambas clases de problemas comparten una pregunta fundamental: 
+	¿cuán ``dinámico'' debe ser realmente el sistema de despacho? ¿Deben las decisiones ser reacitvas (FCFS) 
+	o pueden ser anticipatorias?
+	
+	Ichoua et al. (2006) abordó directamente esta pregunta en el contexto de dial-a-ride dinámico. Comparó 
+	políticas de despacho que desconocen solicitudes futuras (puramente miopes) contra políticas que tienen 
+	acceso a información sobre solicitudes que llegarán en los próximos 20-30 minutos. Su hallazgo fue 
+	significativo: políticas anticipatorias mejoraron de 20-30\% sobre políticas reactivas, sin necesidad 
+	de información perfecta sobre el futuro distante \cite{Ichoua2006DDARP}.
+	
+	Este es el germen intelectual que conecta DVRP/DARP con el concepto de horizonte rodante (rolling horizon): 
+	en lugar de una asignación inmediata (FCFS), el sistema puede esperar un breve período (el horizonte $\Delta$, 
+	típicamente 10-30 minutos), acumular un lote de solicitudes cuyo arribo es conocido con certeza relativa, 
+	optimizar globalmente ese lote resolviendo un VRP estático (el ``matching'' óptimo), y luego ejecutar la 
+	primera etapa de esa solución optimizada. En la siguiente época, repite el proceso.
+	
+	Para entrega de comida, esta estrategia es particularmente adecuada porque los tiempos de preparación 
+	del restaurante crean naturalmente un ``buffer'' temporal. Aunque una orden es formalmente asignada a 
+	un courier en $t$, el courier no puede recogerla hasta que esté lista (típicamente 5-15 minutos después). 
+	Este tiempo de espera puede absorberse en el horizonte de reoptimización sin comprometer los compromisos 
+	de tiempo con el cliente. Es decir, el horizonte rodante no es un costo adicional en términos de SLA, 
+	sino una oportunidad de optimización que explota ineficiencias latentes en políticas puramente miopes.
 	
 	\section{MDRP y políticas de despacho} % Reyes2018
-	\subsection{FCFS (baseline) vs Rolling Horizon (RH)} % idea general y motivación
-	\subsection{Conocimiento futuro y decisiones en tiempo real} % Ichoua2006DDARP
 	
-	\section{Ruteo realista en redes viales}
-	\subsection{OpenStreetMap (OSM): datos abiertos} % OSMWiki2025
-	\subsection{OSRM: consultas rápidas y CH} % OSRMWiki2025, Geisberger2008
+	El Problema de Enrutamiento de Entrega de Comida (MDRP) fue formalmente introducido por Reyes et al. (2018) 
+	como una nueva clase de problema de ruteo dinámico que, aunque comparte características fundamentales con 
+	DVRP y DARP, añade dimensiones específicas de la entrega de alimentos que lo distinguen conceptualmente y 
+	requieren políticas de despacho especializadas.
+	
+	\subsection{Características compartidas con DVRP y DARP}
+	
+	Como todo problema DVRP, el MDRP hereda la característica de dinamicidad: nuevas órdenes arriban 
+	continuamente en tiempo real, y el conjunto de demanda no es conocido \textit{ex-ante}. Como problema 
+	similar a DARP, el MDRP inherita la estructura de recogida-entrega: una orden debe ser recogida en un 
+	restaurante (fuente) y entregada en un domicilio (destino), con restricciones de ventanas de tiempo y 
+	capacidad de vehículos. Ambas características---dinamicidad y estructura pickup-delivery---crean el 
+	contexto operacional básico.
+	
+	Sin embargo, Reyes et al. (2018) demostraron que ni DVRP ni DARP capturan plenamente la realidad de 
+	la entrega de comida en línea. El MDRP fue definido para llenar esta brecha, formulando un problema que 
+	integra cinco características estructurales que no aparecen de forma acoplada en la literatura previa:
+	
+	\subsection{Características distintivas del MDRP}
+	
+	Primero, \textbf{múltiples depósitos heterogéneos (restaurantes)}: A diferencia del DVRP clásico, donde 
+	existe un depósito central único, o del MDVRP, donde hay múltiples depósitos pero los vehículos son 
+	homogéneos, en el MDRP cada restaurante actúa como un depósito independiente con su propia geografía, 
+	catálogo de productos y tiempos de preparación. Una orden debe ser recogida del restaurante específico 
+	que la prepara; no existe flexibilidad en esto. Además, los restaurantes no son pasivos: tienen su propia 
+	dinámica operacional (horarios de atención, capacidad de preparación limitada, congestión en cocina).
+	
+	Segundo, \textbf{tiempos de preparación heterogéneos y estocásticos}: Esta es una característica única y 
+	crítica del MDRP. Cuando un cliente coloca una orden en $t=0$, la orden no está inmediatamente disponible 
+	para recogida. El restaurante requiere un tiempo variable $p_r$ (tiempo de preparación) que depende del 
+	restaurante $r$, del tipo de comida ordenada, y del estado de congestión de la cocina. Este tiempo de 
+	preparación crea un ``buffer'' natural entre la decisión de despacho y la acción física de recogida. 
+	A diferencia del DARP, donde el tiempo entre recogida y entrega es impuesto por la ruta (y es determinístico 
+	dado el plan), en el MDRP el tiempo de preparación es exógeno al modelo de ruteo pero endógeno a la 
+	experiencia del cliente.
+	
+	Tercero, \textbf{demanda dinámica y estocástica con patrones predecibles}: Las órdenes en sistemas de 
+	comida en línea no arriban uniformemente sino que muestran patrones bursátiles pronunciados (picos en 
+	horas de almuerzo 12:00-14:00 y cena 19:00-21:00, valles en horarios no pico). Esta estructura es 
+	predecible pero estocástica: conocemos la distribución aproximada de llegadas por hora, pero la realización 
+	exacta es aleatoria. Esta característica es específicamente importante para políticas de horizonte rodante, 
+	que pueden explotar la predictibilidad local (``en los próximos 30 minutos, el flujo será alto'') sin 
+	requerir predicción perfecta a largo plazo.
+	
+	Cuarto, \textbf{ventanas de tiempo estrictas pero flexibles en estructura}: En el MDRP, los clientes 
+	esperan entregas dentro de un SLA bien definido, típicamente 30-60 minutos desde la colocación de la orden 
+	(Click-to-Door). Sin embargo, a diferencia del VRPTW clásico, donde la ventana es un intervalo rígido 
+	[a, b] con penalización por incumplimiento, en el MDRP la ventana es implícitamente estructurada: existe 
+	un período de preparación (durante el cual el cliente no espera activamente), un período de envío 
+	(durante el cual la expectativa de entrega es alta), y una latencia aceptable de espera en domicilio 
+	(típicamente 5-10 minutos). Esta estructura de múltiples fases es específica de comida.
+	
+	Quinto, \textbf{capacidades limitadas de couriers}: Aunque CVRP y DARP ya incluyen restricciones de 
+	capacidad, en el MDRP la capacidad es especialmente restrictiva por la naturaleza del producto (comida 
+	con requisito de temperatura) y la heterogeneidad de órdenes (tamaños muy variados: desde un café hasta 
+	una comida completa para grupo). Un courier puede portar 3-6 órdenes simultáneamente, según el tamaño. 
+	Esta restricción acoplada con múltiples restaurantes crea un problema de asignación más complejo: no solo 
+	se debe decidir qué orden llevar y en qué secuencia, sino también a cuál restaurante ir primero.
+	
+	\subsection{Formalización del problema de despacho}
+	
+	Dado estas características, Reyes et al. (2018) formularon el MDRP como un problema de despacho dinámico 
+	donde, en cada época de reoptimización (cada $\Delta$ minutos, típicamente 5-10 min), el sistema debe:
+	
+	\begin{enumerate}
+		\item Acumular el conjunto de órdenes aún no asignadas $O^t$
+		\item Determinar cuáles órdenes están lista para recogida (han superado el tiempo de preparación)
+		\item Asignar estas órdenes a couriers disponibles $C$, considerando:
+		\begin{itemize}
+			\item Ubicación actual de cada courier
+			\item Capacidad disponible del courier
+			\item Ventana de tiempo restante de cada orden (riesgo de incumplimiento SLA)
+			\item Multirrestaurante: un courier debe visitar múltiples restaurantes en una sola ruta
+		\end{itemize}
+		\item Secuenciar los pasos de recogida y entrega para minimizar tiempo total de ruta
+		\item Comprometerse a la primera etapa del plan (decision commitment) y desechar el resto
+	\end{enumerate}
+	
+	Esta formalización genera un problema de optimización de gran complejidad, que es NP-duro incluso para 
+	instancias medianas. Reyes et al. (2018) demostraron que una heurística de horizonte rodante 
+	(RH)---que resuelve el subproblema como VRP estático en cada época---produce mejoras sustanciales sobre 
+	políticas miopes como FCFS.
+	
+	\subsection{Comparación: FCFS versus Rolling Horizon}
+	
+	La política de \textbf{First-Come-First-Served (FCFS)} es el baseline operacional más simple. En FCFS, 
+	cuando una orden $o$ está lista para recogida (tiempo de preparación completado), el sistema identifica 
+	inmediatamente el courier más cercano al restaurante y le asigna la orden:
+	
+	\begin{equation}
+	c^* = \arg\min_{c \in C_{\text{available}}} d(c_{\text{loc}}, r_o)
+	\end{equation}
+	
+	La complejidad es $O(n)$ donde $n$ es el número de couriers. FCFS es miope: no considera que esperar un 
+	breve período podría permitir que órdenes futuras se agrupen con la actual, reduciendo viajes redundantes. 
+	Como resultado, FCFS genera rutas subóptimas: entregas a múltiples domicilios desde un único restaurante 
+	requieren viajes separados, y el sistema pierde oportunidades de consolidación.
+	
+	La política de \textbf{Rolling Horizon (RH)} implementa una estrategia anticipatoria. En lugar de asignar 
+	órdenes inmediatamente, el sistema espera un horizonte $\Delta$ (típicamente 10-30 minutos), durante el cual 
+	acumula todas las órdenes listas y pendientes, resuelve un VRP estático sobre este conjunto, y ejecuta la 
+	primera etapa. La optimización en cada época es:
+	
+	\begin{equation}
+	\min \sum_{c \in C} \text{costo}(\text{ruta}_c) + \sum_{o \in O^t} \text{penalización}(o)
+	\end{equation}
+	
+	donde $\text{costo}(\text{ruta}_c)$ incluye distancia total, y $\text{penalización}(o)$ es un costo para 
+	órdenes no asignadas (reflejando el riesgo SLA). El problema es NP-duro, pero instancias de 5-20 órdenes 
+	y 15-60 couriers pueden resolverse en segundos mediante heurísticas (Lin-Kernighan, metaheurísticas, etc.).
+	
+	El beneficio de RH proviene del bundling (agrupación): órdenes geográficamente cercanas se asignan a un 
+	único courier en una sola ruta, reduciendo distancia total de viaje y aumentando utilización de capacidad. 
+	Reyes et al. (2018) demostraron experimentalmente que RH logra mejoras de aproximadamente 99\% en 
+	órdenes/courier-hora comparado con FCFS (aumentando de ~20 a ~40 órdenes servidas por courier por hora) 
+	\cite{Reyes2018}, con todo ello manteniendo cumplimiento de SLA en > 95\%.
+	
+	\subsection{Naturaleza anticipatoria del horizonte rodante}
+	
+	¿Por qué funciona mejor RH que FCFS? Ichoua et al. (2006) proporcionan la justificación teórica: el 
+	valor de conocimiento sobre el futuro cercano. En su estudio de dial-a-ride dinámico, demostraron que 
+	políticas que conocen solicitudes futuras en un horizonte de 20-30 minutos mejoran de 20-30\% sobre 
+	políticas puramente reactivas \cite{Ichoua2006DDARP}. El mecanismo es la anticipación: el sistema puede 
+	retrasar estratégicamente decisiones, esperando información que mejore la calidad de decisiones futuras.
+	
+	Para entrega de comida, existe un factor adicional que vuelve esta anticipación prácticamente ``gratuita'' 
+	en términos de experiencia del cliente: los tiempos de preparación del restaurante. Cuando una orden es 
+	colocada en $t=0$, está disponible para recogida en $t=p$ (tiempo de preparación). El horizonte de 
+	reoptimización $\Delta$ (típicamente 15-30 minutos) puede ocurrir enteramente dentro del período de espera, 
+	sin que el courier sea enviado prematuramente. Es decir, el RH no añade latencia perceptible al cliente; 
+	en su lugar, aprovecha eficientemente la latencia existente en la cadena de preparación.
+	
+	\section{Ruteo realista en redes viales} % Haklay2010, Geisberger2008, Figliozzi2007
+	
+	Todas las políticas de despacho discutidas anteriormente (FCFS, RH) dependen críticamente de una entrada 
+	fundamental: matrices de distancias o tiempos de viaje entre ubicaciones. Las decisiones de despacho son 
+	tan buenas como la información de red que las informa. Sin embargo, existe una tensión fundamental en 
+	logística académica: precisión versus disponibilidad.
+	
+	Sistemas comerciales como Google Maps, Mapbox y Here Maps proporcionan datos de red vial altamente precisos, 
+	actualizados continuamente con información de tráfico real y capas geográficas completas. Sin embargo, su 
+	costo operacional es prohibitivo: típicamente \$50-\$150 USD por día para consultas de ruteo a escala de 
+	simulación. Para microempresas urbanas de entrega de comida, este costo elimina cualquier viabilidad económica. 
+	Figliozzi (2007) documentó que esta tensión es real: distancias euclidianas (la aproximación más simple) 
+	subestiman tiempos reales de viaje en 30-50\% en redes urbanas complejas \cite{Figliozzi2007}.
+	
+	La pregunta de investigación que surge es: ¿existe una alternativa que balance precisión y disponibilidad 
+	económica? La respuesta viene de dos componentes que, combinadas, ofrecen una solución viable: datos abiertos 
+	(OpenStreetMap) e infraestructura de ruteo de código abierto (OSRM).
+	
+	\subsection{OpenStreetMap: Datos abiertos de cartografía urbana}
+	
+	OpenStreetMap (OSM) es un proyecto colaborativo de mapeo global iniciado en 2004 que captura la geometría 
+	de redes viales, límites administrativos, puntos de interés, y otros elementos geográficos, principalmente 
+	mediante contribución voluntaria. A diferencia de cartografía comercial (Google Maps, Mapbox) o estatal 
+	(catastros oficiales), OSM es un bien común digital: los datos son abiertos (licencia ODbL), reutilizables 
+	sin restricciones comerciales, y auditables por cualquiera \cite{Haklay2010}.
+	
+	Haklay y Weber (2010) realizaron el primer análisis comprehensivo de la calidad de OSM, comparándolo contra 
+	cartografía de referencia oficial en varios contextos urbanos \cite{Haklay2010}. Sus hallazgos fueron 
+	significativos: en áreas urbanas bien documentadas (típicamente ciudades en países desarrollados y en líneas 
+	de interés público), OSM alcanza una precisión horizontal (exactitud de posicionamiento) de 5-10 metros, 
+	comparable a datos comerciales. Más importante aún, el nivel de cobertura de la red vial en áreas urbanas 
+	es típicamente del 85-95\% en ciudades medianas desarrolladas, y ha mejorado consistentemente con el tiempo 
+	conforme crece la comunidad de mapeadores.
+	
+	Para contextos latinoamericanos y ciudades medianas, la cobertura de OSM ha mostrado mejora significativa 
+	en los últimos años. Aunque no alcanza la densidad de ciudades como Londres o Nueva York, ciudades medianas 
+	como La Paz han sido ampliamente mapeadas, particularmente en zonas urbanas donde la densidad de usuarios y 
+	mapeadores es mayor. El factor crítico es que OSM no es una instantánea estática: es una base de datos 
+	viva que se actualiza continuamente. Esto permite que trabajos de investigación que utilicen OSM sean 
+	reproducibles en múltiples contextos geográficos sin depender de acuerdos comerciales con proveedores de mapas.
+	
+	Las características clave de OSM relevantes para ruteo son:
+	
+	\begin{itemize}
+		\item \textbf{Geometría de red}: OSM captura la topología de la red vial como un grafo, donde nodos 
+		representan intersecciones y arcos representan segmentos de calle. Cada arco tiene atributos como nombre, 
+		tipo de vía (autopista, calle, callejón), y restricciones de circulación (sentido único, prohibiciones 
+		de acceso).
+				
+		\item \textbf{Metadatos de accesibilidad}: OSM registra restricciones de acceso (callejones sin salida, 
+		zonas peatonales, etc.) que afectan el ruteo. Esto es especialmente importante en entrega urbana donde 
+		ciertas rutas pueden estar prohibidas para vehículos de transporte comercial.
+		
+		\item \textbf{Escalabilidad temporal}: OSM permite trabajar con descargas históricas de datos, facilitando 
+		reproducibilidad exacta: un experimento de 2025 puede ser replicado exactamente con la versión de OSM de 
+		2025, sin depender de actualizaciones futuras que cambien resultados.
+	\end{itemize}
+	
+	\subsection{OSRM: Infraestructura de ruteo de código abierto basada en Contraction Hierarchies}
+	
+	Aunque OSM proporciona datos abiertos, la pregunta operacional permanece: ¿cómo calcular rutas óptimas 
+	eficientemente sobre esta red? Este es precisamente el problema que resuelve OSRM (Open Source Routing 
+	Machine), una herramienta de código abierto que implementa algoritmos avanzados de ruteo sobre datos de OSM.
+	
+	OSRM fue originalmente desarrollada por Dennis Luxen en 2010 como respuesta a la necesidad de consultas de 
+	ruteo rápidas, reproducibles y sin dependencias comerciales. La característica técnica que vuelve a OSRM 
+	viable para aplicaciones dinámicas es su implementación del algoritmo de Contraction Hierarchies (CH).
+	
+	Geisberger et al. (2008) introdujeron Contraction Hierarchies, un algoritmo de preprocesamiento jerárquico 
+	que acelera consultas de camino más corto (shortest path queries) en redes de carreteras en órdenes de 
+	magnitud \cite{Geisberger2008}. La idea es ingeniosamente simple: antes de responder consultas, el algoritmo 
+	preprocesa la red de carreteras de OSM, identificando y añadiendo ``atajos'' jerárquicos que reflejan 
+	estructuras naturales de la red (por ejemplo, autopistas que conectan rápidamente regiones distantes). Este 
+	preprocesamiento (ejecutado una sola vez) permite responder consultas de ruta en milisegundos, incluso para 
+	redes con millones de nodos.
+	
+	¿Por qué es esto crítico para MDRP? Una simulación de horizonte rodante requiere recalcular rutas 
+	repetidamente---potencialmente decenas o centenas de consultas en cada época de reoptimización. Si cada 
+	consulta tomara segundos (como en un algoritmo de Dijkstra simple o una API comercial con latencia de 
+	comunicación), la simulación sería computacionalmente inviable. OSRM, usando CH, realiza estas consultas 
+	en milisegundos, haciendo viable el pipeline completo.
+	
+	Formalmente, CH funciona en dos fases:
+	
+	\begin{enumerate}
+		\item \textbf{Preprocesamiento}: Dado una red de carreteras con $n$ nodos y $m$ arcos, CH identifica una 
+		ordenación jerárquica de nodos. Para cada nodo, se computan ``atajos'' que conectan sus vecinos, omitiendo 
+		el nodo intermedio. Esto se realiza iterativamente, contrayendo nodos (de menor importancia primero) y 
+		registrando los atajos generados.
+		
+		\item \textbf{Consulta}: Para encontrar el camino más corto entre dos nodos, el algoritmo ejecuta búsqueda 
+		bidireccional Dijkstra sobre la red aumentada (red original + atajos), deteniéndose cuando el punto de 
+		encuentro supera la distancia conocida. Los atajos garantizan que la búsqueda no explora la mayoría de la red.
+	\end{enumerate}
+	
+	El resultado empírico es dramático: en una red de carreteras de Europa (aproximadamente 18 millones de nodos), 
+	CH realiza consultas de distancia en aproximadamente 1-2 milisegundos, comparado con 100-500 milisegundos para 
+	Dijkstra simple, y segundos para APIs comerciales con latencia de comunicación.
+	
+	OSRM implementa CH junto con optimizaciones adicionales (caching, paralelización, compresión de datos) que lo 
+	hacen viable para aplicaciones del mundo real. Típicamente, OSRM se despliega como un servicio containerizado 
+	(Docker) que escucha consultas HTTP, preprocesa la red OSM una sola vez al inicio, y responde consultas en 
+	tiempo real.
+	
+	\subsection{Viabilidad del pipeline: OSM + OSRM para simulación reproducible}
+	
+	La combinación de OSM y OSRM crea una arquitectura que es simultáneamente precisa, rápida y reproducible:
+	
+	\begin{itemize}
+		\item \textbf{Precisión}: Utiliza geometría de red real (no distancias euclidianas), capturando topología 
+		y topografía urbana. Figliozzi (2007) demostró que esta precisión es crítica: errores en estimaciones de 
+		tiempo de viaje se propagan directamente a errores en SLA y utilización de recursos.
+		
+		\item \textbf{Velocidad}: CH permite consultas en milisegundos, habilitando reoptimización dinámica en 
+		simulaciones sin penalidad computacional.
+		
+		\item \textbf{Reproducibilidad}: Ambos componentes son abiertos (código fuente disponible), abiertos 
+		(datos auditables), y versionables (ambos tienen versiones explícitas). Un investigador en 2030 puede 
+		replicar exactamente un experimento de 2025 usando OSRM v5.26.0 y OSM snapshot de 2025.
+		
+		\item \textbf{Transferibilidad}: Funciona para cualquier región con cobertura OSM, permitiendo aplicación 
+		a contextos geográficos distintos de aquellos en benchmarks estándar (por ejemplo, Manhattan). Para ciudades 
+		medianas latinoamericanas, esto es particularmente relevante.
+	\end{itemize}
+	
+	Esta arquitectura contrasta agudamente con el status quo académico donde simulaciones MDRP utilizan distancias 
+	euclidianas o matrices sintéticas (sin validación a redes reales), y con la práctica comercial donde APIs 
+	propietarias generan dependencias que inhiben reproducibilidad. El pipeline OSM + OSRM + Docker ofrece una 
+	tercera vía: rigor académico con realismo operacional y reproducibilidad completa.
 	
 	\section{Brecha de reproducibilidad y motivación del pipeline}
 	
