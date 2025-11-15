@@ -590,7 +590,125 @@
 	propietarias generan dependencias que inhiben reproducibilidad. El pipeline OSM + OSRM + Docker ofrece una 
 	tercera vía: rigor académico con realismo operacional y reproducibilidad completa.
 	
-	\section{Brecha de reproducibilidad y motivación del pipeline}
+	\section{Brecha de reproducibilidad y motivación del pipeline} % Merkel2014, Pillac2013, Reyes2018
+	
+	La visión de un pipeline integrado de simulación MDRP usando OSM+OSRM+Docker no surge del vacío, sino que 
+	responde a brechas específicas en cómo la literatura contemporánea aborda el problema de validación de 
+	políticas dinámicas de despacho. Para contextualizar, es útil revisar brevemente el panorama de herramientas 
+	y aproximaciones disponibles.
+	
+	\subsection{Panorama de herramientas y simuladores: Estado del arte}
+	
+	Existen varias clases de soluciones para simular y evaluar políticas de ruteo:
+	
+	\textbf{(1) Plataformas comerciales de ruteo (Google Maps, Mapbox, Here Maps):} Proporcionan APIs que 
+	calculan rutas óptimas usando datos de red vial real, actualizados continuamente. Ventajas: precisión, 
+	integración con datos de tráfico real, interfaz estándar. Desventajas: costo prohibitivo (\$50-\$150/día 
+	para volúmenes de simulación), dependencia externa, no reproducible (resultados pueden variar entre versiones 
+	o regiones), imposible auditar algoritmos subyacentes.
+	
+	\textbf{(2) Simuladores académicos con distancias euclidianas (CVRP, VRPTW, MDVRP):} La mayoría de trabajos 
+	en optimización combinatoria (desde Dantzig & Ramser 1959 hasta trabajos contemporáneos) utilizan matrices 
+	de distancia euclidiana o sintéticas, sin relación con geometría real. Ventajas: costo cero, fácil de 
+	implementar, énfasis en algoritmos de optimización. Desventajas: falta de realismo (Figliozzi 2007 documenta 
+	errores de 30-50\%), no transferible a contextos reales, resultados pueden no generalizarse.
+	
+	\textbf{(3) Frameworks de simulación general (SUMO, AnyLogic, Simul8):} Plataformas de simulación de eventos 
+	discretos que pueden modelar transporte urbano, pero requieren configuración manual de redes viales y típicamente 
+	se integran con APIs comerciales o matrices sintéticas. Ventajas: flexibilidad, soporte comercial. Desventajas: 
+	complejidad, costo, dependencias externas.
+	
+	\textbf{(4) Herramientas de código abierto especializadas (OSRM, Vroom, GraphHopper):} Software de código 
+	abierto que implementa ruteo eficiente. OSRM (Open Source Routing Machine) es específicamente diseñado para 
+	consultas rápidas de camino más corto. Vroom (Vehicle Routing Open Optimization Machine) añade soporte para 
+	VRP. GraphHopper es alternativa general de ruteo. Ventajas: código abierto, reproducible, rápido. Desventajas: 
+	menor soporte comercial, requiere integración manual.
+	
+	\subsection{Heterogeneidad y fragmentación del ecosistema}
+	
+	La realidad actual del ecosistema de ruteo es fragmentada: no existe un estándar integrado que combine precisión, 
+	velocidad, reproducibilidad y transferibilidad. En cambio, investigadores típicamente \textit{eligen}:
+	
+	\begin{itemize}
+		\item \textbf{Precisión + velocidad pero sin reproducibilidad}: Usar APIs comerciales (Google Maps). 
+		Resultados publicados no pueden ser auditados ni replicados exactamente.
+		
+		\item \textbf{Reproducibilidad + bajo costo pero sin realismo}: Usar distancias euclidianas. Resultados 
+		no generalizan a contextos reales.
+		
+		\item \textbf{Parcialmente reproducible pero con complejidad}: Usar frameworks generales (SUMO, AnyLogic). 
+		Integración manual, dependencias múltiples.
+	\end{itemize}
+	
+	Para MDRP específicamente, Reyes et al. (2018) utilizó distancias euclidianas en sus experimentos publicados, 
+	logrand demostraciones teóricas convincentes (99\% mejora RH vs FCFS), pero sin validación empírica contra 
+	redes reales. Esta no es una crítica al trabajo de Reyes; refleja simplemente el estado de la práctica académica.
+	
+	\subsection{Motivación del pipeline: Cerrando la brecha}
+	
+	El presente trabajo motiva un pipeline integrado que busca simultaneizar las cuatro dimensiones:
+	
+	\begin{enumerate}
+		\item \textbf{Precisión}: Usar geometría de red real (OSM), no distancias euclidianas.
+		\item \textbf{Velocidad}: Usar CH (Geisberger 2008) implementado en OSRM, permitiendo simulaciones dinámicas.
+		\item \textbf{Reproducibilidad}: Ambos componentes (OSM, OSRM) son abiertos, versionables y auditables.
+		\item \textbf{Transferibilidad}: Funciona para cualquier ciudad con cobertura OSM, no limitado a contextos de metrópolis estadounidenses.
+	\end{enumerate}
+	
+	Merkel (2014) introdujo Docker como herramienta estándar para reproducibilidad en investigación e 
+	ingeniería \cite{Merkel2014}. Docker permite capturar el estado completo de un experimento (versión de OSRM, 
+	configuración de preprocesamiento, datasets, scripts de análisis) en un contenedor inmutable que puede 
+	ejecutarse idénticamente en cualquier máquina. Para simulación MDRP, esto significa que un investigador 
+	en 2030 puede descargar el contenedor original, ejecutarlo, y obtener exactamente los mismos resultados, 
+	sin depender de actualizaciones de software o cambios en servicios externos.
+	
+	\subsection{Contribución específica del presente trabajo}
+	
+	La contribución de esta tesis no es inventar nuevos algoritmos de ruteo (CH ya existe desde 2008), ni 
+	proponer nuevas políticas de despacho (RH ya existe desde Reyes 2018). En su lugar, la contribución es 
+	\textit{integración y validación local}: construir un pipeline que combine componentes maduros (OSM, OSRM, 
+	Docker) de una manera coherente, y validar que políticas de despacho abstractas (RH, FCFS) funcionan 
+	efectivamente en contextos reales (La Paz, B.C.S.) con geometría y topografía específica.
+	
+	Pillac et al. (2013) enfatizaron que las políticas de reoptimización periódica (como RH) son un enfoque 
+	estándar pero bien establecido para problemas dinámicos \cite{Pillac2013}. La pregunta abierta que permanece 
+	es: ¿generalizan estas políticas a contextos urbanos no estudiados? ¿Funcionan en ciudades medianas latinoamericanas? 
+	¿Qué configuraciones de parámetros (horizonte $\Delta$, frecuencia de reoptimización) son óptimas localmente?
+	
+	Este trabajo responde estas preguntas de forma reproducible y auditables, creando además un pipeline que 
+	puede servir como referencia metodológica para trabajos futuros en otros contextos urbanos.
+	
+	\subsection{Sugerencias para mejora del pipeline (Extensiones futuras)}
+	
+	Durante la construcción del pipeline, varias mejoras potenciales han emergido, que se documentan aquí como 
+	direcciones futuras:
+	
+	\begin{itemize}
+		\item \textbf{Integración con datos de tráfico real}: OSRM actualmente usa velocidades promedio por tipo 
+		de vía. Integración con datos de tráfico históricos (disponibles en plataformas como TomTom, AggData) 
+		podría refinar estimaciones de tiempo de viaje, particularmente en horarios pico.
+		
+		\item \textbf{Modelado estocástico de tiempos de preparación}: Actualmente, tiempos de prep se sampleen 
+		de distribuciones paramétricas. Usar datos históricos reales de restaurantes (si disponibles) podría 
+		mejorar fidelidad.
+		
+		\item \textbf{Algoritmos de optimización más avanzados}: Actualmente se usa heurística simple (nearest 
+		neighbor + 2-opt) para resolver VRP en cada época. Metaheurísticas (Tabu Search, Genetic Algorithms) o 
+		solvers comerciales (Gurobi) podrían mejorar calidad de soluciones.
+		
+		\item \textbf{Machine Learning para predicción de demanda}: Actualmente se asume patrones estocásticos 
+		conocidos. Usar ML (LSTM, XGBoost) para predicción de órdenes futuras podría refinar horizonte rodante.
+		
+		\item \textbf{Extensión a múltiples ciudades}: Validar el pipeline en otras ciudades medianas 
+		latinoamericanas (Bogotá, Medellín, Quito) para confirmar generalización.
+		
+		\item \textbf{Integración con aprendizaje por refuerzo}: El pipeline construido podría servir como 
+		``gym'' (entorno de simulación) para entrenar agentes de RL, como los descritos en Asadi et al. (2025) 
+		y papers recientes de Meituan.
+	\end{itemize}
+	
+	Estas extensiones no son requisitos para el trabajo actual, pero representan direcciones naturales de 
+	investigación futura que construirían sobre la base reproducible aquí establecida.
 	
 	
 	\chapter{Descripción del problema}
