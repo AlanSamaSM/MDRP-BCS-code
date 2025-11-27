@@ -1,0 +1,2377 @@
+Citation: Jazemi, R.; Alidadiani, E.;
+Ahn, K.; Jang, J. A Review of
+Literature on Vehicle Routing
+Problems of Last-Mile Delivery in
+Urban Areas. Appl. Sci. 2023, 13,
+13015. https://doi.org/10.3390/
+app132413015
+Academic Editor: Arkadiusz Gola
+Received: 1 November 2023
+Revised: 30 November 2023
+Accepted: 3 December 2023
+Published: 6 December 2023
+Copyright: © 2023 by the authors.
+Licensee MDPI, Basel, Switzerland.
+This article is an open access article
+distributed under the terms and
+conditions of the Creative Commons
+Attribution (CC BY) license (https://
+creativecommons.org/licenses/by/
+4.0/).
+applied
+sciences
+Review
+A Review of Literature on Vehicle Routing Problems of Last-Mile
+Delivery in Urban Areas
+Reza Jazemi 1
+, Ensieh Alidadiani 2
+, Kwangseog Ahn 3 and Jaejin Jang 1,*
+1 Department of Industrial & Manufacturing Engineering, University of Wisconsin, Milwaukee, WI 53190, USA;
+rjazemi@uwm.edu
+2 Lubar School of Business, University of Wisconsin, Milwaukee, WI 53211, USA; ensieh@uwm.edu
+3 Department of Occupational and Environmental Safety and Health, University of Wisconsin,
+Whitewater, WI 53190, USA; ahnk@uww.edu
+* Correspondence: jang@uwm.edu; Tel.: +1-(414)-229-2978
+Abstract: Logistics has long been important in an industrial society. Compared with the traditional
+structure of distribution, which requires freight to be delivered mostly to warehouses or retail stores,
+customers now often prefer packages to be delivered to their residences, especially after the delivery challenges during the COVID-19 pandemic. The delivery of parcels to urban residential areas
+increases the challenge due to the amount of delivery volume, tight delivery schedules, and continuously changing delivery conditions. Last-mile delivery tries to address the challenges, taking
+advantage of the available automation, sensor and communication technologies, and people’s attitudes toward parcel delivery for the benefit of all stakeholders. Various approaches to last-mile
+delivery have been proposed and analyzed in the literature. This paper reviews the recent literature
+on vehicle routing for last-mile delivery. The review identified four major categories: crowdshipping,
+parcel lockers, delivery by sidekicks, and delivery to optional points. The nature of the problems is
+discussed in five aspects: fleet capacity, time window, fleet option, dynamism of input, and stochastic
+parameters. The review identifies the achievements and limitations of the research in the areas and
+proposes a future research agenda.
+Keywords: last-mile delivery; vehicle routing; occasional driver; parcel locker; sidekick; optional
+points of delivery; optimization
+1. Introduction
+Logistics has long been important in an industrial society. It is ironic, however, that the
+advancement of information technology, which allows fast and almost no-cost transmittal
+of information, increased the complexity and importance of logistics. Compared with
+the traditional structure of distribution, which requires freight to be delivered mostly to
+warehouses or retail stores, customers now often prefer packages to be delivered to their
+residences or even to public places without designated mailing addresses for certain types
+of product based on the Global Positioning System (GPS). Additionally, the COVID-19
+pandemic made people more accustomed to package delivery at their designated locations.
+The shift in people’s habits and expectations resulted in a substantial increase in the demand
+for delivery services. Also, the emergence and rapid expansion of e-retail companies, such
+as Amazon, eBay, Alibaba, Walmart+, and Shop BBC, have changed customer attitudes to
+delivery.
+The delivery of parcels to urban residential areas increases the challenge due to the
+amount of delivery volume, tight delivery schedules, and continuously changing delivery
+conditions, as discussed in the last-mile delivery (LMD) literature. Naturally, LMD tries to
+take advantage of the available technologies and people’s attitudes toward parcel delivery,
+both on the supply and demand sides, for the benefit of all stakeholders. The prosperity
+of the pickup and delivery services by occasional drivers is seen in the cases of Uber and
+Appl. Sci. 2023, 13, 13015. https://doi.org/10.3390/app132413015 https://www.mdpi.com/journal/applsci
+Appl. Sci. 2023, 13, 13015 2 of 27
+Lyft. Sometimes, a logistics company delivers to one of its designated places or parcel
+locker locations. At the same time, LMD utilizes the help of customers on the demand side;
+customers are flexible and allow optional delivery locations, one of which will be chosen
+by the logistics company during delivery planning. Automation certainly helps delivery,
+and drones have already been commercialized. Sooner or later, autonomous vehicles on
+the land and water will also be used [1,2]. Amazon commercialized its patented flying
+warehouses, which also carry small drones [3]. Multiple delivery modes can surely be
+combined for a delivery job.
+LMD is the final stage of the parcel delivery process when a customer order is transported from a fulfillment center to a destination, often a residential address [4]. LMD
+studies discuss diverse issues of delivery [5], including pricing, delivery mode, and security concerns [6]. These studies also investigate innovative solutions, infrastructure
+setup, staffing, and fleet design in recent years [5,7]. The application of computational
+intelligence [8], new solution methods [9,10], and the environmental side effects of VRP
+and LMD [11] are also widely discussed in the literature. Optimization models to employ
+various types of vehicle in LMD are discussed in [5,12,13].
+Researchers have been studying vehicle routing problems (VRPs) to design optimal
+delivery or pickup routes from one or multiple depots to a number of geographically
+scattered destinations subject to practical constraints [14,15], playing important roles in
+logistics [16,17]. Responding to diverse requirements such as working hour limit, fleet
+capacity, nature of deliverables, and environmental requirements, various VRP models
+have been discussed, including green VRP and electric VRP. Details of G-VRP [18,19] and
+E-VRP [20–22] are discussed in many VRP review papers.
+Many vehicle routing issues in LMD have long been considered implicitly in conventional VRP [23–25]. Due to the recent changes in social life, customer behavior, pandemic limitations, increased delivery volume, time pressure, and workforce limitations,
+e-commerce has widely been accepted by both industry and customers, and the research
+on vehicle routing for LMD has been pervasively investigated [7,26].
+Many papers discuss the vehicle routing issues on LMD considering the new infrastructure of the information and automation technologies [10]. However, the literature
+shows a lack of a comprehensive survey to categorize and characterize the papers. This
+research summarizes the current problems discussed in LMD vehicle routing. The results
+of this study can be used to identify the research gaps in LMD vehicle routing and develop
+future research agendas. In the literature, the same solution procedures of the conventional
+VRP models are used for the LMD optimization as well. This review paper does not explore
+details of the solution methods, except listing them for each paper in the summary tables.
+In-depth discussions of the solution procedures in VRP can be found in the literature
+including [27–30].
+The distinctive characteristics of vehicle routing in LMD in urban areas include more
+uncertainties and higher dynamicity compared with conventional VRP. The information
+update occurs more frequently, asking for more frequent real-time adjustments of the
+delivery plan. It also gives a larger number of visits per route, and the parking lot space
+and service time at the destination are sometimes considered. The time windows are tighter.
+The allowed route of a vehicle can be different for different vehicles, e.g., the size of a truck
+to make a right turn or its weight.
+Additionally, vehicle routing in LMD considers the involvement of individuals, for
+both the supply and demand sides. For the supply side, we can use occasional drives
+(outsourcing), which makes the operation more efficient at peak times. Considerations of
+occasional drivers add new issues of the supplier’s time window, zoning, and matching
+of drivers and customers. For the demand side, customers are willing to provide optional
+delivery points and use regional parcel lockers.
+The common characteristics of conventional VRP and LMD include vehicle capacity
+and fleet options. Also, both the conventional VRP and vehicle routing in LMD problems
+can utilize modern technology for sidekicks.
+Appl. Sci. 2023, 13, 13015 3 of 27
+This review paper is constructed as follows. Section 2 explains the review methodology.
+Section 3 describes the framework used for the survey. The framework groups LMD study
+into four categories based on the focus of the problems: delivery with occasional drivers,
+delivery to parcel lockers, delivery by sidekicks, and delivery to optional points. Section 4
+presents the research on LMD routing in these four subsections. Section 5 concludes
+the paper by summarizing the study’s implications and presenting an agenda for future
+research.
+2. Review Methodology
+We reviewed 38 survey papers on VRP to gain a comprehensive understanding of
+the routing problems and the position of LMD in the VRP area. We incorporated 26
+of the survey papers to establish the scope of our survey, to ensure the inclusion of a
+comprehensive range of relevant study areas and minimize the possibility of overlooking
+pertinent research findings (Figure 1).
+Appl. Sci. 2023, 13, x FOR PEER REVIEW 3 of 24
+The common characteristics of conventional VRP and LMD include vehicle capacity
+and fleet options. Also, both the conventional VRP and vehicle routing in LMD problems
+can utilize modern technology for sidekicks.
+This review paper is constructed as follows. Section 2 explains the review methodology. Section 3 describes the framework used for the survey. The framework groups LMD
+study into four categories based on the focus of the problems: delivery with occasional
+drivers, delivery to parcel lockers, delivery by sidekicks, and delivery to optional points.
+Section 4 presents the research on LMD routing in these four subsections. Section 5 concludes the paper by summarizing the study’s implications and presenting an agenda for
+future research.
+2. Review Methodology
+We reviewed 38 survey papers on VRP to gain a comprehensive understanding of
+the routing problems and the position of LMD in the VRP area. We incorporated 26 of the
+survey papers to establish the scope of our survey, to ensure the inclusion of a comprehensive range of relevant study areas and minimize the possibility of overlooking pertinent research findings (Figure 1).
+Figure 1. Applied methodology for this review.
+The related keywords and phrases offered by the review papers were used as a baseline to find the routing papers in the LMD area. Considering the wide range of vehicle
+routing problems, we employed the 14 keywords and their combinations derived from
+surveys [10,26,31–34]: last-mile delivery (LMD), vehicle routing problem (VRP), drone,
+crowdshipping, crowdsourcing, parcel delivery, human-driven delivery, autonomous delivery, city logistics, smart cities, sidekick fleet, occasional driver, delivery option, traveling salesman. The review papers led us to find the different aspects of LMD that are not
+discussed in the literature. We found that routing in LMD is an important area that is not
+discussed in a comprehensive way. After searching the available inventories of Business
+Source Premier, Google Scholar, Science Direct, Emerald Insight, Scopus, and Web of Science, we found more than 500 papers, which showed us the important characteristics of
+LMD problems. Based on the initial analysis of abstracts and conclusions, we opted for
+166 papers among initial inventories that were mostly concentrated on routing and optimization models in different LMD configurations. After a thorough investigation of their
+modeling and related considerations of the papers we chose 136 papers and constructed
+the characteristics of the LMD problems and their common specifications, which were entitled as the nature of the LMD problems.
+Figure 1. Applied methodology for this review.
+The related keywords and phrases offered by the review papers were used as a baseline to find the routing papers in the LMD area. Considering the wide range of vehicle
+routing problems, we employed the 14 keywords and their combinations derived from
+surveys [10,26,31–34]: last-mile delivery (LMD), vehicle routing problem (VRP), drone,
+crowdshipping, crowdsourcing, parcel delivery, human-driven delivery, autonomous delivery, city logistics, smart cities, sidekick fleet, occasional driver, delivery option, traveling
+salesman. The review papers led us to find the different aspects of LMD that are not
+discussed in the literature. We found that routing in LMD is an important area that is not
+discussed in a comprehensive way. After searching the available inventories of Business
+Source Premier, Google Scholar, Science Direct, Emerald Insight, Scopus, and Web of Science, we found more than 500 papers, which showed us the important characteristics of
+LMD problems. Based on the initial analysis of abstracts and conclusions, we opted for
+166 papers among initial inventories that were mostly concentrated on routing and optimization models in different LMD configurations. After a thorough investigation of their
+modeling and related considerations of the papers we chose 136 papers and constructed the
+characteristics of the LMD problems and their common specifications, which were entitled
+as the nature of the LMD problems.
+3. Framework of the Literature Survey
+The VRP seeks to find the best fleet and its routes to deliver parcels to customers.
+The conventional VRP models mostly consider the routes as a closed loop, in which the
+fleet returns to its depot after delivery, as shown in Figure 2. These models also consider
+relatively homogenous fleets run by professional operators.
+Appl. Sci. 2023, 13, 13015 4 of 27 these issues, LMD planning mostly begins with segmentation or grouping of points. It is then followed by parcel packaging to ensure safe and convenient hSubsequently, the delivery fleet is chosen along with its delivery paths. The detailssteps vary depending on the conditions of the delivery requests and the avaisources. The following sections provide the categories and nature of the LMD pconsidered in the literature.
+Figure 2. Conventional VRP.
+3.1. Categories of LMD Problems
+Due to technological advancements and the effects of pandemics on LMD, msearch has been reported on vehicle routing in LMD during the last eight years.the literature on LMD can be grouped into these four categories based on the focuproblems:
+1. Delivery with occasional drivers (crowdshipping): The logistics companies usionally available non-professional drivers in addition to their own fleet fodelivery.
+2. Delivery to parcel locker: Customers’ parcels are delivered to specific locatiomany lockers, and the customers retrieve their parcels from assigned lockers3. Delivery using sidekicks: The delivery uses a main vehicle and one or more vehicles. The main vehicle brings parcels and sidekicks to intermediate placelocations are determined by each delivery plan, and the sidekicks deliver thefrom the main vehicle to customers’ locations.
+4. Delivery to optional points: A customer offers multiple delivery locations, delivery system delivers the parcel to the best location.
+Some papers simultaneously consider two of the above categories. For examcasional drivers are considered as the sidekicks [35]. Also, crowdshipping and options are considered together in [36]. Some researchers consider different goathe same approaches. Refs. [37,38] employ drones to reduce emissions in green V[39] uses drones for cost optimization and delivery time reduction.
+3.2. Nature of LMD Problems
+Each delivery plan is subject to the different operation conditions given by cumanagerial options, uncertainties, and technical conditions such as real-time Figure 2. Conventional VRP.
+Compared with them, the vehicle routing in LMD considers more diverse issues in
+city logistics, reflecting the new needs and conditions given to it. To better respond to these
+issues, LMD planning mostly begins with segmentation or grouping of delivery points. It is
+then followed by parcel packaging to ensure safe and convenient handling. Subsequently,
+the delivery fleet is chosen along with its delivery paths. The details of these steps vary
+depending on the conditions of the delivery requests and the available resources. The
+following sections provide the categories and nature of the LMD problems considered in
+the literature.
+3.1. Categories of LMD Problems
+Due to technological advancements and the effects of pandemics on LMD, much
+research has been reported on vehicle routing in LMD during the last eight years. Most
+of the literature on LMD can be grouped into these four categories based on the focus of
+the problems:
+1. Delivery with occasional drivers (crowdshipping): The logistics companies use occasionally available non-professional drivers in addition to their own fleet for parcel
+delivery.
+2. Delivery to parcel locker: Customers’ parcels are delivered to specific locations with
+many lockers, and the customers retrieve their parcels from assigned lockers.
+3. Delivery using sidekicks: The delivery uses a main vehicle and one or more sidekick
+vehicles. The main vehicle brings parcels and sidekicks to intermediate places, whose
+locations are determined by each delivery plan, and the sidekicks deliver the parcels
+from the main vehicle to customers’ locations.
+4. Delivery to optional points: A customer offers multiple delivery locations, and the
+delivery system delivers the parcel to the best location.
+Some papers simultaneously consider two of the above categories. For example,
+occasional drivers are considered as the sidekicks [35]. Also, crowdshipping and delivery
+options are considered together in [36]. Some researchers consider different goals using the
+same approaches. Refs. [37,38] employ drones to reduce emissions in green VRP, and [39]
+uses drones for cost optimization and delivery time reduction.
+3.2. Nature of LMD Problems
+Each delivery plan is subject to the different operation conditions given by customers,
+managerial options, uncertainties, and technical conditions such as real-time demand
+change, traffic congestion, time window, fleet accessibility, and service times at the points
+of delivery. The literature often considers these five aspects of the nature of problems as
+more important:
+Appl. Sci. 2023, 13, 13015 5 of 27
+1. Fleet capacity: Capacitated VRP (CVRP) optimizes routes considering vehicle capacity
+limits such as weight, volume, and number of parcels [40,41]. Sometimes, however,
+these limits can be ignored for mail delivery, where the parcel volumes are so small
+compared with fleet capacity, and perishable item delivery, when vehicles cannot wait
+for the full load of items [42]. The pickup and delivery problems widely discussed in
+many conventional VRPs [43] and also in LMD [44,45] are modeled as a problem with
+vehicle capacity limit.
+2. Time window: Time windows require deliveries to be made within specified time
+horizons [41,46]. LMD additionally considers the time windows of driver availability.
+Various types of window in a logistics network have been discussed in literature [47].
+3. Fleet option: The research considers multiple types of fleet, including a heterogeneous fleet, which involves a fleet of vehicles with different capacities [48]; electric
+vehicles, which need additional time for charging [49]; and autonomous vehicles [50].
+Various autonomous vehicles allow us diverse options for delivery network design.
+Autonomous vehicles for delivery are discussed in survey papers [1,10,51].
+4. Dynamic input: Dynamic VRP (DVRP) considers the changeability of variables (e.g.,
+a customer’s change of order quantity) during delivery [41,52].
+5. Stochastic parameter: Stochastic VRP (SVRP) considers the randomness or uncertainty
+of the parameters [41,53].
+In the discussion of each paper, these aspects are mentioned only when the paper
+explicitly considers them.
+4. Literature on LMD Vehicle Routing
+We grouped the literature on LMD vehicle routing into the following four categories:
+4.1. Occasional Drivers (Crowdshipping)
+As modern society continues to adapt to the shared economy, occasional drivers (ODs)
+are likely to play more important roles in future delivery systems. In crowdshipping,
+individual ODs act as operators in the sharing economy [54]. They make their resources
+(vehicles and time) available to assist the LMD. Based on the advancement of social media,
+people had already begun using the concept of crowdshipping to have their friends deliver
+parcels [55]. It is believed that numerous companies have already been adopting crowdshipping as their foundational business model since 2011. Crowdshipping was popularized
+by Amazon from 2015 [56]. Crowdshipping takes advantage of ODs, who are sometimes
+more cost-efficient than company-owned fleets [57]. It especially helps delivery during
+peak times.
+Some research regards crowdshipping as a part of an open VRP, in which the drivers
+are not required to return to the depot [58,59]. However, crowdshipping considers more
+issues that are not considered important in the traditional open VRP. While a traditional
+VRP considers the time windows of customers, LMD considers the time windows of the
+ODs’ availability as well. Also, the segmentation process of LMD considers that some ODs
+cannot access some customers’ sites due to the vehicle characteristics or driver’s preferences.
+In the literature, the terms crowdshipping, cargo hitching [60], crowd logistics [61], passingby vehicles [62], crowdsourcing [63], and collaborative logistics [55] refer to delivery by
+occasional drivers.
+In Figure 3, crowdshipping groups the customers based on their locations and time
+requirements, and assigns them to available drivers (matching). Grouping is based on
+either the driver’s destinations [61,64] or customers’ neighborhoods [65,66]. Scheduling
+and matching in crowdshipping involve many challenges [67]. Most research shows that
+occasional drivers have their own destinations, except for [58]. Different matching mechanisms, such as pure self-scheduling, hybrid and centralized scheduling, route matching,
+and bulletin-board type matching, are being used by different platform companies [68].
+Appl. Sci. 2023, 13, 13015 6 of 27 Appl. Sci. 2023, 13, x FOR PEER REVIEW 6 of 24
+casional drivers have their own destinations, except for [58]. Different matching mechanisms, such as pure self-scheduling, hybrid and centralized scheduling, route matching,
+and bulletin-board type matching, are being used by different platform companies [68].
+Figure 3. Delivery with occasional drivers (crowdshipping) in LMD.
+Table 1 shows the identified publications on crowdshipping. The nature of problems,
+important considerations, and solution methods are summarized in the table. Crowdshipping naturally chooses a vehicle from available ODs and company fleets (the third nature
+of the LMD problems). Although all of the natures of LMD problems can be seen in
+crowdshipping, because of the complexity of the problems, most of the literature considers at most two of them and uses heuristic algorithms for problem-solving and data analytics. In crowdshipping research, occasional drivers have their own vehicles. Vehicle
+loading capacity (90% of the papers), travel distance, driver’s work time, or number of
+deliveries are commonly considered. Also, various types of time window are considered
+in the papers, underlining the significance of meeting delivery deadlines. Some papers
+include waiting time in the customer’s desired timespan and penalties for late arrivals.
+The dynamicity consideration of the variables and parameters is mostly limited to online
+orders (20% of the papers), and the stochastic nature of the problem (20% of the papers)
+is confined to travel times and fluctuating customer demands [69,70].
+Among the papers in Table 1, just two of them use transactional data to evaluate their
+model, while most of them use simulated data. Various solution methods, ranging from
+metaheuristics to machine learning techniques, are used across the studies to deal with
+the complexities of ODs’ logistics. Some contradictory observations are seen in the literature. While some papers advocate crowdshipping for emission reduction [66,71,72], some
+others argue that crowdshipping does not reduce environmental pollution [73].
+Table 1. Literature on delivery with occasional drivers (crowdshipping).
+Ref. Problem Nature Important Considerations Objective(s) Sample Size Solution
+Method
+[35] - Capacitated
+- Mixed-integer nonlinear model
+- ODs can only work in the second echelon
+- ODs can just deliver one request
+- Limited capacity and mileage for ODs
+- Own fleet can go on limited routes
+Minimize travelling
+costs of trucks, city
+freighters, and the
+employed ODs
+- 1 depot, 2 satellites, 12 customers
+- 1 depot, 2–4
+satellites, 21–
+50 customers
+Heuristic (adaptive large neighborhood)
+[46] - Time windowed
+- Multi depot
+- Limited vehicle speed
+Minimize distribution cost using company’s truck or ODs
+- 4 company’s
+truck and 4
+ODs
+Simulation
+Figure 3. Delivery with occasional drivers (crowdshipping) in LMD.
+Table 1 shows the identified publications on crowdshipping. The nature of problems,
+important considerations, and solution methods are summarized in the table. Crowdshipping naturally chooses a vehicle from available ODs and company fleets (the third
+nature of the LMD problems). Although all of the natures of LMD problems can be seen in
+crowdshipping, because of the complexity of the problems, most of the literature considers
+at most two of them and uses heuristic algorithms for problem-solving and data analytics.
+In crowdshipping research, occasional drivers have their own vehicles. Vehicle loading
+capacity (90% of the papers), travel distance, driver’s work time, or number of deliveries
+are commonly considered. Also, various types of time window are considered in the papers,
+underlining the significance of meeting delivery deadlines. Some papers include waiting
+time in the customer’s desired timespan and penalties for late arrivals. The dynamicity
+consideration of the variables and parameters is mostly limited to online orders (20% of the
+papers), and the stochastic nature of the problem (20% of the papers) is confined to travel
+times and fluctuating customer demands [69,70].
+Among the papers in Table 1, just two of them use transactional data to evaluate their
+model, while most of them use simulated data. Various solution methods, ranging from
+metaheuristics to machine learning techniques, are used across the studies to deal with the
+complexities of ODs’ logistics. Some contradictory observations are seen in the literature.
+While some papers advocate crowdshipping for emission reduction [66,71,72], some others
+argue that crowdshipping does not reduce environmental pollution [73].
+Table 1. Literature on delivery with occasional drivers (crowdshipping).
+Ref. Problem Nature Important Considerations Objective(s) Sample Size Solution
+Method
+[35] - Capacitated
+- Mixed-integer nonlinear
+model
+- ODs can only work in the
+second echelon
+- ODs can just deliver one
+request
+- Limited capacity and
+mileage for ODs
+- Own fleet can go on
+limited routes
+Minimize travelling
+costs of trucks, city
+freighters, and the
+employed ODs
+- 1 depot, 2 satellites,
+12 customers
+- 1 depot, 2–4 satellites,
+21–50 customers
+Heuristic
+(adaptive large
+neighborhood)
+[46]
+- Time
+windowed
+- Multi depot
+- Limited vehicle speed
+Minimize
+distribution cost
+using company’s
+truck or ODs
+- 4 company’s truck and
+4 ODs Simulation
+Appl. Sci. 2023, 13, 13015 7 of 27
+Table 1. Cont.
+Ref. Problem Nature Important Considerations Objective(s) Sample Size Solution
+Method
+[58]
+- Capacitated
+- Stochastic
+- Each demand can be
+delivered in more than
+one parcel
+- Stochastic assignment
+acceptance
+- Limited route duration
+Minimize the fixed
+and variable
+compensations paid
+to ODs
+- Considers 100 customers
+in 10 clusters
+- At most 4 vehicles for
+each cluster
+Heuristic
+(combined with
+B&P)
+[61] - Capacitated
+- Limited capacity for own
+fleet
+- Unlimited capacity for
+ODs
+- Limited distance
+variation for ODs
+- ODs can perform one
+delivery.
+Minimize total costs
+of vehicles and ODs’
+payments
+- Different numbers of 13,
+25, 50, or 100 ODs
+Metaheuristic
+(Iterated local
+search & parallel
+cooperation)
+[62]
+- Capacitated
+- Time
+windowed
+- Stochastic
+(fuzzy)
+- Heterogeneous vehicles
+- Different sensitivity of
+customers following a
+fuzzy trend
+- Considering carbon
+emissions
+- Limited mass of ODs
+deliveries
+maximize the
+number of customers
+served and usage
+rate of PD and
+minimize operational
+cost and unfairness
+of PD routes.
+- -
+Heuristic
+(variable
+neighborhood
+search)
+[63]
+- Capacitated
+- Time
+windowed
+- Both pickup and delivery
+requests
+- Waiting during time
+window just for own
+vehicles, not for ODs
+- Sub-tours are not
+allowed.
+Minimize the cost of
+trucks, OD’s
+compensation, and
+late delivery penalty
+- 30 customers, 8 ODs,
+2 trucks
+- 100 customers, 15 ODs,
+2 trucks
+Two-Step exact
+solution method
+(B&B +
+SPDPSTW)
+[64]
+- Capacitated
+- Stochastic
+- Limited capacity of own
+fleet
+- Sub-tours are not allowed
+- ODs are free to reject
+delivery assignments
+- Compensation calculated
+as stochastic
+willingness/acceptance
+Minimize total costs
+of vehicles and ODs’
+payments
+- 15 customers
+Heuristic
+(bi-level
+stochastic model)
+[65] - Capacitated
+- Mixed-integer model
+- Limited stop and
+duration of ODs
+Minimize total costs
+of vehicles and ODs’
+payments
+- 25–100 customers,
+25–100 ODs
+Heuristic
+(adaptive
+neighborhood)
+[66] - Capacitated
+- Heterogeneous capacity
+- Limited distance for own
+fleet
+- Different types of route
+with different velocities
+are available.
+- Different training costs
+and compensation
+- Environmental penalty
+for different velocities
+Minimize the
+consumed energy,
+environmental
+penalty, and total
+cost, and maximize
+the delivery velocity
+- 5 customers, 4 trucks,
+3 OD’s, 4 types of route
+Linearized
+model and exact
+methods for
+problem-solving
+[67]
+- Time
+windowed
+- Dynamicity
+- Online dynamic
+demands with expected
+time windows
+- Homogeneous vehicles
+- Considering the time
+effect as an amplifying
+cost element
+Minimize the
+distribution cost of
+regular vehicles, ODs
+compensation and
+penalty
+- 5, 15, 25, 100,
+200 customers
+Heuristic
+(Iterative
+variable
+neighborhood)
+Appl. Sci. 2023, 13, 13015 8 of 27
+Table 1. Cont.
+Ref. Problem Nature Important Considerations Objective(s) Sample Size Solution
+Method
+[69]
+- Stochastic
+- Capacitated
+- Time
+windowed
+- Multiple fleet
+options
+- Using cargo bikes or ODs
+to deliver parcels with
+limited capacities
+- Customers follow
+stochastic trends
+- Earliest and latest arrival
+time considered.
+- The stochastic requests
+are assigned to ODs
+based on distance,
+capacity, and time
+window constraints
+Minimize the total
+travel cost and
+minimize rejections
+- With 150, 350, 550
+customers and 20 ODs
+Heuristic (Monte
+Carlo
+simulation &
+large
+neighborhood
+search)
+[70]
+- Capacitated
+- Dynamicity
+- ODs have limited
+capacities
+- Limited detour is
+allowed for ODs
+- Online orders follow
+dynamic trend
+Minimize total costs
+of vehicles and ODs’
+payments
+- -
+Simulation
+(Auction-based
+matching)
+[74]
+- Capacitated
+- Time
+windowed
+- Stochastic
+- Uncertain travel time
+- Penalty for probable
+missed delivery
+- Limited capacity for own
+fleet & ODs
+- Limited numbers of
+departures for ODs
+- ODs can perform
+multiple deliveries
+Minimize total costs
+of vehicles and ODs’
+payments
+- Numbers of Customer:
+- Small (5, 10, 15)
+- Big (25, 35, 50)
+Heuristic
+(Bender’s
+two-stage
+decomposition
+strategy)
+[75]
+- Capacitated
+- Stochastic
+- Customer demands
+and/or customer
+presence are stochastic.
+- Vehicles are capacitated.
+- Detour could occur if
+they reached the vehicle’s
+capacity
+Minimize total costs
+of vehicles and ODs’
+payments
+- 1 depot and 10, 30, 70,
+150, or 300 customers
+Reinforcement
+learning (B&C
+and integer
+L-shaped)
+[76]
+- Capacitated
+- Dynamicity
+- Some limited detour for
+ODs.
+- Both pickup and Delivery
+requests
+- Dynamic demand during
+each day
+Minimize mean
+differences of
+estimated and actual
+arrival time
+- 100 or 1000 locations
+(delivery nodes)
+Heuristic
+(Two-step
+Look-ahead
+Algorithm)
+[77]
+- Capacitated
+- Time
+windowed
+- Limited conservations
+- Limited number of
+depots
+Minimize the cost of
+vehicle, diesel,
+emission, and ODs
+payment, minimize
+the emission
+- 5, 19, 15 customers Simulation
+[78]
+- Capacitated
+- Time
+windowed
+- Limited transshipment
+nodes
+- Capacitated ODs
+- Necessity of usage of
+ODs/own fleet for
+specified customers
+Minimize total costs
+of vehicles and ODs’
+payments
+- 400 nodes (customer
+locations)
+Heuristicgenerated
+data
+[79]
+- Capacitated
+- Time
+windowed
+- Limited hours of driving
+- Different shipments for
+different product groups
+- Heterogeneous capacity
+Minimizing the total
+cost of shipments
+- 25 or 50 customers with
+total demand of 190 or
+388
+Metaheuristics
+[80]
+- Capacitated
+- Time
+windowed
+- Limited number of
+departures from each
+depot
+- Limited number of
+ODs/own fleet
+Minimize total costs
+of vehicles and ODs’
+payments
+- 5 to 400 customers Heuristic (greedy
+randomized)
+Appl. Sci. 2023, 13, 13015 9 of 27
+Table 1. Cont.
+Ref. Problem Nature Important Considerations Objective(s) Sample Size Solution
+Method
+[81]
+- Capacitated
+- Time
+windowed
+- Mixed-integer linear
+model
+- Limited capacity &
+mileage
+Minimize start-up
+and travel costs for
+vehicles and ODs
+order cost
+- 1 depot and
+100 customers
+Heuristic
+(adaptive ant
+col.)
+[82]
+- Capacitated
+- Time
+windowed
+- Limited transshipment
+nodes
+- Heterogeneous vehicles
+Minimize total costs
+of vehicles and ODs’
+payments
+- Customers range 5 to 100
+- No. of ODs from 3 to 10
+Heuristic
+(variable
+neighborhood)
+[83]
+- Capacitated
+- Time
+windowed
+- Own fleet should come
+back.
+- Each customer should be
+met only once.
+- Heterogeneous vehicles
+Minimize the costs
+(fixed and variable
+costs of ODs and
+vehicles)
+- 30 customers
+Heuristic
+(Multitasking
+Algorithm)
+[84] - Dynamicity
+- Effect of driver’s training
+- Dynamic nature of road
+and customer demand
+Maximize ODs
+reward (defined
+based on travel
+distance)
+- 20 customers Machine
+Learning
+[85] - Capacitated
+- Mixed-integer linear
+model
+- Both pickup and delivery
+- Limited capacity &
+mileage
+- Each OD can serve one
+customer
+Minimize total costs
+of vehicles and ODs’
+payments
+- 50 to 199 Customers
+- 28 traveling distance
+cases
+Heuristic (SA)
+[86] - Capacitated
+- Commuters using public
+transportation are
+considered ODs.
+- ODs’ willingness is
+affected by
+compensation.
+- Each parcel should be
+delivered by one OD
+- Transshipment locations
+are parcel lockers near
+railways
+- No capacity limitation on
+lockers
+- Delivery time limited to
+do in daytimes
+Minimize total
+operation and
+compensation cost as
+well as emission
+produced
+- 100 to 2000 parcels
+- 1 to 20 areas (parcel
+locker locations)
+- 5 vehicles and 100 ODs.
+Heuristic, based
+on real data in
+Singapore
+[87] - Capacitated
+- Limited capacity & work
+duration
+- Sub-tours are not allowed
+- ODs can just win one
+bidding a day
+Minimize vehicles
+routing and winning
+bids costs
+- 57 customers in
+27 locations
+- 8 ODs
+Heuristic, real
+data from an
+Oman bookstore
+[88]
+- Capacitated
+- Time
+windowed
+- Dynamicity
+- ODs dynamically join as
+an available fleet
+- There are some backup
+fleets to use, as IDs may
+not be available
+- Each OD can deliver one
+parcel
+- ODs have limited driving
+time
+- Parcels should be
+delivered upon a specific
+time schedule
+Minimize total costs
+of ODs and backup
+vehicles
+- 100 nodes
+- 100 ODs
+Heuristic (3-step
+algorithm)
+Appl. Sci. 2023, 13, 13015 10 of 27
+Table 1. Cont.
+Ref. Problem Nature Important Considerations Objective(s) Sample Size Solution
+Method
+[89]
+- Dynamicity
+- Capacitated
+- A group of customers is
+considered a bundle
+which can be selected by
+ODs to deliver
+- Two grouping
+approaches: clustering,
+corridor creation
+- ODs dynamically appear
+at regular time intervals
+- Both ODs and fleet have
+limited capacity
+- Company should not use
+ODs more than its own
+fleet
+Minimize total travel
+costs of vehicles and
+ODs’ bid
+- 20 customers, 10 ODs,
+5 vehicles
+- 40 customers, 20 ODs,
+5 vehicles
+Metaheuristic
+(large
+neighborhood
+search-based
+algorithm)
+[90]
+- Capacitated
+- Time
+windowed
+- Multiple fleet
+options
+- The fleet of other logistic
+companies is considered
+as ODs
+- Each vehicle can go on
+just one round trip
+- Each vehicle has limited
+capacity & driving time
+- Service time is
+considered
+Minimize the routing
+cost and number of
+ODs
+- 20 customers Exact solution
+(CPLEX)
+4.2. Parcel Lockers
+Parcel lockers, also called pickup points [91], offer a promising solution to some
+of the challenges posed by LMD for enhanced efficiency, reduced costs, and minimized
+environmental side effects [92–94]. In this case, distributors deliver parcels to appropriate
+lockers and inform the customers. The parcel locker system does not reveal customers’
+addresses. This system also reduces the risk of parcel damage or loss as customers may not
+be able to get their products quickly enough [95–97]. Parcel lockers may also help to reduce
+emissions [92,98]. While parcel lockers usually lead to lower shipment costs for customers,
+people in urban areas are willing to pay more for this service [99,100].
+As shown in Figure 4, the lockers are located in places such as public areas, shopping
+centers, or residential complexes for customers’ convenience. Customers are assigned to
+parcel lockers, and the vehicle routing is planned. After parcel delivery, recipients receive
+notifications with locker details and access codes. Recipients visit the locker station and
+retrieve packages at their convenience. There are different approaches to setting up parcel
+lockers and assigning customers to them. The lockers can be stationary, temporary, or
+mobile [101]. The models consider the travel distances of customers as well as those of the
+fleet. The sizes or other specific technical requirements of the lockers (e.g., refrigerating,
+chemical restrictions) are commonly considered in the literature. Table 2 details the available
+literature on the LMD using parcel lockers.
+Most studies in this category emphasize the significance of capacity constraints for
+both lockers and fleets [102,103]. On the contrary, the nature of the parcel locker makes the
+time windows not as critical as in other cases unless customers specify optional delivery
+points along with their desired time windows. Multiple fleet options are not discussed
+extensively in the literature, except for [96], which investigates mobile lockers. Autonomous
+vehicles and drones can also be considered as fleet options. No research considers the
+dynamicity; just [104] assumes the stochastic availability of the ODs, in which a combined
+model of OD and parcel locker are defined.
+Appl. Sci. 2023, 13, 13015 11 of 27 Appl. Sci. 2023, 13, x FOR PEER REVIEW 10 of 24
+chemical restrictions) are commonly considered in the literature. Table 2 details the available literature on the LMD using parcel lockers.
+Figure 4. Delivery with parcel locker in LMD.
+Most studies in this category emphasize the significance of capacity constraints for
+both lockers and fleets [102,103]. On the contrary, the nature of the parcel locker makes
+the time windows not as critical as in other cases unless customers specify optional delivery points along with their desired time windows. Multiple fleet options are not discussed
+extensively in the literature, except for [96], which investigates mobile lockers. Autonomous vehicles and drones can also be considered as fleet options. No research considers
+the dynamicity; just [104] assumes the stochastic availability of the ODs, in which a combined model of OD and parcel locker are defined.
+The solution methods vary from heuristic methods and mathematical optimization
+to simulation-based approaches [92–94]. Different types of specialized locker for hazardous and perishable items have been suggested [105]. Delivery of a large number of parcels
+requires big trucks, and lockers are often located in crowded areas; the planning requires
+consideration of time windows to avoid traffic delays.
+Table 2. Literature on delivery to parcel lockers.
+Ref. Problem Nature Important Considerations Objective(s) Sample Size Solution Method
+[91] - Capacitated
+- Can opt for parcel lockers or home delivery
+- Minimize the number of open locker stations
+and should cover minimum deliveries
+- Fleets with different capacities and costs are
+considered
+- Fuel consumption and emission is considered
+Minimize the number of locker locations
+- 3 vehicle
+types
+- 606 locker
+locations
+- 5–40 vehicles
+Statistical analytics
+[92] - Time windowed
+- Parcel locker is an option for customers
+- Route of fleet and customers are considered
+- Which locker station
+- Minimize the number of open locker stations
+- Limited traveling distance for each customer
+- Limited numbers of fleet
+Minimize environmental effect (based
+on customer and vehicle travel distance)
+- 50 or 100
+customers
+- 5, 10, 15
+locker locations
+Mixed-integer
+solver (Gurobi
+application) on
+60 benchmarks
+[93]
+- Time windowed
+- Capacitated
+- Parcel locker is an option for customers
+- Minimum travel of fleet is considered
+- Limited capacity of vehicles and lockers
+Minimize total
+travel distance of
+vehicles
+- 25, 50 and
+100 customers
+Heuristic (SA)
+Figure 4. Delivery with parcel locker in LMD.
+The solution methods vary from heuristic methods and mathematical optimization to
+simulation-based approaches [92–94]. Different types of specialized locker for hazardous
+and perishable items have been suggested [105]. Delivery of a large number of parcels
+requires big trucks, and lockers are often located in crowded areas; the planning requires
+consideration of time windows to avoid traffic delays.
+Table 2. Literature on delivery to parcel lockers.
+Ref. Problem Nature Important Considerations Objective(s) Sample Size Solution
+Method
+[91] - Capacitated
+- Can opt for parcel lockers
+or home delivery
+- Minimize the number of
+open locker stations and
+should cover minimum
+deliveries
+- Fleets with different
+capacities and costs are
+considered
+- Fuel consumption and
+emission is considered
+Minimize the number
+of locker locations
+- 3 vehicle types
+- 606 locker locations
+- 5–40 vehicles
+Statistical
+analytics
+[92]
+- Time
+windowed
+- Parcel locker is an option
+for customers
+- Route of fleet and
+customers are considered
+- Which locker station
+- Minimize the number of
+open locker stations
+- Limited traveling
+distance for each
+customer
+- Limited numbers of fleet
+Minimize
+environmental effect
+(based on customer
+and vehicle travel
+distance)
+- 50 or 100 customers
+- 5, 10, 15 locker locations
+Mixed-integer
+solver (Gurobi
+application) on
+60 benchmarks
+[93]
+- Time
+windowed
+- Capacitated
+- Parcel locker is an option
+for customers
+- Minimum travel of fleet
+is considered
+- Limited capacity of
+vehicles and lockers
+Minimize total travel
+distance of vehicles - 25, 50 and 100 customers Heuristic (SA)
+Appl. Sci. 2023, 13, 13015 12 of 27
+Table 2. Cont.
+Ref. Problem Nature Important Considerations Objective(s) Sample Size Solution
+Method
+[94] - Capacitated
+- Considers automated
+parcel lockers (APLs)
+- Capacity of parcel lockers
+- Lockers are activated
+based on the needed
+coverage area
+- Specified distance range
+Minimize customer
+assignment cost and
+locker setup,
+decomposition, &
+working cost
+- Yearly APL demand:
+13 K to 28 K
+- No. of lockers: 52 to 122
+Agent-based
+simulation model
+[96] - Capacitated
+- Mobility is considered as
+a different option for
+locations of lockers
+- Total travel distances of
+flees and customers
+- Maximum coverage
+desired by limited
+numbers of mobile parcel
+lockers with specific
+capacities
+- Problem defined as
+facility location problem
+Maximum coverage,
+minimum overlap,
+and minimum idle
+capacity
+- 10 smart parcel lockers
+- population size: 50, 100,
+or 150
+Heuristic
+(Taguchi Method
+and
+GA)
+[98] - Capacitated
+- Parcel locker as a delivery
+point of customers for
+different sellers (open
+parcel lockers)
+- Home deliveries are not
+available
+- Total travel distances of
+fleet from different sellers
+and customers are
+considered as effecting
+factor of emission
+Minimize travel
+distance and
+emission
+- 3 types of vehicle
+- Four lockers in two cities
+Statistical
+analytics
+[100]
+- Time
+windowed
+- Capacitated
+- Concurrent consideration
+of home delivery or
+locker delivery
+- Grouping locker areas
+based on postal zones
+- Limited time spans for
+delivery
+- Volume limits on each
+locker
+- Limited travel distance
+for customers
+- Cost of active locker
+positions is considered
+Minimize the cost
+and emission - -
+Generic VRP
+solvers
+[102]
+- Capacitated
+- Time
+windowed
+- Parcel locker is an option
+for customers.
+- Limited capacity for
+lockers and fleet
+- Limiting not to have sub
+tours
+Minimize total travel
+distance by trucks
+and customers, and
+locker opening cost
+- 20, 40, 60, 100 customers
+- lockers are 1/10 of
+customers
+Branch-and-cut
+algorithm
+[103] - Capacitated
+- Lockers as intermediate
+depots
+- Traveling distance for
+fleet
+- Compensates customers
+for travel
+- Considers capacity for
+fleet and lockers
+- There are some
+predetermined lockers
+Minimize the
+transportation cost
+and compensation to
+customers
+- 4 lockers and 6 customers Heuristic (SA)
+Appl. Sci. 2023, 13, 13015 13 of 27
+Table 2. Cont.
+Ref. Problem Nature Important Considerations Objective(s) Sample Size Solution
+Method
+[104]
+- Capacitated
+- Stochastic (just
+for specific
+customers)
+- Use of customers who
+come to location of
+lockers as ODs for home
+delivery requests
+- Compensates customers
+if they act as ODs
+- Limited capacity for the
+lockers, fleet, and ODs
+- Sub-tours are not allowed
+Minimize the cost of
+locker supply, OD
+compensation, and
+routing
+- 40 to 106 customers
+- 3 to 5 lockers
+Exact solve with
+CPLEX
+[106] - Capacitated
+- Waiting time for the
+customers
+- Effect of naval services
+and ferries
+- Specified capacity for
+lockers
+Minimize parcel
+waiting time
+- 30 customers
+- 1 locker Heuristic (GA)
+[107]
+- Capacitated
+- time
+windowed
+- Parcel locker is an option
+for customers
+- Home delivery is limited
+to time windows
+- Multi-size lockers
+- Compensates customers
+for travel
+- Putting multiple parcels
+in one locker
+Minimize the travel
+distance cost and
+compensation to
+customers
+- 25, 50, 75 customers
+- 5 stations with different
+slots
+Heuristic
+(adaptive large
+neighborhood
+search)
+[108]
+- Capacitated
+- Time
+windowed
+- Multiple fleet
+options
+- Considers mobility of
+parcel lockers
+- Using an autonomous
+vehicle or a human
+- Limited customer travel
+distance
+- Limited capacities for
+vehicles
+- Minimum overlap
+between vehicle waiting
+time and customer
+expected time span
+- Parking space limitation
+Minimize fixed &
+variable costs of
+lockers, and fixed
+and swapping costs
+of drives
+- 5, 15, 30, 50 customers
+- 15 locker locations
+- 6 types of locker
+Holistic MIP
+Tabu search
+[109] - Capacitated
+- Total travel distances of
+fleet and customers
+- Limited and multiple
+fleets with small and
+medium capacities
+- Customer grouping
+based on lockers’
+locations.
+Minimize travel
+distance cost from
+depots to virtual
+centers and distance
+cost to serve
+customers
+- 65 customer zones
+- 2 depots
+- 19 lockers
+Metaheuristic
+(customer
+clustering & TSP
+solving)
+4.3. Sidekicks
+Delivery by sidekicks in LMD is based on drones and real-time navigation technology [110]. Sidekick delivery uses main vehicles, usually trucks, which carry sidekicks and
+parcels to local areas, where the sidekicks complete delivery. Drones, or Unmanned Aerial
+Vehicles (UAVs) [51], have evolved from military applications tracing back to the 1930s. As
+their costs have substantially decreased, they have become readily available to the public
+and logistics companies in the last 10 years [111].
+Sidekicks are often aerial drones with different capabilities and limitations in their carrying capacity, charging time, and coverage area. Sidekick delivery has many other names,
+such as drone-assisted delivery [112,113], multi-modal delivery [13], carrier-vehicle [12],
+joint-delivery systems [114], two-echelon delivery [115], and automated delivery robots [116].
+Fleet synchronization and collaborative operations between main vehicles and drones
+are important. Among the 10 categories of two-echelon VRPs in [117], synchronization
+Appl. Sci. 2023, 13, 13015 14 of 27
+between two echelons applies to the sidekick delivery. In urban areas, other options, such
+as bikes and postal couriers, can also be sidekicks.
+As shown in Figure 5, there are two different types of route in a sidekick delivery
+system. To plan the delivery with sidekicks, delivery nodes (customer locations and intermediate depots) are selected along with the routes of the main vehicles and sidekicks. For
+the delivery, the main vehicle departs from the main depot toward a series of intermediate
+depots (ID). Sidekicks then depart from the main vehicle at an intermediate depot to deliver
+the parcels to customers based on the pre-defined collaboration mode. There are three
+modes of vehicle–sidekick collaborations.
+Appl. Sci. 2023, 13, x FOR PEER REVIEW Figure 5. Delivery with sidekick in LMD.
+The literature on sidekicks in Table 3 shares common characteristics and ferences in the nature of problems. Drones and main vehicles are commonly except for [119]. The battery life of the drones is also considered as a capacity references of [120,121]. Some papers on sidekick delivery consider time windmain vehicles and sidekicks for the collaboration between fleets [118,122–12mous drones are the most common sidekicks, while [119] consider boats as sidmain vehicles are mostly human operated, except for [116,121]. Autonomous vethe advantages of reduced labor cost and delivery time, increased work safety,accessibility. No paper in this survey considers the dynamic and stochastic naproblems. The solution methods in sidekick deliveries vary widely, including ger programming (MIP) and heuristic search algorithms such as clustering-baalgorithms and adaptive large neighborhood algorithms.
+Table 3. Literature on delivery using sidekicks.
+Ref. Problem Nature Important Considerations Objective(s) Sample Size [38] - Capacitated
+- Grouping the customers, then using a drone to
+reach them
+- Trucks as conveyors of drones
+- Drones’ capacity affects customer grouping
+- Drones perform limited travel based on their
+charge
+Minimize cost of
+distance traveled
+and waiting time of
+the main vehicle
+(AV)
+- 100 or 500
+customers
+- 10–100
+drones
+- 8 delivery
+scenarios
+Heu(grerithm-MainvehiclecandeliverproductsFigure 5. Delivery with sidekick in LMD.
+- Mode 1: The main vehicle stays at an intermediate depot until the sidekicks finish
+their deliveries and return to it [112,115].
+- Mode 2: Sidekicks leave the main vehicle at an intermediate depot and join the main
+vehicle at another intermediate depot. They return to the main depot together [39,118].
+- Mode 3: Sidekicks leave the main vehicle at an intermediate depot for delivery and
+return to the main depot by themselves [113].
+In the above cases, the main vehicle may deliver parcels by itself or just act as a carrier.
+The literature on sidekicks in Table 3 shares common characteristics and notable
+differences in the nature of problems. Drones and main vehicles are commonly capacitated
+except for [119]. The battery life of the drones is also considered as a capacity limit in
+two references of [120,121]. Some papers on sidekick delivery consider time windows of the
+main vehicles and sidekicks for the collaboration between fleets [118,122–124]. Autonomous
+drones are the most common sidekicks, while [119] consider boats as sidekicks. The main
+vehicles are mostly human operated, except for [116,121]. Autonomous vehicles have the
+advantages of reduced labor cost and delivery time, increased work safety, and higher
+accessibility. No paper in this survey considers the dynamic and stochastic natures of
+the problems. The solution methods in sidekick deliveries vary widely, including mixedinteger programming (MIP) and heuristic search algorithms such as clustering-based
+genetic algorithms and adaptive large neighborhood algorithms.
+Appl. Sci. 2023, 13, 13015 15 of 27
+Table 3. Literature on delivery using sidekicks.
+Ref. Problem Nature Important Considerations Objective(s) Sample Size Solution
+Method
+[38] - Capacitated
+- Grouping the customers,
+then using a drone to
+reach them
+- Trucks as conveyors of
+drones
+- Drones’ capacity affects
+customer grouping
+- Drones perform limited
+travel based on their
+charge
+Minimize cost of
+distance traveled and
+waiting time of the
+main vehicle (AV)
+- 100 or 500 customers
+- 10–100 drones
+- 8 delivery scenarios
+Heuristic (greedy
+algorithm)
+[39] - Capacitated
+- Main vehicle can deliver
+products
+- Main vehicles and
+sidekicks should join
+before returning to the
+depot
+- Two types of sidekick
+evaluated
+Minimize the total
+truck arrival time
+- 8 customer nodes
+- 1–2 trucks
+Mixed-integer
+problem (MIP)
+[50] - Capacitated
+- Customers clustered to
+intermediate depots
+- Two-echelon VRP: a van
+as main and drone as
+sidekick
+- Different vans can go to
+each intermediate depot
+- Sidekicks should join vans
+to come back to depot
+Minimize total cost of
+travel and emission
+- No. of main vehicles: 2, 4,
+5, 10
+Heuristic (GA
+and particle
+swarm)
+[112] - Capacitated
+- Main vehicles and
+sidekicks should join
+before returning to the
+depot
+- Sidekicks can join the
+main vehicle in different
+intermediate depots
+- Setup time and retrieval
+time are considered.
+- Some customers’
+locations are defined as
+intermediate depots
+Minimize the return
+time to depot
+- 72 problem sets with 10
+or 20 customers.
+Heuristic (5-step
+algorithm)
+[113] - Capacitated
+- Main vehicles and
+sidekicks come back
+independently.
+- Both trucks and sidekicks
+can deliver parcels
+- Sidekicks should meet a
+truck for each delivery
+and can ride them in
+some parts of the path
+- Intermediate depots can
+be met many times by
+trucks or sidekicks
+- Minimized the latest
+return to the depot
+Minimize the largest
+return time
+- 2 trucks, 1 drone,
+10 customers
+Mixed-integer
+problem (MIP)
+using some
+algorithm for
+upper bounding
+[115] - Capacitated
+- There are limited main
+vehicles and sidekicks
+- Each intermediate depot
+is considered as a
+micro-hub
+- Capacity of vans and
+drones, as well as battery
+life limitations for drones,
+are considered
+- Each drone joins back to
+the van at the same
+location after delivery
+Minimize delivery
+(volume) and
+emission (weight &
+speed) costs
+- -
+Heuristic
+(cluster-based
+artificial
+immune)
+Appl. Sci. 2023, 13, 13015 16 of 27
+Table 3. Cont.
+Ref. Problem Nature Important Considerations Objective(s) Sample Size Solution
+Method
+[116] - Capacitated
+- All vehicles are
+considered autonomous
+- Intermediate locations
+are fixed
+- Relative effects of
+distance and
+compartments
+Minimize the cost of
+customer serving
+- 4 depots
+- 100 customers
+Statistical
+analytics on real
+data
+[118]
+- Time
+windowed
+- Capacitated
+- Parcels will be delivered
+to/from mobile points
+(intermediate depots)
+- Bidirectional delivery
+(delivery and pick up)
+- A single parcel can be
+carried by drones
+- Runs executed within the
+required time
+Minimize total
+delivery costs
+- 10 customers
+- 1–3 main vehicles
+- 1 or 3 mobile points
+Heuristic
+(dedicated GA)
+[119]
+- Capacitated
+- Multiple fleet
+options
+- Ship/plane as main
+vehicle and boat/drone
+as sidekick
+- Drones can carry one or
+more parcels but have
+limited travel lengths
+- Main vehicles have no
+capacity limit
+- Main vehicles only serve
+as drone carriers
+Minimize the total
+travel time of main
+vehicles and drones
+- 10 to 200 customers
+B&B and cone
+heuristic
+algorithm
+[120] - Capacitated
+- Drones deliver parcels
+with limited flight length
+- Intermediate depots
+should be in one of the
+customers’ locations, and
+drones can join trucks in
+various locations
+- Trucks also deliver
+parcels
+- The truck and drones
+leave and return to the
+depot together
+- No charging time by
+swapping batteries
+Minimize the tour
+costs of trucks and
+drones
+- 100 nodes
+- 1–2 depots
+Heuristic (two
+steps of
+clustering and
+local search
+/dynamic
+programming
+[121] - Capacitated
+- Drones (UAVs) can
+deliver one parcel
+- Flying length of drones is
+limited by the speed and
+parcel’s weight
+- Autonomous trucks
+(UGVs) also deliver
+parcels
+- Waiting time is
+considered for both
+trucks and drones
+Minimize the total
+travel time of UGV &
+UAV
+- 10, 50, 100 nodes
+Heuristic
+(two-stages of set
+covering and
+allocations)
+[122]
+- Capacitated
+- Time
+windowed
+- Main vehicles are mobile
+during the departure and
+return of drones
+- Either main vehicle or
+drone can deliver parcels
+- Both types of vehicle
+should reach destinations
+at specific durations
+- Service time is considered
+- Waiting times are
+considered for both types
+Minimize operation
+and waiting time
+costs for both vans &
+UAVs
+- 100 customers
+Heuristic
+(adaptive large
+neighborhood)
+Appl. Sci. 2023, 13, 13015 17 of 27
+Table 3. Cont.
+Ref. Problem Nature Important Considerations Objective(s) Sample Size Solution
+Method
+[123]
+- Capacitated
+- Time
+windowed
+- Both trucks and drones
+deliver parcels
+- Trucks have limited
+capacities
+- There are some depots as
+the start-points
+- Drones can join trucks in
+various locations
+- Trucks may wait for
+drones to reach them, but
+the reverse case is not
+allowed
+- Drones may
+independently return to
+the main depot after the
+last delivery.
+- Battery limitation is
+considered for drones
+Minimize travel costs
+for trucks & UAVs
+- 50, 100, 150,
+200 customers
+Heuristic
+(adaptive
+neighborhood)
+[124]
+- Capacitated
+- Time
+windowed
+- Both trucks and drones
+can deliver parcels
+- Trucks and drones leave
+and return to the depot
+together
+- Both travel and waiting
+costs are considered
+Minimize the
+transportation
+and waiting costs,
+minimize latest
+return time
+- 10–100 customers
+- 600–25 k deliverables by
+drone
+Heuristic
+(non-dominated
+sorting GA)
+[125] - Capacitated
+- Drone may serve
+multiple targets per trip
+- Battery capacity is
+defined based on the load
+and speed of drones
+- Trucks just act as carriers
+- Tradeoff between the
+speed and fuel
+consumption is
+considered
+Minimize total route
+time
+- 25, 50 customers
+- 25, 50 depots Flexible heuristic
+4.4. Optional Points
+Delivery to optional points quickly became popular in LMD as customers wanted
+timely and reliable deliveries. Customers provide multiple optional delivery points for
+pickup along with delivery time windows, and then the delivery plan chooses one of
+them. This delivery mode can reduce the number of visit locations, mitigate costly detours, and ultimately enhance customer satisfaction while simultaneously minimizing the
+environmental impact and overall distribution costs [126–129].
+Delivery to an optional point is also named as covering options [130], covering locations [131], different delivery locations [127], and delivery options [132]. In general, as
+shown in Figure 6, customers specify their preferred delivery points. They can prioritize
+these points along with their possible time windows. Then, the delivery system determines
+the optimal route along with appropriate delivery nodes for customers, considering both
+customer preferences and the objectives of the delivery system.
+Table 4 summarizes the literature on optional delivery points. While earlier research
+does not consider customers’ preferences on delivery points [133], more recent papers
+offer customers a broader array of location choices and consider customers’ preferences
+over the delivery points for route planning [129,132]. All papers in the table consider the
+capacity limit of the fleet. Many references introduce time-windowed constraints (80% of
+the papers) and consider additional service times at the delivery point to account for the
+temporal aspects of the deliveries. Multiple fleet options are not widely considered except
+in two papers [36,131]. Due to the complexity of the solution procedure, the dynamic
+Appl. Sci. 2023, 13, 13015 18 of 27
+nature of the problem and unpredictability of the influencing factors are not studied in
+the literature.
+Appl. Sci. 2023, 13, x FOR PEER REVIEW 16 of 24
+Figure 6. Delivery with optional points in LMD.
+Table 4 summarizes the literature on optional delivery points. While earlier research
+does not consider customers’ preferences on delivery points [133], more recent papers offer customers a broader array of location choices and consider customers’ preferences over
+the delivery points for route planning [129,132]. All papers in the table consider the capacity limit of the fleet. Many references introduce time-windowed constraints (80% of the
+papers) and consider additional service times at the delivery point to account for the temporal aspects of the deliveries. Multiple fleet options are not widely considered except in
+two papers [36,131]. Due to the complexity of the solution procedure, the dynamic nature
+of the problem and unpredictability of the influencing factors are not studied in the literature.
+Most researchers use heuristic and metaheuristic approaches to solve the problems,
+except [134], which uses an exact solution approach. While the ideal concept of optional
+delivery points would allow customers to use any delivery location, all research assumes
+only one home address in addition to the pre-determined locker locations. An incentive
+system for the delivery to parcel lockers is suggested for higher customer satisfaction and
+reduced delivery costs [103].
+Table 4. Literature on delivery to optional points.
+Ref. Problem Nature Important Considerations Objectives Sample Size Solution
+Method
+[36]
+- Time window
+- Capacitated
+- Multiple
+fleet options
+- Both vehicles and ODs can be used for deliveries
+- ODs just take parcels for home delivery
+- ODs and vehicles have limited capacity but can
+take more than one parcel based on their capacities
+- ODs should pick up the parcels from lockers, depots, or both before going to delivery
+- Time windows are considered for home deliveries
+- Service time is considered
+Minimize the
+transportation
+cost and ODs
+payment
+- 25 customers with 3
+alternative
+nodes, and
+25 ODs
+Heuristic
+(adaptive large
+neighborhood
+search)
+[126]
+- Time windowed
+- Capacitated
+- Each vehicle can deliver multiple parcels with limited capacity and time for each day
+- Optional points have location-dependent costs
+- Lockers, as optional points, have limited capacities
+- Service time is considered
+Minimize the
+fixed & variable
+costs of vehicles, and location cost
+- 8 stations
+for 892 urban customers
+- 18 stations
+for 1101
+rural customers
+Heuristic
+(adaptive large
+neighborhood
+search)
+Figure 6. Delivery with optional points in LMD.
+Table 4. Literature on delivery to optional points.
+Ref. Problem Nature Important Considerations Objectives Sample Size Solution
+Method
+[36]
+- Time window
+- Capacitated
+- Multiple fleet
+options
+- Both vehicles and ODs
+can be used for deliveries
+- ODs just take parcels for
+home delivery
+- ODs and vehicles have
+limited capacity but can
+take more than one parcel
+based on their capacities
+- ODs should pick up the
+parcels from lockers,
+depots, or both before
+going to delivery
+- Time windows are
+considered for home
+deliveries
+- Service time is
+considered
+Minimize the
+transportation cost
+and ODs payment
+- 25 customers with
+3 alternative nodes, and
+25 ODs
+Heuristic
+(adaptive large
+neighborhood
+search)
+[126]
+- Time
+windowed
+- Capacitated
+- Each vehicle can deliver
+multiple parcels with
+limited capacity and time
+for each day
+- Optional points have
+location-dependent costs
+- Lockers, as optional
+points, have limited
+capacities
+- Service time is
+considered
+Minimize the fixed &
+variable costs of
+vehicles, and location
+cost
+- 8 stations for 892 urban
+customers
+- 18 stations for 1101 rural
+customers
+Heuristic
+(adaptive large
+neighborhood
+search)
+[127]
+- Time
+windowed
+- Capacitated
+- Customers can give
+multiple locations with
+priorities
+- Each location is available
+in a specific time window
+- Each vehicle delivers just
+a parcel and returns to
+depot
+Minimize the cost as
+operation cost and
+customer priorities
+- 10, 25, 50, 100 customers
+- 3 options for each
+customer
+Comparative ad
+hoc heuristic
+Appl. Sci. 2023, 13, 13015 19 of 27
+Table 4. Cont.
+Ref. Problem Nature Important Considerations Objectives Sample Size Solution
+Method
+[128] - Capacitated
+- All options for delivery
+are automatic lockers
+- Lockers have limited
+capacities, but vehicles
+are big enough not to
+consider the capacity
+limit
+- All vehicles should go
+out and come back to the
+depot in a specific time
+span. The assigned
+parcels to each locker
+should be carried by at
+most one truck
+- Service time is
+considered for unloading
+at each locker
+Minimize the fixed &
+variable costs of
+vehicles, and delivery
+penalty
+- 500, 1000, 1500 parcels
+- 20, 40, 50 lockers
+Heuristic (Tabu
+search & large
+neighborhood
+search)
+[129] - Capacitated
+- Delivery options are
+self-pickup from lockers
+or home delivery
+- Customers’ priorities are
+considered
+- Some lockers may be
+activated for delivery
+with some charges
+- Vehicles and locker
+stations have limited
+capacities
+Minimize the fixed &
+variable costs of
+vehicles, maximize
+revenue
+- 4 to 22 customers
+Heuristic
+(MCDM &
+tailored
+mathematics)
+[130] - Capacitated
+- Delivery to the nearest
+locker or customer’s
+home
+- Home deliveries will be
+made from lockers with
+bikes
+- It is a combination of two
+separate problems:
+delivery to parcel locker
+and sidekick delivery
+- There are limited
+numbers of bikes and
+trucks
+Minimize the
+traveling and
+connection costs
+- -
+Heuristic
+(adaptive large
+neighborhood
+search)
+[132]
+- Time
+windowed
+- Capacitated
+- Service time is
+considered, as it affects
+delivery costs
+- Direct delivery or pickup
+facility are the two
+options
+- Direct delivery charges
+for customers
+- Parcels are delivered to
+home during a time
+window or sent to a
+pickup facility out of
+those times
+- Vehicles are limited by
+capacities and travel
+distances
+Minimize the travel,
+vertical, service, and
+penalty costs
+- 8–100 customers
+- 4–30 vehicles
+- 3–15 lockers
+Heuristic
+(crowding
+differential
+evolution)
+Appl. Sci. 2023, 13, 13015 20 of 27
+Table 4. Cont.
+Ref. Problem Nature Important Considerations Objectives Sample Size Solution
+Method
+[134]
+- Time
+windowed
+- Capacitated
+- If a delivery cannot be
+made in a defined time
+window, it will be
+delivered to the other
+optional point
+- Customer priorities are
+considered for delivery
+points
+- Vehicles and lockers, as
+optional points, have
+limited capacities
+Minimize the overall
+cost of selected routes
+- 25–50 requests
+- Average of 1.5 (2) points
+of delivery
+Exact solve
+(branch price and
+cut)
+[135]
+- Time
+windowed
+- Capacitated
+- Vehicles have limited
+volumes
+- Deliveries should be
+made within the required
+time
+- Deliveries cannot be split
+between two vehicles
+- Customers can select to
+have home deliveries or
+pickup from lockers near
+them
+- For delivery to lockers,
+distributors should pay
+penalties
+Minimize travel costs
+and penalty costs
+- No. of items 20–20 k
+- No. of points 5–200
+- No. of vehicles 2–20
+Heuristic (hybrid
+CLP/MP)
+[136]
+- Stochastic
+- Capacitated
+- Time
+windowed
+- Two delivery options:
+home and locker station.
+- Travel time is considered
+stochastic
+- Vehicles have limited
+capacities
+- Vehicles are allowed to
+use limited daily fuel and
+should come back to
+depot (GVRP)
+- Delivery should be made
+in a specific time span
+Minimize the cost of
+travel time
+- 30 to 300 customers
+- 30, 60, 90, 120 nodes
+Heuristic
+(two-stage with
+large acceptance
+strategy
+Most researchers use heuristic and metaheuristic approaches to solve the problems,
+except [134], which uses an exact solution approach. While the ideal concept of optional
+delivery points would allow customers to use any delivery location, all research assumes
+only one home address in addition to the pre-determined locker locations. An incentive
+system for the delivery to parcel lockers is suggested for higher customer satisfaction and
+reduced delivery costs [103].
+5. Implications and Future Research
+Last-mile delivery (LMD) is a new request for city logistics that resulted from changes
+in people’s way of life and expectations along with the development of supporting technology of computation, communication, and automation. Continuing or even accelerated
+global urbanization requires continuous discussion and innovation on LMD.
+5.1. Result Summary
+This review research identified the problem nature, important considerations, and
+solution methods in the LMD literature under four categories: crowdshipping, parcel
+lockers, sidekick delivery, and optional delivery points.
+- Crowdshipping utilizes sharing economy platforms for parcel delivery. Occasional
+drivers make their resources available for parcel delivery, offering cost-effective LMD
+solutions. This paradigm thrives on the efficiency and flexibility of the drivers. De-
+Appl. Sci. 2023, 13, 13015 21 of 27
+spite the highly dynamic and stochastic nature of the problem, these issues have not
+been discussed in depth in the literature. Various matching mechanisms have been
+proposed.
+- Delivery to parcel lockers offers a promising solution for LMD under urban logistics.
+Distributors place customers’ parcels in lockers and notify them for pickup. Parcel
+lockers are expected to reduce cost and environmental hazards while enhancing
+security and privacy. The assignment of customers to parcel lockers is an important
+decision for the network design. Various configurations of lockers are proposed:
+stationary, temporary, and mobile lockers. Time window consideration for busy areas
+is another emerging aspect of profit generation and customer satisfaction.
+- Delivery by using sidekicks is a specialized category within LMD, taking full advantage of automation, data communication, and sensor technologies. Main vehicles
+carry sidekicks (mostly aerial drones) and parcels to intermediate locations and deploy sidekicks, getting the benefit of multiple fleet modes. Careful coordination of
+vehicles is essential. Fleet capacity, battery life, and coverage limitation are considered
+important.
+- Delivery to optional points invites customers to participate in the delivery planning;
+customers offer alternative drop locations for the shippers to choose from. This option
+reduces travel distance and distribution costs while enhancing customer satisfaction.
+The time window considerations are necessary but difficult during implementation.
+While some research emphasizes a tradeoff between logistics costs and customer
+satisfaction from nearby and timely pickup, most studies focus on the logistics costs.
+This review research noticed that new VRP problems are being formulated to meet
+very practical and non-traditional needs in the logistics markets. They include not only
+the development of new communication and automation technology, but also cultural
+changes in customers’ expectations and active involvement in the distribution process.
+The consideration of people engagement in logistics will continue to be an important
+consideration in LMD and conventional VRP as well.
+5.2. Opportunities for Future Research
+The literature survey suggests the need for the following future research in last-mile
+delivery studies.
+1. Last-mile delivery deals with the B2C (business to customer) model of business, which
+involves a high level of dynamism: frequent updates of the problem environment,
+including customers’ real-time order changes. The urban condition of delivery and
+the use of automated systems make the problem highly stochastic. Considerations of
+the dynamic and stochastic nature of the problem environments are needed for more
+robust logistics planning.
+2. Not only autonomous aerial drones and unmanned trucks, but other possible autonomous devices have distinct characteristics of service: speed, size, geographical
+barriers, and coverage spans. The reliability of the units and local intelligence to
+cope with unexpected circumstances along with the improvement in the technical
+characteristics are challenging. The development and creative use of delivery modes
+will significantly enhance logistics efficiency, especially for urban logistics.
+3. Most studies use simulated data. Rigorous integration of academic models and
+transactional data will improve the validity of the LMD models. Data gathering
+becomes more challenging, especially to reflect the diverse characteristics of different
+areas and people.
+4. Comprehensive assessments of the environmental impact of various LMD approaches
+in all four categories of LMD configurations are needed to understand their sustainability implications. People understand that vehicles are responsible for a large
+portion of pollution. Different delivery approaches may help or harm the environment. Holistic considerations of pollutants generated by both customers and delivery
+Appl. Sci. 2023, 13, 13015 22 of 27
+systems as well as pollution from energy production and the consumption life cycle
+are warranted.
+5. Individuals are willing to help both the supply and demand sides of city logistics
+by serving as ODs (occasional driers) and providing optional delivery points. The
+development of various business models utilizing individuals and careful operational
+planning will improve both customer satisfaction and firms’ profitability.
+6. The routing problem in LMD is computationally difficult. Innovative ways of using
+big data analytics, AI-based procedures, heuristic/metaheuristic approaches, and
+exact solution approaches along with their hybrid methods are warranted.
+Author Contributions: Conceptualization, J.J., E.A., R.J. and K.A.; methodology, R.J.; software, Not
+Applicable; validation, R.J., J.J. and K.A.; formal analysis, E.A.; investigation, R.J. and E.A.; resources,
+E.A.; data curation, E.A.; writing—original draft preparation, R.J. and E.A.; writing—review and
+editing, J.J. and K.A.; visualization, R.J. and E.A.; supervision, J.J.; project administration, J.J.; funding
+acquisition, Not Applicable. All authors have read and agreed to the published version of the
+manuscript.
+Funding: This research received no external funding.
+Institutional Review Board Statement: Not applicable.
+Informed Consent Statement: Not applicable.
+Data Availability Statement: Not applicable.
+Conflicts of Interest: The authors declare no conflict of interest.
+References
+1. Li, J.; Rombaut, E.; Vanhaverbeke, L. A systematic review of agent-based models for autonomous vehicles in urban mobility and
+logistics Possibilities for integrated simulation models. Comput. Environ. Urban Syst. 2021, 89, 101686. [CrossRef]
+2. Otto, A.; Agatz, N.; Campbell, J.; Golden, B.; Pesch, E. Optimization approaches for civil applications of unmanned aerial vehicles
+(UAVs) or aerial drones: A survey. Networks 2018, 72, 411–458. [CrossRef]
+3. Berg, P.W.; Isaacs, S.; Blodgett, K.L. Airborne Fulfillment Center Utilizing Unmanned Aerial Vehicles for Item Delivery. U.S.
+Patent 9,305,280, 5 April 2016.
+4. Owens, B. Last Mile Delivery Explained: Definition, Cost, and How to Get It Right. Available online: https://whiplash.com/
+blog/last-mile-delivery/ (accessed on 28 March 2023).
+5. Boysen, N.; Fedtke, S.; Schwerdfeger, S. Last-mile delivery concepts a survey from an operational research perspective. OR Spectr.
+2021, 43, 1–58. [CrossRef]
+6. Pourrahmani, E.; Jaller, M. Crowdshipping in last mile deliveries Operational challenges and research opportunities. Socio-Econ.
+Plan. Sci. 2021, 78, 101063. [CrossRef]
+7. Mangiaracina, R.; Perego, A.; Seghezzi, A.; Tumino, A. Innovative solutions to increase last-mile delivery efficiency in B2C
+e-commerce: A literature review. Int. J. Phys. Distrib. Logist. Manag. 2019, 49, 901–920. [CrossRef]
+8. Ma ´ndziuk, J. New shades of the vehicle routing problem: Emerging problem formulations and computational intelligence
+solution methods. IEEE Trans. Emerg. Top. Comput. Intell. 2018, 3, 230–244. [CrossRef]
+9. Demir, E.; Syntetos, A.; Van Woensel, T. Last mile logistics: Research trends and needs. IMA J. Manag. Math. 2022, 33, 549–561.
+[CrossRef]
+10. Eskandaripour, H.; Boldsaikhan, E. Last-mile drone delivery Past, present, and future. Drones 2023, 7, 77. [CrossRef]
+11. Sabet, S.; Farooq, B. Green Vehicle Routing Problem: State of the Art and Future Directions. IEEE Access 2022, 10, 101622–101642.
+[CrossRef]
+12. Macrina, G.; Pugliese, L.D.P.; Guerriero, F.; Laporte, G. Drone-aided routing: A literature review. Transp. Res. Part C Emerg.
+Technol. 2020, 120, 102762. [CrossRef]
+13. Moshref-Javadi, M.; Winkenbach, M. Applications and Research avenues for drone-based models in logistics: A classification and
+review. Expert Syst. Appl. 2021, 177, 114854. [CrossRef]
+14. Christofides, N. The vehicle routing problem. Revue française d’automatique, informatique, recherche opérationnelle. Rech.
+Opérationnelle 1976, 10, 55–70. [CrossRef]
+15. Laporte, G. The vehicle routing problem: An overview of exact and approximate algorithms. Eur. J. Oper. Res. 1992, 59, 345–358.
+[CrossRef]
+16. Osaba, E.; Yang, X.S.; Del Ser, J. Is the vehicle routing problem dead an overview through bioinspired perspective and a prospect
+of opportunities. In Nature-Inspired Computation in Navigation and Routing Problems: Algorithms, Methods and Applications; Springer:
+Singapore, 2020; pp. 57–84.
+Appl. Sci. 2023, 13, 13015 23 of 27
+17. Dantzig, G.B.; Ramser, J.H. Truck Dispatching Problem. Manag. Sci. 1959, 6, 80–91. [CrossRef]
+18. Lin, C.; Choy, K.L.; Ho, G.T.; Chung, S.H.; Lam, H.Y. Survey of green vehicle routing problem: Past and future trends. Expert Syst.
+Appl. 2014, 41, 1118–1138. [CrossRef]
+19. Ghorbani, E.; Alinaghian, M.; Gharehpetian, G.B.; Mohammadi, S.; Perboli, G. A survey on environmentally friendly vehicle
+routing problem and a proposal of its classification. Sustainability 2020, 12, 9079. [CrossRef]
+20. Qin, H.; Su, X.; Ren, T.; Luo, Z. A review on the electric vehicle routing problems Variants and algorithms. Front. Eng. Manag.
+2021, 8, 370–389. [CrossRef]
+21. Erdeli´c, T.; Cari´c, T. A survey on the electric vehicle routing problem variants and solution approaches. J. Adv. Transp. 2019, 2019,
+5075671. [CrossRef]
+22. Martins, L.D.C.; Tordecilla, R.D.; Castaneda, J.; Juan, A.A.; Faulin, J. Electric vehicle routing, arc routing, and team orienteering
+problems in sustainable transportation. Energies 2021, 14, 5131. [CrossRef]
+23. Agatz, N.; Erera, A.L.; Savelsbergh, M.W.; Wang, X. Dynamic ride-sharing: A simulation study in metro Atlanta. Procedia-Soc.
+Behav. Sci. 2011, 17, 532–550. [CrossRef]
+24. Ghilas, V.; Demir, E.; Van Woensel, T. Integrating Passenger and Freight Transportation: Model Formulation and Insights; Technische
+Universiteit Eindhoven: Eindhoven, The Netherlands, 2013.
+25. Berbeglia, G.; Cordeau, J.F.; Gribkovskaia, I.; Laporte, G. Static pickup and delivery problems: A classification scheme and survey.
+Top 2007, 15, 1–31. [CrossRef]
+26. Ranieri, L.; Digiesi, S.; Silvestri, B.; Roccotelli, M. A review of last mile logistics innovations in an externalities cost reduction
+vision. Sustainability 2018, 10, 782. [CrossRef]
+27. Tan, S.Y.; Yeh, W.C. The vehicle routing problem: State-of-the-art classification and review. Appl. Sci. 2021, 11, 10295. [CrossRef]
+28. Li, B.; Wu, G.; He, Y.; Fan, M.; Pedrycz, W. An overview and experimental study of learning-based optimization algorithms for
+the vehicle routing problem. CAA J. Autom. Sin. 2022, 9, 1115–1138. [CrossRef]
+29. Karakatiˇc, S.; Podgorelec, V. A survey of genetic algorithms for solving multi depot vehicle routing problem. Appl. Soft Comput.
+2015, 27, 519–532. [CrossRef]
+30. Sharma, R.; Saini, S. Heuristics and meta-heuristics based multiple depot vehicle routing problem: A review. In Proceedings of
+the International Conference on Electronics and Sustainable Communication Systems (ICESC), Coimbatore, India, 2–4 July 2020.
+31. Lim, S.F.W.; Jin, X.; Srai, J.S. Consumer-driven e-commerce A literature review, design framework, and research agenda on
+last-mile logistics models. Int. J. Phys. Distrib. Logist. Manag. 2018, 48, 308–332. [CrossRef]
+32. Mohammad, W.A.; Diab, Y.N.; Elomri, A.; Triki, C. Innovative solutions in last mile delivery concepts, practices, challenges, and
+future directions. Supply Chain Forum Int. J. 2023, 24, 151–169. [CrossRef]
+33. Patella, S.M.; Grazieschi, G.; Gatta, V.; Marcucci, E.; Carrese, S. The adoption of green vehicles in last mile logistics A systematic
+review. Sustainability 2020, 13, 6. [CrossRef]
+34. Giuffrida, N.; Fajardo-Calderin, J.; Masegosa, A.D.; Werner, F.; Steudter, M.; Pilla, F. Optimization and machine learning applied
+to last-mile logistics A review. Sustainability 2022, 14, 5329. [CrossRef]
+35. Vincent, F.Y.; Nguyen, M.P.; Putra, K.; Gunawan, A.; Dharma, I. The Two-Echelon Vehicle Routing Problem with Transshipment
+Nodes and Occasional Drivers: Formulation and Adaptive Large Neighborhood Search Heuristic. J. Adv. Transp. 2022, 2022,
+5603956.
+36. Vincent, F.Y.; Jodiawan, P.; Redi, A.P. Crowd-shipping problem with time windows, transshipment nodes, and delivery options.
+Transp. Res. Part E Logist. Transp. Rev. 2022, 157, 102545.
+37. Chiang, W.C.L.Y.; Shang, J.; Urban, T.L. Impact of drone delivery on sustainability and cost Realizing the UAV potential through
+vehicle routing optimization. Appl. Energy 2019, 242, 1164–1175. [CrossRef]
+38. Imran, N.M.; Mishra, S.; Won, M. A-VRPD: Automating Drone-Based Last-Mile Delivery Using Self-Driving Cars. In IEEE
+Transactions on Intelligent Transportation Systems; IEEE: New York, NY, USA, 2023.
+39. Kitjacharoenchai, P.; Lee, S. Vehicle routing problem with drones for last mile delivery. In Proceedings of the 25th International
+Conference on Production Research Manufacturing Innovation: Cyber Physical Manufacturing, Chicago, IL, USA, 9–14 August
+2019.
+40. Praveen, V.; Keerthika, P.; Sivapriya, G.; Sarankumar, A.; Bhasker, B. Vehicle routing optimization problem a study on capacitated
+vehicle routing problem. Mater. Today Proc. 2022, 64, 670–674. [CrossRef]
+41. Toth, P.; Vigo, D. Vehicle Routing Problems, Methods, and Applications; Society for Industrial and Applied Mathematics: Philadelphia,
+PA, USA, 2014.
+42. Martins-Turner, K.; Nagel, K. How driving multiple tours affects the results of last mile delivery vehicle routing problems. In
+Proceedings of the 8th International Workshop on Agent-Based Mobility, Traffic and Transportation Models, Leuven, Belgium,
+29 April–2 May 2019.
+43. Min, H.; Current, J.; Schilling, D. The multiple depot vehicle routing problem with backhauling. J. Bus. Logist. 1992, 13, 259.
+44. Parragh, S.N.; Doerner, K.F.; Hartl, R.F. A survey on pickup and delivery problems Part I Transportation between customers and
+depot. J. Für Betriebswirtschaft 2008, 58, 21–51. [CrossRef]
+45. Vincent, F.Y.; Aloina, G.; Jodiawan, P.; Gunawan, A.; Huang, T.C. Solving the vehicle routing problem with simultaneous pickup
+and delivery and occasional drivers by simulated annealing. In Proceedings of the 28th IEEE International Conference on
+Industrial Engineering and Engineering Management (IEEM 2021), Virtual, 13–16 December 2021.
+Appl. Sci. 2023, 13, 13015 24 of 27
+46. Lalang, D.; Making, S.R.M.; Manapa, I.Y.H. Modulating the Multi-Depot Vehicle Routing Problem Model with Time Windows
+using Occasional Driver. Int. J. Innov. Creat. Chang. 2019, 5, 39–60.
+47. Abdallah, K.S.; Jang, J. An exact solution for vehicle routing problems with semi-hard resource constraints. Comput. Ind. Eng.
+2014, 76, 366–377. [CrossRef]
+48. Koç, Ç.; Bekta¸s, T.; Jabali, O.; Laporte, G. The fleet size and mix pollution-routing problem. Transp. Res. Part B Methodol. 2014, 70,
+239–254. [CrossRef]
+49. Xiao, Y.; Zhang, Y.; Kaku, I.; Kang, R.; Pan, X. Electric vehicle routing problem: A systematic review and a new comprehensive
+model with nonlinear energy recharging and consumption. Renew. Sustain. Energy Rev. 2021, 151, 111567. [CrossRef]
+50. Liu, D.; Deng, Z.; Mao, X.; Yang, Y.; Kaisar, E.I. Two-echelon vehicle-routing problem optimization of autonomous delivery
+vehicle-assisted E-grocery distribution. IEEE Access 2020, 8, 108705–108719. [CrossRef]
+51. Li, Y.; Liu, M.; Jiang, D. Application of unmanned aerial vehicles in logistics: A literature review. Sustainability 2022, 14, 14473.
+[CrossRef]
+52. Rios, B.H.O.; Xavier, E.C.; Miyazawa, F.K.; Amorim, P.; Curcio, E.; Santos, M.J. Recent dynamic vehicle routing problems A survey.
+Comput. Ind. Eng. 2021, 160, 107604. [CrossRef]
+53. Oyola, J.; Arntzen, H.; Woodruff, D.L. The stochastic vehicle routing problem, a literature review, part I models. EURO J. Transp.
+Logist. 2018, 7, 193–221. [CrossRef]
+54. Strulak-Wójcikiewicz, R.; Wagner, N. Exploring opportunities of using the sharing economy in sustainable urban freight transport.
+Sustain. Cities Soc. 2021, 68, 102778. [CrossRef]
+55. Carbone, V.; Rouquet, A.; Roussat, C. “Carried away by the crowd”: What types of logistics characterise collaborative consumption.
+In Proceedings of the 1st International Workshop on Sharing Econom, Utrecht, The Netherlands, 4–5 June 2015.
+56. Halzack, S. Washingtonpost. Available online: https://www.washingtonpost.com/news/business/wp/2015/09/29/amazonflex-the-retailers-uber-like-effort-to-bring-you-packages/?noredirect=on (accessed on 29 September 2015).
+57. Rougès, J.F.; Montreuil, B. Crowdsourcing delivery New interconnected business models to reinvent delivery. In Proceedings of
+the 1st International Physical Internet Conference, Québec City, QC, Canada, 28–30 May 2014.
+58. Torres, F.; Gendreau, M.; Rei, W. Crowdshipping An open VRP variant with stochastic destinations. Transp. Res. Part C Emerg.
+Technol. 2022, 140, 103677. [CrossRef]
+59. Chinh, N.Q.; Kim, H.C.; Siwei, J.; NengSheng, Z. Collaborative vehicle routing problem for urban last-mile logistics. In
+Proceedings of the IEEE International Conference on Systems, Man, and Cybernetics, Budapest, Hungary, 9–12 October 2016.
+60. Rai, H.B.; Verlinde, S.; Merckx, J.; Macharis, C. Crowd logistics: An opportunity for more sustainable urban freight transport? Eur.
+Transp. Res. Rev. 2017, 9, 39.
+61. Martín-Santamaría, R.; López-Sánchez, A.D.; Delgado-Jalón, M.L.; Colmenar, J.M. An efficient algorithm for crowd logistics
+optimization. Mathematics 2021, 9, 509. [CrossRef]
+62. Cao, L.; Ye, C.M.; Cheng, R.; Wang, Z.K. Memory-based variable neighborhood search for green vehicle routing problem with
+passing-by drivers A comprehensive perspective. Complex Intell. Syst. 2022, 8, 2507–2525. [CrossRef]
+63. Kafle, N.; Zou, B.; Lin, J. Design and modeling of a crowdsource-enabled system for urban parcel relay and delivery. Transp. Res.
+Part B Methodol. 2017, 99, 62–82. [CrossRef]
+64. Gdowska, K.; Viana, A.; Pedroso, J.P. Stochastic last-mile delivery with crowdshipping. Transp. Res. Procedia 2018, 30, 90–100.
+[CrossRef]
+65. Voigt, S.; Kuhn, H. Crowdsourced logistics The pickup and delivery problem with transshipments and occasional drivers.
+Networks 2022, 79, 403–426. [CrossRef]
+66. Al Hla, Y.A.; Othman, M.; Saleh, Y. Optimising an eco-friendly vehicle routing problem model using regular and occasional
+drivers integrated with driver behaviour control. J. Clean. Prod. 2019, 234, 984–1001. [CrossRef]
+67. Archetti, C.; Guerriero, F.; Macrina, G. The online vehicle routing problem with occasional drivers. Comput. Oper. Res. 2021, 127,
+105144. [CrossRef]
+68. Alnaggar, A.; Gzara, F.; Bookbinder, J.H. Crowdsourced delivery A review of platforms and academic literature. Omega 2021, 98,
+102139. [CrossRef]
+69. Perboli, G.; Rosano, M.; Wei, Q. A simulation-optimization approach for the management of the on-demand parcel delivery in
+sharing economy. IEEE Trans. Intell. Transp. Syst. 2021, 23, 10570–10582. [CrossRef]
+70. Shen, C.W.; Hsu, C.C.; Tseng, K.H. An Auction-Based Multiagent Simulation for the Matching Problem in Dynamic Vehicle
+Routing Problem with Occasional Drivers. J. Adv. Transp. 2022, 2022, 2999162. [CrossRef]
+71. Gatta, V.; Marcucci, E.; Nigro, M.; Patella, S.M.; Serafini, S. Public transport-based crowdshipping for sustainable city logistics
+Assessing economic and environmental impacts. Sustainability 2019, 11, 145. [CrossRef]
+72. Le, T.V.; Stathopoulos, A.; Van Woensel, T.; Ukkusuri, S.V. Supply, demand, operations, and management of crowd-shipping
+services A review and empirical evidence. Transp. Res. Part C Emerg. Technol. 2019, 103, 83–103. [CrossRef]
+73. Bajec, P.; Tuljak-Suban, D. A Strategic Approach for Promoting Sustainable Crowdshipping in Last-Mile Deliveries. Sustainability
+2022, 14, 13508. [CrossRef]
+74. Pugliese, L.D.P.; Ferone, D.; Macrina, G.; Festa, P.; Guerriero, F. The crowd-shipping with penalty cost function and uncertain
+travel times. Omega 2023, 115, 102776. [CrossRef]
+Appl. Sci. 2023, 13, 13015 25 of 27
+75. Silva, M.; Pedroso, J.P. Deep reinforcement learning for crowdshipping last-mile delivery with endogenous uncertainty. Mathematics 2022, 10, 3902. [CrossRef]
+76. Zehtabian, S.; Larsen, C.; Wøhlk, S. Estimation of the arrival time of deliveries by occasional drivers in a crowd-shipping setting.
+Eur. J. Oper. Res. 2022, 303, 616–632. [CrossRef]
+77. Macrina, G.; Pugliese, L.D.P.; Guerriero, F. Crowd-shipping a new efficient and eco-friendly delivery strategy. Procedia Manuf.
+2020, 42, 483–487. [CrossRef]
+78. Macrina, G.; Pugliese, L.D.P.; Guerriero, F.; Laporte, G. Crowd-shipping with time windows and transshipment nodes. Comput.
+Oper. Res. 2020, 113, 104806. [CrossRef]
+79. Alcaraz, J.J.; Caballero-Arnaldos, L.; Vales-Alonso, J. Rich vehicle routing problem with last-mile outsourcing decisions. Transp.
+Res. Part E Logist. Transp. Rev. 2019, 129, 263–286. [CrossRef]
+80. Di Puglia Pugliese, L.; Ferone, D.; Festa, P.; Guerriero, F.; Macrina, G. Solution approaches for the vehicle routing problem with
+occasional drivers and time windows. Optim. Methods Softw. 2022, 37, 1384–1414. [CrossRef]
+81. Xue, S. An adaptive ant colony algorithm for crowdsourcing multi-depot vehicle routing problem with time windows. Sustain.
+Oper. Comput. 2023, 4, 62–75. [CrossRef]
+82. Macrina, G.; Pugliese, L.D.P.; Guerriero, F. A Variable Neighborhood Search for the Vehicle Routing Problem with Occasional
+Drivers and Time Windows. In Proceedings of the 9th International Conference on Operations Research and Enterprise Systems
+(ICORES 2020), Valletta, Malta, 22–24 February 2020; pp. 270–277.
+83. Feng, L.; Zhou, L.; Gupta, A.; Zhong, J.; Zhu, Z.; Tan, K.C.; Qin, K. Solving generalized vehicle routing problem with occasional
+drivers via evolutionary multitasking. IEEE Trans. Cybern. 2019, 51, 3171–3184. [CrossRef]
+84. Huang, H.; Lin, Y.S.; Kang, J.R.; Lin, C.C. A Deep Reinforcement Learning Approach for Crowdshipping Vehicle Routing Problem.
+In Proceedings of the IEEE International Conference on Industrial Engineering and Engineering Management (IEEM), Kuala
+Lumpur, Malaysia, 7–10 December 2022.
+85. Vincent, F.Y.; Aloina, G.; Jodiawan, P.; Gunawan, A.; Huang, T.C. The vehicle routing problem with simultaneous pickup and
+delivery and occasional drivers. Expert Syst. Appl. 2023, 214, 119118.
+86. Zhang, M.; Cheah, L.; Courcoubetis, C. Exploring the Potential Impact of Crowdshipping Using Public Transport in Singapore.
+Transp. Res. Rec. 2023, 2677, 173–189. [CrossRef]
+87. Triki, C. Using combinatorial auctions for the procurement of occasional drivers in the freight transportation A case-study. J.
+Clean. Prod. 2021, 304, 127057. [CrossRef]
+88. Arslan, M.; Agatz, N.; Kroon, L.; Zuidwijk, R. Crowdsourced delivery—A dynamic pickup and delivery problem with ad hoc
+drivers. Transp. Sci. 2019, 53, 222–235. [CrossRef]
+89. Mancini, S.; Gansterer, M. Bundle generation for last-mile delivery with occasional drivers. Omega 2022, 108, 102582. [CrossRef]
+90. Ambrosino, D.; Cerrone, C. A Rich Vehicle Routing Problem for a City Logistics Problem. Mathematics 2022, 10, 191. [CrossRef]
+91. Masteguim, R.; Cunha, C.B. An Optimization-Based Approach to Evaluate the Operational and Environmental Impacts of Pickup
+Points on E-Commerce Urban Last-Mile Distribution: A Case Study in São Paulo, Brazil. Sustainability 2022, 14, 8521. [CrossRef]
+92. Bonomi, V.; Mansini, R.; Zanotti, R. Last Mile Delivery with Parcel Lockers: Evaluating the environmental impact of eco-conscious
+consumer behavior. IFAC-PapersOnLine 2022, 55, 72–77. [CrossRef]
+93. Vincent, F.Y.; Susanto, H.; Jodiawan, P.; Ho, T.W.; Lin, S.W.; Huang, Y.T. A simulated annealing algorithm for the vehicle routing
+problem with parcel lockers. IEEE Access 2022, 10, 20764–20782.
+94. Sawik, B.; Serrano-Hernandez, A.; Muro, A.; Faulin, J. Multi-Criteria Simulation-Optimization Analysis of Usage of Automated
+Parcel Lockers: A Practical Approach. Mathematics 2022, 10, 4423. [CrossRef]
+95. Lai, P.L.; Jang, H.; Fang, M.; Peng, K. Determinants of customer satisfaction with parcel locker services in last-mile logistics. Asian
+J. Shipp. Logist. 2022, 38, 25–30. [CrossRef]
+96. Che, Z.H.; Chiang, T.A.; Luo, Y.J. Multiobjective optimization for planning the service areas of smart parcel locker facilities in
+logistics last mile delivery. Mathematics 2022, 10, 422. [CrossRef]
+97. Schnieder, M.; Hinde, C.; West, A. Sensitivity analysis of emission models of parcel lockers vs. Home delivery based on hbefa. Int.
+J. Environ. Res. Public Health 2021, 18, 6325. [CrossRef]
+98. Prandtstetter, M.; Seragiotto, C.; Braith, J.; Eitler, S.; Ennser, B.; Hauger, G.; Steinbauer, M. On the impact of open parcel lockers on
+traffic. Sustainability 2021, 13, 755. [CrossRef]
+99. Hagen, T.; Scheel-Kopeinig, S. Would customers be willing to use an alternative (chargeable) delivery concept for the last mile.
+Res. Transp. Bus. Manag. 2021, 39, 100626. [CrossRef]
+100. Dong, B.; Hovi, I.B.; Pinchasik, D.R. Analysis of Service Efficiency of Parcel Locker in Last-mile Delivery: A Case Study in Norway.
+Transp. Res. Procedia 2023, 69, 918–925. [CrossRef]
+101. Liu, Y.; Ye, Q.; Feng, Y.; Escribano-Macias, J.; Angeloudis, P. Location-routing Optimisation for Urban Logistics Using Mobile
+Parcel Locker Based on Hybrid Q-Learning Algorithm. arXiv 2021, arXiv:2110.15485.
+102. Buzzega, G.; Novellani, S. Last mile deliveries with lockers: Formulations and algorithms. Soft Comput. 2023, 27, 12843–12861.
+[CrossRef]
+103. Redi, P.; Jewpanya, P.; Kurniawan, A.C.; Persada, S.F.; Nadlifatin, R.; Dewi, O.A.C. A simulated annealing algorithm for solving
+two-echelon vehicle routing problem with locker facilities. Algorithms 2020, 13, 218. [CrossRef]
+Appl. Sci. 2023, 13, 13015 26 of 27
+104. Santos, G.D.; Viana, A.; Pedroso, J.P. 2-echelon lastmile delivery with lockers and occasional couriers. Transp. Res. Part E Logist.
+Transp. Rev. 2022, 162, 102714. [CrossRef]
+105. Tiwari, K.V.; Sharma, S.K. An optimization model for vehicle routing problem in last-mile delivery. Expert Syst. Appl. 2023, 222,
+119789. [CrossRef]
+106. Di Gangi, M.; Polimeni, A.; Belcore, O.M. Freight Distribution in Small Islands: Integration between Naval Services and Parcel
+Lockers. Sustainability 2023, 15, 7535. [CrossRef]
+107. Grabenschweiger, J.; Doerner, K.F.; Hartl, R.F.; Savelsbergh, M.W. The vehicle routing problem with heterogeneous locker boxes.
+Cent. Eur. J. Oper. Res. 2021, 29, 113–142. [CrossRef]
+108. Schwerdfeger, S.; Boysen, N. Who moves the locker? A benchmark study of alternative mobile parcel locker concepts. Transp. Res.
+Part C Emerg. Technol. 2022, 142, 103780. [CrossRef]
+109. Carotenuto, P.; Ceccato, R.; Gastaldi, M.; Giordani, S.; Rossi, R.; Salvatore, A. Comparing home and parcel lockers’ delivery
+systems: A math-heuristic approach. Transp. Res. Procedia 2022, 62, 91–98. [CrossRef]
+110. Venkataraman, S.; Baclet, S.; Rumpler, R. Optimizing noise exposure in the Vehicle Routing Problem: A case study of last-mile
+freight deliveries in Stockholm. In INTER-NOISE and NOISE-CON Congress and Conference Proceedings; Institute of Noise Control
+Engineering: Reston, VA, USA, 2023.
+111. Garcia, O.; Santoso, A. Supply Chain Management. Master’s Thesis, Massachusetts Institute of Technology, Cambridge, MA,
+USA, 2019.
+112. Murray, C.; Chu, A.G. The flying sidekick traveling salesman problem: Optimization of drone-assisted parcel delivery. Transp.
+Res. Part C Emerg. Technol. 2015, 54, 86–109. [CrossRef]
+113. Bakir, I.; Tiniç, G.Ö. Optimizing drone-assisted last-mile deliveries: The vehicle routing problem with flexible drones. Optim.-
+Ouline Org. 2020, 1–28.
+114. Li, Y.; Zhang, G.; Pang, Z.; Li, L. Continuum approximation models for joint delivery systems using trucks and drones. Enterp.
+Inf. Syst. 2020, 14, 406–435. [CrossRef]
+115. Liu, D.; Yang, H.; Mao, X.; Antonoglou, V.; Kaisar, E.I. New Mobility-Assist E-Grocery Delivery Network: A Load-Dependent
+Two-Echelon Vehicle Routing Problem with Mixed Vehicles. Transp. Res. Rec. 2023, 2677, 294–310. [CrossRef]
+116. Corentin, P.; Adriana, S. Automated Delivery Robots: A Vehicle Routing Problem on last mile delivery cost per unit based on
+range and carrying capacity. IFAC-PapersOnLine 2022, 55, 121–126. [CrossRef]
+117. Sluijk, N.; Florio, A.M.; Kinable, J.; Dellaert, N.; Van Woensel, T. Two-echelon vehicle routing problems A literature review. Eur. J.
+Oper. Res. 2023, 304, 865–886. [CrossRef]
+118. Sitek, P.; Wikarek, J.; Jagodzi ´nski, M. A Proactive Approach to Extended Vehicle Routing Problem with Drones (EVRPD). Appl.
+Sci. 2022, 12, 8255. [CrossRef]
+119. Poikonen, S.; Golden, B. The mothership and drone routing problem. INFORMS J. Comput. 2020, 32, 249–262. [CrossRef]
+120. Agatz, N.; Bouman, P.; Schmidt, M. Optimization approaches for the traveling salesman problem with drone. Transp. Sci. 2018,
+52, 965–981. [CrossRef]
+121. Gao, W.; Luo, J.; Zhang, W.; Yuan, W.; Liao, Z. Commanding cooperative ugv-uav with nested vehicle routing for emergency
+resource delivery. IEEE Access 2020, 8, 215691–215704. [CrossRef]
+122. Li, H.; Wang, H.; Chen, J.; Bai, M. Two-echelon vehicle routing problem with time windows and mobile satellites. Transp. Res.
+Part B Methodol. 2020, 138, 179–201. [CrossRef]
+123. Sacramento, D.; Pisinger, D.; Ropke, S. An adaptive large neighborhood search metaheuristic for the vehicle routing problem
+with drones. Transp. Res. Part C Emerg. Technol. 2019, 102, 289–315. [CrossRef]
+124. Wang, K.; Yuan, B.; Zhao, M.; Lu, Y. Cooperative route planning for the drone and truck in delivery services: A bi-objective
+optimisation approach. J. OR Soc. 2020, 71, 1657–1674. [CrossRef]
+125. Poikonen, S.; Golden, B. Multi-visit drone routing problem. Comput. Oper. Res. 2020, 113, 104802. [CrossRef]
+126. Janinhoff, L.; Klein, R.; Scholz, D. Multitrip vehicle routing with delivery options: A data-driven application to the parcel industry.
+OR Spectr. 2023, 1–54. [CrossRef]
+127. Escudero-Santana, A.; Muñuzuri, J.; Lorenzo-Espejo, A.; Muñoz-Díaz, M.L. Improving E-Commerce Distribution through
+Last-Mile Logistics with Multiple Possibilities of Deliveries Based on Time and Location. J. Theor. Appl. Electron. Commer. Res.
+2022, 17, 507–521. [CrossRef]
+128. Orenstein, I.; Raviv, T.; Sadan, E. Flexible parcel delivery to automated parcel lockers models, solution methods and analysis.
+EURO J. Transp. Logist. 2019, 8, 683–711. [CrossRef]
+129. Pourmohammadreza, N.; Jokar, M.R.A. A Novel Two-Phase Approach for Optimization of the Last-Mile Delivery Problem with
+Service Options. Sustainability 2023, 15, 8098. [CrossRef]
+130. Enthoven, L.; Jargalsaikhan, B.; Roodbergen, K.J.; Uit het Broek, M.A.; Schrotenboer, A.H. The two-echelon vehicle routing
+problem with covering options: City logistics with cargo bikes and parcel lockers. Comput. Oper. Res. 2020, 118, 104919. [CrossRef]
+131. Vincent, Y.; Jodiawan, P.; Hou, M.L.; Gunawan, A. Design of a two-echelon freight distribution system in last-mile logistics
+considering covering locations and occasional drivers. Transp. Res. Part E Logist. Transp. Rev. 2021, 154, 102461.
+132. Chen, C.; Yerasani, S.; Tiwari, M.K. Solving a 3-dimensional vehicle routing problem with delivery options in city logistics using
+fast-neighborhood based crowding differential evolution algorithm. J. Ambient. Intell. Humaniz. Comput. 2023, 14, 10389–10402.
+[CrossRef]
+Appl. Sci. 2023, 13, 13015 27 of 27
+133. Anily, S. The vehicle-routing problem with delivery and back-haul options. Nav. Res. Logist. (NRL) 1996, 43, 415–434. [CrossRef]
+134. Tilk, C.; Olkis, K.; Irnich, S. The last-mile vehicle routing problem with delivery options. OR Spectr. 2021, 43, 877–904. [CrossRef]
+135. Sitek, P.; Wikarek, J. Capacitated vehicle routing problem with pick-up and alternative delivery (CVRPPAD) model and
+implementation using hybrid approach. Ann. Oper. Res. 2019, 273, 257–277. [CrossRef]
+136. Zhou, F.; He, Y.; Zhou, L. Last mile delivery with stochastic travel times considering dual services. IEEE Access 2019, 7,
+159013–159021. [CrossRef]
+Disclaimer/Publisher’s Note: The statements, opinions and data contained in all publications are solely those of the individual
+author(s) and contributor(s) and not of MDPI and/or the editor(s). MDPI and/or the editor(s) disclaim responsibility for any injury to
+people or property resulting from any ideas, methods, instructions or products referred to in the content.

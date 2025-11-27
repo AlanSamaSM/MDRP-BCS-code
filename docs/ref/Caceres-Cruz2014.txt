@@ -1,0 +1,1357 @@
+32
+Rich Vehicle Routing Problem: Survey
+JOSE CACERES-CRUZ, Open University of Catalonia
+POL ARIAS, Autonomous University of Barcelona
+DANIEL GUIMARANS, National ICT Australia
+DANIEL RIERA and ANGEL A. JUAN, Open University of Catalonia
+The Vehicle Routing Problem (VRP) is a well-known research line in the optimization research community.
+Its different basic variants have been widely explored in the literature. Even though it has been studied for
+years, the research around it is still very active. The new tendency is mainly focused on applying this study
+case to real-life problems. Due to this trend, the Rich VRP arises: combining multiple constraints for tackling
+realistic problems. Nowadays, some studies have considered specific combinations of real-life constraints to
+define the emerging Rich VRP scopes. This work surveys the state of the art in the field, summarizing
+problem combinations, constraints defined, and approaches found.
+Categories and Subject Descriptors: A.1 [Introductory and Survey]; G.2.1 [Discrete Mathematics]:
+Combinatorics—Combinatorial algorithms; G.2.3 [Discrete Mathematics]: Applications
+General Terms: Algorithms, Economics
+Additional Key Words and Phrases: Routing, Transportation, Vehicle Routing Problem
+ACM Reference Format:
+Jose Caceres-Cruz, Pol Arias, Daniel Guimarans, Daniel Riera, and Angel A. Juan. 2014. Rich vehicle routing
+problem: Survey. ACM Comput. Surv. 47, 2, Article 32 (December 2014), 28 pages.
+DOI: http://dx.doi.org/10.1145/2666003
+1. INTRODUCTION
+Road transportation is the predominant way of transporting goods in Europe and
+other parts of the world. Direct costs associated with this type of transportation have
+increased significantly since 2000 and more so in recent years due to rising oil prices.
+Furthermore, road transportation is intrinsically associated with a good deal of indirect
+or external costs, which are usually easily observable: congestion, pollution, securityand safety-related costs, mobility, delay time costs, and the like. However, these costs
+are usually left unaccounted because of the difficulty of quantifying them [Sinha and
+Labi 2011]. For example, traffic jams in metropolitan areas constitute a serious challenge for the competitiveness of industry: for instance, according to some studies [EC
+2008, 2011; Van Essen et al. 2011], external costs due to traffic jams could represent
+This work has been partially supported by the Spanish Ministry of Economy and Competitiveness (TRA2013-
+48180-C3-3-P) in the context of the IN3 group on Smart Logistics & Production.
+NICTA is funded by the Australian Government through the Department of Communications and the
+Australian Research Council through the ICT Centre of Excellence Program.
+Authors’ addresses: J. Caceres-Cruz, D. Riera, and A. A. Juan, Department of Computer Science, Multimedia,
+and Telecommunication, Open University of Catalonia, 08018 Barcelona, Spain; P. Arias, Department of
+Telecommunication and Systems Engineering, Autonomous University of Barcelona, 08193 Cerdanyola del
+Valles, Spain; D. Guimarans, Optimisation Research Group, National ICT Australia (NICTA), Eveleigh NSW `
+2015, Australia.
+Permission to make digital or hard copies of part or all of this work for personal or classroom use is granted
+without fee provided that copies are not made or distributed for profit or commercial advantage and that
+copies show this notice on the first page or initial screen of a display along with the full citation. Copyrights for
+components of this work owned by others than ACM must be honored. Abstracting with credit is permitted.
+To copy otherwise, to republish, to post on servers, to redistribute to lists, or to use any component of this
+work in other works requires prior specific permission and/or a fee. Permissions may be requested from
+Publications Dept., ACM, Inc., 2 Penn Plaza, Suite 701, New York, NY 10121-0701 USA, fax +1 (212)
+869-0481, or permissions@acm.org.
+c 2014 ACM 0360-0300/2014/12-ART32 $15.00
+DOI: http://dx.doi.org/10.1145/2666003
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+32:2 J. Caceres-Cruz et al.
+about 1–2% of the European GDP, a percentage that continues to increase. In addition
+to these easily observable costs, many others might be considered. In this scenario, it
+becomes evident that new methods must be developed to support the decision-making
+process so that optimal (or quasi-optimal) strategies can be chosen in road transportation. This need for optimizing road transportation affects both the public and private
+sectors and constitutes a major challenge for most industrialized regions.
+Recent advances on Information and Communications Technologies (ICT)—such as
+the growing use of GPS and smartphone devices, Internet-scale (distributed) systems, and Internet computing technologies—open new possibilities for optimizing the
+planning process of road transportation [Orozco 2011]. In particular, when combined
+with advanced simulation and optimization techniques, Distributed- and ParallelComputing Systems (DPCS) allow the practical development and implementation of
+new ICT-based solutions to support decision making in the Transportation and Logistics (T&L) arena. “Real-world applications, both in North America and in Europe, have
+widely shown that the use of computerised procedures generates substantial savings
+(generally from 5% to 20%) in the global transportation costs” [Toth and Vigo 2002].
+Road transportation optimization (cost-saving) issues are especially critical in the case
+of Small and Medium Enterprises (SME) since they are rarely able to obtain the economic and human resources required to implement, maintain, and manage efficient
+routing-optimization methods. Similarly, those companies have difficulties in accessing
+the appropriate technologies, such as computer clusters and expensive commercial software, that would help them to improve their productivity level and reduce unnecessary
+costs and thus achieve a more sustainable business model.
+1.1. Context and Motivation
+In this context, the goal of the so-called Vehicle Routing Problem (VRP) is to optimize
+the routing design (distribution process from depots to customers) in such a way that
+customers’ demand of goods is satisfied without violating any problem-specific constraint, such as route maximum distance or time-related restrictions [Golden et al.
+2008]. The VRP has many variants depending on the parameters and constraints
+considered. Despite its apparent simplicity, in computational complexity theory, the
+classical version of VRP and its variants (for extension) are NP-hard (nondeterministic
+polynomial-time hard) [Lenstra and Rinnooy-Kan 1981]. This implies that, in practice,
+it will not be possible to guarantee the (mathematically) optimal solution; thus, the
+given problem cannot be solved by an algorithm in a finite number of steps [Garey
+and Johnson 1979]. NP-hard problems may be of any type: decision problems, search
+problems, or optimization problems. Some practical examples are found in data mining,
+scheduling, planning, decision support, etc. In recent years, due to the fast development of new and more efficient optimization and computing methods, the interest of
+academics and practitioners has been shifting toward realistic VRP variants, which
+are commonly known as Rich VRP (RVRP). These problems deal with realistic (and
+sometimes multiobjective) optimization functions, uncertainty (i.e., stochastic or fuzzy
+behaviors), and dynamism, along with a wide variety of real-life constraints related
+to time and distance factors, use of heterogeneous fleets, linkage with inventory and
+scheduling problems, integration with ICT, environmental and energy issues, and more.
+After a number of VRP variants have appeared over the years, we found a need to
+classify those that can be part of the RVRP. As a matter of fact, there is no consensus
+on which problems can be described as rich ones and which are just a new variant
+of VRP. Thus, in this article, we describe the main variants of the VRP, analyze their
+constraints, and present the main techniques used to face them. This work allows
+us to create an extensive list of the main constraints that are applicable to an RVRP
+problem. Furthermore, we introduce a definition of RVRP summarizing all the previous
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+Rich Vehicle Routing Problem: Survey 32:3
+information existing about the problem. Furthermore, classification of RVRP problems
+and a matrix table relating all the RVRP papers with the collected constraints are
+shown. Finally, future trends in both vehicle routing problems and tools used to solve
+them are summarized.
+1.2. Structure
+To begin, a definition of the basic Capacitated Vehicle Routing Problem (CVRP) is
+given in Section 2. Additionally, we introduce the basic formulation of the problem
+and the main classic variations of the VRP. In Section 3, the most common approaches
+for solving current variations of the VRP are introduced. In Section 4, a definition of
+the RVRP is given. A complete literature review is presented in Section 5. Section 6
+presents a complete classification of all papers on the RVRP and an explanation of the
+different kinds of constraints found in them. In Section 7, some perspective on current
+and future trends regarding the RVRP is provided. Finally, we summarize the survey
+and present some conclusions in Section 8.
+2. PROBLEM DEFINITION
+In the CVRP, first defined by Dantzig and Ramser [1959], a homogeneous fleet of
+vehicles supplies customers using resources available from a depot or central node (see
+Figure 1). Each vehicle has the same capacity (homogeneous fleet) and each customer
+has a certain demand that must be satisfied. Additionally, there is a cost matrix that
+measures the costs associated with moving a vehicle from one node to another. These
+costs usually represent distances, traveling times, number of vehicles employed, or a
+combination of these factors.
+More formally, we assume a set  of n+ 1 nodes, each of them representing a vehicle
+destination (depot node) or a visit (demanding node). The nodes are numbered from 0
+to n, with node 0 being the depot and the remaining n nodes the visits to be performed
+(∗ =  − {0}). A demand qi > 0 of some commodity has been assigned to each nondepot node i, i ∈ ∗ (we assume q0 = 0). On the other hand, A = {(i, j) : i, j ∈ ;i < j}
+represents the set of the n · (n + 1)/2 existing edges connecting the n + 1 nodes. Each
+of these links has an associated aprioristic cost, ci j > 0, which represents the cost of
+sending a vehicle from node i to node j. In this original version, these ci j are assumed
+to be symmetric (ci j = c ji, 0 ≤ i, j ≤ n), and they are frequently expressed in terms of
+the Euclidean distance (di j) between the two nodes. The delivery process is to be carried
+out by a fleet of V vehicles (V ≥ 1) with equal capacity, Q >> max{qi : i ∈ }. These V
+vehicles are responsible of R routes (R ≤ V ).
+Some additional constraints associated with the CVRP are the following [Laporte
+et al. 2000]:
+—Each nondepot node is supplied by a single vehicle.
+—All vehicles begin and end their routes at the depot (node 0).
+—A vehicle cannot stop twice at the same nondepot node.
+—No vehicle can be loaded to exceed its maximum capacity.
+The following generic formulation is based on the formulation proposed by Toth and
+Vigo [2002] and then used in Baldacci et al. [2008] for the heterogeneous fleet VRP
+variant. It is useful for both symmetrical and asymmetrical instances, as well as for
+both homogeneous and heterogeneous fleets. The vehicle fleet M is composed of m
+different vehicle types (M = {1,..., m}). Each type k ∈ M has mk available vehicles at
+the depot, each having a capacity defined by Qk. There is a three-index binary variable
+for each edge and possible vehicle type (Equation (8)). The variable xk
+i j indicates if the
+arc (i, j) (i, j ∈ ) is used or traveled by a vehicle of type k in the optimal solution. In
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+32:4 J. Caceres-Cruz et al.
+Fig. 1. Representation of a VRP example using a node design.
+addition, flow variables yk
+i j represent the load in the vehicle servicing customer j after
+visiting customer i:
+min
+k∈M
+
+i,j∈
+i= j
+ck
+i jxk
+i j (1)
+subject to:
+
+j∈∗
+xk
+0 j =
+i∈∗
+xk
+i0 ∀k ∈ M (2)
+
+k∈M
+
+i∈
+xk
+i j = 1 ∀ j ∈ ∗ (3)
+
+i∈
+xk
+iu =
+j∈
+xk
+uj ∀u ∈ ∗, ∀k ∈ M (4)
+
+j∈∗
+xk
+0 j ≤ mk ∀k ∈ M (5)
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+Rich Vehicle Routing Problem: Survey 32:5
+
+i∈
+yk
+i j −
+i∈
+yk
+ji = qj
+
+i∈
+xk
+i j ∀ j ∈ ∗, ∀k ∈ M (6)
+0 ≤ qjxk
+i j ≤ yk
+i j ≤ (Qk − qi)xk
+i j ∀i, j ∈ ,i = j, ∀k ∈ M (7)
+xk
+i j ∈ {0, 1} ∀i, j ∈ ,i = j, ∀k ∈ M (8)
+The objective function in Equation (1) minimizes the total distance cost required
+to service all customers. Equation (2) implies that the number of vehicles leaving the
+depot is the same as the number of vehicles returning to it. Equations (3) and (4) ensure
+that each customer is visited exactly once and that if a vehicle visits a customer, it must
+also depart from it. Equation (5) imposes that the number of used vehicles does not
+exceed the number of available vehicles for each vehicle type. Equation (6) states that
+the quantity of goods in the vehicle arriving at customer j, yk
+i j, minus the demand of
+that customer, equals the quantity of goods in the vehicle leaving it after the service
+has been completed. Equation (7) guarantees lower and upper bounds ensuring that
+the quantity of goods in the vehicle leaving customer i, yk
+i j, is equal to or greater than
+the demand of its next visit, qj; and the total demand serviced by each vehicle of type
+k does not exceed its capacity Qk.
+2.1. Vehicle Routing Problem Variants
+Different variants of the VRP have been target studies in the past 50 years [Laporte
+2009]. In the literature, the variants of the VRP include a large family of specific
+optimization problems. For instance, the VRP with Time Windows (VRPTW) is one
+of the most popular families studied in the community [Braysy and Gendreau 2005a, ¨
+2005b]. As main common feature, these studies are focused on considering one or few
+constraints in their mathematical models; this has created a huge set of separate
+branches of VRP research lines with long abbreviation names. Each research line has
+been identified by the acronym of the considered constraints or attributes used in the
+optimization problem. Many of these individual branches have been recombined to
+create new “basic” branches. The main variants of the VRP can be found in Toth and
+Vigo [2002] and Golden et al. [2008]. A relatively new variant that is not included in the
+aforementioned references is the Green VRP [Erdogan and Miller-Hooks 2012; Kopfer ˘
+et al. 2014]. So far, the most common current extensions studied in the literature are
+described here:
+Asymmetric cost matrix VRP (AVRP). The cost for going from customer i to j is
+different from that for going from j to i.
+Distance-Constrained VRP (DCVRP). The total length of the arcs in a route cannot
+exceed a maximum route length. This constraint can either replace the capacity
+constraint or supplement it.
+Heterogeneous fleet VRP (HVRP). The company uses different kinds of vehicles, and
+the routes have to be designed according to the capacity of each vehicle. Some
+costs could be considered and the number of vehicles could be limited or not, thus
+creating different contexts. When the number of vehicles is unlimited, then it
+is called Fleet Size and Mix VRP (FSMVRP). If a specific type of vehicle cannot
+reach some clients for any reason, then the problem becomes a Site-Dependent
+VRP (SVRP). Also if a vehicle is allowed to perform more than one trip, then we
+are solving a HVRP with Multiple use of vehicles (HVRPM).
+Multiple Depots VRP (MDVRP). A company has several depots from which it can
+serve its customers. Therefore, some routes will have different starting/ending
+points.
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+32:6 J. Caceres-Cruz et al.
+Open VRP (OVRP). The planned routes can end on several points distinct to the
+depot location.
+Periodic delivery VRP (PVRP). The optimization is done over a set of days (while
+normally being planned daily). The customers may not have to be visited each
+day. Customers can have different delivery frequencies.
+Pickup-and-delivery VRP (PDVRP). Each customer is associated with two quantities
+representing one demand to be delivered to the customer and another demand
+to be picked up and returned to the depot. In addition to the constraint that the
+total pickup and total delivery on a route cannot exceed the vehicle capacity, it
+also must ensure that this capacity is not exceeded at any point on the route. One
+variant of the pickup-and-delivery problem occurs when the pickup demand is
+not returned to the depot but should be delivered to another customer, as in the
+transport of people. In some cases, the vehicles must pick up and deliver items
+to the same customers in one visit (Simultaneous Pickup-and-delivery VRP), as
+when picking up and dropping off new and returned bottles. Notice that the other
+important variant is the 1 − M − 1 (“one-to-many-to-one”); this means that all
+delivery demands are initially located at the depot, and all pickup demands are
+destined for the depot. Taken collectively, all delivery demands can be viewed as a
+single commodity, and all pickup demands can be viewed as a second commodity.
+This variant is generally referred to in the literature as Delivery and Collection
+[Gribkovskaia and Laporte 2008].
+Split-delivery VRP (SDVRP). The same customer can be served by different vehicles
+if it will reduce the overall cost. This relaxation of the basic problem is important
+in those cases where a customer order can be as large as the capacity of the
+vehicle.
+Stochastic VRP. In one realistic aspect of the routing problem, a random behavior
+is considered. This is typically the presence of a customer, its demand, its service
+time, or the travel time between customers. So far, this uncertainty aspect has
+emerged as a key aspect for future demanding developments [Juan et al. 2011].
+VRP with Backhauls (VRPB). As in the PDVRP, customers are divided into two
+subsets. The first subset contains the linehaul customers, which are customers
+requiring a given quantity of product to be delivered. The second subset contains
+the backhaul customers, where a given quantity of inbound product must be
+picked up. Thus, all linehaul customers have to be visited before the backhaul
+customers in a route.
+VRP with Time Windows (VRPTW). Each customer is associated with a time interval
+and can only be served within this interval. In this problem, the dimension of
+time is introduced, and one has to consider both travel time and service time at
+each customer location. A set of time windows for each customer could be also
+considered (VRP with Multiple Time Windows). And, these time windows could
+be flexible depending on some extra costs (VRP with Soft Time Windows).
+Green VRP (GVRP). This variant of the VRP aims at including different environmental issues in the optimization process, such as greenhouse gas emissions [Ubeda
+et al. 2011], pollution, waste, noise [Bektas¸ and Laporte 2011], and the effects
+of using “greener” fleet configurations [Juan et al. 2014a], etc. An excellent and
+updated survey on GRVP can be found in Demir et al. [2014].
+Several hybrid variants have been created in the literature from these basic variants, all inspired by real-life scenarios. A large number of VRP acronyms have been
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+Rich Vehicle Routing Problem: Survey 32:7
+Fig. 2. Classification of the classical optimization methods.
+developed to refer to these combinations of routing restrictions. However, all these
+new combinations can be encompassed in the larger family of RVRP, as we explain in
+Section 4.
+3. VRP METHODOLOGIES
+Different approaches to VRPs have been explored. These range from the use of pure
+optimization methods, such as mathematical programming to solve small- to mediumsized problems (up to about 75–100 customers) with relatively simple constraints, to the
+use of heuristics and metaheuristics that provide near-optimal solutions for mediumand large-sized problems with more complex constraints. Metaheuristics serve three
+main purposes: solving problems faster, solving larger problems, and obtaining more
+robust algorithms. This branch of optimization in computer science and applied mathematics is related to algorithms and computational complexity theory. Metaheuristics
+provide acceptable solutions in a reasonable time for solving hard and complex problems [Talbi 2009]. Even though the VRP has been studied for decades, and a large
+set of efficient optimization methods, heuristics, and metaheuristics have been developed [Golden et al. 2008; Laporte 2007], more realistic or RVRP problems—such as
+the VRP with Stochastic Demands or the Inventory VRP—are still in their infancy.
+Following the proposed division of Talbi [2009], this large family could be preliminarily
+summarized in the balanced tree presented in Figure 2.
+3.1. Exact Methods
+From Talbi [2009], “Exact methods obtain optimal solutions and guarantee their optimality.” This type of technique is often applied to small-sized instances. This family
+includes a broad set of methods, such as the family of Branch-and-X (where the X
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+32:8 J. Caceres-Cruz et al.
+represent the different variants) methods used for solving Integer Linear Programming
+(ILP) and Mixed Integer Linear Programming problems (MILP), and also dynamic
+programming, which focuses on solving complex problems by breaking them down
+into simpler subproblems [Kok et al. 2010]. As well, column generation is a popular
+technique used for solving larger linear programming problems, which consists in
+splitting the given problem into two problems: the master problem and the subproblem
+[Desaulniers et al. 2005]. This allows one to simplify the original problem with only a
+subset of variables in the master problem. A new variable is created in the subproblem,
+which will be minimized in the objective function with respect to the current dual variables and constraints naturally associated with the new variable. Set Partitioning (SP)
+modeling is other binary variable formulation for each feasible route. This technique is
+quite general and can consider several constraints at a time [Subramanian et al. 2012;
+Subramanian 2012]. Constraint programming (CP) is a programming paradigm that
+uses constraints to define relations among variables [Van Hentenryck 1989]. It differs
+from other programming languages in that it is not necessary to specify a sequence of
+steps to execute to solve a problem, but rather its properties. Models in CP are based
+on three elements: variables, their corresponding domains, and constraints relating all
+the variables. The main mechanism for solving a problem using CP is called constraint
+propagation. It works by reducing variables domains, strengthening constraints, or
+generating new ones. This leads to a reduction of search space, making the problem
+easier to solve by means of search algorithms. Guimarans et al. [2011] presents a
+hybrid approach to solve the CVRP by applying Lagrange relaxation to each route and
+feasibility checking using a CP model. A* [Hart et al. 1968] is a computer algorithm
+commonly used in shortest paths and graph traversal problems; it uses the best-first
+search [Dechter and Pearl 1985] to find the most promising node to expand. In the
+same way, IDA* [Korf 1985] is a variant of the A* algorithm that uses less memory
+because it does not keep track of prior visits; instead, it uses iterative deepening. Some
+of these methods are also quite popular for solving basic CVRP: branch-and-bound,
+branch-and-cut, branch-and-price, branch-and-cut-and-price, Sbased, and dynamic
+programming. More details of these methods are reviewed [Baldacci et al. 2010, 2012;
+Laporte et al. 2013] for the CVRP and for some of its variants.
+3.2. Approximate Methods
+From Talbi [2009], “Heuristics find goodsolutions on large-size problem instances. They
+allow to obtain acceptable performance at acceptable costs in a wide range of problems.
+They do not have an approximation guarantee on the obtained solutions. They are
+tailored and designed to solve a specific problem or/and instance. Meta-heuristics are
+general-purpose algorithms that can be applied to solve almost any optimization problem. They may be viewed as upper level general methodologies that can be used as
+a guiding strategy in designing underlying heuristics.” The author also proposes that
+two contradictory criteria must be taken into account: exploration of the search space
+(diversi f ication) and exploitation of the best solutions found (intensi f ication). Promising regions are determined by the obtained good solutions. In intensification, promising
+regions are explored more thoroughly in the hope of finding better solutions. In diversification, nonexplored regions must be visited to be sure that all regions of the search
+space are evenly explored and that the search is not confined to only a reduced number
+of regions.
+There are many metaheuristics inspired by natural processes, such as the evolutionary algorithms (including Genetic Algorithms [GA]) and Ant Colony Optimization
+(ACO). For instance, the ACO metaheuristic is inspired by the communication and cooperation mechanisms found among real ants that allow them to find the shortest paths
+from their nest to food sources. The communication medium is a chemical compound
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+Rich Vehicle Routing Problem: Survey 32:9
+(pheromone). The amount of pheromone is represented by a weight in the algorithm
+[Gendreau et al. 2008]. In ACO algorithms, the range [min, MAX] of a pheromone trail
+values can be controlled. This type of technique can also be classified as a populationbased metaheuristic because it iteratively improves a population of solutions. Another
+member of this wide group is the deterministic strategy of scatter search, which recombines selected solutions from a known set to create new ones [Talbi 2009].
+Other techniques are based on memory usage (short, medium, and long term).
+Tabu Search (TS) is a local search-based metaheuristic where, at each iteration, the
+best solution in the neighborhood of the current solution is selected as the new current
+solution, even if it leads to an increase in solution cost. A short-term memory (Tabu list)
+stores recently visited solutions (or attributes) to avoid short-term cycling [Gendreau
+et al. 2008]. This family can be considered as single-solution-based metaheuristics since
+all methods are focused on improving a single solution at a time. A common feature
+is that all include the definition of building an initial solution. Other promising techniques are Variable Neighborhood Search (VNS) and Greedy Randomized Adaptive
+Search Procedure (GRASP). VNS has been widely used in several problems. It is based
+on a successive exploration of a set of predefined neighborhoods to find a better solution
+at each step. Large Neighborhood Search (LNS) [Guimarans 2012] can be interpreted
+as a special case of VNS in which efficient procedures are designed to consider a high
+number of neighborhoods at the same time. Inside this branch, we can find one of the
+first techniques used for the traveling salesman problem: the nearest neighborhood
+method. Simulated Annealing (SA) [Nikolaev and Jacobson 2010] is another singlesolution-based method based on the same physical principle used in the process of
+heating and then slowly cooling a substance to produce a strong crystalline structure.
+Thus, it is typical to include a temperature parameter to control the process.
+Some approximate algorithms, called heuristics, are tailor-made to solve a specific
+problem. Systematically following a number of steps, they are used to find an acceptable
+solution. However, they do not guarantee finding the optimal solution. For instance,
+Savings (CWS) [Clarke and Wright 1964] is probably one of the most cited heuristics
+used to solve the CVRP. In the literature, there are several variants and improvements
+of the CWS [Golden et al. 1984]. The original version of CWS is based on the estimation
+of possible savings originating from merging routes, as for unidirectional or symmetric
+edges Sav(i, j) = ci0 + c0 j − ci j. These savings are estimated between all nodes and
+then decreasingly sorted. Then, the bigger saving is always taken and is used to merge
+the two associated routes. As the authors propose, this procedure uses the concept of
+savings. In general, at each step of the solution construction process, the edge with
+the most savings is selected if and only if the two corresponding routes can feasibly be
+merged using the selected edge. The CWS algorithm usually provides relatively good
+solutions in less than a second, especially for small- and medium-sized problems. In
+addition, new algorithms have been proposed based on CWS. For instance, Juan et al.
+[2010] propose a multistart randomized approach, called Simulation in Routing via the
+Generalized Clarke and Wright Savings heuristic (SR-GCWS) that could be considered
+a metaheuristic in this general classification.
+4. RICH VRP DEFINITION
+A first attempt to define the RVRP was made by Toth and Vigo [2002]. The authors
+define the potential of extending the “vehicle flow formulations, particularly the more
+flexible three-index ones.” The authors also state that models of symmetric and asymmetric CVRP “may be adapted to model some variants of the basic versions.” Other
+authors have given a different description of this realistic problem. For the research
+community, the RVRP is a generalization or union of other independent problems.
+Goel and Gruhn [2005, 2006, 2008] deal with the General Vehicle Routing Problem
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+32:10 J. Caceres-Cruz et al.
+(GVRP) as “a combined load acceptance and routing problem which generalizes the
+well known Vehicle Routing Problem and Pickup and Delivery Problem. Furthermore,
+it amalgamates some extensions of the classical models which, up to now, have only
+been treated independently.” In a Special Issue explicitly dedicated to Rich models, the
+editors [Hasle et al. 2006] summarize “non-idealised models that represent the application at hand in an adequate way by including all important optimization criteria,
+constraints, and preferences.” In fact, Hasle and Kloster [2007] refer to this type of
+problem as an industrial or applied routing problem.
+Pellegrini et al. [2007] state that “in recent years, moreover, thanks to the increasing
+efficiency of these methods and the availability of a larger computing power, the interest
+has been shifted to other variants identified as RVRP. The problems grouped under this
+denomination have in common the characteristics of including additional constraints,
+aiming a closer representation of real cases.” Their case study is characterized by many
+different types of constraints, each of which is unanimously classified as “challenging
+even when considered alone.” For instance, Crainic et al. [2009a, 2009b] introduce another term to refer to RVRP when dealing with multiattribute VRP-like rich problems.
+They also stated that “real-world problems are generally characterised by several interacting attributes, which describe their feasibility and optimality structures. Many
+problems also display a combinatorial nature and are, in most cases of interest, both
+formally difficult and dimensionally large. In the past, the general approach when
+tackling a combinatorial multi-attribute, rich problem was either to frontally attack
+it, to address a simplified version, or to solve in a pipeline manner a series of simpler
+problems.” Therefore, the constraints may be known also as attributes of the RVRP
+(VRP with multiattributes).
+More recently, Rieck and Zimmermann [2010] state that: “Hence, research has turned
+to more specific and rich variants of the CVRP. The family of these problems is identified as rich vehicle routing problems. In order to model RVRPs, the basic CVRP must
+be extended by considering additional constraints or different objective functions.” The
+evolution of models can be appreciated when new needs concerning the models themselves emerge. In this respect, the authors stated that “rich vehicle routing problems
+are usually formulated as three-index vehicle-flow models with decision variables xk
+i j
+which indicate whether an arc (i, j) : i, j ∈  is traversed by vehicle k (k = 1,..., K).”
+These models seem to be more flexible in incorporating additional constraints (e.g.,
+different vehicle capacities). In their monograph, Toth and Vigo [2002] suggest that
+two-index vehicle-flow formulations “generally are inadequate for more complex versions of vehicle routing problems.” Their arguments are based on the fact that “these
+models are not suited for the cases where the cost or the feasibility of a circuit [each
+corresponding to a vehicle route] depends on the overall vertex sequence or on the type
+of vehicle allocated to the route.” The new models have been extended to include other
+features in the logistic or supply chain process. Furthermore, Schmid et al. [2013] have
+proposed six integrative models considering the classical version of the VRP and some
+important extensions in the context of supply chain management. These extensions
+are lotsizing, scheduling, packing, batching, inventory, and intermodality. The authors
+state that, as a benefit, their models consider an efficient use of resources as well as
+the inclusion of interdependencies among the subproblems. Lahyani et al. [2012] have
+pointed out the importance of stating a common and closed definition for RVRP scope,
+“in most papers devoted to RVRPs, definitions of rich problems are quite vague and
+not significantly different. There is no formal definition either criterion which leads
+to decide whether or not a VRP is rich. Such definition has to rely on a relevant taxonomy which can help to differentiate among numerous variants of the VRP.” In fact,
+the authors conclude their study with a numerical proposal for a specific definition:
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+Rich Vehicle Routing Problem: Survey 32:11
+“a RVRP extends the academic variants of the VRP in the different decision levels by
+considering additional strategic and tactical aspects in the distribution system (4 or
+more) and including several daily restrictions related to the Problem Physical Characteristics (6 or more) [pure routing or operational]. Therefore, a RVRP is either a VRP
+that incorporates many strategic and tactical aspects and/or a VRP that reflects the
+complexities of the real-life context by various challenges revealed daily. The state of
+the art of RVRP has changed since 2006. Now studies incorporate more complex aspects
+of reality. Therefore, some variants described as rich by their authors in 2006 may not
+be considered as such anymore.” So, depending on the considered paper, the RVRP
+definition evolves continuously.
+In fact, some authors have stated that the taxonomy of VRPs is in constant evolution. The growing number of papers related to VRPs has created the necessity of
+classifying the context and different problems considered within it. Eksioglu et al.
+[2009] proposed a framework for classifying the literature of VRPs based on scenario
+characteristics. They tested their proposal with a disparate set of VRP details so that
+specific variants of VRP can be defined. However, this study does not mention emerging RVRPs. Recently, other realistic VRP variants have been promoted, and these new
+VRP applications are expanding the scope of RVRP. Thanks to technological advances,
+dynamic VRPs (so-called real-time VRP) can be also considered as part of the overall
+RVRP scope [Pillac et al. 2013]. This branch includes uncertainty over some variables
+(number of customers, travel times, and demands), and it explores the use of real-time
+communication of inputs (e.g., Global Positioning Systems). Therefore the target of this
+area is to generate “good” routing solutions applicable to any change in context and
+in a really rapid way for each data variation. In general, the border between RVRPs
+and other VRP fields is blurred, and other emerging VRP variants can be included
+within of RVRP for its current interest and future impact. One highlighted application
+is Green VRP [Lin et al. 2014; Erdogan and Miller-Hooks 2012], in which sustainable ˘
+transportation issues are involved through objective functions or variables related to
+environmental costs. Within this, a special branch has been developed: Pollution VRP
+[Bektas¸ and Laporte 2011; Demir et al. 2012a, 2012b]. Its main objective is to reduce
+emissions during transportation activities. A combination of previous VRP branches
+represents promising applications of RVRP, as was recently promoted in a special issue
+of Rich and Real-Life VRPs [Juan et al. 2014].
+To summarize, we conclude that an RVRP reflects, as a model, most of the relevant
+attributes of a real-life vehicle-routing distribution system. These attributes might
+include dynamism, stochasticity, heterogeneity, multiperiodicity, integration with
+other related activities (e.g., vehicle packing, inventory management, etc.), diversity of
+users and policies, legal and contractual issues, environmental issues, and more. Thus,
+as a model, an RVRP is an accurate representation of a real-life distribution system
+and, therefore, the solutions obtained for the RVRP should be directly applicable to a
+real-life scenario.
+As can be appreciated, the implications of the RVRP definition have evolved toward
+a more concise concept over time. The new demanding needs of enterprises have forced
+researchers to consider more complex approaches. There is also a clear trend toward
+creating generic and efficient approaches. Considering the large number of papers
+devoted to the VRP, only a few can be applied to the current RVRP context, and only a
+small number of papers have explicitly addressed the RVRP. This fact emphasizes the
+sparse nature of the literature as well as the opportunities that the academy sector
+has to collaborate with enterprises addressing real routing problems. The next section
+presents a literature review on some strategies aimed at solving RVRP instances with
+more than one constraint simultaneously.
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+32:12 J. Caceres-Cruz et al.
+5. LITERATURE REVIEW
+In this section, we review the more than 50 papers selected because they are denominated Rich extensions of the original VRP or are related to other RVRPs, plus some
+few others that consider several VRP variants. All these papers have in common that
+they consider one or more variants of the classical VRP. The approaches presented
+in these papers solve separated VRP variants or different combinations of their constraints. One of the first explicitly RVRP cases is presented in Pellegrini [2005]. The
+author addresses a specific RVRP approach with the consideration of a heterogeneous
+fleet, multiple time windows, delivery restricted within some intervals of time, and a
+maximum time for a single tour. They proposed two heuristic algorithms based on the
+well-known Nearest Neighbor (NN) heuristic procedure [Solomon 1987] combined with
+a swap local search. In this article, a Deterministic version of a NN (DNN) algorithm as
+well as a Randomized NN (RNN) version is created. A random behavior in the selection
+of the next customer in the building process of a route is added to the procedure. The
+author showed encouraging results in a short computational time with generated instances of 50, 100, 150, and 200 customers. The RNN algorithm reaches better results
+than the DNN version, although the RNN version loses some efficiency as the number
+of customers increases.
+On the other hand, Goel and Gruhn [2005, 2006] address capacity restrictions, time
+windows, and a heterogeneous fleet with different travel times, and also multiple pickup
+and delivery locations, travel costs, different start and end locations for vehicles, and
+other constraints. They propose iterative improvement approaches based on LNS. The
+authors created an instance generator of 50, 100, 250, and 500 orders to show the
+performance of their approach. In addition, Goel and Gruhn [2008] consider other sets
+of real-life requirements (e.g., time window restrictions, a heterogeneous vehicle fleet
+with different travel times, travel costs and capacity, multidimensional capacity constraints, order/vehicle compatibility constraints, orders with multiple pickup, delivery
+and service locations, different start and end locations for vehicles, and route restrictions for vehicles). The authors propose an iterative improvement approach. They use
+a reduced Variable Neighborhood Search (VNS) algorithm for exchanging elements
+between neighborhoods and also an LNS approach for using nested neighborhoods of
+different sizes. This combination helps avoid a local minimum.
+Following the LNS research line, Ropke and Pisinger [2006a, 2006b] propose a heuristic based on LNS as proposed by Shaw [1998]. Furthermore, their approach is a unified
+heuristic with an adaptive layer. They are focused on the VRP with backhauls (VRPB)
+with time windows, pickup and delivery constraints, and multiple depots. They propose a model transformation of the VRPB to solve simultaneous pickups and deliveries.
+Nine datasets are used to test several configurations of the proposed heuristic in which
+more than 50% of best known solutions for those instances are improved. Later, the
+same authors developed an Adaptive LNS framework [Pisinger and Ropke 2007] for
+addressing capacitated deliveries, time windows, multiple depots, split deliveries, and
+open routes constraints. They use several sets of instances with up to 1,000 customers,
+and they improve 183 best-known solutions out of 486 benchmark tests.
+Hasle et al. [2005] briefly describe four mechanisms to enhance scalability and
+present a generic route construction heuristic for RVRPs. The empirical investigation results based on standard test instances for several VRP variants show the effectiveness of this approach. In addition, Hasle and Kloster [2007] propose a generic
+approach to harness modeling flexibility. The authors present a generic solver based
+on a unified algorithmic approach that is a combined operation of the Variable Neighborhood Descent and a promising Iterated Local Search (ILS) [Lourenc¸o et al. 2010].
+An initial solution is generated using the parallel version of CWS. They address a
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+Rich Vehicle Routing Problem: Survey 32:13
+capacitated constraint, distance limitation, pickup and delivery constraints, fleet size,
+and mix problems, as well as time windows. They present the possibility of extending
+their solution to multidepot and site-dependent problems. Classical benchmarks from
+Solomon [1987] and their modification of Li and Lim [2001] are also used. Their results
+are based on a range of customers between 50 and 1,000.
+A wide classification of RVRP variants is presented in a special issue published by
+Hartl et al. [2006]. Seven papers were selected that cover different aspects and illustrate novel types of VRP applications. The editors state that “VRP research has often
+been criticized for being too focused on idealized models with non-realistic assumptions
+for practical applications.” Several optimization methods are proposed for solving problems inspired by real applications of VRP knowledge. For instance, Reimann and Ulrich
+[2006] addressed the VRP with backhauls and time windows. Hoff and Løkketangen
+[2006] are focused in the traveling salesman problem with pickup and delivery. Ileri
+et al. [2006] work in pickup and delivery requests with time windows, a heterogeneous
+fleet, and some operational constraints over the driver routes. The authors use an SP
+technique and also CG to solve real-life instances. Fugenschuh [2006] proposes a meta- ¨
+heuristic for the VRP with coupling time windows. This method combines classical
+construction aspects with mixed-integer preprocessing techniques, and it is improved
+with a randomized search strategy. Several randomly generated instances are used, as
+well as a real-world case for public bus transportation considering school times in rural
+areas of Germany. Magalhaes and Sousa [2006] present a real case adopting a system ˜
+of variable routes that are dynamically designed. Sorensen [2006] shows a bi-objective ¨
+case considering marketing and financial interests that is solved using a metaheuristic. Bolduc et al. [2006] addressed a multiple period horizon in an inventory context
+with a heterogeneous fleet, multiple trips, and capacity restrictions. The authors use
+heuristics to minimize the cost of distributing products to the retailers and the cost
+of maintaining inventory at the facility. Randomly generated instances were used to
+measure the performance of the approach with two sets of small and large cases.
+Pellegrini et al. [2007] presented a case study characterized by multiple objectives,
+constraints concerning multiple time windows, a heterogeneous fleet of vehicles, a
+maximum duration of subtours, and periodic visits to the customers. They considered
+two versions of ACO: the Multiple Ant Colony System (M-ACS) first proposed by Dorigo
+and Gambardella [1997] and (b) the MAX-MIN Ant System (MMAS) based on Stutzle ¨
+and Hoos [1997]. The authors compared the results with a TS algorithm and an RNN
+heuristic (mentioned earlier). Both ACO algorithms perform significantly better than
+the TS and RNN approaches using an instance generator of 70–80 orders. Another
+ACO implementation is proposed by Rizzoli et al. [2007] that has been applied to
+real contexts addressing separately a heterogeneous fleet, time windows, pickup and
+delivery constraints, and time dependent deliveries. The authors tested four ACO
+algorithms using data from real distribution companies with between 15 and 600
+customers.
+In Hoff [2006], we find four papers [Hoff and Løkketangen 2006, 2007; Hoff et al.
+2009, 2010] focused on the development of Lasso Solution Strategies using TS and
+heuristics for the VRP with pickup and delivery, time-dependent, and stochastic demands. Lasso Strategies consist of a path or spoke that is first followed by each vehicle
+to perform deliveries; the remaining customers assigned to this vehicle are then visited
+along a loop, and, finally, the spoke is followed in the reverse order to perform pickups.
+If the loop is empty, then the lasso reduces to a double-path; if the path is empty, then
+it reduces to a Hamiltonian cycle. The authors created instances with 7–262 nodes
+that are derived from classical benchmarks used in CVRP. A real-life problem from
+a Norwegian company is also considered. In Derigs and Dohmer [2005], the authors ¨
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+32:14 J. Caceres-Cruz et al.
+also addressed the pickup and delivery VRP with time windows. They proposed an
+indirect search procedure based on sequence/permutation of tasks, cheapest insertion
+of a visit, and a threshold-accepting local search metaheuristic. The proposed algorithm
+was implemented into a decision support system for a removal firm. They produce some
+promising preliminary results with randomly generated instances.
+Irnich [2008] takes advantage of strong modeling capabilities and proposes a unified modeling and heuristic solution framework. The author highlights the potential of
+k − edge exchange neighborhoods. This approach is intended to support efficient local
+search procedures for addressing all standard types of VRPs, such as capacitated and
+distance-constrained deliveries, multiple depots, time windows, simultaneous delivery
+and pickup, backhauling, pickup-and-delivery problems, periodic VRP, fleet mix and
+size, and site dependencies as well as mixtures and extensions of these. The author
+proposes integrating efficient search blocks into different metaheuristic. Some promising results are presented for VRPTW and MDVRPTW combining a VNS with LNS
+strategies and inspired by the work of Ropke and Pisinger [2006b].
+A large number of studies use exact methods or combinations of them. In Wen [2010],
+we find three papers that address some variants of the RVRP inspired by real-life situations. The author proposes different strategies to solve (a) the VRP with cross-docking
+options through a TS-based heuristic tested over 200 pairs of suppliers and customers
+[Wen et al. 2008]; (b) the dynamic VRP with multiple objectives over a planning horizon
+that consists of multiple periods through MILP and a three-phase heuristic [Wen et al.
+2010]; and (c) the VRP with multiperiod horizon, time windows for delivery, heterogeneous vehicles, drivers working regulations, and other constraints [Wen et al. 2011].
+In the last work, the author proposes a MILP embedded in a multilevel VNS algorithm. Good quality solutions for solving up to 2,000 orders are generated using real
+case information. In this same research line, Rieck and Zimmermann [2010] propose a
+new MILP (two-index vehicle flow) model for a RVRP with docking constraints. They
+consider time windows, simultaneous delivery and pickup at customer locations, and
+multiple uses of vehicles. The test instances with 10–30 customers were generated from
+a classical set of VRP with time windows [Solomon 1987]. The proposed method solves
+small and medium problem instances efficiently. Another promising approach, as proposed by Doerner and Schmid [2010], consists in the combination of exact algorithms
+and metaheuristic search components. The authors present a survey of several hybrid
+techniques and also highlight some key aspects for future studies. Hybrid approaches
+allow researchers to conquer the obstacles observed when individual concepts are applied independently. These authors present three trends of hybridization schemes:
+set-covering-based approaches, local branching approaches, and decomposition techniques. They addressed the periodic VRP with time windows and multidepot VRP with
+time windows, but other variants are commented. An exact solution framework based
+on SP modeling is proposed by Baldacci et al. [2010, 2011a, 2011b] for individual types
+of VRPs. The results outperform all other exact methods published so far and also
+solve several previously unsolved test instances. The preliminary step to the proposed
+framework is presented in Baldacci and Mingozzi [2009], where a unified exact method
+based on SP is introduced for solving the well-known CVRP, HVRP, SVRP, and the
+MDVRP. Computational results assess the performance of their approach over main
+instances from the literature covering different variants of HVRP, SVRP, and MDVRP.
+Several studies have developed CG-based methods as well. Oppen et al. [2010] consider a real scenario called the Livestock Collection Problem (LCP), which is considered
+an RVRP extended with inventory constraints. This context includes duration and capacity restrictions, heterogeneous fleets, time windows, multiple trips, and multiproduct issues. The authors addressed it through an exact solution method based on CG.
+The authors created instances with less than 30 customer orders inspired by the real
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+Rich Vehicle Routing Problem: Survey 32:15
+world. The CG approach has helped to find optimal solutions in different scenarios, but
+the authors defined limitations for finding optimal solutions to LCP instances. Another
+CG heuristic is proposed by Goel [2010] for addressing a VRP with time windows, a heterogeneous vehicle fleet, multiple depots, and pickup and delivery constraints. Some
+small instances are randomly generated in order to test the heuristic performance.
+Ceselli et al. [2009] also propose the use of a CG combined with a dynamic programming algorithm to address simultaneously a heterogeneous fleet, different depots, time
+windows, route length variation, optionally opened routes, and pickup and delivery and
+several other constraints. The authors tested their approach with 46 randomly generated instances composed of 100 orders, and the results are compared with valid lower
+bounds. Under a similar restricted context, Ruinelli [2011] compared three methods on
+a master thesis: an ACS, a CG algorithm, and a general-purpose MILP solver. Computational results are presented using 14 real instances from a distribution company, where
+the CG outperforms the other two methods. Prescott-Gagnon et al. [2012] present a
+real-life case of an oil distribution company that presents a set of particular features.
+Some of the constraints addressed are the heterogeneous vehicle fleet, multiple depots,
+intraroute replenishment, time windows, driver shifts, and optional customers. The authors propose three metaheuristic solutions; namely, the TS algorithm, a LNS heuristic
+combined with TS, and another LNS based on a CG heuristic. Computational results
+indicate that both LNS methods outperform the TS heuristic. In fact, the LNS method
+based on CG tends to produce better quality solutions. Also Lannez et al. [2010] present
+an approach based on CG for a very particular extension of RVRP called the Rich Arc
+Routing Problem, in which the demand is located on the arcs and not in the nodes.
+Other generic Rich solvers have emerged in the literature. Cordeau et al. [Cordeau
+et al. 1997, 2001; Cordeau and Laporte 2003; Cordeau et al. 2004] propose a unified TS
+approach for VRPs with time windows and multiperiod, multidepot, and site-dependent
+constraints. Several real and theoretical benchmarks were used to test the performance
+of this approach. Some ILS approaches are proposed [Ibaraki et al. 2005; Hashimoto
+et al. 2006, 2008]. In fact, Subramanian [2012] proposes a promising combination of ILS
+with integer programming aspects for several VRP variants. This work was extended to
+the Fleet Size and Mix (FSM) and HVRP research lines in Subramanian et al. [2012].
+They developed a hybrid algorithm composed of an ILS- based heuristic and an SP
+formulation. The SP model is solved using a MIP solver that calls the ILS heuristic
+during its execution. Three benchmark instances with up to 360 customers were used
+to test the approach. For instance, Groer et al. [2010] implemented a library of seven ¨
+local search heuristics for addressing several variants such as the CVRP, VRPTW, and
+MDVRP. Some classical heuristic are used (e.g., record-to-record, CWS). Their approach
+is based on easily removing and inserting customers from an existing solution (called
+neighborhood ejection). Several classical benchmarks are used to show the performance
+of their approach. In Battarra [2011] several exact and heuristic algorithms for routing
+problems are presented in individual RVRP cases [Baldacci et al. 2009; Battarra et al.
+2009]. Some of the problems addressed are FSM and HVRP with multitrips and time
+windows.
+Recently, Santillan et al. [2012] solved a routing-scheduling-loading problem using ´
+a heuristic-based system. As first step, the proposed system applies an ACS for the
+routing and scheduling problem, then a bin packing technique is used for the vehicle load problem. Some tests with Solomon [1987] instances are developed. Also, the
+authors use real information from the distribution of bottles provided by a Mexican
+company. Another hybrid approach is proposed by Vallejo et al. [2012]. They apply
+a three-phase heuristic that merges the use of a memory-based approach with clustering techniques. The authors present promising test results using between 100 and
+2,000 customers, and they compare their approach to a GA. Next, two particular real
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+32:16 J. Caceres-Cruz et al.
+cases are presented, inspired by Ropke and Pisinger [2006b]. First, Amorim et al.
+[2012] create a new Adaptive LNS for solving specific real instances of a heterogeneous
+fleet site- dependent vehicle routing problem with multiple time windows. This case is
+inspired by a food distribution company in Portugal. Second, Derigs et al. [2013] propose to combine the commented ALNS with local searches, with both controlled by two
+metaheuristic procedures (record-to-record travel and attribute-based hill climber) for
+addressing a particular real case, called a Rollon-Rolloff VRP (RRVRP), which occurred
+in sanitation/waste collection.
+Vidal et al. [2013a] developed a study of more than 64 metaheuristics comparing
+their solutions to 15 classic variants of VRP with multiple attributes. They present
+a classification on the types of constraints as attributes and identify promising principles in algorithmic designfor Rich VRP. In conclusion, they state that the critical
+factor for efficient metaheuristics is the appropriate balance between intensification
+and diversification explorations in the solution space. The authors conclude that the
+combination of hybrid algorithms and parallel cooperative methods would create effective solutions. Later, the same authors proposed a unified solution framework called
+Unified Hybrid Genetic Search (UHGS) for several types of RVRP [Vidal et al. 2013c].
+The framework uses efficient generic local search and genetic operators. This approach
+is also based on a giant-tour representation with a split procedure originally proposed by Prins [2004]. The authors present interesting computational results using 39
+benchmarks over 26 different Rich VRPs. Furthermore, the authors apply their method
+combined with diversity management mechanisms to different large-scale instances of
+Rich Time-constrained VRPs [Vidal et al. 2013b]. The used instances involve up to
+1,000 customers. The proposed framework outperforms all current state-of-the-art approaches and addresses any combination of periodic, multidepot, site-dependent, and
+duration-constrained VRPs with time windows.
+Table I presents a summary of the cited state-of-the-art approaches developed for the
+RVRP by author, year of publication, type of proposed method, and maximum number
+of customers addressed in the study. The rows are sorted by type of method, year, and
+last name of first author. We applied a restrictive filter for approaches that can solve
+more than one RVRP. The asterisk (*) on the last column highlights the approaches
+that have been or can be tested with no restriction on the combination of constraints.
+The table is divided into two parts: complete methods first and incomplete later.
+6. CLASSIFICATION OF RICH VRP PAPERS
+Most of the routing constraints considered in the previous works were unified and
+classified. The next list presents the main distribution constraints considered in these
+papers. Table II shows the presence of each constraint in the cited papers. This is useful
+to appreciate the diversity of cataloged papers covering RVRP topics. And, finally, in
+Table III a classification of these routing constraints is done using the cited studies of
+Vidal et al. [2013c] and Lahyani et al. [2012]. In Vidal et al. [2013c], the routing constraints are related to their representation points inside the inner methodology process.
+For this, the authors propose three groups that represent the simple aspects that any
+solution must deal with: assignment of customers and routes to resources, sequence
+choices, and the evaluation of fixed sequences. The authors state that this “simple classification is intimately connected with the resolution methodology.” In Lahyani et al.
+[2012], constraints are associated with the company decision levels (operational, tactical, and strategic). The first level (strategic) includes decisions related to locations, the
+number of depots used, and the data type. The tactical level defines the order type and
+the visit frequencies of customers over a given time horizon. Finally, the operational
+considers vehicle and driver schedules so that constraints are related to distribution
+planning and specified for customers, vehicles, drivers, and roads. Additionally, we
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+Rich Vehicle Routing Problem: Survey 32:17
+Table I. State-of-the-Art of Rich VRP Methods
+Maximum Several
+Authors Year Method n Rich VRPs
+Ruinelli [2011] Column Generation 150
+Baldacci et al. [2011a] Exact Method 200 √*
+Baldacci et al. [2011b] Exact Method 200 √*
+Baldacci et al. [2010] Exact-Solution Framework 200 √*
+Bettinelli et al. [2011] Branch-and-Cut-and-Price 144
+Doerner and
+Schmid
+[2010] MatHeuristics -
+Goel [2010] Column Generation 250
+Oppen et al. [2010] Column Generation 27
+Rieck and
+Zimmermann
+[2010] Mixed-Integer Linear Programming 30
+Baldacci and
+Mingozzi
+[2009] Set Partitioning 100 √
+Ceselli et al. [2009] Column Generation 100
+Fugenschuh ¨ [2006] Mixed-Integer Programming 404
+Derigs et al. [2013] LS/LNS-based metaheuristic 199
+Vidal et al. [2013b] Hybrid Genetic Search with Advanced
+Diversity Control
+1,000 √*
+Amorim et al. [2012] Adaptive Large Neighborhood Search
+Framework
+366
+Santillan et al. ´ [2012] Ant Colony System 100
+Subramanian
+et al.
+[2012] Iterated Local Search 360
+Vidal et al. [2013c] Unified local search and Hybrid
+Genetic Search
+480 √*
+Vallejo et al. [2012] 3-phase heuristic using a
+memory-based and clustering
+techniques
+2,000
+Battarra [2011] Exact and Heuristic algorithms 100 √
+Groer et al. ¨ [2010] Local Search Heuristic 483
+Prescott-Gagnon
+et al.
+[2012] Tabu Search, LNS+TS heuristic,
+LNS+CG heuristic
+750
+Wen et al. [2010] 3-phase heuristic 80
+Goel and Gruhn [2008] Variable and Large Neighborhood
+Searches
+40
+Irnich [2008] Heuristic Framework using Local
+Search-Based metaheuristic
+1,000 √*
+Wen et al. [2008] TS and Adaptive Memory Procedure 200
+Hasle and
+Kloster
+[2007] metaheuristic 199 √*
+Pellegrini et al. [2007] Multiple Ant Colony Optimization 80
+Pisinger and
+Ropke
+[2007] LNS Heuristic 1,008 √*
+Rizzoli et al. [2007] Ant Colony Optimization 600 √
+Bolduc et al. [2006] Heuristics 75
+Goel and Gruhn [2006] Large Neighborhood Search 500
+Hoff and
+Løkketangen
+[2006] Tabu Search Heuristic 262
+Ileri et al. [2006] Set partitioning model 130
+Magalhaes and ˜
+Sousa
+[2006] Clustering Heuristic 450
+Reimann and
+Ulrich
+[2006] Ant Colony Optimization 100
+Continued
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+32:18 J. Caceres-Cruz et al.
+Table I. Continued
+Maximum Several
+Authors Year Method n Rich VRPs
+Ropke and
+Pisinger
+[2006b] LNS Heuristic 500 √
+Ropke and
+Pisinger
+[2006a] LNS Heuristic 500 √
+Sorensen ¨ [2006] Memetic algorithm with population
+management
+199
+Derigs and
+Dohmer ¨
+[2005] Local Search Algorithm -
+Goel and
+Gruhn
+[2005] Large Neighborhood Search 500
+Pellegrini [2005] Nearest Neighbor 200
+Cordeau et al. [2004] Improved Unified Tabu Search heuristic 288 √
+Cordeau et al. [2001] Unified Tabu Search heuristic 1,035 √
+Cordeau et al. [1997] Tabu Search 288
+propose a second level of classification associated with the routing element involved
+(depot, customer, route, vehicle, and product) in order to help better understand the
+classification:
+—Multiproducts (CP): Some vehicles can carry several types of products (fresh-cold,
+small-big, etc.).
+—Multidimensional capacity (CD): The capacity of vehicles is considered in 2D or 3D.
+—Vehicle Capacity (C): The capacity of vehicles is limited.
+—Homogeneous Fleet of Vehicles (FO): All vehicles of the fleet have the same capacity.
+—Heterogeneous Fleet of Vehicles (FE): Several type of vehicles (capacities) can be
+found in the fleet.
+—Unfixed Fleet of Vehicles (VU): The number of vehicles considered is unlimited.
+—Fixed Fleet of Vehicles (VF): The number of vehicles considered is limited.
+—Fixed Cost per Vehicle (FC): To use a vehicle implies an extra cost.
+—Variable Cost of Vehicle (VC): The real cost is represented by the product of the
+distance assigned to a vehicle and its price per distance unit.
+—Multitrips (MT): All or some vehicles of the fleet can execute more than one trip
+(multiple uses of vehicles).
+—Vehicle Site-Dependence (DS): Some vehicles cannot visit some nodes due to geographical, compatibility, or legal issues.
+—Vehicle Road-Dependence (DR): Some vehicles can not pass through some edges of
+the network for some legal issues.
+—Duration Constraints/Length (L): The duration of each route cannot exceeded a
+maximum value or cost, including service times on each visited client.
+—Driver Shifts/Working Regulations (D): The design of routes include the number of
+legal working hours for drivers (stops, breaks, rest, etc).
+—Balanced Routes (BR): The load of routes or vehicles must be balanced between all.
+—Symmetric Cost Matrix (CS): The cost matrix has a symmetric nature.
+—Asymmetric Cost Matrix (CA): The cost matrix has an asymmetric nature.
+—Intraroute replenishments (IR): The vehicles must be reloaded at some point in the
+routes.
+—Time-Dependent/Dynamic/Stochastic Times (TD): The target is minimizing time,
+and traveling times could vary during a day (hard or flexible). The location/distance
+of clients changes.
+—Stochastic Demands/Dynamic (S): The demands of clients can change during the
+application of a routing solution.
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+Rich Vehicle Routing Problem: Survey 32:19 Table II. Relation of Rich VRP Papers and Considered Constraints Authors CP CD C FO FE VU VF FC VC MT DS DR L D BR CS CA IR TD S TW MW PD PS B MV MP I CC MD WD O DA DD PC MO [Derigs et al. 2013] √√ √ √ √ √ [Vidal et al. 2013b] √√ √ √ √ √ √ √ √ √ [Amorim et al. 2012] √ √√ √√ √ √ √ √ [Santill´an et al. 2012] √ √ √ √ √ √ √ √ √ √√ √ √ √ √ [Subramanian 2012] √√ √ √ √ √ √ √ √ √ √ √ √ [Subramanian et al. 2012] √ √√√√√ √
+√
+[Vidal et al. 2013c] √ √ √ √ √ √ √ √ √√ √ √ √ √ √ √ √ √ √
+[Vallejo et al. 2012] √√ √ √ √ √ √
+[Baldacci et al.
+2011a]
+√√ √ √ √ √
+[Baldacci et al.
+2011b]
+√√ √ √ √
+[Battarra 2011] √ √ √√ √ √ √
+[Bettinelli et al.
+2011]
+√ √ √√ √ √ √
+[Ruinelli 2011] √ √ √ √ √√ √ √ √ √
+[Yu and Zhen-Yang
+2011]
+√√ √ √ √ √
+[Baldacci et al.
+2010]
+√ √√√√√ √ √ √ √ √ √
+[Doerner and
+Schmid 2010]
+√√ √ √ √ √ √
+[Gro¨er et al. 2010] √√ √ √ √ √ √
+[Oppen et al. 2010] √ √ √√ √ √ √ √ √ √ √
+[Prescott-Gagnon et
+al. 2012]
+√ √ √ √√ √ √ √ √ √ √ √
+[Wen et al. 2010] √√ √ √ √ √ √
+[Rieck and
+Zimmermann 2010]
+√ √ √ √ √√ √ √ √
+[Goel 2010] √ √ √ √ √ √ √ √ √√
+[Ceselli et al. 2009] √ √ √ √ √ √ √√ √ √ √ √ √
+[Baldacci and
+Mingozzi 2009]
+√ √√√√√ √ √ √
+[Crainic et al.
+2009a]
+√√ √ √ √ √ √ √
+Continued
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+32:20 J. Caceres-Cruz et al. Table II. Continued Authors CP CD C FO FE VU VF FC VC MT DS DR L D BR CS CA IR TD S TW MW PD PS B MV MP I CC MD WD O DA DD PC MO [Goel and Gruhn 2008] √√ √ √ √ √ √ √ √ √√ [Hashimoto et al. 2008] √√ √ √ √ √ √ [Irnich 2008] √√ √ √ √ √ √ √ √ √ √√ √ √ √ √ [Wen et al. 2008] √√ √ √ √ √ [Hasle and Kloster 2007] √√ √ √ √ √ √ √ √ √ √ [Pellegrini et al. 2007] √ √ √ √ √ √ √√ √ √ √ √ √ [Pisinger and Ropke 2007] √√ √ √ √ √ √ √ √ √ [Rizzoli et al. 2007] √√ √ √ √√√ √ [Bolduc et al. 2006] √ √ √ √ √√ [F¨ugenschuh 2006] √√ √ √ √ √ [Hashimoto et al. 2006] √√ √ √ √ √ [Goel and Gruhn 2006] √ √ √ √ √ √ √√ √ √ √ √ √ √ [Hoff and Løkketangen 2006] √√ √ √ √ [Ileri et al. 2006] √ √ √√√ √ √ √ [Magalh˜aes and Sousa 2006] √√ √ √ √ [Reimann and Ulrich 2006] √√ √ √ √ √ √ [Ropke and Pisinger 2006b] √√ √ √ √ √ √√ √ √ [Ropke and Pisinger 2006a] √√ √ √ √ √ [S¨orensen 2006] √√ √ √ √
+√
+[Derigs and D¨ohmer
+2005]
+√√ √ √ √ √
+[Goel and Gruhn
+2005]
+√√ √ √ √ √ √ √√ √ √√
+[Ibaraki et al. 2005] √√ √ √ √ √ √
+[Pellegrini 2005] √√ √ √ √ √
+[Cordeau et al. 2004] √√ √ √ √ √ √ √ √
+[Cordeau and Laporte
+2003]
+√√ √ √ √ √ √
+[Cordeau et al. 2001] √√ √ √ √ √ √
+[Cordeau et al. 1997] √√ √ √ √ √
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+Rich Vehicle Routing Problem: Survey 32:21
+Table III. Classification of Main Documented Rich VRP Constraints
+[Vidal et al.
+2013c]
+[Lahyani et al.
+2012] Our 2nd-Level
+Restriction Code/Id Classification Classification Classification
+Multiproducts CP Assign Strategic Veh-Prod
+Multidimensional capacity CD Assign Strategic Veh-Prod
+Vehicle Capacity C Assign Operational Veh
+Homogeneous Fleet of
+Vehicles
+FO Assign Operational Veh
+Heterogeneous Fleet of
+Vehicles
+FE Assign Operational Veh
+Unfixed Fleet of Vehicles VU Evaluation Operational Veh
+Fixed Fleet of Vehicles VF Assign Operational Veh
+Fixed Cost per Vehicle FC Evaluation Operational Veh
+Variable Cost of Vehicle VC Evaluation Operational Veh
+Multitrips MT Sequence Operational Veh
+Vehicle Site Dependence DS Assign Operational Veh-Cust
+Vehicle Road Dependence DR Assign Operational Veh-Route
+Duration Constraints/
+Length
+L Evaluation Operational Route-Driver
+Driver Shifts/Working
+Regulations
+D Evaluation Operational Route-Driver
+Balanced Routes BR Assign Operational Route-Driver
+Symmetric Cost Matrix CS Sequence Operational Route
+Asymmetric Cost Matrix CA Sequence Operational Route
+Intraroute Replenishments IR Assign Tactical Route
+Time-Dependent/Dynamic/
+Stochastic Times
+TD Evaluation Tactical Route
+Stochastic Demands/
+Dynamic
+S Evaluation Tactical Customer
+Time Windows TW Evaluation Tactical Customer
+Multiple Time Windows MW Evaluation Tactical Customer
+Pickup & Delivery PD Sequence Tactical Customer
+Simultaneous Pickup &
+Delivery
+PS Evaluation Tactical Customer
+Backhauls B Sequence Tactical Customer
+Multiple Visits/Split
+Deliveries
+MV Assign Tactical Customer
+Multiperiod/Periodic MP Assign Tactical Customer
+Inventory Levels Controls I Assign Tactical Customer
+Customer Capacity CC Assign Tactical Customer
+Multidepot MD Assign Strategic Depot
+Time Windows for the
+Depot
+WD Evaluation Strategic Depot
+Different End Locations/
+Open Routes
+O Evaluation Strategic Depot
+Different Start and End
+Locations
+DA Evaluation Strategic Depot
+Departure from Different
+Locations
+DD Evaluation Strategic Depot
+Precedence Constraints PC Sequence Tactical Depot
+Multiobjectives MO Evaluation Tactical Depot
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+32:22 J. Caceres-Cruz et al.
+—Time Windows (TW): The clients cannot receive orders outside of a time window.
+Each client has a particular time window (hard or soft).
+—Multiple Time Windows (MW): The clients can not receive the orders out of a set of
+time windows. Each client has a particular set of time windows.
+—Pickup & Delivery (PD): The construction of routes must consider the picking up
+of products from some clients and the delivery to others in a sequential or separate
+way. The depot simply defines the starting/ending point for vehicles.
+—Simultaneous Pickup & Delivery (PS): The construction of routes must consider the
+picking up and delivery of products/persons at the same time in all nodes by the
+same vehicle. The depot simply defines the starting/ending point for vehicles.
+—Backhauls (B): The construction of routes must consider the picking up of products
+from some clients and delivery to others in a sequential or separate way. The critical
+assumption is that all deliveries must be made on each route before any pickups
+can be made (sometimes a client may require both a delivery and a pickup). The rearrangement of products may be expensive or unfeasible. The depot simply defines
+the starting/ending point for vehicles.
+—Multiple Visits/Split Deliveries (MV): Clients are visited several times for delivering
+a summary of original orders. Each vehicle may deliver a fraction of a customer’s
+demand.
+—Multiperiod/Periodic (MP): The optimization is made over a set of days, considering
+several visits, and each client has a different frequency of visits.
+—Inventory Levels Controls (I): The costs of stocks are also considered to be minimized
+with the routing costs while the levels of stock are controlled.
+—Customer Capacity (CC): The capacity stock of clients is also considered.
+—Multidepot (MD): There are more than one depots from whence vehicles leave and
+arrive.
+—Time Windows for the Depot (WD): The depot is open during a period of time. Vehicles
+that need to do more than one trip need to consider this.
+—Different End Locations/Open Routes (O): The routes start at the depot but finish on
+the last client. The return cost is not considered (optional).
+—Different Start and End Locations (DA): The vehicles start and end in different
+locations.
+—Departure from Different Locations (DD): The vehicles start in different locations.
+—Precedence Constraints (PC): The visiting order of clients could be important for the
+loading and unloading of products. Its order could be important for health or security
+reasons.
+—Multiobjectives (MO): The study considers more than one objective function or related costs at the same time.
+7. INSIGHTS AND FUTURE TRENDS
+From the previous sections, it is possible to extract some insight regarding the historical
+evolution of the VRP, both in terms of realism in the models that various authors
+consider and the methods employed to solve them. Thus, as shown in Figure 3, VRPs
+can be classified into three levels according to the degree of realism of their associated
+models.
+At the lower level, we find the most theoretical (classical) VRPs, which are represented by mostly academic models (as opposed to real-life models). These lab models
+are, of course, of high interest in order to develop mathematical and computing-based
+approaches that are exact but also of heuristic nature. Thus, solution techniques can
+be tested in controlled environments to assess their performance before being used in
+solving more complex models. The CVRP, VRPTW, HVRP and AVRP, among others,
+constitute clear examples of this category.
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+Rich Vehicle Routing Problem: Survey 32:23
+Fig. 3. Models classification and methodological future trends in RVRPs.
+In a second level, the classical-advanced VRPs appear. These are models characterized by a higher level of realism: large-scale problems, multiobjective functions,
+combined routing and cross problems (e.g., VRPs combined with packing, allocation, or
+inventory management), and the like. More advanced and complex VRP variants are
+included in this category. Usually, these problems have been solved by metaheuristic
+approaches, such as GA, ACO, SA, GRASP, and the like.
+Most of the existing work in the VRP literature so far deals with these two levels.
+Recently, however, and largely due to the maturity of existing exact and metaheuristic methods, researchers are able to go one step beyond and cope with RVRPs using
+a plethora of new hybrid methods that combine exact and metaheuristic approaches
+(matheuristics) [Doerner and Schmid 2010] or even simulation with metaheuristics
+(simheuristics). As discussed in Juan et al. [2014b], simheuristics allow a consideration of uncertainty in costs and constraints of the VRP model, thus making these
+models a more accurate representation of real-life routing distribution systems. These
+hybrid methods not only can deal with uncertainty (stochastic factors), but they can
+also consider aspects such as dynamism, diversity of vehicles and customers, multiperiodicity in the distribution activity, integration with other supply chain components, environmental issues, and more. As models and solving techniques are refined
+to tackle more realistic problems, a further increase of VRP variants considering complex constraints—and therefore included in the RVRP category—is to be expected.
+8. CONCLUSION
+The VRP is a classical combinatorial problem. Throughout history, many different
+variants have been studied. The main difference among them is either the kind of
+constraints or the cost function of the specific type. Nowadays, it is common to find
+increasingly complex problems that are closer to real world ones. These can be classified
+as RVRPs.
+In this survey, we reviewed the evolution of studied problems in the RVRP arena.
+We present a variety of routing scenarios that can be found in the real world and
+the most common methods developed for addressing all types of RVRPs (i.e., exact,
+approximated, and their combinations). The RVRP domain appeared during the first
+decade of the 21st century, and it has shown itself to be a promising research area.
+There are many tailored approaches for specific cases of RVRP; however, in the past
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+32:24 J. Caceres-Cruz et al.
+10 years, general-purpose methods are slowly emerging that preserve previous quality
+features, but that can be applied to generic Rich VRP scenarios.
+To organize the information about the RVRP, we analyzed the different constraints
+included in RVRP papers and tried to define how they can be characterized. Moreover,
+we collected all papers devoted to this area, classifying them according to the active
+constraints they addressed. Finally, we included a section that follows the evolution
+from the classical VRP to the so-called RVRP, and we speculate on future trends that
+this research line will face in the upcoming years.
+REFERENCES
+P. Amorim, S. N. Parragh, F. Sperandio, and B. Almada-Lobo. 2012. A rich vehicle routing problem dealing
+with perishable food: A case study. TOP 22, 2 (2012), 1–20.
+R. Baldacci, E. Bartolini, A. Mingozzi, and R. Roberti. 2010. An exact solution framework for a broad class
+of vehicle routing problems. Computational Management Science 7, 3 (2010), 229–268.
+R. Baldacci, E. Bartolini, A. Mingozzi, and A. Valletta. 2011a. An exact algorithm for the period routing
+problem. Operations Research 59, 1 (2011), 228–241.
+R. Baldacci, M. Battarra, and D. Vigo. 2008. Routing a heterogeneous fleet of vehicles. In The Vehicle Routing
+Problem: Latest Advances and New Challenges, B. Golden, S. Raghavan, and E. Wasil (Eds.). Operations
+Research/Computer Science Interfaces, Vol. 43. Springer, 3–27.
+R. Baldacci, M. Battarra, and D. Vigo. 2009. Valid inequalities for the fleet size and mix vehicle routing
+problem with fixed costs. Networks 54, 4 (2009), 178–189.
+R. Baldacci and A. Mingozzi. 2009. A unified exact method for solving different classes of vehicle routing
+problems. Mathematical Programming 120, 2 (2009), 347–380.
+R. Baldacci, A. Mingozzi, and R. Roberti. 2012. Recent exact algorithms for solving the vehicle routing
+problem under capacity and time window constraints. European Journal of Operational Research 218,
+1 (2012), 1–6.
+R. Baldacci, A. Mingozzi, and R. Wolfler-Calvo. 2011b. An exact method for the capacitated location-routing
+problem. Operations Research 59, 5 (2011), 1284–1296.
+R. Baldacci, P. Toth, and D. Vigo. 2010. Exact algorithms for routing problems under vehicle capacity
+constraints. Annals of Operations Research 175, 1 (2010), 213–245.
+M. Battarra. 2011. Exact and heuristic algorithms for routing problems. 4OR 9 (2011), 421–424.
+M. Battarra, M. Monaci, and D. Vigo. 2009. An adaptive guidance approach for the heuristic solution of
+a minimum multiple trip vehicle routing problem. Computers & Operations Research 36, 11 (2009),
+3041–3050.
+T. Bektas¸ and G. Laporte. 2011. The pollution-routing problem. Transportation Research Part B: Methodological 45, 8 (2011), 1232–1250.
+A. Bettinelli, A. Ceselli, and G. Righini. 2011. A branch-and-cut-and-price algorithm for the multi-depot
+heterogeneous vehicle routing problem with time windows. Transportation Research Part C: Emerging
+Technologies 19, 5 (2011), 723–740.
+M. C. Bolduc, J. Renaud, and B. Montreuil. 2006. Synchronized routing of seasonal products through a
+production/distribution network. Central European Journal of Operations Research 14, 2 (2006), 209–
+228.
+O. Braysy and M. Gendreau. 2005a. Vehicle routing problem with time windows, part I: Route construction ¨
+and local search algorithms. Transportation Science 39, 1 (2005), 104–118.
+O. Braysy and M. Gendreau. 2005b. Vehicle routing problem with time windows, part II: Metaheuristics. ¨
+Transportation Science 39, 1 (2005), 119–139.
+A. Ceselli, G. Righini, and M. Salani. 2009. A column generation algorithm for a rich vehicle-routing problem.
+Transportation Science 43, 1 (2009), 56–69.
+G. Clarke and J. W. Wright. 1964. Scheduling of vehicles from central depot to number of delivery points.
+Operations Research 12, 4 (1964), 568–581.
+J. F. Cordeau, M. Gendreau, and G. Laporte. 1997. A Tabu search heuristic for periodic and multi-depot
+vehicle routing problems. Networks 30, 2 (1997), 105–119.
+J. F. Cordeau and G. Laporte. 2003. A Tabu search heuristic for the static multi-vehicle dial-a-ride problem.
+Transportation Research Part B: Methodological 37, 6 (2003), 579–594.
+J. F. Cordeau, G. Laporte, and A. Mercier. 2001. A unified Tabu search heuristic for vehicle routing problems
+with time windows. Journal of the Operational Research Society 52, 8 (2001), 928–936.
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+Rich Vehicle Routing Problem: Survey 32:25
+J. F. Cordeau, G. Laporte, and A. Mercier. 2004. Improved Tabu search algorithm for the handling of route
+duration constraints in vehicle routing problems with time windows. Journal of the Operational Research
+Society 55, 5 (2004), 542–546.
+T. G. Crainic, G. C. Crisan, M. Gendreau, N. Lahrichi, and W. Rei. 2009a. A concurrent evolutionary approach
+for rich combinatorial optimization. In Proceedings of the 11th Annual Conference Companion on Genetic
+and Evolutionary Computation Conference: Late Breaking Papers. 2017–2022.
+T. G. Crainic, G. C. Crisan, M. Gendreau, N. Lahrichi, and W. Rei. 2009b. Multi-thread integrative cooperative
+optimization for rich combinatorial problems. In Proceedings of the IEEE International Symposium on
+Parallel & Distributed Processing (IPDPS). 1–8.
+G. Dantzig and J. H. Ramser. 1959. The truck dispatching problem. Management Science 6, 1 (1959), 80–91.
+R. Dechter and J. Pearl. 1985. Generalized best-first search strategies and the optimality of A*. J. ACM 32,
+3 (1985), 505–536.
+E. Demir, T. Bektas¸, and G. Laporte. 2012a. An adaptive large neighborhood search heuristic for the PollutionRouting Problem. European Journal of Operational Research 223, 2 (2012), 346–359.
+E. Demir, T. Bektas¸, and G. Laporte. 2012b. The bi-objective pollution-routing problem. European Journal
+of Operational Research 232, 3 (2012), 464–478.
+E. Demir, T. Bektas¸, and G. Laporte. 2014. A review of recent research on green road freight transportation.
+European Journal of Operational Research 237, 3 (2014), 775–793.
+U. Derigs and T. Dohmer. 2005. Router: A fast and flexible local search algorithm for a class of rich vehicle ¨
+routing problems. In Operations Research Proceedings 2004, H. Fleuren, D. Hertog, and P. Kort (Eds.).
+Vol. 2004. Springer, 144–149.
+U. Derigs, M. Pullmann, and U. Vogel. 2013. A short note on applying a simple LS/LNS-based metaheuristic
+to the rollon-rolloff vehicle routing problem. Computers & Operations Research 40, 3 (2013), 867–872.
+G. Desaulniers, J. Desrosiers, and M. M. Solomon. 2005. Column Generation. Springer.
+K. F. Doerner and V. Schmid. 2010. Survey: Matheuristics for rich vehicle routing problems. In Hybrid
+Metaheuristics, M. Blesa, C. Blum, G. Raidl, A. Roli, and M. Sampels (Eds.). Lecture Notes in Computer
+Science, Vol. 6373. Springer, 206–221.
+M. Dorigo and L. M. Gambardella. 1997. Ant colonies for the travelling salesman problem. BioSystems 43, 2
+(1997), 73–81.
+European Commission EC. 2008. Greening Transport. Communication from the Commission to the European
+Parliament and the Council SEC(2008) 2206. European Union.
+European Commission EC. 2011. Roadmap to a single European transport area: Towards a competitive and
+resource efficient transport system. Impact assessment. White Paper SEC(2011) 358. European Union.
+B. Eksioglu, A. Volkan-Vural, and A. Reisman. 2009. The vehicle routing problem: A taxonomic review.
+Computers & Industrial Engineering 57, 4 (2009), 1472–1483.
+S. Erdogan and E. Miller-Hooks. 2012. A green vehicle routing problem. ˘ Transportation Research Part E:
+Logistics and Transportation Review 48, 1 (2012), 100–114.
+A. Fugenschuh. 2006. The vehicle routing problem with coupled time windows. ¨ Central European Journal
+of Operations Research 14, 2 (2006), 157–176.
+M. R. Garey and D. S. Johnson. 1979. Computers and intractability: a guide to the theory of NP-Completeness.
+W.H. Freeman & Co.
+M. Gendreau, J. Y. Potvin, O. Braumlaysy, G. Hasle, and A. Løkketangen. 2008. Metaheuristics for the ¨
+vehicle routing problem and its extensions: A categorized bibliography. In The Vehicle Routing Problem: Latest Advances and New Challenges, B. Golden, S. Raghavan, and E. Wasil (Eds.). Operations
+Research/Computer Science Interfaces, Vol. 43. Springer, 143–169.
+A. Goel. 2010. A column generation heuristic for the general vehicle routing problem. In Learning and
+Intelligent Optimization, C. Blum and R. Battiti (Eds.). Lecture Notes in Computer Science, Vol. 6073.
+Springer, 1–9.
+A. Goel and V. Gruhn. 2005. Large neighborhood search for rich VRP with multiple pickup and delivery
+locations. In Proceedings of the 18th Mini EURO Conference on VNS (MEC-VNS).
+A. Goel and V. Gruhn. 2006. Solving a dynamic real-life vehicle routing problem. In Operations Research
+Proceedings 2005, H. D. Haasis, H. Kopfer, and J. Schonberger (Eds.). Operations Research Proceedings, ¨
+Vol. 2005. Springer, 367–372.
+A. Goel and V. Gruhn. 2008. A general vehicle routing problem. European Journal of Operational Research
+191, 3 (2008), 650–660.
+B. L. Golden, A. Assad, L. Levy, and F. Gheysens. 1984. The fleet size and mix vehicle routing problem.
+Computers & Operations Research 11, 1 (1984), 49–66.
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+32:26 J. Caceres-Cruz et al.
+B. L. Golden, S. Raghavan, and E. A. Wasil. 2008. The Vehicle Routing Problem: Latest Advances and New
+Challenges. Springer.
+I. Gribkovskaia and G. Laporte. 2008. One-to-many-to-one single vehicle pickup and delivery problems. In
+The Vehicle Routing Problem: Latest Advances and New Challenges, Bruce Golden, S. Raghavan, and
+Edward Wasil (Eds.). Springer, 359–377.
+C. Groer, B. Golden, and E. Wasil. 2010. A library of local search heuristics for the vehicle routing problem. ¨
+Mathematical Programming Computation 2, 2 (2010), 79–101.
+D. Guimarans. 2012. Hybrid Algorithms for Solving Routing Problems. Ph.D. Dissertation. Universitat
+Autonoma Barcelona. `
+D. Guimarans, R. Herrero, D. Riera, A. A. Juan, and J. J. Ramos. 2011. Combining probabilistic algorithms,
+constraint programming and Lagrangian relaxation to solve the vehicle routing problem. Annals of
+Mathematics and Artificial Intelligence 62, 3–4 (2011), 299–315.
+P. E Hart, N. J Nilsson, and B. Raphael. 1968. A formal basis for the heuristic determination of minimum
+cost paths. IEEE Transactions on Systems Science and Cybernetics 4, 2 (1968), 100–107.
+R. F. Hartl, G. Hasle, and G. K. Janssens. 2006. Special issue on rich vehicle routing problems. Central
+European Journal of Operations Research 14, 2 (2006), 103–104.
+H. Hashimoto, T. Ibaraki, S. Imahori, and M. Yagiura. 2006. The vehicle routing problem with flexible time
+windows and traveling times. Discrete Applied Mathematics 154, 16 (2006), 2271–2290.
+H. Hashimoto, M. Yagiura, and T. Ibaraki. 2008. An iterated local search algorithm for the time-dependent
+vehicle routing problem with time windows. Discrete Optimization 5, 2 (2008), 434–456.
+G. Hasle and O. Kloster. 2007. Industrial vehicle routing. In Geometric Modelling, Numerical Simulation,
+and Optimization, G. Hasle, K. A. Lie, and E. Quak (Eds.). Springer, 397–435.
+G. Hasle, O. Kloster, E. J. Nilssen, A. Riise, and M. Smedsrud. 2005. Scalable and instance robust metaheuristics for a rich VRP model. In ROUTE 2005 - International Workshop on Vehicle Routing and
+Intermodal Transportation.
+G. Hasle, A. Løkketangen, and S. Martello. 2006. Rich models in discrete optimization: Formulation and
+resolution (ECCO XVI). European Journal of Operational Research 175, 3 (2006), 1752–1753.
+A. Hoff. 2006. Heuristics for Rich Vehicle Routing Problem. Ph.D. Dissertation. Molde University College.
+A. Hoff, I. Gribkovskaia, G. Laporte, and A. Løkketangen. 2009. Lasso solution strategies for the vehicle
+routing problem with pickups and deliveries. European Journal of Operational Research 192, 3 (2009),
+755–766.
+A. Hoff, A. G. Lium, A. Løkketangen, and T. G. Crainic. 2010. A metaheuristic for stochastic service network
+design. Journal of Heuristics 16, 5 (2010), 653–679.
+A. Hoff and A. Løkketangen. 2006. Creating lasso-solutions for the traveling salesman problem with pickup
+and delivery by Tabu search. Central European Journal of Operations Research 14, 2 (2006), 125–140.
+A. Hoff and A. Løkketangen. 2007. A Tabu search approach for milk collection in western Norway using
+trucks and trailers. In Proceedings of the 6th Triennial Symposium on Transportation Analysis.
+T. Ibaraki, S. Imahori, M. Kubo, T. Masuda, T. Uno, and M. Yagiura. 2005. Effective local search algorithms
+for routing and scheduling problems with general time-window constraints. Transportation Science 39,
+2 (2005), 206–232.
+Y. Ileri, M. Bazaraa, T. Gifford, G. Nemhauser, J. Sokol, and E. Wikum. 2006. An optimization approach
+for planning daily drayage operations. Central European Journal of Operations Research 14, 2 (2006),
+141–156.
+S. Irnich. 2008. A unified modeling and solution framework for vehicle routing and local search-based
+metaheuristics. INFORMS Journal on Computing 20, 2 (2008), 270–287.
+A. A. Juan, J. Faulin, S. Grasman, and K. Govindan. 2014. Special issue on rich and real-life vehicle routing
+problems. International Journal of Advanced Operations Management 6, 1 (2014), 1–3.
+A. A. Juan, J. Faulin, S. Grasman, D. Riera, J. Marull, and C. Mendez. 2011. Using safety stocks and
+simulation to solve the vehicle routing problem with stochastic demands. Transportation Research Part
+C: Emerging Technologies 19, 5 (2011), 751–765.
+A. A. Juan, J. Faulin, R. Ruiz, B. B. Barrios, and S. Caballe. 2010. The SR-GCWS hybrid algorithm for solving
+the capacitated vehicle routing problem. Applied Soft Computing 10, 1 (2010), 215–224.
+A. A. Juan, J. Goentzel, and T. Bektas¸. 2014a. Routing fleets with multiple driving ranges: Is it possible to
+use greener fleet configurations? Applied Soft Computing 21 (2014), 84–94.
+A. A. Juan, S. Grasman, J. Caceres-Cruz, and T. Bektas¸. 2014b. A simheuristic algorithm for the singleperiod stochastic inventory-routing problem with stock-outs. Simulation Modelling Practice and Theory
+46 (2014), 40–52.
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+Rich Vehicle Routing Problem: Survey 32:27
+A. L. Kok, C. M. Meyer, H. Kopfer, and J. M. J. Schutten. 2010. A dynamic programming heuristic for the
+vehicle routing problem with time windows and European community social legislation. Transportation
+Science 44, 4 (2010), 442–454.
+H. W. Kopfer, J. Schonberger, and H. Kopfer. 2014. Reducing greenhouse gas emissions of a heterogeneous ¨
+vehicle fleet. Flexible Services and Manufacturing Journal 26, 1–2 (2014), 221–248.
+R. E. Korf. 1985. Depth-first iterative-deepening: An optimal admissible tree search. Artificial Intelligence
+27, 1 (1985), 97–109.
+R. Lahyani, M. Khemakhem, F. Semet, and H. Chabchoub. 2012. Taxonomy for rich vehicle routing problems.
+In Proceedings of the 1st International IEEE Conference on Logistics Operations Management.
+S. Lannez, C. Artigues, J. J. Damay, and M. Gendreau. 2010. Column generation heuristic for a rich arc
+routing problem. In Proccedings of the 10th Workshop on Algorithmic Approaches for Transportation
+Modelling, Optimization, and Systems (ATMOS’10), Vol. 14. 130–141.
+G. Laporte. 2007. What you should know about the vehicle routing problem. Naval Research Logistics 54
+(2007), 811–819.
+G. Laporte. 2009. Fifty years of vehicle routing. Transportation Science 43, 4 (2009), 408–416.
+G. Laporte, M. Gendreau, J. Y. Potvin, and F. Semet. 2000. Classical and modern heuristics for the vehicle
+routing problem. International Transactions in Operational Research 7, 4–5 (2000), 285–300.
+G. Laporte, P. Toth, and D. Vigo. 2013. Vehicle routing: Historical perspective and recent contributions.
+EURO Journal on Transportation and Logistics 2, 1–2 (2013), 1–4.
+J. K. Lenstra and A. H. G. Rinnooy-Kan. 1981. Complexity of vehicle routing and scheduling problems.
+Networks 11, 2 (1981), 221–227.
+H. Li and A. Lim. 2001. A metaheuristic for the pickup and delivery problem with time windows. In Proceedings of the 13th International Conference on Tools with Artificial Intelligence. IEEE, 160–167.
+C. Lin, K. L. Choy, G. T. S. Ho, S. H. Chung, and H. Y. Lam. 2014. Survey of green vehicle routing problem:
+Past and future trends. Expert Systems with Applications 41, 4 (2014), 1118–1138.
+H. R. Lourenc¸o, O. C. Martin, and T. Stutzle. 2010. Iterated local search: Framework and applications. In ¨
+Handbook of Metaheuristics, M. Gendreau and J. Y. Potvin (Eds.). International Series in Operations
+Research & Management Science, Vol. 146. Springer, 363–397.
+J. M. D. Magalhaes and J. P. Sousa. 2006. Dynamic VRP in pharmaceutical distribution - a case study. ˜
+Central European Journal of Operations Research 14, 2 (2006), 177–192.
+A. G. Nikolaev and S. H. Jacobson. 2010. Simulated annealing. In Handbook of Metaheuristics, M. Gendreau
+and J. Y. Potvin (Eds.). International Series in Operations Research & Management Science, Vol. 146.
+Springer, 1–39.
+J. Oppen, A. Løkketangen, and J. Desrosiers. 2010. Solving a rich vehicle routing and inventory problem
+using column generation. Computers & Operations Research 37, 7 (2010), 1308–1317.
+J. Orozco. 2011. A Microscopic Traffic Simulation Based Decision Support System for Real-Time Fleet Management. Ph.D. Dissertation. Universitat Politecnica de Catalunya. `
+P. Pellegrini. 2005. Application of Two Nearest Neighbor Approaches to a Rich Vehicle Routing Problem.
+Technical Report TR/IRIDIA/2005-15. IRIDIA, Universite Libre de Bruxelles, Brussels, Belgium. ´
+P. Pellegrini, D. Favaretto, and E. Moretti. 2007. Multiple ant colony optimization for a rich vehicle routing problem: A case study. In Knowledge-Based Intelligent Information and Engineering Systems, B.
+Apolloni, R. J. Howlett, and L. Jain (Eds.). Lecture Notes in Computer Science, Vol. 4693. Springer,
+627–634.
+V. Pillac, M. Gendreau, C. Gueret, and A. Medaglia. 2013. A review of dynamic vehicle routing problems. ´
+European Journal of Operational Research 225, 1 (2013), 1–11.
+D. Pisinger and S. Ropke. 2007. A general heuristic for vehicle routing problems. Computers & Operations
+Research 34, 8 (2007), 2403–2435.
+E. Prescott-Gagnon, G. Desaulniers, and L. M. Rousseau. 2012. Heuristics for an oil delivery vehicle routing
+problem. Flexible Services and Manufacturing Journal (2012), 1–24.
+C. Prins. 2004. A simple and effective evolutionary algorithm for the vehicle routing problem. Computers &
+Operations Research 31, 12 (2004), 1985–2002.
+M. Reimann and H. Ulrich. 2006. Comparing backhauling strategies in vehicle routing using ant colony
+optimization. Central European Journal of Operations Research 14, 2 (2006), 105–123.
+J. Rieck and J. Zimmermann. 2010. A new mixed integer linear model for a rich vehicle routing problem with
+docking constraints. Annals of Operations Research 181, 1 (2010), 337–358.
+A. E. Rizzoli, R. Montemanni, E. Lucibello, and L. M. Gambardella. 2007. Ant colony optimization for realworld vehicle routing problems. Swarm Intelligence 1, 2 (2007), 135–151.
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.
+32:28 J. Caceres-Cruz et al.
+S. Ropke and D. Pisinger. 2006a. An adaptive large neighborhood search heuristic for the pickup and delivery
+problem with time windows. Transportation Science 40, 4 (2006), 455–472.
+S. Ropke and D. Pisinger. 2006b. A unified heuristic for a large class of vehicle routing problems with
+backhauls. European Journal of Operational Research 171, 3 (2006), 750–775.
+L. Ruinelli. 2011. Column Generation for a Rich VRP: VRP with Simultaneous Distribution, Collection
+and Pickup-and-Delivery. Ph.D. Dissertation. University of Applied Sciences and Arts of Southern
+Switzerland.
+C. G. Santillan, L.C. Reyes, M. L. M. Rodr ´ ´ıguez, J. J. G. Barbosa, O. C. Lopez, G. R. Zarate, and P. Hern ´ andez. ´
+2012. Variants of VRP to optimize logistics management problems. In Logistics Management and Optimization through Hybrid Artificial Intelligence Systems, O. Zezzatti, C. A. Ochoa, C. Chira, A. Hernandez,
+and M. Basurto (Eds.). Vol. 2012. IGI Global, 207–237.
+V. Schmid, K. F. Doerner, and G. Laporte. 2013. Rich routing problems arising in supply chain management.
+European Journal of Operational Research 224, 3 (2013), 435–448.
+P. Shaw. 1998. Using constraint programming and local search methods to solve vehicle routing problems. In
+Proceedings of the 4th International Conference on Principles and Practice of Constraint Programming
+(CP-98) (Lecture Notes in Computer Science), M. Maher and J. F. Puget (Eds.), Vol. 1520. 417–431.
+K. C. Sinha and S. Labi. 2011. Transportation Decision Making: Principles of Project Evaluation and Programming. Wiley.
+M. M. Solomon. 1987. Algorithms for the vehicle routing and scheduling problems with time window constraints. Operations Research 35, 2 (1987), 254–265.
+K. Sorensen. 2006. Route stability in vehicle routing decisions: A bi-objective approach using metaheuristics. ¨
+Central European Journal of Operations Research 14, 2 (2006), 193–207.
+T. Stutzle and H. Hoos. 1997. MAX-MIN ant system and local search for the traveling salesman problem. In ¨
+Proceedings of the IEEE International Conference on Evolutionary Computation. 309–314.
+A. Subramanian. 2012. Heuristic, Exact and Hybrid Approaches for Vehicle Routing problems. Ph.D. Dissertation. Universidade Federal Fluminense.
+A. Subramanian, P. H. V. Penna, E. Uchoa, and L. S. Ochi. 2012. A hybrid algorithm for the heterogeneous
+fleet vehicle routing problem. European Journal of Operational Research 221, 2 (2012), 285–295.
+E. G. Talbi. 2009. Metaheuristics: From Design to Implementation. John Wiley & Sons, Inc.
+P. Toth and D. Vigo. 2002. An overview of vehicle routing problems. In The Vehicle Routing Problem, P. Toth
+and D. Vigo (Eds.). SIAM - Society for Industrial and Applied Mathematics, Philadelphia, USA, 1–26.
+S. Ubeda, F. J. Arcelus, and J. Faulin. 2011. Green logistics at Eroski: A case study. International Journal of
+Production Economics 131, 1 (2011), 44–51.
+M. Vallejo, P. A. Vargas, and D. W. Corne. 2012. A fast approximative approach for the vehicle routing
+problem. In Proceedings of the 12th UK Workshop on Computational Intelligence (UKCI). IEEE, 1–8.
+H. Van Essen, A. Schroten, M. Otten, D. Sutter, C. Schreyer, R. Zandonella, M. Maibach, and C. Doll. 2011.
+External Costs of Transport in Europe. Technical Report 11.4215.50. CE Delft, Delft, Netherlands.
+P. Van Hentenryck. 1989. Constraint Satisfaction in Logic Programming. MIT Press.
+T. Vidal, T. G. Crainic, M. Gendreau, and C. Prins. 2013a. Heuristics for multi-attribute vehicle routing
+problems: A survey and synthesis. European Journal of Operational Research 231, 1 (2013), 1–21.
+T. Vidal, T. G. Crainic, M. Gendreau, and C. Prins. 2013b. A hybrid genetic algorithm with adaptive diversity
+management for a large class of vehicle routing problems with time-windows. Computers & Operations
+Research 40, 1 (2013), 475–489.
+T. Vidal, T. G. Crainic, M. Gendreau, and C. Prins. 2013c. A unified solution framework for multi-attribute
+vehicle routing problems. European Journal of Operational Research 234, 3 (2013), 658–673.
+M. Wen. 2010. Rich Vehicle Routing Problems and Applications. Ph.D. Dissertation. Technical University of
+Denmark.
+M. Wen, J. F. Cordeau, G. Laporte, and J. Larsen. 2010. The dynamic multi-period vehicle routing problem.
+Computers & Operations Research 37, 9 (2010), 1615–1623.
+M. Wen, E. Krapper, J. Larsen, and T. K. Stidsen. 2011. A multilevel variable neighborhood search heuristic
+for a practical vehicle routing and driver scheduling problem. Networks 58, 4 (2011), 311–322.
+M. Wen, J. Larsen, J. Clausen, J. F. Cordeau, and G. Laporte. 2008. Vehicle routing with cross-docking.
+Journal of the Operational Research Society 60, 12 (2008), 1708–1718.
+B. Yu and Z. Zhen-Yang. 2011. An ant colony optimization model: The period vehicle routing problem
+with time windows. Transportation Research Part E: Logistics and Transportation Review 47, 2 (2011),
+166–181.
+Received November 2013; revised August 2014; accepted August 2014
+ACM Computing Surveys, Vol. 47, No. 2, Article 32, Publication date: December 2014.

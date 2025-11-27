@@ -1,0 +1,83 @@
+THE TRUCK DISPATCHING PROBLEM*
+G. B. DANTZIG¹ AND J. H. RAMSER
+The paper is concerned with the optimum routing of a fleet of gasoline delivery trucks between a bulk terminal and a large number of service stations
+supplied by the terminal. The shortest routes between any two points in the
+system are given and a demand for one or several products is specified for a
+number of stations within the distribution system. It is desired to find a way
+to assign stations to trucks in such a manner that station demands are satisfied
+and total mileage covered by the fleet is a minimum. A procedure based on a
+linear programming formulation is given for obtaining a near optimal solution.
+The calculations may be readily performed by hand or by an automatic digital
+computing machine. No practical applications of the method have been made
+as yet. A number of trial problems have been calculated, however.
+1. Introduction
+The "Truck Dispatching Problem" formulated in this paper may be considered as a generalization of the "Traveling-Salesman Problem".(1) In itssimplest
+form the Traveling-Salesman Problem is concerned with the determination of
+the shortest route which passes through each of n given points once. Assuming
+that each pair of points is joined by a link, the total number of different routes
+through n points is žn!. Even for small values of n the total number of routes
+is exceedingly large, e.g. for n = 15, there are 653,837,184,000 different routes.
+One of the authors has collaborated with Fulkerson and Johnson in developing
+a "cutting plane" approach for testing whether a proposed tour is optimal or
+finding an improved solution if it is not.(2), (3)
+The Traveling-Salesman Problem may be generalized by introducing additional conditions. Thus, the salesman may be required to return to the "terminal
+point" whenever he has contacted m of the n - 1 remaining points, m being
+a divisor of n - 1. For given n and m the problem is to find loops such that
+all loops have a specified point in common and total loop length is a minimum.
+Since the loops have one point in common, this problem may be called the
+"Clover Leaf Problem". If m is small, optimal sets of m points may often be
+determined by inspection of a map which contains the points and the arcs connecting them. One would look for "clusters of points" and determine by trial
+and error the order in which they should be traversed, taking care that no loop
+crosses itself. However, when clusters are not present in sufficient numbers or
+when m is large, this procedure becomes inapplicable. In this case near-best
+solutions may be obtained by the algorithm in this paper.
+2. The Truck Dispatching Problem
+The Traveling Salesman Problem may also be generalized by imposing the
+condition that specified deliveries q; be made at every point P, (excepting the
+terminal point). If the capacity of the carrier
+* Received November 1958
+1 The RAND Corporation, Santa Monica, California
+The Atlantic Refining Company, Philadelphia, Pennsylvania
+80
+(1)
+THE TRUCK DISPATCHING PROBLEM
+σ Σα,
+81
+the problem is formally identical with the Traveling-Salesman Problem in its
+original form since the carrier can serve every delivery point on one trip which
+links all the points.
+In the "Truck Dispatching Problem" the relation between C and the g, is
+such that the carrier can only make between 1 and t deliveries on each trip.
+Thus, the Truck Dispatching Problem is characterized by the relation
+(2)
+It is obvious that the number of carriers does not enter the problem when they
+have the same capacity. Even when carriers of different capacities are involved,
+or when a number of different products are to be delivered to every point, the
+same mathematical model may be used as will be shown below. For simplicity
+of presentation it will be assumed first that only one product is to be delivered
+and that all trucks have the same capacity С.
+The method of solution starts from the basic idea to synthesize the solution
+in a number of "stages of aggregation" in which suboptimizations are carried
+out on pairs of points or groups. The number of stages of aggregations to be
+employed is determined as follows: order the deliveries, g., in a sequence q1,
+q2,qi, qi+1,qn such that qiSq+1 for any i = 1, n - 1. Then
+determine t such that
+1+1
+C and 2qi > C.
+t obviously represents the maximum number of deliveries which a truck of capacity C can make for a given set of qi's. Since the sequence q1, 92,qt represents a feasible combination it may be in the optimal solution. Therefore, the
+method of calculating the number of aggregations to be employed must admit
+the combination q1, q2,q in the final aggregation. This will be the case if
+the number of stages of aggregations, N, is determined such that
+Nlog, t
+since 2 is the largest number of points aggregated in the Nth and final stage
+of aggregation.
+For example if C = 6000 and the q, are the values shown in column Q of
+Table 1, the ordered sequence of qi's is
+1100, 1200, 1200, 1400, 1400, 1500, 1900
+and t = 4. Therefore N = log2 4 = 2. In the first stage of aggregation only
+those points are allowed to pair up whose combined demand does not exceed
+C. In the second stage of aggregation any pair contained in the suboptimal
+solution of stage 1 may then be combined with any other pair without exceeding
+the truck capacity. If C = 7000 and the qi's are again the values listed in Table 1,
+t = 5 and N = 3. In the first stage of aggregation only those points are allowed
+to pair up whose combined demand does not exceed C. The pairings in the

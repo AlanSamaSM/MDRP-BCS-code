@@ -1,0 +1,1142 @@
+Invited Review
+A review of dynamic vehicle routing problems
+Victor Pillac a,b
+, Michel Gendreau c,d
+, Christelle Guéret a,⇑
+, Andrés L. Medaglia b
+a LUNAM Université, École des Mines de Nantes, IRCCyN UMR 6597, Nantes, France
+b Centro para la Optimización y Probabilidad Aplicada (COPA) & CEIBA, Departamento de Ingenieria Industrial, Universidad de los Andes, Bogotá, Colombia cDépartement de Mathématiques et de Génie Industriel, École Polytechnique de Montréal, C.P. 6079, Succ., Centre-ville, Montréal, Canada H3C 3A7
+d Centre Interuniversitaire de Recherche, sur les Reseaux d’Entreprise, la Logistique et le Transport (CIRRELT), Canada
+article info
+Article history:
+Received 27 September 2011
+Accepted 21 August 2012
+Available online 30 August 2012
+Keywords:
+Transportation
+Combinatorial optimization
+Dynamic vehicle routing
+abstract
+A number of technological advances have led to a renewed interest in dynamic vehicle routing problems.
+This survey classifies routing problems from the perspective of information quality and evolution. After
+presenting a general description of dynamic routing, we introduce the notion of degree of dynamism, and
+present a comprehensive review of applications and solution methods for dynamic vehicle routing
+problems.
+ 2012 Elsevier B.V. All rights reserved.
+1. Introduction
+The Vehicle Routing Problem (VRP) formulation was first introduced by Dantzig and Ramser [35], as a generalization of the Traveling Salesman Problem (TSP) presented by Flood [49]. The VRP is
+generally defined on a graph G ¼ ðV; E; CÞ, where V¼fv0; ... ; vng
+is the set of vertices; E ¼ fðvi; vjÞjðvi; vjÞ2V2; i – jg is the arc
+set; and C ¼ ðcijÞðvi;vjÞ2E is a cost matrix defined over E, representing
+distances, travel times, or travel costs. Traditionally, vertex v0 is
+called the depot, while the remaining vertices in V represent customers (or requests) that need to be served. The VRP consists in
+finding a set of routes for K identical vehicles based at the depot,
+such that each of the vertices is visited exactly once, while minimizing the overall routing cost.
+Beyond this classical formulation, a number of variants have
+been studied. Among the most common are the Capacitated VRP
+(CVRP), where each customer has a demand for a good and vehicles
+have finite capacity; the VRP with Time Windows (VRPTW), where
+each customer must be visited during a specific time frame; the
+VRP with Pick-up and Delivery (PDP), where goods have to be
+picked-up and delivered in specific amounts at the vertices; and
+the Heterogeneous fleet VRP (HVRP), where vehicles have different
+capacities. Routing problems that involve moving people between
+locations are referred to as Dial-A-Ride-Problem (DARP) for land
+transport; or Dial-A-Flight-Problem (DAFP), for air transport.
+In contrast to the classical definition of the vehicle routing problem, real-world applications often include two important dimensions: evolution and quality of information [116]. Evolution of
+information relates to the fact that in some problems the information available to the planner may change during the execution of
+the routes, for example, with the arrival of new customer requests.
+Quality of information reflects possible uncertainty on the available data, for instance, when the demand of a customer is only
+known as a range estimate of its real demand. In addition, depending on the problem and the available technology, vehicle routes
+can either be designed statically (a priori) or dynamically. For instance, the VRP with Stochastic Demands (VRPSD), can be seen
+from both perspectives. From a static perspective, the problem is
+to design a set of robust routes a priori, that will undergo minor
+changes during their execution [16,53]. From a dynamic perspective, the problem consists in designing the vehicle routes in an online fashion, communicating to the vehicle which customer to
+serve next as soon as it becomes idle [104,127,128]. Based on these
+dimensions, Table 1 identifies four categories of routing problems.
+In static and deterministic problems, all input is known beforehand and vehicle routes do not change once they are in execution.
+This classical problem has been extensively studied in the literature, and we refer the interested reader to the recent reviews of exact and approximate methods by Baldacci et al. [33], Cordeau et al.
+[4], Laporte [83,84], and Toth and Vigo [143].
+Static and stochastic problems are characterized by input partially known as random variables, which realizations are only revealed during the execution of the routes. Additionally, it is
+assumed that routes are designed a priori and only minor changes
+are allowed afterwards. For instance, allowable changes include
+0377-2217/$ - see front matter  2012 Elsevier B.V. All rights reserved.
+http://dx.doi.org/10.1016/j.ejor.2012.08.015
+⇑ Corresponding author.
+E-mail addresses: vpillac@mines-nantes.fr (V. Pillac), michel.gendreau@cirrelt.ca
+(M. Gendreau), gueret@mines-nantes.fr (C. Guéret), amedagli@uniandes.edu.co
+(A.L. Medaglia).
+European Journal of Operational Research 225 (2013) 1–11
+Contents lists available at SciVerse ScienceDirect
+European Journal of Operational Research
+journal homepage: www.elsevier.com/locate/ejor
+planning a trip back to the depot or skipping a customer. Applications in this category do not require any technological support.
+Uncertainty may affect any of the input data, yet the three most
+studied cases are [33]: stochastic customers, where a customer
+needs to be serviced with a given probability [15,147]; stochastic
+times, in which either service or travel times are modeled by random variables [79,85,146]; and lastly, stochastic demands
+[31,37,86,97,98,126,128]. Further details on the static stochastic
+vehicle routing can be found in the reviews by Bertsimas and Simchi-Levi [33], Cordeau et al. [16], and Gendreau et al. [53].
+In dynamic and deterministic problems, part or all of the input is
+unknown and revealed dynamically during the design or execution
+of the routes. For these problems, vehicle routes are redefined in an
+ongoing fashion, requiring technological support for real-time
+communication between the vehicles and the decision maker
+(e.g., mobile phones and global positioning systems). This class of
+problems are also referred to as online or real time by some authors
+[77].
+Similarly, dynamic and stochastic problems have part or all of
+their input unknown and revealed dynamically during the execution of the routes, but in contrast with the latter category, exploitable stochastic knowledge is available on the dynamically revealed
+information. As before, the vehicle routes can be redefined in an
+ongoing fashion with the help of technological support.
+Besides dynamic routing problems, where customer visits must
+be explicitly sequenced along the routes, there are other related
+vehicle dispatching problems, such as managing a fleet of emergency vehicles [23,54,66], or the so-called dynamic allocation problems in the area of long haul truckload trucking [60,109,134]. In
+this paper, we focus solely on dynamic problems with an explicit
+routing dimension.
+The remainder of this document is organized as follows: Section2
+presents a general description of dynamic routing problems and
+introduces the notion of degree of dynamism. Section 3 reviews different applications in which dynamic routing problems arise, while
+Section 4 provides a comprehensive survey of solution approaches.
+Finally, Section 5 concludes this paper and gives directions for
+further research.
+2. Dynamic vehicle routing problems
+2.1. A general definition
+The first reference to a dynamic vehicle routing problem is due
+to Wilson and Colvin [148]. They studied a single vehicle DARP, in
+which customer requests are trips from an origin to a destination
+that appear dynamically. Their approach uses insertion heuristics
+able to perform well with low computational effort. Later, Psaraftis
+[116] introduced the concept of immediate request: a customer
+requesting service always wants to be serviced as early as possible,
+requiring immediate replanning of the current vehicle route.
+A number of technological advances have led to the multiplication of real-time routing applications. With the introduction of the
+Global Positioning System (GPS) in 1996, the development and
+widespread use of mobile and smart phones, combined with accurate Geographic Information Systems (GISs), companies are now
+able to track and manage their fleet in real time and cost effectively. While traditionally a two-step process (i.e., plan-execute),
+vehicle routing can now be done dynamically, introducing greater
+opportunities to reduce operational costs, improve customer service, and reduce environmental impact.
+The most common source of dynamism in vehicle routing is the
+online arrival of customer requests during the operation. More specifically, requests can be a demand for goods [2,62,70,71,75,
+99,101,144] or services [7,11,17,52,89,141]. Travel time, a dynamic
+component of most real-world applications, has been recently taken into account [1,6,28,48,64,65,94,108,136,139,153]; while service time has not been explicitly studied (but can be added to
+travel time). Finally, some recent work considers dynamically revealed demands for a set of known customers [104,105,126,128]
+and vehicle availability [92,93,103], in which case the source of
+dynamism is the possible breakdown of vehicles. In the following
+we use the prefix ‘‘D-’’ to label problems in which new requests appear dynamically.
+To better understand what we mean by dynamic, Fig. 1 illustrates the route execution of a single vehicle D-VRP. Before the
+vehicle leaves the depot (time t0), an initial route plans to visit
+the currently known requests (A,B,C,D,E). While the vehicle executes its route, two new requests (X and Y) appear at time t1 and
+the initial route is adjusted to fulfill them. Finally, at time tf the
+executed route is (A,B,C,D,Y,E,X).
+This example reveals how dynamic routing inherently adjusts
+routes in an ongoing fashion, which requires real-time communication between vehicles and the dispatching center. Fig. 2 illustrates this real-time communication scheme, where the
+environment refers to the real-world while the dispatcher is the
+agent that gives instructions to the vehicle. Once the vehicle is
+ready (first dotted arrow), the dispatcher makes a decision and instructs the vehicle to fulfill request A (first double-headed arrow).
+When the vehicle starts (second dotted arrow) and ends (third dotted arrow) service at request A, it notifies the dispatcher, which in
+turn updates the available information and communicates the
+vehicle its next request (second double-headed arrow).
+2.2. Differences with static routing
+In contrast to their static counterparts, dynamic routing problems involve new elements that increase the complexity of their
+decisions (more degrees of freedom) and introduce new challenges
+while judging the merit of a given route plan.
+In some contexts, such as the pick-up of express courier [52],
+the transport company may deny a customer request. As a consequence, it can reject a request either because it is simply impossible to service it, or because the cost of serving it is too high. This
+process of acceptance/denial has been used in many approaches
+[2,43,52,73–75,92] and is referred to as service guarantee [145].
+In dynamic routing, the ability to redirect a moving vehicle to a
+new request nearby allows for additional savings. Nevertheless, it
+requires real-time knowledge of the vehicle position and being
+able to communicate quickly with drivers to assign them new destinations. Thus, this strategy has received limited interest, with the
+main contributions being the early work by Regan et al. [120–122],
+Table 1
+Taxonomy of vehicle routing problems by information evolution and quality.
+Information quality
+Deterministic input Stochastic input
+Information evolution Input known beforehand Static and deterministic Static and stochastic
+Input changes over time Dynamic and deterministic Dynamic and stochastic
+2 V. Pillac et al. / European Journal of Operational Research 225 (2013) 1–11
+the study of diversion issues by Ichoua et al. [73], and the work by
+Branchini et al. [21].
+Dynamic routing also frequently differs in the objective function [118]. In particular, while a common objective in the static
+context is the minimization of the routing cost, dynamic routing
+may introduce other notions such as service level, throughput
+(number of serviced requests), or revenue maximization. Having
+to answer to dynamic customer requests also introduces the notion
+of response time: a customer might request to be serviced as soon
+as possible, in which case the main objective may become to minimize the delay between the arrival of a request and its service.
+Dynamic routing problems require making decisions in an online manner, which often compromises reactiveness with decision
+quality. In other words, the time invested searching for better decisions, comes at the price of a lower reactiveness to input changes.
+This aspect is of particular importance in contexts where customers call for a service and a good decision must be made as fast as
+possible.
+2.3. Measuring dynamism
+Different problems (or instances of a same problem) can have
+different levels of dynamism, which can be characterized according
+to two dimensions [76]: the frequency of changes and the urgency
+of requests. The former is the rate at which new information becomes available, while the latter is the time gap between the disclosure of a new request and its expected service time. From this
+observation three metrics have been proposed to measure the
+dynamism of a problem (or instance).
+Lund et al. [95] defined the degree of dynamism d as the ratio between the number of dynamic requests nd and the total number of
+requests ntot as follows:
+d ¼ nd
+ntot
+ð1Þ
+Based on the fact that the disclosure time of requests is also
+important [117,118], Larsen [87] proposed the effective degree of
+dynamism de
+. This metric can be interpreted as the normalized
+average of the disclosure times. Let T be the length of the planning
+horizon, R the set of requests, and ti the disclosure time of request
+i 2 R. Assuming that requests known beforehand have a disclosure
+time equal to 0, de can be expressed as:
+de ¼ 1
+ntot
+X
+i2R
+ti
+T ð2Þ
+Larsen [87] also extended the effective degree of dynamism to
+problems with time windows to reflect the level of urgency of requests. He defines the reaction time as the difference between the
+disclosure time ti and the end of the corresponding time window
+li, highlighting that longer reaction times mean more flexibility
+to insert the request into the current routes. Thus, the effective degree of dynamism measure is extended as follows:
+de
+TW ¼ 1
+ntot
+X
+i2R
+1  li  ti
+T
+  ð3Þ
+It is worth noting that these three metrics only take values in
+the interval [0,1] and all increase with the level of dynamism of
+a problem. Larsen et al. [88,90] use the effective degree of dynamism to define a framework classifying D-VRPs among weakly,
+moderately, and strongly dynamic problems, with values of de
+being respectively lower than 0.3, comprised between 0.3 and
+0.8, and higher than 0.8.
+Although the effective degree of dynamism and its variations
+have proven to capture well the time-related aspects of dynamism,
+it could be argued that they do not take into account other possible
+sources of dynamism. In particular, the geographical distribution of
+requests, or the traveling times between requests, are also of great
+importance in applications aiming at the minimization of response
+time. Although not considered, the frequency of updates in problem information has a dramatical impact on the time available
+for optimization.
+3. A review of applications
+Recent advances in technology have allowed the emergence of a
+wide new range of applications for vehicle routing. In particular,
+the last decade has seen the development of Intelligent Transport
+Systems (ITSs), which are based on a combination of geolocation
+technologies, with precise geographic information systems, and
+increasingly efficient hardware and software for data processing
+and operations planning. We refer the interested reader to the
+study by Crainic et al. [34] for more details on ITS and the contributions of operations research to this relatively new domain.
+Among ITSs, the Advanced Fleet Management Systems (AFMSs)
+are specifically designed for managing a corporate vehicle fleet.
+The core problem is generally to deliver (pick-up) goods or persons
+to (from) locations distributed in a given area. While customer requests can either be known in advance or appear dynamically during the day, vehicles are dispatched and routed in real time,
+potentially by taking into account changing traffic conditions,
+Fig. 1. Example of dynamic vehicle routing.
+Fig. 2. Timeline of events for the dynamic routing of a single vehicle.
+V. Pillac et al. / European Journal of Operational Research 225 (2013) 1–11 3
+uncertain demands, or varying service times. A key technological
+feature of AFMSs is the optimization component. Traditionally,
+vehicle routing relies on teams of human dispatchers, meaning a
+critical operational process is bound to the competence and experience of dispatchers, as well as the management costs that are directly linked to the size of the fleet [1]. Advances in computer
+science have allowed a technological transfer from operational research to AFMSs, as presented in the studies by Attanasio et al. [1],
+Du et al. [38], Godfrey and Powell [60], Powell and Topaloglu [115],
+Roy [125], Simao et al. [129], and Slater [130].
+The remainder of this section presents applications where dynamic routing has been or can be implemented. The interested
+reader is also referred to the work by Gendreau and Potvin [55]
+and Ichoua et al. [76] for complementary reviews.
+3.1. Services
+In this category of applications, a service request is defined by a
+customer location and a possible time window; while vehicle
+routes just fulfill service requests without considering side constraints such as capacity. Perhaps the simplest, yet most illustrative case in this category is the dynamic traveling salesman
+problem [89].
+A common application of dynamic routing can be found in the
+area of maintenance operations. Maintenance companies are often
+committed to their customers by means of a contract which specifies periodical or planned visits to perform preventive maintenance, and may also request corrective maintenance on short
+notice. Therefore, each technician is first given a route with known
+requests at the beginning of the day, while new urgent requests are
+inserted dynamically throughout the day. An interesting feature of
+this problem is the possible mix of skills, tools, and spare part
+requirements, which have to be matched in order to service the request. This problem has been studied by Borenstein et al. [19] with
+an application to British Telecom.
+Another application of dynamic routing arises in the context of
+the French non-profit organization SOS Médecins. This organization
+operates with a crew of physicians, who are called on duty via a
+call center coordinated with other emergency services. When a patient calls, the severity of the case is evaluated, and a visit by a
+practitioner is planned accordingly. As in other emergency services, having an efficient dispatching system reduces the response
+time, thus improving service level for the society. On the other
+hand, it is important to decide in real-time whether or not to send
+a physician, so that it is possible to ensure a proper service level in
+areas where emergencies are likely to appear.
+Dynamic aspects can also appear on arc routing problems.
+This is for instance the case in the study by Tagmouti et al.
+[136] on the operation of a fleet of vehicles for winter gritting
+applications. Their work consider a network of streets or road
+segments that need to be gritted when affected by a moving
+storm. Depending on the movements of the storm, new segments
+may have to be gritted, and the routing of vehicles has to be updated accordingly.
+3.2. Transport of goods
+Due to the fact that urban areas are often characterized by
+highly variable traveling times, transport of goods in such areas
+has led to the definition of a specific category of applications
+known as city logistics. City logistics can be defined as an integrated
+vision of transport activities in urban areas, taking into account
+factors such as traffic and competition or cooperation between
+transport companies [140]. Barcelo et al. [6] developed a general
+framework for city logistics applications. They describe the different modules ranging from modeling the city road network and
+acquiring real-time traffic data to the dynamic routing of a fleet
+of vehicles. Zeimpekis et al. [153] proposed a Decision Support System (DSS) for city logistics which takes into account dynamic travel and service times.
+A typical application in city logistics is the courier service present in most urban areas. Couriers are dispatched to customer locations to collect packages, and either deliver them to their
+destination (short haul) or to a unique depot (long haul). Depending on the level of service paid by the customer, couriers may consolidate pick-ups from various customers, or provide an expedited
+service. Companies offering courier services often have an heterogeneous fleet composed of bicycles, motorbikes, cars, and small
+vans. The problem is then to dynamically route couriers, taking
+into account not only the known requests, their type, pick-up
+and delivery locations, and time windows, but also considering
+traffic conditions and varying travel times. A case study by Attanasio et al. [1] outlines the benefits of using an optimization-enabled
+AFMS at eCourier Ltd, a London based company offering courier
+services. The authors illustrate that aside from the improvements
+in service quality, response time, and courier efficiency, the use
+of an automated system allows decoupling the fleet size from the
+need for more dispatchers. Further results motivated by a similar
+application can be found in Gendreau et al. [51] and Ghiani et al.
+[59].
+The delivery of newspapers and magazines is a domain in which
+customer satisfaction is of first importance. When a magazine or
+newspaper is not delivered, a subscriber contacts a call center
+and is offered to choose between a voucher or a future delivery.
+In the latter case, the request is then forwarded to the delivery
+company, which assigns it to a driver that will do a priority delivery. Traditionally, this process relies on an exchange of phone calls,
+faxes, and printed documents, that ultimately communicates the
+pending delivery to the driver once he/she comes back to the depot. As an alternative, Bieding et al. [18] propose a centralized
+application that makes use of mobile phones to communicate with
+drivers and intelligently perform the routing in real time, reducing
+costs and improving customer satisfaction. More recently, Ferrucci
+et al. [44] developed an approach that makes use historical data to
+anticipate future requests.
+Another application in which customer requests need to be answered with short delays can be found in companies with a direct
+service model, such as grocery delivery services. In general, the
+customer selects products on a website, and then chooses a time
+frame for the delivery at his home. Traditionally, the vendor defines an arbitrary number of customers that can be serviced within
+a time window, and the time window is made unavailable to customers as soon as the capacity is reached. Campbell and Savelsbergh [24] defined the Home Delivery Problem, in which the goal
+is to maximize the total expected revenue by dynamically deciding
+whether or not to accept a customer request within a specific time
+window. In comparison with the traditional approach, this means
+that the time windows available for a customer are dynamically
+defined taking into consideration the possible future requests.
+The authors propose a Greedy Randomized Adaptive Search Procedure (GRASP) and compare different cost functions to capture the
+problem uncertainty. Later, Azi et al. [3] proposed an Adaptive
+Large Neighborhood Search (ALNS) that takes into account uncertainty by generating scenarios containing possible demand
+realizations.
+Apart from classical routing problems, related operational problems also arise in many organizations. The review by Stahlbock and
+Voss [135] on operations research applications in container terminals describes the dynamic stacker crane problem [5,14], which
+considers the routing of container carriers loading and unloading
+ships in a terminal. Other applications include transport of
+goods inside warehouses [132], factories, and hospitals, where
+4 V. Pillac et al. / European Journal of Operational Research 225 (2013) 1–11
+documents or expensive medical instruments must be transferred
+efficiently between services [45].
+3.3. Transport of persons
+The transport of persons is in general – and by many aspects –
+similar to the transport of goods, yet it is characterized by additional constraints such as regulation on waiting, travel, and service
+times.
+Taxis are arguably the most common on-demand individual
+transport systems. Requests are composed of a pick-up location
+and time, possibly coupled with a destination. They can be either
+known in advance, for instance when a customer books a cab for
+the next day, or they can arrive dynamically, in which case a taxi
+must be dispatched in the shortest time. When customers cannot
+share a vehicle, the closest free taxi is generally the one which
+takes the ride, leaving limited space for optimization. The study
+by Caramia et al. [25], generalized by Fabri and Recht [42], focuses
+on a multi-cab metropolitan transportation system, where a taxi
+can transport more than one passenger at the same time. In this
+case the online algorithms minimize the total traveled distance,
+while assigning requests to vehicles and computing the taxi routes.
+This multi-cab transportation system can be generalized as an ondemand or door-to-door transport service.
+Many applications involve the transport of children, the elderly,
+disabled people, or patients, from their home to schools, place of
+work, or medical centers. Xiang et al. [149] studied a DARP with
+changing travel speeds, vehicle breakdowns, and traffic congestion; while Dial [36], followed by Horn [67–69], studied demandresponsive transport systems. An extensive review of this class of
+problems can be found in the studies by Cordeau et al. [32] and
+Berbeglia et al. [14].
+A singular application of on-demand transportation systems
+can be found in major hospitals, with services possibly spread
+across various buildings on several branches. Depending on the
+medical procedure or facility capacity, a patient may need to be
+transferred on short notice from one service to another, possibly
+requiring trained staff or specific equipment for his/her care. This
+application has been studied by Beaudry et al. [7], Kergosien
+et al. [80], and Melachrinoudis et al. [96].
+Air taxis developed as a flexible response to the limitations of
+traditional airlines. Air taxis offer passengers the opportunity to
+travel through smaller airports, avoiding waiting lines at check-in
+and security checks. Air taxi companies offer an on-demand service: customers book a flight a few days in advance, specifying
+whether they are willing to share the aircraft, stop at an intermediate airport, or have flexible traveling hours. Then, the company
+accommodates these requests, trying to consolidate flights whenever possible. The underlying optimization problems have not
+been subject to much attention, except in the studies by Cordeau
+et al. [32], Espinoza et al. [40,41], Fagerholt et al. [43], and Yao
+et al. [152]. Similar problems arises in helicopter transportation
+systems, typically used by oil and gas companies to transport personnel between offshore petroleum platforms [63,124].
+4. Solution methods
+Few research was conducted on dynamic routing between the
+work of Psaraftis [116] in 1980 and the late 1990s. However, the
+last decade has seen a renewed interest for this class of problems
+[39], with solution techniques ranging from linear programming
+to metaheuristics. This section presents the major contributions
+in this field, and the reader is referred to the reviews, books, and
+special issues by Gendreau and Potvin [55,56], Ghiani et al. [57],
+Goel [61], Ichoua [72], Ichoua et al. [75,76], Jaillet and Wagner
+[78], Larsen et al. [91], and Zeimpekis et al. [154], to complement
+our review.
+4.1. Dynamic and deterministic routing problems
+This section presents approaches that have been successfully
+applied to dynamic routing, in the absence of stochastic information. In this context, critical information is revealed over time,
+meaning that the complete instance is only known at the end of
+the planning horizon. As a consequence, exact methods only provide an optimal solution for the current state, but do not guarantee
+that the solution will remain optimal once new data becomes
+available. Therefore, most dynamic approaches rely on heuristics
+that quickly compute a solution to the current state of the problem.
+Approaches for dynamic and deterministic vehicle routing problems can be divided into two categories: those based on periodic
+reoptimization, and those based on continuous reoptimization.
+4.1.1. Periodic reoptimization
+To the best of our knowledge, the first periodic reoptimization
+approach is due to Psaraftis [116], with the development of a dynamic programming approach. His research focuses on the DARP
+and consists in finding the optimal route each time a new request
+is known. The main drawback of dynamic programming is the
+well-known curse of dimensionality [Chap. 1][110], which prevents
+its application to large instances.
+More generally, periodic reoptimization approaches start at the
+beginning of the day with a first optimization that produces an initial set of routes. Then, an optimization procedure periodically
+solves a static problem corresponding to the current state, either
+whenever the available data changes, or at fixed intervals of
+time – referred to as decision epochs [29] or time slices [81]. The
+advantage of periodic reoptimization is that it can be based on
+algorithms developed for static routing, for which extensive
+research has been carried out. The main drawback is that all the
+optimization needs to be performed before updating the routing
+plan, thus increasing delays for the dispatcher.
+Yang et al. [150] addressed the real-time truckload PDP, in
+which a fleet of trucks has to service point-to-point transport requests arriving dynamically. Important assumptions are that all
+trucks can only handle one request at a time, with no possible preemption, and they travel at the same constant speed. The authors
+propose MYOPT, a rolling horizon approach based on a linear program (LP) that is solved whenever a new request arrives. Along the
+same line of linear programming, Chen and Xu [29] designed a dynamic column generation algorithm (DYCOL) for the D-VRPTW.
+The authors propose the concept of decision epochs over the planning horizon, which are the dates when the optimization process
+runs. The novelty of their approach relies on dynamically generating columns for a set-partitioning model, using columns from the
+previous decision epoch. The authors compared DYCOL to a traditional column generation with no time limit (COL). Computational
+results based on the Solomon benchmark [133] demonstrate that
+DYCOL yields comparable results in terms of objective function,
+but with running times limited to 10 seconds, opposed to the
+various hours consumed by COL.
+Montemanni et al. [102] developed an Ant Colony System (ACS)
+to solve the D-VRP. Similar to Kilby et al. [81], their approach uses
+time slices, that is, they divide the day in periods of equal duration.
+A request arriving during a time slice is not handled until the end
+of the time bucket, thus the problem solved during a time slice
+only considers the requests known at its beginning. Hence, the
+optimization is run statically and independently during each time
+slice. The main advantage of this time partition is that similar computational effort is allowed for each time slice. This discretization
+is also possible by the nature of the requests, which are never
+V. Pillac et al. / European Journal of Operational Research 225 (2013) 1–11 5
+urgent, and can be postponed. An interesting feature of their approach is the use of the pheromone trace to transfer characteristics
+of a good solution to the next time slice. A similar approach was
+also used by Gambardella et al. [50] and Rizzoli et al. [123].
+4.1.2. Continuous reoptimization
+Continuous reoptimization approaches perform the optimization throughout the day and maintain information on good solutions in an adaptive memory [138]. Whenever the available data
+changes, a decision procedure aggregates the information from
+the memory to update the current routing. The advantage is that
+the computational capacity is maximized, possibly at the expense
+of a more complex implementation. It is worth noting that because
+the current routing is subject to change at any time, vehicles do not
+know their next destination until they finish the service of a
+request.
+To the best of our knowledge, the first continuous reoptimization approach is due to Gendreau et al. [52] with the adaptation
+of the parallel Tabu Search (TS) framework introduced by Taillard
+et al. [137] to a D-VRPTW problem arising in the local operation
+of long distance express courier services. Their approach maintains
+a pool of good routes – the adaptive memory – which is used to
+generate initial solutions for a parallel TS. The parallelized search
+is done by partitioning the routes of the current solution, and optimizing them in independent threads. Whenever a new customer
+request arrives, it is checked against all the solutions from the
+adaptive memory to decide whether it should be accepted or rejected. This framework was also implemented for the D-VRP
+[73,74], while other variations of TS have been applied to the DPDP [6,27] and the DARP [2,7].
+Bent and Van Hentenryck [9] introduced the Multiple Plan Approach (MPA) as a generalization of the TS with adaptive memory
+[52]. The general idea is to populate and maintain a solution pool
+(the routing plans) that are used to generate a distinguished solution. Whenever a new request arrives, a procedure is called to
+check whether it can be serviced or not; if it can be serviced, then
+the request is inserted in the solution pool and incompatible solutions are discarded. Pool updates are performed periodically or
+whenever a vehicle finishes servicing a customer. This pool-update
+phase is crucial and ensures that all solutions are coherent with the
+current state of vehicles and customers. The pool can be seen as an
+adaptive memory that maintains a set of alternative solutions.
+In an early work, Benyahia and Potvin [13] studied the D-PDP
+and proposed a Genetic Algorithm (GA) that models the decision
+process of a human dispatcher. More recently, GAs were also used
+for the same problem [30,65] and for the D-VRP [144]. Genetic
+algorithms in dynamic contexts are very similar to those designed
+for static problems, although they generally run throughout the
+planning horizon and solutions are constantly adapting to the
+changes made to the input.
+4.2. Dynamic and stochastic routing problems
+Dynamic and stochastic routing problems can be seen as an
+extension of their deterministic counterparts, where additional
+(stochastic) knowledge is available in the dynamically revealed input. Approaches for this class of problems can be divided in two
+categories: those based on sampling and those based on stochastic
+modeling. As their name suggests, sampling strategies incorporate
+stochastic knowledge by generating scenarios based on realizations
+drawn from the random variable distributions. Each scenario is
+then optimized by solving the static and deterministic problem
+they define. On the other hand, approaches based on stochastic
+modeling integrate stochastic knowledge analytically. The advantage of sampling is its relative simplicity and flexibility on distributional assumptions, while its drawback is the massive generation
+of scenarios to accurately reflect reality. Alternatively, stochastic
+modeling strategies formally capture the stochastic nature of the
+problem, but they are highly technical in their formulation and require to efficiently compute possibly complex expected values.
+Examples of these two strategies follow.
+4.2.1. Stochastic modeling
+Powell et al. [113] formulated a truckload PDP as a Markov
+Decision Process (MDP). Later, MDPs were used by Thomas and
+White [142] and Thomas [141] to solve a VRP in which known customers may ask for service with a known probability. Kim et al.
+[82] also used MDPs to tackle the VRP with dynamic travel times.
+Unfortunately, the curse of dimensionality and the simplifying
+assumptions make this approach unsuitable in most real-world
+applications. Nonetheless, it allowed new insights in the field of
+dynamic programming.
+To cope with the scalability problems of traditional dynamic
+programming, Approximate Dynamic Programming (ADP) steps
+forward in time, approximates the value function, and ultimately
+avoids the evaluation of all possible states. We refer the interested
+reader to Powell [110,111] for a more detailed description of the
+ADP framework. ADP has been successfully applied to freight
+transport [112,114] and fleet management problems
+[60,115,129]. In particular, Novoa and Storer [104] propose an
+ADP algorithm to dynamically solve the VRPSD.
+Linear programming has also been adapted to the dynamic and
+stochastic context. The OPTUN approach, proposed by Yang et al.
+[150] as an extension of MYOPT (see Section 4.1.1), considers
+opportunity costs on each arc to reflect the expected cost of traveling to isolated areas. Consequently, the optimization tends to reject
+isolated requests, and avoids traversing arcs that are far away from
+potential requests. Later, Yang et al. [151] studied the emergency
+vehicle dispatching and routing and proposed a mathematical formulation that was later used by Haghani and Yang [66] on a similar
+problem.
+4.2.2. Sampling
+Sampling approaches rely on the generation of scenarios containing possible realizations of the random variables. Fig. 3 illustrates how scenarios are generated for the D-VRP. Solely based
+on the current customers (Fig. 3a), the optimal tour would be
+(A,B,E,D,C), which ignores two zones (gray areas) where customers
+are likely to appear. By sampling the customer spatial distributions
+(Fig. 3b), customers X, Y, and Z are generated, and the new optimal
+tour is (C,X,Y,B,A,Z,E,D). Removing the sampled (potential) customers (Fig. 3c) leads to the tour (C,B,A,E,D) which is suboptimal
+regarding a myopic cost evaluation, but leaves room to accommodate new customers at a lower cost.
+The Multiple Scenario Approach (MSA) is a predictive adaptation of the MPA framework discussed in Section 4.1.2. The idea behind MSA is to take advantage of the time between decisions to
+continuously improve the current scenario pool. During the initialization, the algorithm, generates a first set of scenarios based on
+the requests known beforehand. Throughout the day, scenarios
+are then reoptimized and new ones are generated and added to
+the pool. When a decision is required, the scenario optimization
+procedure is suspended, and MSA uses the scenario pool to select
+the request to service next. MSA then discards the scenarios that
+are incompatible with the current routing, and resumes the optimization. Computational experiments on instances adapted from
+the Solomon benchmark [133] showed that MSA outperforms
+MPA both in terms of serviced customers and traveled distances,
+especially for instances with high degrees of dynamism [9]. Flatberg et al. [47] adapted the SPIDER commercial solver to use multiple scenarios and a consensus algorithm to tackle the D-VRP, while
+Pillac et al. [107] implemented an event-driven optimization
+6 V. Pillac et al. / European Journal of Operational Research 225 (2013) 1–11
+framework based on MSA and showed significant improvements
+over state-of-the-art algorithms for the D-VRPSD.
+An important component of scenario based-approaches such as
+MSA is the decision process, which defines how the information
+from the scenario pool is used to reach upon a decision regarding
+the next customer to visit. The most common algorithms used to
+reach a decision in MSA are: consensus, expectation, and regret.
+The consensus algorithm [9,10] selects the customer appearing
+first with the highest frequency among scenarios. Expectation
+[8,10,26] consists in evaluating the cost of visiting each customer
+first by forcing its visit in all scenarios and performing a complete
+optimization. Finally, regret [8] approximates the expectation algorithm and avoids the reoptimization of all scenarios. Even though
+these algorithms were initially designed for the routing of a single
+vehicle, they can be extended to the multi-vehicle case [145].
+Hvattum et al. [70] developed the Dynamic Sample Scenario
+Hedge Heuristic (DSHH), an approach similar to the consensus
+algorithm for D-VRP. This method divides the planning horizon
+into time intervals. At the beginning of each interval, DSHH revises
+the routing by assigning a subset of promising requests to the vehicles, depending on the frequency of their assignment over all scenarios. DSHH later led to the development of the Branch and Regret
+Heuristic (BRH), where scenarios are merged to build a unique
+solution.
+Various local search approaches have been developed for the
+stochastic and dynamic problems. Ghiani et al. [59] developed an
+algorithm for the D-PDP that only samples the near future to reduce the computational effort. The main difference with MSA is
+that no scenario pool is used and the selection of the distinguished
+solution is based on the expected penalty of accommodating requests in the near future. Azi et al. [3] developed an Adaptive Large
+Neighborhood Search (ALNS) for a dynamic routing problem with
+multiple delivery routes, in which the dynamic decision is the
+acceptance of a new request. The approach maintains a pool of scenarios, optimized by an ALNS, that are used to evaluate the opportunity value of an incoming request.
+Tabu search has also been adapted to dynamic and stochastic
+problems. Ichoua et al. [75] and Attanasio et al. [1] tackled with
+tabu search the D-VRPTW and the D-PDP, respectively.
+4.2.3. Other strategies
+In addition to the general frameworks described previously, the
+use of stochastic knowledge allows for the design and implementation of other strategies that try to adequately respond to upcoming events.
+The waiting strategy consists in deciding whether a vehicle
+should wait after servicing a request, before heading toward the
+next customer; or planning a waiting period on a strategic location.
+This strategy is particularly important in problems with time
+windows, where time lags appear between requests. Mitrovic´-
+Minic´ [100] proved that in all cases it is better to wait after servicing a customer, but a more refined strategy can lead to further
+improvements. The problem is in general to evaluate the likelihood
+of a new request in the neighborhood of a serviced request and to
+plan a waiting period accordingly. The waiting strategy has been
+implemented in various frameworks for the D-VRP [22,141], DVRPTW [12,21,75,145], D-PDP [100,59], and Dynamic and Stochastic TSP [58]. The strategy has shown good results, especially in the
+case of a limited fleet facing a high request rate [145].
+Aside from the waiting after or before servicing a customer, a
+vehicle can be relocated to a strategic position, where new
+requests are likely to appear. This strategy is the keystone of
+emergency fleet deployment, also known as Emergency Vehicle
+Dispatching – or Redeployment – Problem [54,66]. The relocation strategy has also been applied to other vehicle routing problems, such as the D-VRP [87], D-VRPTW [12,21,75,145], D-TSPTW
+[89], D-PDP [59,119], and the Resource Allocation Problem (RAP)
+[60].
+Request buffering, introduced by Pureza and Laporte [119], consists in delaying the assignment of some requests to vehicles in a
+priority buffer, so that more urgent requests can be handled first.
+4.3. Performance evaluation
+In contrast to static problems, where measuring the performance of an algorithm is straightforward (i.e., running time and
+solution quality), dynamic problems require the introduction of
+new metrics to assess the performance of a particular method.
+Sleator and Tarjan [131] introduced the competitive analysis
+[77,90]. Let P be a minimization problem and I the set of all instances of P. Let z
+⁄
+(Ioff) be the optimal cost for the offline instance
+Ioff corresponding to I 2 I. For offline instance Ioff, all input data
+from instance I, either static or dynamic, is available when building
+the solution. In contrast, the data of the online version I is revealed
+in real time, thus an algorithm A has to take into account new
+information as it is revealed and produce a solution relevant to
+the current state of knowledge. Let zAðIÞ ¼ zðxAðIÞÞ be the cost of
+the final solution xAðIÞ found by the online algorithm A on instance
+I. Algorithm A is said to be c-competitive, or equivalently to have a
+competitive ratio of c, if there exists a constant a such that
+zAðIÞ 6 c  z
+ðIoffÞ þ a; 8I 2I ð4Þ
+In the case where a = 0, the algorithm is said to be strictly c-competitive, meaning that in all cases the objective value of the solution
+found by A will be at most of c times the optimal value. The competitive ratio metric allows a worst-case absolute measure of an
+algorithm performance in terms of the objective value. We refer
+the reader to Borodin and El-Yaniv [20] for an in-depth analysis of
+Fig. 3. Scenario generation in sampling approaches.
+V. Pillac et al. / European Journal of Operational Research 225 (2013) 1–11 7
+this measure, and to Jaillet and Wagner [77] and Fink et al. [46] for
+results on various routing problems.
+The main drawback of the competitive analysis is that it requires to prove the previously stated inequality analytically, which
+may be complex for real-world applications. The value of information proposed by Mitrovic´ -Minic´ [100] constitutes a more flexible
+and practical metric. We denote by zAðIoffÞ the value of the objective function returned by algorithm A for the offline instance Ioff.
+The value of information VAðIÞ for algorithm A on instance I is then
+defined as
+VAðIÞ ¼ zAðIÞ  zAðIoffÞ
+zAðIoffÞ ð5Þ
+The value of information can be interpreted as the gap between the
+solution returned by an algorithm A on an instance I and the solution returned by the same algorithm when all information from I is
+known beforehand. In contrast with the competitive ratio, the value
+of information gives information on the performance of an algorithm based on empirical results, without requiring optimal solutions for the offline instances. It captures the impact of the
+dynamism on the solution yield by the algorithm under analysis.
+For instance, Gendreau et al. [52] report a value of information between 2.5% and 4.1% for their tabu search algorithm for the DVRPTW, while Tagmouti et al. [136] report values between 10%
+and 26.7% for a variable neighborhood search descent applied to a
+dynamic arc routing problem.
+4.4. Benchmarks
+To date, there is no reference benchmark for dynamic routing
+problems. Although, it is worth noting that various authors based
+their computational experiments on adaptations of the Solomon
+[133] instances for static routing [8,9,28,29,52]. Van Hentenryck
+and Bent [145][Chap. 10] describe how the original benchmark
+by Solomon [133] can be adapted to dynamic problems.
+The interested reader is referred to the website of Pankratz and
+Krypczyk [106] for an updated list of publicly available instances
+sets for dynamic vehicle routing problems.
+5. Conclusions
+Recent technological advances provide companies with the
+right tools to manage their fleet in real time. Nonetheless, these
+new technologies also introduce more complexity in fleet management tasks, unveiling the need for decision support systems
+adapted to dynamic contexts. Consequently, during the last decade, the research community has shown a growing interest for
+the underlying optimization problems, leading to a new family of
+approaches specifically designed to efficiently address dynamism
+and uncertainty. By analyzing the current state of the art, some
+directions can be drawn for future research in this relatively new
+field.
+First, further work should aim at creating a taxonomy of dynamic vehicle routing problem, possibly by extending existing research on static routing [39]. This would allow a more precise
+classification of approaches, evaluate similarities between problems, and foster the development of generic frameworks.
+Second, there is currently no reference benchmark for dynamic
+vehicle routing problems. Therefore, there is a strong need for the
+development of publicly available benchmarks for the most common dynamic vehicle routing problems.
+Third, with the advent of multi-core processors on desktop
+computers, and low-cost graphical processing units (GPUs), parallel computing is now readily available for time-consuming methods such as those based on sampling. Although early studies
+considered distributed optimization [52], most approaches reviewed in this document do not take advantage of parallel architectures. The development of parallel algorithms is a challenge
+that could reduce the time needed for optimization and provide
+decision makers with highly reactive tools.
+Fourth, our review of the existing literature revealed that a large
+fraction of work done in the area of dynamic routing does not consider stochastic aspects. We are convinced that developing algorithms that make use of stochastic information will improve the
+fleet performance and reduce operating costs. Thus this line of research should become a priority in the near future.
+Finally, researchers have mainly focused on the routing aspect
+of the dynamic fleet management. However, in some applications
+there is more that can be done to improve performance and service
+level. For instance, in equipment maintenance services, the call
+center has a certain degree of freedom in fixing service appointments. In other words, it means that the customer time windows
+can be defined, or influenced, by the call center operator. As a consequence, a system in which aside from giving a yes/no answer to a
+customer request, suggests convenient times for the company
+would be highly desirable in such contexts.
+Acknowledgements
+Financial support for this work was provided by the CPER (Contrat de Projet Etat Region) Vallée du Libre; and the Centro de Estudios Interdisciplinarios Básicos y Aplicados en Complejidad (CEIBA,
+Colombia). This support is gratefully acknowledged.
+References
+[1] A. Attanasio, J. Bregman, G. Ghiani, E. Manni, Real-time fleet management at
+Ecourier Ltd, in: V. Zeimpekis, C.D. Tarantilis, G.M. Giaglis, I. Minis (Eds.),
+Dynamic Fleet Management, Operations Research/Computer Science
+Interfaces, vol. 38, Springer, US, 2007, pp. 219–238 (chapter 10).
+[2] A. Attanasio, J.F. Cordeau, G. Ghiani, G. Laporte, Parallel tabu search heuristics
+for the dynamic multi-vehicle dial-a-ride problem, Parallel Computing 30 (3)
+(2004) 377–387.
+[3] N. Azi, M. Gendreau, J.Y. Potvin, A dynamic vehicle routing problem with
+multiple delivery routes, Annals of Operations Research, in press, http://
+dx.doi.org/10.1007/s10479-011-0991-3.
+[4] R. Baldacci, P. Toth, D. Vigo, Recent advances in vehicle routing exact
+algorithms, 4OR: A Quarterly Journal of Operations Research 5 (4) (2007)
+269–298.
+[5] S. Balev, F. Guinand, G. Lesauvage, D. Olivier, Dynamical handling of straddle
+carriers activities on a container terminal in uncertain environment – a
+swarm intelligence approach, in: Proceedings of the 2009 International
+Conference on Complex Systems and Applications (ICCSA 2009), University of
+Le Havre, Le Havre, France, 2009.
+[6] J. Barcelo, H. Grzybowska, S. Pardo, Vehicle routing and scheduling models,
+simulation and city logistics, in: V. Zeimpekis, C.D. Tarantilis, G.M. Giaglis, I.
+Minis (Eds.), Dynamic Fleet Management, Operations Research/Computer
+Science Interfaces, vol. 38, Springer, US, 2007, pp. 163–195.
+[7] A. Beaudry, G. Laporte, T. Melo, S. Nickel, Dynamic transportation of patients
+in hospitals, OR Spectrum 32 (2010) 77–107.
+[8] R. Bent, P. Van Hentenryck, Regrets only! online stochastic optimization
+under time constraints, in: Proceedings of the 19th National Conference on
+Artificial Intelligence (AA AI-04), AAAI Press, 2004, pp. 501–506.
+[9] R. Bent, P. Van Hentenryck, Scenario-based planning for partially dynamic
+vehicle routing with stochastic customers, Operations Research 52 (6) (2004)
+977–987.
+[10] R. Bent, P. Van Hentenryck, The value of consensus in online stochastic
+scheduling, in: Proceedings of the 14th International Conference on
+Automated Planning and Scheduling (ICAPS-04), AAAI Press, 2004.
+[11] R. Bent, P. Van Hentenryck, Online stochastic and robust optimization, in: M.
+Maher (Ed.), Advances in Computer Science – ASIAN 2009, Lecture Notes in
+Computer Science, vol. 3321, Springer, Berlin/Heidelberg, 2005, pp. 286–300.
+[12] R. Bent, P. Van Hentenryck, Waiting and relocation strategies in online
+stochastic vehicle routing, in: M. Veloso (Ed.), Proceedings of the 20th
+International Joint Conference on Artifical Intelligence (IJCAI-07), 2007, pp.
+1816–1821.
+[13] I. Benyahia, J.Y. Potvin, Decision support for vehicle dispatching using genetic
+programming, IEEE Transactions on Systems Man and Cybernetics Part A –
+Systems and Humans 28 (3) (1998) 306–314.
+[14] G. Berbeglia, J.-F. Cordeau, G. Laporte, Dynamic pickup and delivery problems,
+European Journal of Operational Research 202 (1) (2010) 8–15.
+8 V. Pillac et al. / European Journal of Operational Research 225 (2013) 1–11
+[15] D. Bertsimas, Probabilistic combinatorial optimization problems, PhD thesis,
+Massachusetts Institute of Technology, Dept. of Mathematics, 1988.
+[16] D. Bertsimas, D. Simchi-Levi, A new generation of vehicle routing research:
+robust algorithms, addressing uncertainty, Operations Research 44 (2) (1996)
+286–304.
+[17] D. Bertsimas, G. Van Ryzin, A stochastic and dynamic vehicle-routing problem
+in the Euclidean plane, Operations Research 39 (4) (1991) 601–615.
+[18] T. Bieding, S. Görtz, A. Klose, On-line routing per mobile phone: a case on
+subsequent deliveries of newspapers, in: M. Beckmann, H.P. Künzi, G. Fandel,
+W. Trockel, A. Basile, A. Drexl, H. Dawid, K. Inderfurth, W. Kürsten, J.A.
+Nunen, M.G. Speranza, L. Bertazzi (Eds.), Innovations in Distribution Logistics,
+Lecture Notes in Economics and Mathematical Systems, vol. 619, Springer,
+Berlin Heidelberg, 2009, pp. 29–51.
+[19] Y. Borenstein, N. Shah, E. Tsang, R. Dorne, A. Alsheddy, C. Voudouris, On the
+partitioning of dynamic workforce scheduling problems, Journal of
+Scheduling 13 (4) (2010) 411–425.
+[20] A. Borodin, R. El-Yaniv, Online Computation and Competitive Analysis,
+Cambridge University Press, Cambridge, 2005.
+[21] R.M. Branchini, V.A. Armentano, A. Lokketangen, Adaptive granular local
+search heuristic for a dynamic vehicle routing problem, Computers &
+Operations Research 36 (11) (2009) 2955–2968.
+[22] J. Branke, M. Middendorf, G. Noeth, M. Dessouky, Waiting strategies for
+dynamic vehicle routing, Transportation Science 39 (3) (2005) 298–312.
+[23] L. Brotcorne, G. Laporte, F. Semet, Ambulance location and relocation models,
+European Journal of Operational Research 147 (3) (2003) 451–463.
+[24] A. Campbell, M. Savelsbergh, Decision support for consumer direct grocery
+initiatives, Transportation Science 39 (3) (2005) 313–327.
+[25] M. Caramia, G. Italiano, G. Oriolo, A. Pacifici, A. Perugia, Routing a fleet of
+vehicles for dynamic combined pick-up and deliveries services, in:
+Proceedings of the Symposium on Operation Research 2001, Duisburg,
+Germany, 2002, pp. 3–5.
+[26] H. Chang, R. Givan, E. Chong, On-line scheduling via sampling, in: Proceedings
+of the Artificial Intelligence Planning and Scheduling (AIPS 2000), 2000, pp.
+62–71.
+[27] M.S. Chang, S. Chen, C. Hsueh, Real-time vehicle routing problem with time
+windows and simultaneous delivery/pickup demands, Journal of the Eastern
+Asia Society for Transportation Studies 5 (2003) 2273–2286.
+[28] H.-K. Chen, C.-F. Hsueh, M.-S. Chang, The real-time time-dependent vehicle
+routing problem, Transportation Research Part E: Logistics and
+Transportation Review 42 (5) (2006) 383–408.
+[29] Z. Chen, H. Xu, Dynamic column generation for dynamic vehicle routing with
+time windows, Transportation Science 40 (1) (2006) 74–88.
+[30] B.K.S. Cheung, K.L. Choy, C.-L. Li, W. Shi, J. Tang, Dynamic routing model and
+solution methods for fleet management with mobile technologies,
+International Journal of Production Economics 113 (2) (2008) 694–705.
+[31] C. Christiansen, J. Lysgaard, A branch-and-price algorithm for the capacitated
+vehicle routing problem with stochastic demands, Operations Research
+Letters 35 (6) (2007) 773–781.
+[32] J.-F. Cordeau, G. Laporte, J.-Y. Potvin, M.W. Savelsbergh, Transportation on
+demand, in: C. Barnhart, G. Laporte (Eds.), Transportation, Handbooks in
+Operations Research and Management Science, vol. 14, Elsevier, 2007, pp.
+429–466 (chapter 7).
+[33] J.-F. Cordeau, G. Laporte, M.W. Savelsbergh, D. Vigo, Vehicle routing, in: C.
+Barnhart, G. Laporte (Eds.), Transportation, Handbooks in Operations
+Research and Management Science, vol. 14, Elsevier, 2007, pp. 367–428
+(chapter 6).
+[34] T.G. Crainic, M. Gendreau, J.-Y. Potvin, Intelligent freight-transportation
+systems: assessment and the contribution of operations research,
+Transportation Research Part C: Emerging Technologies 17 (6) (2009) 541–
+557.
+[35] G. Dantzig, J. Ramser, The truck dispatching problem, Management Science 6
+(1) (1959) 80–91.
+[36] R.B. Dial, Autonomous dial-a-ride transit introductory overview,
+Transportation Research Part C: Emerging Technologies 3 (5) (1995) 261–
+275.
+[37] M. Dror, G. Laporte, P. Trudeau, Vehicle routing with stochastic demands:
+Properties and solution frameworks, Transportation Science 23 (3) (1989)
+166–176.
+[38] T. Du, F.K. Wang, P.-Y. Lu, A real-time vehicle-dispatching system for
+consolidating milk runs, Transportation Research Part E: Logistics and
+Transportation Review 43 (5) (2007) 565–577.
+[39] B. Eksioglu, A.V. Vural, A. Reisman, The vehicle routing problem: a taxonomic
+review, Computers & Industrial Engineering 57 (4) (2009) 1472–1483.
+[40] D. Espinoza, R. Garcia, M. Goycoolea, G.L. Nemhauser, M.W.P. Savelsbergh,
+Per-seat, on-demand air transportation part I: problem description and an
+integer multicommodity flow model, Transportation Science 42 (3) (2008)
+263–278.
+[41] D. Espinoza, R. Garcia, M. Goycoolea, G.L. Nemhauser, M.W.P. Savelsbergh,
+Per-seat, on-demand air transportation part II: parallel local search,
+Transportation Science 42 (3) (2008) 279–291.
+[42] A. Fabri, P. Recht, On dynamic pickup and delivery vehicle routing with
+several time windows and waiting times, Transportation Research Part B:
+Methodological 40 (4) (2006) 335–350.
+[43] K. Fagerholt, B.A. Foss, O.J. Horgen, A decision support model for establishing
+an air taxi service: a case study, Journal of The Operational Research Society
+60 (9) (2009) 1173–1182.
+[44] F. Ferrucci, S. Block, M. Gendreau, A pro-active real-time control approach for
+dynamic vehicle routing problems dealing with the delivery of urgent goods,
+European Journal of Operational Research 225 (1) (2013) 130–141.
+[45] C. Fiegl, C. Pontow, Online scheduling of pick-up and delivery tasks in
+hospitals, Journal of Biomedical Informatics 42 (4) (2009) 624–632.
+[46] I. Fink, S.O. Krumke, S. Westphal, New lower bounds for online k-server
+routing problems, Information Processing Letters 109 (11) (2009) 563–567.
+[47] T. Flatberg, G. Hasle, O. Kloster, E.J. Nilssen, A. Riise, Dynamic and stochastic
+vehicle routing in practice, in: V. Zeimpekis, C.D. Tarantilis, G.M. Giaglis, I.
+Minis (Eds.), Dynamic Fleet Management, Operations Research/Computer
+Science Interfaces, vol. 38, Springer, US, 2007, pp. 41–63.
+[48] B. Fleischmann, S. Gnutzmann, E. Sandvoss, Dynamic vehicle routing based on
+online traffic information, Transportation Science 38 (4) (2004) 420–433.
+[49] M. Flood, The traveling-salesman problem, Operations Research 4 (1) (1956)
+61–75.
+[50] L. Gambardella, A. Rizzoli, F. Oliverio, N. Casagrande, A. Donati, R.
+Montemanni, E. Lucibello, Ant colony optimization for vehicle routing in
+advanced logistics systems, in: Proceedings of the International Workshop on
+Modelling and Applied Simulation (MAS 2003), 2003, pp. 3–9.
+[51] M. Gendreau, F. Guertin, J.-Y. Potvin, R. Séguin, Neighborhood search
+heuristics for a dynamic vehicle dispatching problem with pick-ups and
+deliveries, Transportation Research Part C: Emerging Technologies 14 (3)
+(2006) 157–174.
+[52] M. Gendreau, F. Guertin, J.-Y. Potvin, E. Taillard, Parallel tabu search for realtime vehicle routing and dispatching, Transportation Science 33 (4) (1999)
+381–390.
+[53] M. Gendreau, G. Laporte, R. Séguin, Stochastic vehicle routing, European
+Journal of Operational Research 88 (1) (1996) 3–12.
+[54] M. Gendreau, G. Laporte, F. Semet, A dynamic model and parallel tabu search
+heuristic for real-time ambulance relocation, Parallel Computing 27 (12)
+(2001) 1641–1653.
+[55] M. Gendreau, J.-Y. Potvin, Dynamic vehicle routing and dispatching, in:
+Teodor G. Crainic, Gilbert Laporte (Eds.), Fleet Management and Logistics,
+Kluwer, Boston, 1998, pp. 115–126 (chapter 5).
+[56] M. Gendreau, J.-Y. Potvin (Eds.) Transportation Science. Number 38. (special
+issue on real-time fleet management), 2004.
+[57] G. Ghiani, F. Guerriero, G. Laporte, R. Musmanno, vehicle routing: solution
+concepts, algorithms and parallel computing strategies, European Journal of
+Operational Research 151 (1) (2003) 1–11.
+[58] G. Ghiani, G. Laporte, E. Manni, R. Musmanno, Waiting strategies for the
+dynamic and stochastic traveling salesman problem, Int J Operat Res 5 (4)
+(2008) 233–241.
+[59] G. Ghiani, E. Manni, A. Quaranta, C. Triki, Anticipatory algorithms for sameday courier dispatching, Transportation Research Part E: Logistics and
+Transportation Review 45 (1) (2009) 96–106.
+[60] G. Godfrey, W.B. Powell, An adaptive dynamic programming algorithm for
+dynamic fleet management, I: single period travel times, Transportation
+Science 36 (1) (2002) 21–39.
+[61] A. Goel, in: Fleet Telematics: Real-Time Management and Planning of
+Commercial Vehicle Operations, Operations Research Computer Science
+Interfaces Series, vol. 40, Springer Verlag, 2008.
+[62] A. Goel, V. Gruhn, A general vehicle routing problem, European Journal of
+Operational Research 191 (3) (2008) 650–660.
+[63] I. Gribkovskaia, G. Laporte, A. Shlopak, A tabu search heuristic for a routing
+problem arising in servicing of offshore oil and gas platforms, Journal of the
+Operational Research Society 59 (11) (2008) 1449–1459.
+[64] A.R. Güner, A. Murat, R.B. Chinnam, Dynamic routing under recurrent and
+non-recurrent congestion using real-time its information, Computers &
+Operations Research 39 (2) (2012) 358–373.
+[65] A. Haghani, S. Jung, A dynamic vehicle routing problem with time-dependent
+travel times, Computers & Operations Research 32 (11) (2005) 2959–2986.
+[66] A. Haghani, S. Yang, Real-time emergency response fleet deployment:
+concepts, systems, simulation & case studies, in: V. Zeimpekis, C.D.
+Tarantilis, G.M. Giaglis, I. Minis (Eds.), Dynamic Fleet Management,
+Operations Research/Computer Science Interfaces, vol. 38, Springer, US,
+2007, pp. 133–162.
+[67] M.E.T. Horn, Fleet scheduling and dispatching for demand-responsive
+passenger services, Transportation Research Part C: Emerging Technologies
+10 (1) (2002) 35–63.
+[68] M.E.T. Horn, Multi-modal and demand-responsive passenger transport
+systems: a modelling framework with embedded control systems,
+Transportation Research Part A: Policy and Practice 36 (2) (2002) 167–
+188.
+[69] M.E.T. Horn, Procedures for planning multi-leg journeys with fixed-route and
+demand-responsive passenger transport services, Transportation Research
+Part C: Emerging Technologies 12 (1) (2004) 33–55.
+[70] L.M. Hvattum, A. Lokketangen, G. Laporte, Solving a dynamic and stochastic
+vehicle routing problem with a sample scenario hedging heuristic,
+Transportation Science 40 (4) (2006) 421–438.
+[71] L.M. Hvattum, A. Lokketangen, G. Laporte, A branch-and-regret heuristic for
+stochastic and dynamic vehicle routing problems, Networks 49 (4) (2007)
+330–340.
+[72] S. Ichoua, Problèmes de gestion de flottes de véhicules en temps réel, PhD
+thesis, Universite de Montreal, Montreal, Canada, 2001.
+[73] S. Ichoua, M. Gendreau, J.-Y. Potvin, Diversion issues in real-time vehicle
+dispatching, Transportation Science 34 (4) (2000) 426–438.
+V. Pillac et al. / European Journal of Operational Research 225 (2013) 1–11 9
+[74] S. Ichoua, M. Gendreau, J.-Y. Potvin, Vehicle dispatching with time-dependent
+travel times, European Journal of Operational Research 144 (2) (2003) 379–
+396.
+[75] S. Ichoua, M. Gendreau, J.-Y. Potvin, Exploiting knowledge about future
+demands for real-time vehicle dispatching, Transportation Science 40 (2)
+(2006) 211–225.
+[76] S. Ichoua, M. Gendreau, J.-Y. Potvin, Planned route optimization for real-time
+vehicle routing, in: V. Zeimpekis, C.D. Tarantilis, G.M. Giaglis, I. Minis (Eds.),
+Dynamic Fleet Management, Operations Research/Computer Science
+Interfaces, vol. 38, Springer, US, 2007, pp. 1–18.
+[77] P. Jaillet, M.R. Wagner, Generalized online routing: new competitive ratios,
+resource augmentation, and asymptotic analyses, Operations Research 56 (3)
+(2008) 745–757.
+[78] P. Jaillet, M.R. Wagner, Online vehicle routing problems: a survey, in: The
+Vehicle Routing Problem: Latest Advances and New Challenges, Operations
+Research/Computer Science Interfaces Series, vol. 43, Springer, US, 2008, pp.
+221–237.
+[79] A.S. Kenyon, D. Morton, Stochastic vehicle routing with random travel times,
+Transportation Science 37 (1) (2003) 69.
+[80] Y. Kergosien, C. Lenté, D. Piton, J.-C. Billaut, A tabu search heuristic for the
+dynamic transportation of patients between care units, European Journal of
+Operational Research 214 (2) (2011) 442–452.
+[81] P. Kilby, P. Prosser, P. Shaw, Dynamic VRPs: a study of scenarios, Technical
+Report APES-06-1998, University of Strathclyde, Glasgow, Scotland, 1998.
+[82] S. Kim, M. Lewis, C.C. W, Optimal vehicle routing with real-time traffic
+information, IEEE Transactions on Intelligent Transportation Systems 6 (2)
+(2005) 178–188.
+[83] G. Laporte, What you should know about the vehicle routing problem, Naval
+Research Logistics 54 (8) (2007) 811–819.
+[84] G. Laporte, Fifty years of vehicle routing, Transportation Science 43 (4) (2009)
+408–416.
+[85] G. Laporte, F. Louveaux, H. Mercure, The vehicle routing problem with
+stochastic travel times, Transportation Science 26 (3) (1992) 161–170.
+[86] G. Laporte, F. Louveaux, L. Van Hamme, An integer L-shaped algorithm for the
+capacitated vehicle routing problem with stochastic demands, Operations
+Research 50 (3) (2002) 415–423.
+[87] A. Larsen, The Dynamic Vehicle Routing Problem, PhD thesis, Technical
+University of Denmark (DTU), 2001.
+[88] A. Larsen, O.B.G. Madsen, M.M. Solomon, Partially dynamic vehicle routing –
+models and algorithms, The Journal of the Operational Research Society 53
+(6) (2002) 637–646.
+[89] A. Larsen, O.B.G. Madsen, M.M. Solomon, The a priori dynamic traveling
+salesman problem with time windows, Transportation Science 38 (4) (2004)
+459–472.
+[90] A. Larsen, O.B.G. Madsen, M.M. Solomon, Classification of dynamic vehicle
+routing systems, in: V. Zeimpekis, C.D. Tarantilis, G.M. Giaglis, I. Minis (Eds.),
+Dynamic Fleet Management, Operations Research/Computer Science
+Interfaces Series, vol. 38, Springer, US, 2007, pp. 19–40 (chapter 2).
+[91] A. Larsen, O.B.G. Madsen, M.M. Solomon, Recent developments in dynamic
+vehicle routing systems, in: The Vehicle Routing Problem: Latest Advances
+and New Challenges, Operations Research/Computer Science Interfaces
+Series, vol. 43, Springer, US, 2008, pp. 199–218.
+[92] J.-Q. Li, P.B. Mirchandani, D. Borenstein, A lagrangian heuristic for the realtime vehicle rescheduling problem, Transportation Research Part E: Logistics
+and Transportation Review 45 (3) (2009) 419–433.
+[93] J.-Q. Li, P.B. Mirchandani, D. Borenstein, Real-time vehicle rerouting problems
+with time windows, European Journal of Operational Research 194 (3) (2009)
+711–727.
+[94] S. Lorini, J.-Y. Potvin, N. Zufferey, Online vehicle routing and scheduling with
+dynamic travel times, Computers & Operations Research 38 (7) (2011) 1086–
+1090.
+[95] K. Lund, O.B.G. Madsen, J.M. Rygaard, Vehicle routing problems with varying
+degrees of dynamism, Technical report, IMM Institute of Mathematical
+Modelling, 1996.
+[96] E. Melachrinoudis, A.B. Ilhan, H. Min, A dial-a-ride problem for client
+transportation in a health-care organization, Computers & Operations
+Research 34 (3) (2007) 742–759.
+[97] J.E. Mendoza, B. Castanier, C. Guéret, A.L. Medaglia, N. Velasco, A memetic
+algorithm for the multi-compartment vehicle routing problem with
+stochastic demands, Computers & Operations Research 37 (11) (2010)
+1886–1898.
+[98] J.E. Mendoza, B. Castanier, C. Guéret, A.L. Medaglia, N. Velasco, Constructive
+heuristics for the multicompartment vehicle routing problem with stochastic
+demands, Transportation Science 45 (3) (2011) 346–363.
+[99] M. Mes, M. Van der Heijden, A. Van Harten, Comparison of agentbased scheduling to look-ahead heuristics for real-time transportation
+problems, European Journal of Operational Research 181 (1) (2007) 59–
+75.
+[100] S. Mitrovic´ -Minic´, R. Krishnamurti, G. Laporte, Double-horizon based
+heuristics for the dynamic pickup and delivery problem with time
+windows, Transportation Research Part B: Methodological 38 (8) (2004)
+669–685.
+[101] S. Mitrovic´ -Minic´, G. Laporte, Waiting strategies for the dynamic pickup and
+delivery problem with time windows, Transportation Research Part B:
+Methodological 38 (7) (2004) 635–655.
+[102] R. Montemanni, L.M. Gambardella, A.E. Rizzoli, A.V. Donati, Ant colony
+system for a dynamic vehicle routing problem, Journal of Combinatorial
+Optimization 10 (4) (2005) 327–343.
+[103] Q. Mu, Z. Fu, J. Lysgaard, R. Eglese, Disruption management of the vehicle
+routing problem with vehicle breakdown, Journal of the Operational
+Research Society 62 (4) (2011) 742–749.
+[104] C. Novoa, R. Storer, An approximate dynamic programming approach for the
+vehicle routing problem with stochastic demands, European Journal of
+Operational Research 196 (2) (2009) 509–515.
+[105] C.M. Novoa, Static and dynamic approaches for solving the vehicle routing
+problem with stochastic demands, PhD thesis, Lehigh University,
+Pennsylvania, United States. AAT 3188502, 2005.
+[106] G. Pankratz, V. Krypczyk, Benchmark data sets for dynamic vehicle routing
+problems <http://www.fernuni-hagen.de/WINF/inhalte/benchmark_data.
+htm>, 2009.
+[107] V. Pillac, C. Guéret, A.L. Medaglia, An event-driven optimization framework
+for dynamic vehicle routing, Decision Support Systems, in press, http://
+dx.doi.org/10.1016/j.dss.2012.06.007.
+[108] J.Y. Potvin, Y. Xu, I. Benyahia, Vehicle routing and scheduling with dynamic
+travel times, Computers & Operations Research 33 (4) (2006) 1129–1137.
+[109] W. Powell, J. Shapiro, H. Simao, An adaptive dynamic programming algorithm
+for the heterogeneous resource allocation problem, Transportation Science
+36 (2) (2002) 231–249.
+[110] W.B. Powell, Approximate dynamic programming: solving the curses of
+dimensionality, Wiley Series in Probability and Statistics, vol. 703, WileyInterscience, Hoboken, New Jersey, 2007.
+[111] W.B. Powell, What you should know about approximate dynamic
+programming, Naval Research Logistics 56 (3) (2009) 239–249.
+[112] W.B. Powell, B. Bouzaiene-Ayari, H. Simao, Dynamic models for freight
+transportation, in: C. Barnhart, G. Laporte (Eds.), Transportation, Handbooks
+in Operations Research and Management Science, vol. 14, North-Holland,
+2007, pp. 285–365 (chapter 5).
+[113] W.B. Powell, Y. Sheffi, K.S. Nickerson, K. Butterbaugh, S. Atherton, Maximizing
+profits for North American Van Lines’ truckload division: a new framework
+for pricing and operation, Interfaces 18 (1) (1988) 21–41.
+[114] W.B. Powell, H. Topaloglu, Stochastic programming in transportation and
+logistics, Handbooks in Operations Research and Management Science 10
+(2003) 555–636.
+[115] W.B. Powell, H. Topaloglu, Fleet management, in: S. Wallace, W. Ziemba
+(Eds.), Applications of Stochastic Programming, MPS-SIAM Series on
+Optimization, vol. 5, SIAM, 2005, pp. 185–215 (chapter 12).
+[116] H. Psaraftis, A dynamic-programming solution to the single vehicle many-tomany immediate request dial-a-ride problem, Transportation Science 14 (2)
+(1980) 130–154.
+[117] H. Psaraftis, Dynamic vehicle routing problems, in: B. Golden, A. Assas (Eds.),
+Vehicle Routing: Methods and Studies, Elsevier Science Publishers BV, 1988,
+pp. 223–248.
+[118] H.N. Psaraftis, Dynamic vehicle routing: status and prospects, Annals of
+Operations Research 61 (1) (1995) 143–164.
+[119] V. Pureza, G. Laporte, Waiting and buffering strategies for the dynamic pickup
+and delivery problem with time windows, INFOR 46 (3) (2008) 165–175.
+[120] A. Regan, H. Mahmassani, P. Jaillet, Improving efficiency of commercial
+vehicle operations using real-time information: potential uses and
+assignment strategies, Transportation Research Record: Journal of the
+Transportation Research Board 1493 (1995) 188–198.
+[121] A. Regan, H. Mahmassani, P. Jaillet, Evaluation of dynamic fleet management
+systems – simulation framework, in: Forecasting, Travel Behavior, And
+Network Modeling, number 1645 in Transportation Research Record, 1998,
+pp. 176–184.
+[122] A.C. Regan, H.S. Mahmassani, P. Jaillet, Dynamic decision making for
+commercial fleet operations using real-time information, Transportation
+Research Record: Journal of the Transportation Research Board 1537 (1996)
+91–97.
+[123] A. Rizzoli, R. Montemanni, E. Lucibello, L. Gambardella, Ant colony
+optimization for real-world vehicle routing problems, Swarm Intelligence 1
+(2007) 135–151.
+[124] M. Romero, L. Sheremetov, A. Soriano, A genetic algorithm for the pickup and
+delivery problem: An application to the helicopter offshore transportation,
+in: Theoretical Advances and Applications of Fuzzy Logic and Soft Computing,
+Advances in Soft Computing, vol. 42, Springer, Berlin/Heidelberg, 2007, pp.
+435–444.
+[125] J. Roy, Recent trends in logistics and the need for real-time decision tools in
+the trucking industry, in: Proceedings of the 34th Annual Hawaii
+International Conference on System Sciences, 2001, 2001.
+[126] N. Secomandi, Comparing neuro-dynamic programming algorithms for the
+vehicle routing problem with stochastic demands, Computers & Operations
+Research 27 (11–12) (2000) 1201–1225.
+[127] N. Secomandi, A rollout policy for the vehicle routing problem with stochastic
+demands, Operations Research 49 (5) (2001) 796–802.
+[128] N. Secomandi, F. Margot, Reoptimization approaches for the vehicle-routing
+problem with stochastic demands, Operations Research 57 (1) (2009) 214–
+230.
+[129] H. Simao, J. Day, A. George, T. Gifford, J. Nienow, W.B. Powell, An approximate
+dynamic programming algorithm for large-scale fleet management: a case
+application, Transportation Science 43 (2) (2009) 178–197.
+10 V. Pillac et al. / European Journal of Operational Research 225 (2013) 1–11
+[130] A. Slater, Specification for a dynamic vehicle routing and scheduling system,
+International Journal of Transport Management 1 (1) (2002) 29–40.
+[131] D. Sleator, R. Tarjan, Amortized efficiency of list update and paging rules,
+Communications of the ACM 28 (2) (1985) 202–208.
+[132] N. Smolic-Rocak, S. Bogdan, Z. Kovacic, T. Petrovic, Time windows based
+dynamic routing in multi-agv systems, IEEE Transactions on Automation
+Science and Engineering 7 (1) (2010) 151–155.
+[133] M.M. Solomon, Algorithms for the vehicle-routing and scheduling problems
+with time window constraints, Operations Research 35 (2) (1987) 254–265.
+[134] M. Spivey, W.B. Powell, The dynamic assignment problem, Transportation
+Science 38 (4) (2004) 399–419.
+[135] R. Stahlbock, S. Voss, Operations research at container terminals: a literature
+update, OR Spectrum 30 (1) (2008) 1–52.
+[136] M. Tagmouti, M. Gendreau, J.-Y. Potvin, A dynamic capacitated arc routing
+problem with time-dependent service costs, Transportation Research Part C:
+Emerging Technologies 19 (1) (2011) 20–28.
+[137] E. Taillard, P. Badeau, M. Gendreau, F. Guertin, J. Potvin, A tabu search
+heuristic for the vehicle routing problem with soft time windows,
+Transportation Science 31 (2) (1997) 170–186.
+[138] E.D. Taillard, L.M. Gambardella, M. Gendreau, J.-Y. Potvin, Adaptive memory
+programming: a unified view of metaheuristics, European Journal of
+Operational Research 135 (1) (2001) 1–16.
+[139] E. Taniguchi, H. Shimamoto, Intelligent transportation system based dynamic
+vehicle routing and scheduling with variable travel times, Transportation
+Research Part C: Emerging Technologies 12 (3–4) (2004) 235–250.
+[140] E. Taniguchi, R. Thompson, Modeling city logistics, Transportation Research
+Record: Journal of the Transportation Research Board 1790 (1) (2002) 5–51.
+[141] B.W. Thomas, Waiting strategies for anticipating service requests from
+known customer locations, Transportation Science 41 (3) (2007) 319–331.
+[142] B.W. Thomas, Chelsea C.I. White, Anticipatory route selection, Transportation
+Science 38 (4) (2004) 473–487.
+[143] P. Toth, D. Vigo (Eds.) The Vehicle Routing Problem, SIAM Monographs on
+Discrete Mathematics, vol. 9, SIAM Philadelphia, 2002.
+[144] J.I. Van Hemert, J.L. Poutré, Dynamic routing problems with fruitful regions:
+models and evolutionary computation, in: X. Yao, E. Burke, J.A. Lozano, J.
+Smith, J.J. Merelo-Guervós, J.A. Bullinaria, J. Rowe, P. Tino, A. Kabán, H.-P.
+Schwefel (Eds.), Parallel Problem Solving from Nature, Lecture Notes in
+Computer Science, vol. 3242, Springer, Berlin/Heidelberg, 2004, pp. 692–701.
+[145] P. Van Hentenryck, R. Bent, Online Stochastic Combinatorial Optimization,
+MIT Press, 2006.
+[146] B. Verweij, S. Ahmed, A. Kleywegt, G. Nemhauser, A. Shapiro, The sample
+average approximation method applied to stochastic routing problems: a
+computational study, Computational Optimization and Applications 24 (2)
+(2003) 289–333.
+[147] C. Waters, Vehicle-scheduling problems with uncertainty and omitted
+customer, The Journal of the Operational Research Society 40 (12) (1989)
+1099–1108.
+[148] N. Wilson, N. Colvin, Computer control of the Rochester dial-a-ride system,
+Technical Report Report R77-31, Dept. of Civil Engineering, Massachusetts
+Institute of Technology, Cambridge, Massachusetts.
+[149] Z. Xiang, C. Chu, H. Chen, The study of a dynamic dial-a-ride problem under
+time-dependent and stochastic environments, European Journal of
+Operational Research 185 (2) (2008) 534–551.
+[150] J. Yang, P. Jaillet, H. Mahmassani, Real-time multivehicle truckload pickup
+and delivery problems, Transportation Science 38 (2) (2004) 135–148.
+[151] S. Yang, M. Hamedi, A. Haghani, Online dispatching and routing model for
+emergency vehicles with area coverage constraints, in: Network Modeling
+2005, number 1923 in Transportation Research Record, 2005, pp. 1–8.
+[152] Y. Yao, O. Ergun, E. Johnson, Integrated model for the dynamic on-demand air
+transportation operations, in: V. Zeimpekis, C.D. Tarantilis, G.M. Giaglis, I.
+Minis (Eds.), Dynamic Fleet Management, Operations Research/Computer
+Science Interfaces Series, vol. 38, Springer, US, 2007, pp. 95–111.
+[153] V. Zeimpekis, I. Minis, K. Mamassis, G.M. Giaglis, Dynamic management of a
+delayed delivery vehicle in a city logistics environment, in: V. Zeimpekis, C.D.
+Tarantilis, G.M. Giaglis, I. Minis (Eds.), Dynamic Fleet Management,
+Operations Research/Computer Science Interfaces Series, vol. 38, Springer,
+US, 2007, pp. 197–217 (chapter 9).
+[154] V. Zeimpekis, C.D. Tarantilis, G.M. Giaglis, I. Minis (Eds.), Dynamic Fleet
+Management, Operations Research Computer Science Interfaces Series, vol.
+38, Springer, US, 2007.
+V. Pillac et al. / European Journal of Operational Research 225 (2013) 1–11 11
