@@ -1,0 +1,652 @@
+Geographical Analysis (2021) 0, 1–17
+doi: 10.1111/gean.12281
+© 2021 The Ohio State University
+1
+Special Issue
+Street Network Models and Indicators for Every
+Urban Area in the World
+Geoff Boeing
+Department of Urban Planning and Spatial Analysis, Sol Price School of Public Policy, University of
+Southern California, Los Angeles, CA USA
+Cities worldwide exhibit a variety of street network patterns and configurations that shape
+human mobility, equity, health, and livelihoods. This study models and analyzes the street
+networks of every urban area in the world, using boundaries derived from the Global Human
+Settlement Layer. Street network data are acquired and modeled from OpenStreetMap
+with the open-source OSMnx software. In total, this study models over 160 million
+OpenStreetMap street network nodes and over 320 million edges across 8,914 urban areas
+in 178 countries, and attaches elevation and grade data. This article presents the study’s
+reproducible computational workflow, introduces two new open data repositories of readyto-use global street network models and calculated indicators, and discusses summary
+findings on street network form worldwide. It makes four contributions. First, it reports the
+methodological advances of this open-source workflow. Second, it produces an open data
+repository containing street network models for each urban area. Third, it analyzes these
+models to produce an open data repository containing street network form indicators for
+each urban area. No such global urban street network indicator data set has previously
+existed. Fourth, it presents a summary analysis of urban street network form, reporting the
+first such worldwide results in the literature.
+Introduction
+Street networks shape the city. They structure the circulation patterns of people and goods and
+underlie urban accessibility. Differences in street network geometry and topology—collectively,
+form—­worldwide reflect different cultures, political systems, urbanization eras, technology, design paradigms, climates, and terrain. These networks in turn organize physical urban space and
+influence the ability to traverse it via different modes of transportation.
+Yet in this era of post-­globalization, little is known about comparative street network form
+worldwide at the urban scale. This is largely due to data access and computational limitations.
+Traditionally, delineating consistent urban area boundaries was difficult, making it challenging
+Correspondence: Geoff Boeing, Assistant Professor, Department of Urban Planning and Spatial Analysis,
+Sol Price School of Public Policy, University of Southern California, 301A Lewis Hall, Los Angeles,
+California 90089-0626, USA
+e-mail: boeing@usc.edu
+Submitted: 16 September 2020; Revised version accepted: 25 January 2021
+Geographical Analysis
+2
+to define consistent study sites (Lemoine-­Rodríguez, Inostroza, and Zepp 2020). Even if consistent study sites could be established, it was nearly impossible to gather consistent comprehensive street network data around the world. And even if one did, it was nearly impossible
+to manipulate and organize the hundreds of millions of geospatial elements that would entail,
+then model them in a graph-theoretic way, then compute geometric and topological indicators
+of form. Nevertheless, such models, indicators, and analyses would be useful for understanding
+urbanization patterns, transportation infrastructure planning, and the path to sustainable urban
+form for cities worldwide.
+This study takes advantage of several emerging tools, technologies, and open data to model
+the individual street networks of every urban area in the world, compute geometric and topological indicators, and analyze them. It uses the Global Human Settlement Layer (GHSL) to define
+the urban area boundaries and other variables. Using OSMnx, it downloads and models urbanscale street network data globally from OpenStreetMap, attaches elevation data, then calculates
+indicators for each urban area. It places all of the resulting network models, indicators, and code
+into open data repositories for public reuse.
+This article reports the novel methods employed in this modeling and analytics project.
+Then, it documents the street network model repository and its contents and the indicators repository and its contents. Next it presents a high-level analysis of worldwide urban street network
+form, using these models and indicators. Across all urban areas worldwide, both total street
+length and intersection count scale sublinearly with population. Higher per capita GDP is associated with higher per capita total street length. Validation reveals that the open data used as
+elevation attributes compare favorably with high-quality commercial data. The article concludes
+with notes on reuse. In sum, this study produces the first comprehensive public data repository
+of ready-­to-­use urban street network models and indicators worldwide and reports the first such
+worldwide analytical results.
+Background
+Street network models
+Street network models come in many flavors, but most commonly are mathematical models
+called graphs (Trudeau 1994; Brandes and Erlebach 2005; Gastner and Newman 2006; Newman
+2003, 2010; Vespignani 2018). Graphs can represent both the geometry and the topology of
+a real-world street network. Abstractly, a graph G comprises a set of nodes (i.e., elements) N
+which are linked to one another by a set of edges (i.e., connections) E. Each edge e in set E either
+connects two nodes or connects a single node to itself as a self-loop. Parallel edges exist when
+multiple edges connect the same two nodes.
+Network modelers must decide on several theoretical aspects of representation, including
+directedness, planarity, and primality (O’Sullivan 2014; Marshall et al. 2018). In the case of a
+directed graph, all the edges in E point one-way from some node u to another node v. This may
+allow for the possibility of a self-loop where u = v. In the case of an undirected graph, all the
+edges in E point bidirectionally between the nodes they link. If a graph is planar, all the edges
+in E intersect in a two-dimensional plane exclusively at nodes in N. If this condition does not
+hold, the graph is nonplanar (Hopcroft and Tarjan 1974; Székely 2004; Cardillo et al. 2006;
+Masucci et al. 2009; Viana et al. 2013). A primal graph of a street network models intersections
+and dead-­ends as nodes and the street segments that connect them as edges (Porta, Crucitti, and
+Latora 2006b). A dual graph of a street network does the opposite, modeling street segments as
+Geoff Boeing Street Network Models and Indicators
+3
+nodes and intersections as edges (Porta, Crucitti, and Latora 2006a). Real-­world street networks
+often have self-­loops, parallel edges, flow directionality restrictions such as one-­way streets, and
+nonplanar elements such as overpasses and underpasses (Boeing 2017).
+Street network data
+Data on street networks around the world exist in various sources of various quality and accessibility. Many are digitized by local or regional authorities, resulting in inconsistencies in digitization standards, spatial validity, attribute data quality, and file formatting. High-­quality street
+network geometry data exist for most developed countries, but data inconsistencies and language
+barriers make international cross-­sectional comparison difficult. Furthermore, most such data
+sets exist in shapefile format and thus contain network geometry but minimal information about
+topology. Yet both geometry and topology are essential to consider in most spatial network analyses. Street networks are spatially embedded and are thus defined by both their geometry (e.g.,
+positions, lengths, areas, angles, etc.) and their topology (i.e., connections and configurations)
+(Barthelemy 2011; O’Sullivan 2014).
+Given these limitations, better data sources and network models are important for international street network analysis. Four key areas of improvement would include: (1) global coverage and availability, (2) consistent digitization and attribute data, (3) consistent representation
+of both geometric and topological data, and (4) better public accessibility and usability. Online
+geographic information systems, volunteered geographic information, and crowd-sourced big
+data create new opportunities to address these points. In particular, OpenStreetMap offers an
+important alternative source of street network data (Jokar Arsanjani et al. 2015).
+OpenStreetMap is an open-source, collaborative, worldwide mapping project and database.
+One can query its database for street and intersection data, along with attribute data about road
+types, names, and (when available) speeds, widths, and numbers of lanes. It offers good global
+coverage and high geometric and topological data quality (Girres and Touya 2010; Haklay 2010;
+Corcoran, Mooney, and Bertolotto 2013; Zielstra, Hochmair, and Neis 2013; Barron, Neis, and
+Zipf 2014; Maier 2014; Basiri et al. 2016; Sehra et al. 2020). Barrington-­Leigh and Millard-­Ball
+(2017) found that, as of 2016, OpenStreetMap was 83% complete worldwide, over 40% of countries’ (including many developing countries) street networks were effectively 100% complete,
+and completeness was highest in both dense cities and sparsely populated areas.
+As of 2021, OpenStreetMap has more than 7 million contributors who have added over 6.6
+billion nodes (points), 730 million ways (lines and boundaries), and attendant attribute data to its
+database. Volunteers provide editorial oversight of contributions and changes. However, despite
+its large user base, researchers estimate that >95% of these contributors are male, and as such,
+there may be correlated biases in the contributed content (Schmidt and Klettner 2013; Graham,
+De Sabbata, and Zook 2015). While OpenStreetMap road coverage is generally good worldwide,
+other geospatial features have better coverage in developed countries and in cities versus small
+towns. No data source is perfect, but OpenStreetMap is global, publicly accessible, free, and an
+Open Source Initiative affiliate.
+Accordingly, OpenStreetMap helps to address the first three of the four areas of improvement listed earlier. However, the fourth problem persists: it is not particularly accessible or usable for less-technical urban scholars to use its data for graph models and analytics. Researchers
+usually acquire OpenStreetMap data through its APIs or by downloading a prepackaged data
+extract from a third-­party. Either option offers useful raw data but usually requires writing and
+testing hundreds of lines of code to process topological relations and construct graph models.
+Geographical Analysis
+4
+Doing this on an ad hoc basis introduces challenges for interpretation and replication as many
+small computational and modeling decisions get made along the way, such as the exact handling
+of common street network features like self-loops, parallel edges, and culs-de-sac. A consistent
+set of well-documented models and indicators, generated with an accessible open-source workflow, would improve what is otherwise often a black box (Boeing 2020b).
+Street network indicators
+Several efforts in recent years have aimed to address these challenges and generate sets of urban
+street network indicators. For example, the OSMnx project takes this motivation to develop an
+open-­source Python package for automatically downloading, modeling, and analyzing street
+networks and other geospatial features from OpenStreetMap (Boeing 2017). Using this tool,
+a recent project modeled the street networks of every U.S. city/town, county, urbanized area,
+census tract, and Zillow-­defined neighborhood, placed these models online in a public open data
+repository, and conducted spatial network analyses on them (Boeing 2020a).
+Similarly, Dingil et al. (2018) used OSMnx to calculate transportation indicators for 151
+urban areas worldwide. Karduni, Kermanshah, and Derrible (2016) created a data repository
+with 80 worldwide cities’ street networks derived from OpenStreetMap data. da Cruz, Oh,
+and Choumar (2020) developed a database of urban indicators across 58 metropolitan areas
+worldwide, but did not include street network form indicators. Barrington-Leigh and MillardBall (2019, 2020) used all the streets mapped in OpenStreetMap to generate global indicators
+of street network disconnectivity to explore cross-sectional and longitudinal trends in urban
+sprawl.
+Methods
+Urban area boundaries
+The present study builds on this past work to model and analyze the street networks of every
+urban area in the world. It defines these units of analysis using spatial boundaries derived from
+the publicly available GHSL Urban Centre Database1 (UCD) version 2019a 1.2, a project
+supported by the European Commission’s Joint Research Centre and Directorate-­General for
+Regional and Urban Policy (Florczyk et al. 2019). In addition to these urban area boundaries, the
+UCD provides attribute data such as the names of the country and core city, population, built-up
+area, gross domestic product (GDP), UN income class and development group, transport-­sector
+emissions, particulate matter concentration, climate, and land use efficiency.
+The GHSL project uses spatial data mining to organize a vast amount of data from satellite image streams, censuses, and volunteered geographic information. Its UCD data product
+delineates urban areas (which it calls urban centers) using these data from the GHSL and
+other scientific open data sources. It defines these urban areas using resident population and
+built-up surface across a global 1 km2 grid, using the DEGURBA method of delineating
+urban/rural areas for international statistical comparison, developed jointly by the European
+Commission, the World Bank, the Organization for Economic Cooperation and Development,
+the UN Food and Agriculture Organization, and the UN Human Settlements Programme. Thus
+the UCD consists of “high-density clusters of contiguous grid cells of 1 km2
+ with a density
+of at least 1,500 inhabitants per km2 and a minimum population of 50,0000” (Florczyk et al.
+2019, p. 13).
+Geoff Boeing Street Network Models and Indicators
+5
+Graph modeling
+This study uses OSMnx2
+ to download street network data from OpenStreetMap and construct
+graph models of each urban area’s drivable street network. It does this for every urban area in
+the UCD that satisfies three conditions: (1) is marked true positive in the UCD, (2) has ≥1 km2
+built-­up area, and (3) includes at least three OpenStreetMap drivable street network nodes within
+its boundaries. This comprises 8,914 total urban areas.
+This study models these street networks as nonplanar directed multigraphs with possible
+self-loops. All of these models are primal graphs to account for the full geographic characteristics of the street network (Ratti 2004; Batty 2005). The workflow retains all graph components
+even if they are not fully connected and is parameterized to retrieve all public drivable streets,
+excluding service roads like alleyways or parking lot circulation. This parameterization includes
+living streets, shared streets, woonerfs, and the like in the models, but does exclude streets and
+other pathways where motor traffic is forbidden, which may impact some cities more than others.
+Additionally, spatial graphs often exhibit adverse periphery effects due to an artificial boundary
+being imposed: OSMnx attenuates some of these by initially downloading and modeling a larger
+area than requested to correctly calculate node degrees before removing peripheral nodes and
+edges that fall outside the requested boundary polygon.
+This yields a set of models collectively comprising over 160 million nodes and 320 million
+edges. For better theoretical correspondence, OSMnx next topologically simplifies the graphs to
+retain nodes only at true intersections and dead-ends, while retaining the true spatial geometry of
+each edge (i.e., street segment) between them (Boeing 2017). This is a crucial step before conducting analytics with OpenStreetMap network data, such as calculating intersection density or
+average node degree. Raw OpenStreetMap data represent nodes as geometric vertices of straightline segments composing more complex lines. Simplification produces a model that corresponds
+better to graph theory and transportation geography with nodes representing intersections and
+dead-­ends and edges representing street segments. See Fig. 1. Simplification yields a final set of
+models collectively comprising 37 million nodes and 53 million edges.
+Figure 1. The graph of a town’s street network before (left) and after (right) topological
+simplification. Circles are nodes and lines are edges.
+Geographical Analysis
+6
+Elevation
+Next, we attach elevation above sea level to every node in every graph. These elevations come
+from two publicly available digital elevation models(DEMs): the Advanced Spaceborne Thermal
+Emission and Reflection Radiometer (ASTER) v2 and the Shuttle Radar Topography Mission
+(SRTM). The ASTER DEM covers the world from 83° N to 83° S at a spatial resolution of one
+arcsecond (roughly 30 meters at the equator). The SRTM DEM covers the world from 60° N to
+56° S at a spatial resolution of three arcseconds (roughly 90 meters at the equator). The ASTER
+DEM is finer resolution but exhibits more noise. The SRTM DEM is coarser resolution but less
+noisy, and was further processed by CGIAR-­CSI to fix errors and fill voids (Gorokhovich and
+Voustianiouk 2006). We additionally collect the elevation of each node using the Google Maps
+Elevation API, but only for validation purposes as Google provides global and high-­quality but
+commercial and closed-­source data with restrictive licensing (cf Rusli, Majid, and Din 2014).
+On a node-­by-­node basis, the workflow selects either the ASTER or SRTM value to assign
+as the node’s elevation. It selects for each node whichever of the ASTER or SRTM elevation
+values has the least absolute difference from the corresponding Google value, as a validation
+reference point. Finally it calculates the grade (i.e., incline) of each edge then saves each urban
+area’s graph model to disk as a GeoPackage file, a GraphML file, and node/edge lists in comma-­
+separated values (CSV) format.
+Indicator calculation
+Once the models are all assembled, we load each’s saved GraphML file with OSMnx to calculate
+each indicator described in Table 1. These indicators are merged with a set of essential indicators
+from the UCD and saved as a CSV-­formatted file.
+Details and descriptions are in order for the interpretability of some fields in this indicators
+data set. The country field contains the name of the country in which the urban area wholly
+or primarily (in the case of transnational urban areas) lies, while country_iso contains its ISO
+3166-­1 alpha-­3 code for unambiguous identification. The core_city field contains the name of the
+urban area’s core (typically largest) city and the uc_id field contains the unique identifier of this
+urban area in the UCD, allowing downstream users to join these indicators with all of those in the
+UCD. The uc_names field contains a list of city names within this urban area, per the UCD. The
+world_region and world_subregion fields contain the urban area’s major and minor geographical
+region, per the UCD. The resident_pop field contains the UCD’s estimated 2015 resident population in the urban area. The area and built_up_area fields contain the UCD’s boundary polygon
+area and built-­up surface area (both in km2
+), respectively.
+The circuity indicator is the graph’s ratio of street lengths to straight-­line distances between
+adjacent nodes, and straightness is its inverse. The former measures how circuitous the street network is on average, whereas the latter measures how closely its streets approximate straight lines
+(Boeing 2021). The elev_mean, elev_median, elev_std, elev_iqr, and elev_range represent the
+calculated mean, median, standard deviation, interquartile range, and range of node elevations,
+in meters. These provide indicators of the topography underlying the network. The grade_mean
+and grade_median fields represent the calculated mean and median street grade absolute values.
+The intersect_count indicator represents the number of street intersections in the urban
+area—that is, the number of nodes with more than two incident edges in an undirected representation of the graph. The intersect_count_clean indicator is calculated by merging intersections
+within 10 meter buffers of each other geometrically (i.e., 10 meter Euclidean radii) before counting them. This preventsthe over-­counting of complex intersections. For example, the intersection
+Geoff Boeing Street Network Models and Indicators
+7
+Table 1. Fields in the Indicators Dataset. Those Carried Over from the UCD are Noted as Such
+Indicator Name Type Description
+country string Primary country name
+country_iso string Primary country ISO 3166-­1 alpha-­3 code
+core_city string Urban area core city name
+uc_id integer Urban area’s unique identifier in UCD
+cc_avg_dir decimal Avg clustering coefficient (unweighted, directed)
+cc_avg_undir decimal Avg clustering coefficient (unweighted, undirected)
+cc_wt_avg_dir decimal Avg clustering coefficient (weighted, directed)
+cc_wt_avg_undir decimal Avg clustering coefficient (weighted, undirected)
+circuity decimal Ratio of street lengths to straight-line distances
+elev_iqr decimal Interquartile range of node elevations, meters
+elev_mean decimal Mean node elevation, meters
+elev_median decimal Median node elevation, meters
+elev_range decimal Range of node elevations, meters
+elev_std decimal Standard deviation of node elevations, meters
+grade_mean decimal Mean absolute street grade (incline)
+grade_median decimal Median absolute street grade (incline)
+intersect_count integer Count of physical street intersections
+intersect_count_clean integer Count of physical street intersections (after merging
+nodes within 10 meters geometrically)
+intersect_count_clean_topo integer Count of physical street intersections (after merging
+nodes within 10 meters topologically)
+k_avg decimal Avg node degree (undirected)
+length_mean decimal Mean street segment length (undirected edges),
+meters
+length_median decimal Median street segment length (undirected edges),
+meters
+length_total decimal Total street length (undirected edges), meters
+node_count integer Count of nodes
+orientation_entropy decimal Entropy of street bearings
+orientation_order decimal Orientation order of street bearings
+pagerank_max decimal Maximum PageRank value of any node
+prop_4way decimal Proportion of nodes that represent 4-­way street
+intersections
+prop_3way decimal Proportion of nodes that represent 3-way street
+intersections
+prop_deadend decimal Proportion of nodes that represent dead-ends
+self_loop_proportion decimal Proportion of edges that are self-loops
+straightness decimal The inverse of circuity
+street_segment_count integer Count of street segments (undirected edges)
+uc_names string List of city names within this urban area (UCD)
+world_region string Major geographical region (UCD)
+world_subregion string Minor geographical region (UCD)
+(Continues)
+Geographical Analysis
+8
+of two divided roads—each comprising two centerline one-way geometries—creates four nodes
+and thus would otherwise be counted as four intersections. Roundabouts similarly create multiple intersection points unless consolidated. The 10 meter parameterization has a track record in
+the literature (e.g., Barrington-­Leigh and Millard-­Ball 2020). The buffer could be customized for
+each study site to reflect local urban design standards, but for the sake of consistent interpretation
+across the data set we use a universal parameterization that works relatively well across all study
+sites.
+The intersect_count_clean_topo indicator is calculated by merging intersections within 10
+meters of each other topologically along the network. This prevents topologically remote but
+spatially proximate nodes from being merged. For example, a street intersection may lie directly below a freeway overpass’s intersection with an on-­ramp. We would not want to merge
+these and count them as a single intersection, even though their planar Euclidean distance is
+approximately zero: in reality, they are distinct junctions in the three-­dimensional system of
+roads. Similarly, in a residential neighborhood, a bollarded street may create a dead-end immediately next to an intersection or traffic circle. We would not want to merge this dead-­end with
+the intersection and connect their edges—­they are not adjacent nodes in the graph’s topology.
+These examples illustrate (two-­dimensional) geometric proximity, but topological remoteness.
+Accordingly, in some situations we may expect higher intersection counts in intersect_count_
+clean than intersect_count_clean_topo.
+Clustering coefficients measure the extent to which a node’s neighbors form a complete
+graph (Jiang and Claramunt 2004; Opsahl and Panzarasa 2009). The cc_avg_dir and cc_avg_
+undir indicators are the urban area’s directed and undirected unweighted average clustering coefficient. The cc_wt_avg_dir and cc_wt_avg_undir indicators are its directed and undirected
+length-­weighted average clustering coefficient. The pagerank_max indicator is the maximum
+PageRank value of any node in the urban area: PageRank ranks nodes’ importance based on the
+structure of their links (Agryzkov et al. 2012; Boeing 2020a). The self_loop_proportion measures the urban area’s proportion of physical street segments that self-­loop.
+The k_avg indicator represents the average node degree of the undirected representation
+of the graph—­that is, on average, how many physical streets (rather than directed edges) are
+incident to each node. The length_mean and length_median indicators are the calculated mean
+and median physical street segment (i.e., undirected edge) lengths in meters, representing the
+average and typical linear block lengths. The street_segment_count and node_count fields contain the counts of physical street segments and nodes, respectively. The prop_4way, prop_3way,
+and prop_deadend fields contain the proportions of nodes in the graph that represent four-­way
+intersections, three-­way intersections, and culs-­de-­sac, respectively. The orientation_entropy and
+orientation_order indicators represent the calculated entropy of street bearings and their linearized and normalized order, as developed in Boeing (2019).
+Indicator Name Type Description
+resident_pop integer Total resident population, 2015 (UCD)
+area decimal Area within boundary polygon, km2 (UCD)
+built_up_area decimal Built-up surface area in 2015, km2 (UCD)
+Table 1. (Continued)
+Geoff Boeing Street Network Models and Indicators
+9
+Results and discussion
+Open data repositories
+All of the resulting street network models, indicators, and metadata have been made publicly
+available on the Harvard Dataverse, organized within a top-­level dataverse3
+ collectively comprising approximately 80 gigabytes of data. All of these data sets are freely available for reuse:
+see the conclusion section for usage notes. All model files (in GeoPackage, GraphML, and node/
+edge list format) are compressed and zipped at the country level. The top-­level dataverse contains five constituent data sets to organize the street network models, indicators, and metadata
+for retrieval:
+• Global Urban Street Networks Indicators4
+: contains the calculated indicators plus essential
+fields carried over from the UCD for use in downstream analyses. See Table 1.
+• Global Urban Street Networks Metadata5
+: contains metadata describing the indicators and
+the node/edge attributes in the model files.
+• Global Urban Street Networks GraphML6
+: contains all the GraphML street network model
+files, compressed and zipped at the country level.
+• Global Urban Street Networks GeoPackages7
+: contains all the street network model
+GeoPackage files, compressed and zipped at the country level.
+• Global Urban Street Networks Node/Edge Lists8
+: contains all the street network model node
+and edge lists in CSV file format, compressed and zipped at the country level.
+Indicator analysis
+Table 2 presents the results of this workflow by aggregating and summarizing a subset of street
+network form indicators of particular interest to transportation researchers. It reports population-­
+weighted mean values across all urban areas, aggregated and summarized at the level of the
+world subregion.
+Each table column represents an indicator, some of which are transformed for presentation
+as follows. The Circuity Pct column subtracts 1 from the circuity indicator and expresses the
+result as a percent. It thus represents how much more circuitous the streets are than if they were
+all straight lines. The Avg Node Degree, Orientation Order, and Median Street Length columns
+present the k_avg, orientation_order, and length_median indicator values, respectively. The Avg
+Grade column expresses the grade_mean indicator as a percent. The Intersect Density column
+divides the intersect_count_clean_topo indicator by the built_up_area indicator, and thus represents street intersections per km2
+.
+Finally, each of these indicators is aggregated at the subregion-­level using the population-­
+weighted mean. Such weighting reflects the average person’s exposure by measuring the average indicator value as experienced by the subregion’s residents within their urban areas. These
+population-­weighted means are calculated as shown in Equation 1 where ds is the populationweighted mean value of indicator d in subregion s, n is the number of urban areas in subregion s
+, i indexes those urban areas, di
+ is the value of indicator d in urban area i, pi
+ is the population of
+urban area i, and ps is the total population of subregion s.
+d (1) s = ∑n
+i=1
+pi
+ps
+di
+Geographical Analysis
+10
+Table 2. Aggregate Analysis of Urban Area Street Network Indicators Worldwide: Population-­Weighted Mean Values, Calculated and Transformed
+as Described in the Text
+World Subregion Circuity Pct Avg Node Degree Orientation Order
+Median Street
+Length Avg Grade Pct Intersect Density
+Eastern Africa 5.28 2.80 0.12 82.87 3.19 266.88
+Middle Africa 3.81 2.89 0.12 93.97 3.16 171.56
+Northern Africa 3.66 2.90 0.19 49.76 2.56 284.10
+Southern Africa 8.59 2.82 0.05 77.72 3.09 151.13
+Western Africa 4.30 2.82 0.13 92.75 2.48 159.98
+Eastern Asia 4.86 2.96 0.22 168.96 2.14 45.74
+South-Central Asia 6.10 2.65 0.20 138.83 1.97 133.93
+South-­Eastern Asia 6.22 2.60 0.14 64.06 2.68 190.12
+Western Asia 4.97 2.95 0.13 70.04 3.46 197.08
+Eastern Europe 4.97 2.84 0.09 114.48 2.23 39.04
+Northern Europe 6.50 2.47 0.02 65.94 2.94 97.23
+Southern Europe 5.93 2.86 0.05 62.99 4.09 115.94
+Western Europe 6.40 2.79 0.03 78.11 2.60 72.55
+Caribbean 5.62 2.82 0.10 76.38 3.14 118.38
+Central America 3.89 2.88 0.17 62.80 4.06 166.02
+South America 3.68 3.03 0.15 73.22 3.85 197.76
+Northern America 6.71 2.87 0.32 99.95 2.5 53.23
+Australia/New Zealand 5.92 2.73 0.19 82.33 4.47 64.84
+Melanesia 8.50 2.51 0.03 106.07 3.67 105.17
+Geoff Boeing Street Network Models and Indicators
+11
+Southern Africa and Melanesia have the most circuitous street networks, where the weightedaverage urban area has streets 8.6% and 8.5% more circuitous than straight lines. In contrast,
+Northern Africa and South America have the least circuitous, at 3.7% each. South America and
+Eastern Asia have the highest weighted-­average average node degree (3.0 each), a measure of
+network connectedness, whereas Northern Europe and Melanesia (2.5 each) have the lowest.
+Orientation order, a spatial signature of coordinated central planning, is highest in Northern
+America (0.32) and Eastern Asia (0.22) and lowest in Northern Europe (0.02) and Melanesia
+(0.03).
+Eastern Asia (169 meters) and South-­Central Asia (139 meters) have the longest weighted-­
+average median street segment lengths. In contrast, Northern Africa (50 meters) and Central
+America (63 meters) have the shortest. The weighted-­average urban areas in Australia/New
+Zealand (4.5%) and Southern Europe (4.1%) have the highest average street grades, indicating cities built on hillier terrain, whereas Eastern (2.1%) and South-­Central Asia (2.0%) have
+the lowest, indicating cities built on flatter land. Finally, intersection densities (topologically
+cleaned) are highest in Northern Africa (284/km2
+) and Eastern Africa (267/km2
+) and lowest in
+Eastern Europe (39/km2
+) and Eastern Asia (46/km2
+).
+Fig. 2 visualizes a set of fundamental bivariate relationships (estimated via ordinary least
+squares with variables transformed as needed for best linear fit) across all urban areas worldwide.
+Urban areas’ intersection counts (topologically cleaned) exhibit a strong linear relationship with
+their total street lengths (R2 = 0.91, p < 0.001), as expected from theory. A 1 intersection increase
+in an urban area’s intersection count is associated with a 178.6 meter increase in its total street
+length, ±1.2 meters (margin of error at 95% confidence).
+Total street length and intersection count both scale slightly sublinearly with urban area
+population, as seen in the log–­log plots at the bottom of Fig. 2. A 1% increase in urban area population is associated with a 0.90% (±0.02%) increase in total street length and a 0.95% (±0.03%)
+increase in intersection count, which makes theoretical sense as residents can share public infrastructure. Similar results have been found in prior studies of a single country (e.g., Bettencourt
+2013).
+Urban areas’ per capita GDP estimates (i.e., the UCD’s 2015 urban area GDP, based on purchasing power parity, in 2011 USD) exhibit a moderate linear relationship with total street length
+per capita. Across all urban areas, the mean per capita street length is 2.13 meters, and a $10,000
+USD increase in per capita GDP is associated with a 1.13 (±0.03) meter increase in per capita
+street length. Per capita street length is a common indicator of a city’s “infrastructure accessibility” and this finding provides new evidence consilient with prior smaller-­sample findings in the
+literature: cities with greater wealth and economic activity tend to have more road infrastructure
+(e.g., Dingil et al. 2018).
+Validation
+To be useful in urban science and practice, these models must faithfully represent the real world.
+Validation needs to be considered from three perspectives.
+First, the source data themselves must accurately represent the real world. In terms of study
+site demarcation, the UCD derives from the state-of-the-art GHSL developed in tandem by international authorities for this purpose. Numerous researchers have investigated OpenStreetMap’s
+urban street accuracy and completeness (Girres and Touya 2010; Haklay 2010; Neis, Zielstra,
+and Zipf 2011; Corcoran, Mooney, and Bertolotto 2013; Zielstra, Hochmair, and Neis 2013;
+Barron, Neis, and Zipf 2014; Basiri et al. 2016). These data are not perfect. Barrington-­Leigh and
+Geographical Analysis
+12
+Millard-­Ball (2017) note that OpenStreetMap was particularly incomplete in China as of 2016
+due to restrictions on private surveying and publishing geospatial data. The Chinese models and
+indicators may in turn suffer from missing source data, and this could partly explain the low intersection density in Eastern Asia in Table 2 as China accounts for 79% of the subregion’s urban
+population. Nevertheless, OpenStreetMap is the current state-of-the-art for international street
+network analysis and represents the best available global data today.
+The second validation perspective considers how well the resulting graph models represent
+the OpenStreetMap street network. Are the models constructed properly? Does the workflow introduce errors? The open source modeling software, OSMnx, has been downloaded and installed
+over 300,000 times from the Anaconda package repository, generating a large test bed of users
+continuously vetting its functionality. To further assess these models, this study tests the resulting
+repository’s data quality by adapting the methodologies of Barrington-­Leigh and Millard-­Ball
+Figure 2. Scatter plots of relationships across all worldwide urban areas with bivariate regression
+lines and shaded 95% confidence intervals. Axes constrained to not display all outliers.
+Geoff Boeing Street Network Models and Indicators
+13
+(2017) and Karduni, Kermanshah, and Derrible (2016) against the original OpenStreetMap
+source data as a reference data set. It randomly samples 100 U.S. urban areas and 100 non-­U.S.
+urban areas then manually compares each with the OpenStreetMap source data. The results conform to expectations given the source data and OSMnx’s parameterization. Every graph model
+is also tested to ensure it can be loaded, analyzed, and routed, confirming that this study’s computational workflow created a functioning model as described in the methods section.
+Third, the elevation data are validated by comparing the ASTER, SRTM, and Google values
+for each node. Across all 37 million nodes worldwide, the elevation values between these three
+sources exhibit high correlation (all r > 0.999, p < 0.001). Table 3 summarizes their pairwise differences. The ASTER and SRTM node elevation values differ by only 19 centimeters on average,
+and the median node has the same elevation value across both. The ASTER and SRTM differences with the Google validation values are greater but both the mean and median remain near or
+under 1 meter. The high min/max values represent noisy outliers that our node elevation selection
+process mitigated: across all urban areas, the median node’s selected elevation value differs from
+Google by only 32 centimeters. Finally, we compare our street networks’ elev_mean indicator with the UCD’s estimated average elevation for each urban area. They strongly correlate
+(r > 0.999, p < 0.001) and the median difference between the two is 16 centimeters. Overall, the
+high correlations and small pairwise differences demonstrate the tight correspondence between
+the different elevation values and lend confidence to using the ASTER and SRTM open data in
+these models.
+Conclusion
+New models and indicators for street network science
+This article presented new methods to model and analyze the street network of each urban area in
+the world. It used open-­source tools and open data to build these models and calculate geometric
+and topological indicators of street network form. All of its Python source code and resulting data
+have been deposited in open repositories for public reuse. This represents the first such comprehensive repository of ready-to-use urban area street network models and indicators worldwide.
+Analyzing these indicators reveals a snapshot of street network form around the world.
+We find that both total street length and intersection count scale sublinearly with urban area
+population. Higher per capita GDP in an urban area is associated with higher per capita total
+street length. We also find that elevation open data from ASTER and SRTM compare well to
+Google’s closed source, commercial data. All three sources’ elevation values correlate strongly.
+Table 3. Summary Statistics of Pairwise Differencesin Elevation (Meters) from ASTER, SRTM,
+and Google Across all Nodes Worldwide
+ASTER−SRTM ASTER−Google SRTM−Google
+Mean −0.19 0.99 1.18
+Std Dev 7.83 7.90 3.26
+Min −319.00 −319.01 −276.55
+25% −5.00 −3.55 −0.52
+50% 0.00 1.00 0.57
+75% 4.00 5.33 2.57
+Max 441.00 442.34 138.83
+Geographical Analysis
+14
+The median pairwise difference between the nodes’ elevation values and the Google validation
+values is only 32 centimeters, and the median pairwise difference between the urban areas’ mean
+street network elevations and the UCD mean elevations is only 16 centimeters.
+The open data repositories generated by this study fill two needs in the research community.
+First, the network models allow researchers to quickly engage in graph-­theoretic street network
+analyses worldwide without first spending weeks writing their own ad hoc code for data collection and modeling. Second, the indicators data provide the first comprehensive worldwide set of
+geometric and topological street network form indicators at the urban area scale. Together, these
+results help to democratize street network science, opening up quantitative analyses to urban
+planners and policymakers with less-technical backgrounds who otherwise may struggle to develop a complete computational analytics workflow themselves.
+While OpenStreetMap itself provides incredibly valuable raw data, this project transforms
+these data into ready-­to-­use models and indicators through substantial processing. For example,
+these topologically simplified graphs provide models that correspond much better to graph theory and transportation geography than raw OpenStreetMap data do, and they are much faster to
+run graph algorithms on because most such algorithms scale with node count. They also include
+elevation and grade data, which are very sparse on OpenStreetMap and are too often ignored in
+street network analytics. Researchers and practitioners can use these models to simulate trips,
+assess network vulnerability to flooding and sea level rise, or measure accessibility to points of
+interest.
+The indicators data offer a useful basket of variables for cross-sectional, worldwide studies
+of street network form, and the topologically consolidated intersection counts and densities contribute a more theoretically sound measure than traditional node counts or purely geometric consolidation can. Researchers and practitioners can use these indicators to estimate relationships
+between street network characteristics and transport-sector greenhouse gas emissions around the
+world, compare per capita road infrastructure provision across urban areas, or scorecard different
+cities’ street network compactness and connectivity for sustainability initiatives.
+How to use these models and indicators
+Finally, this article concludes with a few notes on reuse. The indicators data can be loaded with
+any data analysis tool. The street network models can be loaded with most GIS and network
+analysis tools, including OSMnx.
+Each graph model file is named as city_name-­uc_id.extension, where uc_id is the urban
+area’s unique identifier in the UCD. The uc_id field thus links each graph model file to its urban
+area in the UCD as well as to its row in the indicators data set. For example, within the china-­
+CHN.zip file from the Global Urban Street Networks GraphML repository are all of China’s
+urban areas’ GraphML files, including beijing-­10687.graphml. This GraphML file contains the
+street network model of Beijing and its uc_id is 10687. As such, 10687 is Beijing’s unique identifier in the indicators data set and in the UCD.
+All of the code used for modeling and analysis in this study is open source and available on
+GitHub9
+ for public inspection, adaptation, and reuse. Comprehensive documentation of OSMnx
+and its modules and functions used in this study is available online10 and OSMnx usage examples, tutorials, and demonstrations are available on GitHub11 for users interested in working with
+this toolkit.
+Geoff Boeing Street Network Models and Indicators
+15
+Acknowledgments
+This work was funded in part by a grant from the Public Good Projects.
+Conflict of interest
+The author has no conflict of interest to declare.
+Notes
+1 UCD: http://data.europa.eu/89h/53473144-­b88c-­44bc-­b4a3-­4583ed1f547e
+2 The data were downloaded with OSMnx v1.0.0 in January 2021
+3 Dataverse: https://dataverse.harvard.edu/dataverse/global-urban-street-networks/
+4 Global Urban Street Networks Indicators repository v2: https://doi.org/10.7910/DVN/ZTFPTB
+5 Global Urban Street Networks Metadata repository v2: https://doi.org/10.7910/DVN/WMPPF9
+6 Global Urban Street Networks GraphML repository v2: https://doi.org/10.7910/DVN/KA5HJ3
+7 Global Urban Street Networks GeoPackages repository v2: https://doi.org/10.7910/DVN/E5TPDQ
+8 Global Urban Street Networks Node/Edge Lists repository v2: https://doi.org/10.7910/DVN/
+DC7U0A
+9 Modeling and analysis source code: https://github.com/gboeing/street-network-models
+10 OSMnx documentation: https://osmnx.readthedocs.org
+11 OSMnx usage examples: https://github.com/gboeing/osmnx-examples
+References
+Agryzkov, T., J. L. Oliver, L. Tortosa, and J. F. Vicent. (2012). “An Algorithm for Ranking the Nodes of an
+Urban Network Based on the Concept of PageRank Vector.” Applied Mathematics and Computation
+219(4), 2186–­93.
+Barrington-­Leigh, C., and A. Millard-­Ball. (2017). “The World’s User-­Generated Road Map is More Than
+80% Complete.” PLoS One 12(8), e0180698.
+Barrington-­Leigh, C., and A. Millard-­Ball. (2019). “A Global Assessment of Street-­Network Sprawl.”
+PLoS One 14(11), e0223078.
+Barrington-­Leigh, C., and A. Millard-­Ball. (2020). “Global Trends Toward Urban Street-­Network Sprawl.”
+Proceedings of the National Academy of Sciences 117(4), 1941–­50.
+Barron, C., P. Neis, and A. Zipf. (2014). “A Comprehensive Framework for Intrinsic Open-­StreetMap
+Quality Analysis.” Transactions in GIS 18(6), 877–­95.
+Barthelemy, M. (2011). “Spatial Networks.” Physics Reports 499(1–­3), 1–­101.
+Basiri, A., M. Jackson, P. Amirian, A. Pourabdollah, M. Sester, A. Winstanley, T. Moore, and L. Zhang.
+(2016). “Quality Assessment of OpenStreetMap Data Using Trajectory Mining.” Geospatial
+Information Science 19(1), 56–­68.
+Batty, M. (2005). “Network Geography: Relations, Interactions, Scaling and Spatial Processes in GIS.” In
+Re-­Presenting GIS, 149–­70, edited by D. J. Unwin and P. Fisher. Chichester, England: John Wiley &
+Sons.
+Bettencourt, L. (2013). “The Origins of Scaling in Cities.” Science 340(6139), 1438–­41.
+Boeing, G. (2017). “OSMnx: New Methods for Acquiring, Constructing, Analyzing, and Visualizing
+Complex Street Networks.” Computers, Environment and Urban Systems 65 126–39.
+Boeing, G. (2019). “Urban Spatial Order: Street Network Orientation, Configuration, and Entropy.” Applied
+Network Science 4(1), 67.
+Boeing, G. (2020a). “AMulti-­Scale Analysis of 27,000 Urban Street Networks: Every US City, Town,
+Urbanized Area, and Zillow Neighborhood.” Environment and Planning B: Urban Analytics and
+City Science 47(4), 590–­608.
+Boeing, G.(2020b). “TheRightToolsforthe Job:TheCase for Spatial ScienceTool-­Building.”Transactions
+in GIS 24(5), 1299–­314.
+Geographical Analysis
+16
+Boeing, G. (2021). “Off the Grid…and Back Again?: The Recent Evolution of American Street Network
+Planning and Design.” Journal of the American Planning Association 87(1), 123–­37.
+Brandes, U. and Erlebach, T., editors (2005). Network Analysis: Methodological Foundations. Number
+3418 in Lecture Notes in Computer Science. Berlin, Germany: Springer.
+Cardillo, A., S. Scellato, V. Latora, and S. Porta. (2006). “Structural Properties of Planar Graphs of Urban
+Street Patterns.” Physical Review E 73(6), 066107.
+Corcoran, P., P. Mooney, and M. Bertolotto. (2013). “Analysing the Growth of OpenStreetMap Networks.”
+Spatial Statistics 3, 21–32.
+da Cruz, N. F., D. Y. Oh, and N. B. Choumar. (2020). “The Metropolitan Scale.” Cities 100, 102644.
+Dingil, A. E., J. Schweizer, F. Rupi, and Z. Stasiskiene. (2018). “Transport Indicator Analysis and
+Comparison of 151 Urban Areas, Based on Open Source Data.” European Transport Research Review
+10(2), 58.
+Florczyk, A., Melchiorri, M., Corbane, C., Schiavina, M., Maffenini, M., Pesaresi, M., Politis, P., Sabo, S.,
+Freire, S., Ehrlich, D., Kemper, T., Tommasi, P., Airaghi, D., and Zanchetta, L. (2019). Description of
+the GHS Urban Centre Database 2015, Public Release 2019, Version 1.0. Luxembourg: Publications
+Office of the European Union. https://doi.org/10.2760/037310.
+Gastner, M. T., and M. E. J. Newman. (2006). “The Spatial Structure of Networks.” The European Physical
+Journal B: Condensed Matter and Complex Systems 49(2), 247–­52.
+Girres, J.-­F., and G. Touya. (2010). “Quality Assessment of the French OpenStreetMap Dataset.”
+Transactions in GIS 14(4), 435–­59.
+Gorokhovich, Y., and A. Voustianiouk. (2006). “Accuracy Assessment of the Processed SRTM-­based
+Elevation Data by CGIAR Using Field Data From USA and Thailand and its Relation to the Terrain
+Characteristics.” Remote Sensing of Environment 104(4), 409–­15.
+Graham, M., S. De Sabbata, and M. A. Zook. (2015). “Towards a Study of Information Geographies:
+(Im)Mutable Augmentations and a Mapping of the Geographies of Information: Towards a Study of
+Information Geographies.” Geo: Geography and Environment 2(1), 88–­105.
+Haklay, M. (2010). “How Good is Volunteered Geographical Information? A Comparative Study of
+OpenStreetMap and Ordnance Survey Datasets.” Environment and Planning B: Planning and Design
+37(4), 682–­703.
+Hopcroft, J., and R. Tarjan. (1974). “Efficient Planarity Testing.” Journal of the ACM 21(4), 549–­68.
+Jiang, B., and C. Claramunt. (2004). “Topological Analysis of Urban Street Networks.” Environment and
+Planning B: Planning and Design 31(1), 151–­62.
+Jokar Arsanjani, J., Zipf, A., Mooney, P., and Helbich, M., editors (2015). OpenStreetMap in GIScience.
+Cham, Switzerland: Springer International.
+Karduni, A., A. Kermanshah, and S. Derrible. (2016). “A Protocol to Convert Spatial Polyline Data to
+Network Formats and Applications to World Urban Road Networks.” Scientific Data 3, 160046.
+Lemoine-­Rodríguez, R., L. Inostroza, and H. Zepp. (2020). “The Global Homogenization of Urban Form:
+An Assessment of 194 Cities Across Time.” Landscape and Urban Planning 204, 103949.
+Maier, G. (2014). “OpenStreetMap, the Wikipedia Map.” Region 1(1), R3–­10.
+Marshall, S., J. Gil, K. Kropf, M. Tomko, and L. Figueiredo. (2018). “Street Network Studies: From
+Networks to Models and their Representations.” Networks and Spatial Economics 18, 735–­49.
+Masucci, A. P., D. Smith, A. Crooks, and M. Batty. (2009). “Random Planar Graphs and the London Street
+Network.” The European Physical Journal B: Condensed Matter and Complex Systems 71(2),
+259–­71.
+Neis, P., D. Zielstra, and A. Zipf. (2011). “The Street Network Evolution of Crowdsourced Maps:
+OpenStreetMap in Germany 2007–­2011.” Future Internet 4(1), 1–­21.
+Newman, M. E. J. (2003). “The Structure and Function of Complex Networks.” SIAM Review 45(2),
+167–­256.
+Newman, M. E. J. (2010). Networks: An Introduction. Oxford, England: OxfordUniversity Press.
+O’Sullivan, D. (2014). “Spatial Network Analysis.” In Handbook of Regional Science, 1253–­73, edited by
+M. M. Fischer and P. Nijkamp. Berlin, Germany: Springer-­Verlag.
+Opsahl, T., and P. Panzarasa. (2009). “Clustering in Weighted Networks.” Social Networks 31(2), 155–­63.
+Porta, S., P. Crucitti, and V. Latora. (2006a). “The Network Analysis of Urban Streets: A Dual Approach.”
+Physica A: Statistical Mechanics and its Applications 369(2), 853–­66.
+Geoff Boeing Street Network Models and Indicators
+17
+Porta, S., P. Crucitti, and V. Latora. (2006b). “The Network Analysis of Urban Streets: A Primal Approach.”
+Environment and Planning B: Planning and Design 33(5), 705–­25.
+Ratti, C. (2004). “Space Syntax: Some Inconsistencies.” Environment and Planning B: Planning and
+Design 31(4), 487–­99.
+Rusli, N., M. R. Majid, and A. H. M. Din. (2014). “Google Earth’s Derived Digital Elevation Model:
+A Comparative Assessment with Aster and SRTM Data.” IOP Conference Series: Earth and
+Environmental Science 18, 012065.
+Schmidt, M. and S. Klettner. (2013). “Gender and Experience-­RelatedMotivators for Contributing to
+OpenStreetMap.” In AGILE 2013, Leuven, Belgium. AGILE.
+Sehra, S. S., J. Singh, H. S. Rai, and S. S. Anand. (2020). “Extending Processing Toolbox for Assessing the
+Logical Consistency of OpenStreetMap Data.” Transactions in GIS 24(1), 44–­71.
+Székely, L. A. (2004). “A Successful Concept for Measuring Non-­Planarity of Graphs: The Crossing
+Number.” Discrete Mathematics 276(1–­3), 331–­52.
+Trudeau, R. J. (1994). Introduction to Graph Theory, 2nd ed. New York, NY: Dover Publications.
+Vespignani, A. (2018). “Twenty Years of Network Science.” Nature 558, 528–9.
+Viana, M. P., E. Strano, P. Bordin, and M. Barthelemy. (2013). “The Simplicity of Planar Networks.”
+Scientific Reports 3(3495), 1–­6.
+Zielstra, D., H. H. Hochmair, and P. Neis.(2013). “Assessing the Effect of Data Imports on theCompleteness
+of OpenStreetMap – A United States Case Study.” Transactions in GIS 17(3), 315–­34.

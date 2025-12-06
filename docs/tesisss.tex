@@ -63,10 +63,10 @@
 			MAESTRÍA EN SISTEMAS COMPUTACIONALES\\[1cm]
 			
 			\Large
-			\textbf{INTEGRACIÓN DE OSRM CON DOCKER PARA LA OPTIMIZACIÓN DE RUTAS DE ENTREGA DE ALIMENTOS: IMPLEMENTACIÓN Y EVALUACIÓN DEL ROLLING HORIZON EN LA PAZ, B.C.S.}\\[1cm]	
-			\textbf{ANTEPROYECTO DE TESIS}\\[1cm]
+			
 			\large
-			QUE PARA OBTENER EL GRADO DE\\[-0.3cm]
+			QUE PARA OBTENER EL GRADO DE\\[-0.3cm]\textbf{OPTIMIZACIÓN DINÁMICA DE ÚLTIMA MILLA EN REDES VIALES REALES: UN ENFOQUE REPRODUCIBLE PARA EL MDRP EN LA PAZ, B.C.S.}\\[1cm]	
+			\textbf{ANTEPROYECTO DE TESIS}\\[1cm]
 			MAESTRO EN SISTEMAS COMPUTACIONALES\\[1cm]
 			
 			\normalsize
@@ -90,6 +90,19 @@
 		\ifnum\c@chapter <1 \@arabic\c@section
 		\else\thechapter. \@arabic\c@section\fi}
 	\makeatother
+
+	\chapter*{Dedicatoria}
+	Es opcional, pero no están de más. :-)
+	
+	\chapter*{Agradecimientos}
+	También opcional.
+	
+	\chapter*{Resumen}
+	Resumen, en español.
+	
+	\chapter*{Abstract}
+	Resumen, en inglés.
+
 	%Índice general de contenidos
 	\tableofcontents
 	
@@ -102,9 +115,11 @@
 	%Capítulos de contenido, estos llevan la paginación normal
 	\mainmatter
 	
-	\chapter{Antecedentes}
+	\chapter{Introducción}
 
-	\section{De TSP a VRP}
+	\section{Antecedentes}
+
+	\subsection{De TSP a VRP}
 	El Problema del Vendedor Viajero (TSP, por sus siglas en inglés) es uno de los problemas de 
 	optimización combinatoria más estudiados y fundamentales en la investigación de operaciones. 
 	En su forma más simple, el problema busca determinar el recorrido más corto posible que visita 
@@ -166,7 +181,7 @@
 	reales, sitúa la motivación y relevancia del presente trabajo.
 	
 	
-	\section{Última milla y contexto urbano} % Jazemi2023
+	\subsection{Última milla y contexto urbano} % Jazemi2023
 	
 	La última milla de entrega---el segmento final desde un centro de distribución o 
 	punto de recogida hasta el domicilio del cliente---representa el componente más 
@@ -192,7 +207,7 @@
 	comida presenta particularidades únicas que requieren una integración específica 
 	de estos conceptos, como se explora en la siguiente sección.
 
-	\section{Ruteo dinámico: DVRP y DARP} % Larsen2000DVRP, Psaraftis1980, Cordeau2007, Ichoua2006DDARP
+	\subsection{Ruteo dinámico: DVRP y DARP} % Larsen2000DVRP, Psaraftis1980, Cordeau2007, Ichoua2006DDARP
 	
 	Mientras que el VRP clásico y sus extensiones (CVRP, VRPTW, MDVRP) asumen que todas las demandas de clientes 
 	son conocidas \textit{ex-ante} (antes de la ejecución), la realidad operacional de los sistemas de entrega 
@@ -293,7 +308,7 @@
 	optimizar globalmente ese lote resolviendo un VRP estático (el ``matching'' óptimo), y luego ejecutar la 
 	primera etapa de esa solución optimizada. En la siguiente época, repite el proceso.
 	
-	\section{MDRP y políticas de despacho} % Reyes2018
+	\subsection{MDRP y políticas de despacho} % Reyes2018
 	
 	El Problema de Enrutamiento de Entrega de Comida (MDRP) fue formalmente introducido por Reyes et al. (2018) 
 	como una nueva clase de problema de ruteo dinámico que, aunque comparte características fundamentales con 
@@ -324,586 +339,287 @@
 		MDRP opera con múltiples restaurantes dispersos, cada uno actuando como un punto de recolección independiente con ubicación
 		 fija.
 		
-		\item \textbf{Tiempos de preparación y "Ready Times":} Las órdenes no están listas inmediatamente al ser colocadas. 
-		Reyes et al. (2018) introducen el concepto de \textit{ready time} ($e_o$) como una restricción dura: el courier no puede
-		 recoger la orden antes de que la comida esté lista. Esto crea un buffer natural pero reduce la flexibilidad del ruteo.
+		\item \textbf{Tiempos de preparación:} Las órdenes no están listas inmediatamente al ser colocadas. 
+		Reyes et al. (2018) introducen el concepto de \textit{ready time} (tiempo de preparación) como una restricción dura: el courier no puede
+		 recoger la orden antes de que la comida esté lista. Esto crea una holgura de tiempo natural pero reduce la flexibilidad del ruteo.
 		
-		\item \textbf{Alta urgencia y Dinamismo:} La mayoría de las solicitudes se revelan durante la operación (dinamismo puro) 
-		y deben completarse en ventanas de tiempo muy cortas (urgencia), típicamente menos de una hora. Reyes et al. (2018) 
+		\item \textbf{Alta urgencia y Dinamismo:} La mayoría de las solicitudes se revelan durante la operación (dinamismo)
+		y deben completarse en ventanas de tiempo muy cortas, típicamente menos de una hora (urgencia). Reyes et al. (2018) 
 		señalan que esta combinación de dinamismo y urgencia es el desafío central del MDRP.
 		
 		\item \textbf{Bundling (Agrupamiento):} Para mejorar la eficiencia, el MDRP permite agrupar múltiples órdenes de un 
-		mismo restaurante en una sola ruta ("bundles"). Aunque el modelo teórico de Reyes et al. (2018) asume capacidad 
+		mismo restaurante en una sola ruta, creando "bundles". Aunque el modelo teórico de Reyes et al. (2018) asume capacidad 
 		ilimitada para estos bundles, en la implementación práctica de esta tesis se considera la capacidad física limitada 
 		de los vehículos (motocicletas/bicicletas) como una restricción operativa real.
 	\end{enumerate}
 	
-	\subsection{Formalización del problema de despacho}
+
 	
-	Dado estas características, Reyes et al. (2018) formularon el MDRP como un problema de despacho dinámico 
-	donde, en cada época de reoptimización (cada $\Delta$ minutos, típicamente 5-10 min), el sistema debe:
+	\subsection{Ruteo realista en redes viales} 
+	% Referencias sugeridas: Haklay2010, Boyaci2021, Jazemi2023, Pereira2021
+
+	La validación efectiva de políticas de despacho dinámico depende críticamente de la calidad de los datos de 
+	ruteo utilizados en la simulación. La literatura actual presenta una división instrumental: por un lado, las 
+	plataformas comerciales (Google Maps, Mapbox) ofrecen máxima precisión en tiempos de viaje, pero su naturaleza 
+	de "caja negra", sumada a estructuras de costos restrictivas, impide la auditoría de los algoritmos y 
+	compromete la reproducibilidad exacta de los experimentos científicos \citep{Pereira2021}. Por otro lado, 
+	la investigación académica tradicional frecuentemente opta por simplificaciones euclidianas que, aunque 
+	gratuitas y totalmente reproducibles, carecen de fidelidad operativa.
+
+	Estudios empíricos recientes demuestran que estas aproximaciones geométricas subestiman sistemáticamente 
+	los tiempos de viaje, introduciendo errores de magnitud crítica para la operación. \citet{Boyaci2021}, 
+	tras analizar 96 instancias en 12 ciudades reales, determinaron que las rutas efectivas son entre un 
+	17\% y un 40\% más largas que la distancia lineal. En términos operativos, esta desviación implica que un 
+	trayecto estimado geométricamente en 20 minutos podría requerir en realidad casi 30 minutos, provocando el incumplimiento 
+	sistemático de las promesas de entrega. En este sentido, \citet{Jazemi2023} enfatizan que las estrictas 
+	ventanas de tiempo en la logística de última milla requieren estimaciones precisas de arribo (ETA) que no 
+	pueden garantizarse con métricas simples. Bajo estas condiciones, \citet{Boyaci2021} advierten que el uso 
+	de distancias lineales resulta frecuentemente en la generación de rutas operativamente infactibles.
+
+	Para resolver este punto crítico y garantizar tanto la precisión operativa como la transparencia científica, 
+	este trabajo integra dos tecnologías abiertas: OpenStreetMap 
+	(OSM) como fuente de datos cartográficos y OSRM (Open Source Routing Machine) como motor de cálculo.
+		
+	\subsection{OpenStreetMap: Cartografía colaborativa de alta precisión}
 	
-	\begin{enumerate}
-		\item Acumular el conjunto de órdenes aún no asignadas $O^t$
-		\item Determinar cuáles órdenes están lista para recogida (han superado el tiempo de preparación)
-		\item Asignar estas órdenes a couriers disponibles $C$, considerando:
-		\begin{itemize}
-			\item Ubicación actual de cada courier
-			\item Capacidad disponible del courier
-			\item Ventana de tiempo restante de cada orden (riesgo de incumplimiento SLA)
-			\item Multirrestaurante: un courier debe visitar múltiples restaurantes en una sola ruta
-		\end{itemize}
-		\item Secuenciar los pasos de recogida y entrega para minimizar tiempo total de ruta
-		\item Comprometerse a la primera etapa del plan (decision commitment) y desechar el resto
-	\end{enumerate}
+	OpenStreetMap (OSM) proporciona una base de datos geoespacial abierta y auditable que supera las limitaciones 
+	de licencias propietarias. Aunque los primeros análisis de calidad \citep{Haklay2010} ya sugerían su potencial, 
+	estudios globales más recientes han validado su madurez definitiva. En particular, validaciones enfocadas en modelado de 
+	redes \citep{Boeing2021} confirman que la topología de OSM posee la consistencia necesaria para análisis de 
+	grafos complejos y ruteo vehicular, proporcionando una base sólida para la simulación de operaciones logísticas en entornos urbanos.
 	
-	Esta formalización genera un problema de optimización de gran complejidad, que es NP-duro incluso para 
-	instancias medianas. Reyes et al. (2018) demostraron que una heurística de horizonte rodante 
-	(RH)---que resuelve el subproblema como VRP estático en cada época---produce mejoras sustanciales sobre 
-	políticas miopes como FCFS.
+	Para el contexto de esta tesis, OSM ofrece una ventaja crítica sobre soluciones propietarias: la \textit{escalabilidad temporal} 
+	y la reproducibilidad. A diferencia de Google Maps, que opera como una "caja negra" en constante cambio, 
+	OSM permite descargar y congelar versiones históricas del mapa, 
+	garantizando que los experimentos de optimización sean replicables exactamente en el futuro, 
+	independientemente de los cambios físicos en la infraestructura vial.	
 	
-	\subsection{Comparación: FCFS versus Rolling Horizon}
+	\subsection{OSRM y la eficiencia algorítmica}
 	
-	La política de \textbf{First-Come-First-Served (FCFS)} es el baseline operacional más simple. En FCFS, 
-	cuando una orden $o$ está lista para recogida (tiempo de preparación completado), el sistema identifica 
-	inmediatamente el courier más cercano al restaurante y le asigna la orden:
+	Para procesar la geometría de OSM eficientemente, se utiliza OSRM (Open Source Routing Machine). Su núcleo
+	algorítmico se basa en las \textit{Contraction Hierarchies} (CH) propuestas por \citet{Geisberger2008}. 
+	Esta técnica preprocesa la red vial generando una jerarquía de atajos que reduce drásticamente el espacio
+	de búsqueda, permitiendo calcular rutas óptimas en milisegundos (órdenes de magnitud más rápido que el
+	algoritmo de Dijkstra estándar).
 	
-	\begin{equation}
-	c^* = \arg\min_{c \in C_{\text{available}}} d(c_{\text{loc}}, r_o)
-	\end{equation}
+	Esta velocidad es un requisito indispensable para el MDRP: una simulación de horizonte rodante requiere 
+	ejecutar un alto número de consultas de ruteo por hora de operación simulada. La combinación de la 
+	precisión geométrica de OSM con la eficiencia algorítmica de OSRM ofrece el balance necesario entre 
+	rigor académico (reproducibilidad, bajo costo) y realismo operacional, superando las limitaciones de 
+	los enfoques puramente teóricos. \citet{MunozVillamizar2021} validaron que estas herramientas abiertas, 
+	cuando se integran adecuadamente, pueden competir con APIs propietarias, premisa que este trabajo 
+	capitaliza al utilizar OSRM como base de un entorno de simulación totalmente reproducible.
 	
-	La complejidad es $O(n)$ donde $n$ es el número de couriers. FCFS es miope: no considera que esperar un 
-	breve período podría permitir que órdenes futuras se agrupen con la actual, reduciendo viajes redundantes. 
-	Como resultado, FCFS genera rutas subóptimas: entregas a múltiples domicilios desde un único restaurante 
-	requieren viajes separados, y el sistema pierde oportunidades de consolidación.
 	
-	La política de \textbf{Rolling Horizon (RH)} implementa una estrategia anticipatoria. En lugar de asignar 
-	órdenes inmediatamente, el sistema espera un horizonte $\Delta$ (típicamente 10-30 minutos), durante el cual 
-	acumula todas las órdenes listas y pendientes, resuelve un VRP estático sobre este conjunto, y ejecuta la 
-	primera etapa. La optimización en cada época es:
-	
-	\begin{equation}
-	\min \sum_{c \in C} \text{costo}(\text{ruta}_c) + \sum_{o \in O^t} \text{penalización}(o)
-	\end{equation}
-	
-	donde $\text{costo}(\text{ruta}_c)$ incluye distancia total, y $\text{penalización}(o)$ es un costo para 
-	órdenes no asignadas (reflejando el riesgo SLA). El problema es NP-duro, pero instancias de 5-20 órdenes 
-	y 15-60 couriers pueden resolverse en segundos mediante heurísticas (Lin-Kernighan, metaheurísticas, etc.).
-	
-	El beneficio de RH proviene del bundling (agrupación): órdenes geográficamente cercanas se asignan a un 
-	único courier en una sola ruta, reduciendo distancia total de viaje y aumentando utilización de capacidad. 
-	Reyes et al. (2018) demostraron experimentalmente que RH logra mejoras de aproximadamente 99\% en 
-	órdenes/courier-hora comparado con FCFS (aumentando de ~20 a ~40 órdenes servidas por courier por hora) 
-	\cite{Reyes2018}, con todo ello manteniendo cumplimiento de SLA en > 95\%.
-	
-	\subsection{Naturaleza anticipatoria del horizonte rodante}
-	
-	¿Por qué funciona mejor RH que FCFS? Ichoua et al. (2006) proporcionan la justificación teórica: el 
-	valor de conocimiento sobre el futuro cercano. En su estudio de dial-a-ride dinámico, demostraron que 
-	políticas que acceden a información sobre solicitudes futuras en un horizonte de 20-30 minutos pueden 
-	superar políticas puramente reactivas en hasta 29\% (en instancias críticas) o de forma más conservadora 
-	en 9\% en promedio general, sin necesidad de predicción perfecta. El mecanismo es la anticipación: el 
-	sistema puede retrasar estratégicamente decisiones, esperando información que mejore la calidad de decisiones 
-	futuras, incluso bajo incertidumbre residual \cite{Ichoua2006DDARP}.
-	
-	Para entrega de comida, existe un factor adicional que vuelve esta anticipación prácticamente ``gratuita'' 
-	en términos de experiencia del cliente: los tiempos de preparación del restaurante. Cuando una orden es 
-	colocada en $t=0$, está disponible para recogida en $t=p$ (tiempo de preparación). El horizonte de 
-	reoptimización $\Delta$ (típicamente 15-30 minutos) puede ocurrir enteramente dentro del período de espera, 
-	sin que el courier sea enviado prematuramente. Es decir, el RH no añade latencia perceptible al cliente; 
-	en su lugar, aprovecha eficientemente la latencia existente en la cadena de preparación.
-	
-	\section{Ruteo realista en redes viales} % Haklay2010, Geisberger2008, Figliozzi2007
-	
-	Todas las políticas de despacho discutidas anteriormente (FCFS, RH) dependen críticamente de una entrada 
-	fundamental: matrices de distancias o tiempos de viaje entre ubicaciones. Las decisiones de despacho son 
-	tan buenas como la información de red que las informa. Sin embargo, existe una tensión fundamental en 
-	logística académica: precisión versus disponibilidad.
-	
-	Sistemas comerciales como Google Maps, Mapbox y Here Maps proporcionan datos de red vial altamente precisos, 
-	actualizados continuamente con información de tráfico real y capas geográficas completas. Sin embargo, su 
-	costo operacional es prohibitivo: típicamente \$50-\$150 USD por día para consultas de ruteo a escala de 
-	simulación. Para microempresas urbanas de entrega de comida, este costo elimina cualquier viabilidad económica. 
-	Figliozzi (2007) documentó que esta tensión es real: distancias euclidianas (la aproximación más simple) 
-	subestiman tiempos reales de viaje en 30-50\% en redes urbanas complejas \cite{Figliozzi2007}.
-	
-	La pregunta de investigación que surge es: ¿existe una alternativa que balance precisión y disponibilidad 
-	económica? La respuesta viene de dos componentes que, combinadas, ofrecen una solución viable: datos abiertos 
-	(OpenStreetMap) e infraestructura de ruteo de código abierto (OSRM).
-	
-	\subsection{OpenStreetMap: Datos abiertos de cartografía urbana}
-	
-	OpenStreetMap (OSM) es un proyecto colaborativo de mapeo global iniciado en 2004 que captura la geometría 
-	de redes viales, límites administrativos, puntos de interés, y otros elementos geográficos, principalmente 
-	mediante contribución voluntaria. A diferencia de cartografía comercial (Google Maps, Mapbox) o estatal 
-	(catastros oficiales), OSM es un bien común digital: los datos son abiertos (licencia ODbL), reutilizables 
-	sin restricciones comerciales, y auditables por cualquiera \cite{Haklay2010}.
-	
-	Haklay y Weber (2010) realizaron el primer análisis comprehensivo de la calidad de OSM, comparándolo contra 
-	cartografía de referencia oficial en varios contextos urbanos \cite{Haklay2010}. Sus hallazgos fueron 
-	significativos: en áreas urbanas bien documentadas (típicamente ciudades en países desarrollados y en líneas 
-	de interés público), OSM alcanza una precisión horizontal (exactitud de posicionamiento) de 5-10 metros, 
-	comparable a datos comerciales. Más importante aún, el nivel de cobertura de la red vial en áreas urbanas 
-	es típicamente del 85-95\% en ciudades medianas desarrolladas, y ha mejorado consistentemente con el tiempo 
-	conforme crece la comunidad de mapeadores.
-	
-	Para contextos latinoamericanos y ciudades medianas, la cobertura de OSM ha mostrado mejora significativa 
-	en los últimos años. Aunque no alcanza la densidad de ciudades como Londres o Nueva York, ciudades medianas 
-	como La Paz han sido ampliamente mapeadas, particularmente en zonas urbanas donde la densidad de usuarios y 
-	mapeadores es mayor. El factor crítico es que OSM no es una instantánea estática: es una base de datos 
-	viva que se actualiza continuamente. Esto permite que trabajos de investigación que utilicen OSM sean 
-	reproducibles en múltiples contextos geográficos sin depender de acuerdos comerciales con proveedores de mapas.
-	
-	Las características clave de OSM relevantes para ruteo son:
-	
+	\section{Planteamiento del problema}
+
+	\subsection{La ineficacia de las aproximaciones tradicionales}
+	El problema de ruteo para entrega de comida (MDRP) en ciudades medianas enfrenta una disyuntiva crítica. Por un lado,
+	las herramientas comerciales de ruteo garantizan precisión geográfica, pero imponen costos de licenciamiento prohibitivos 
+	para las empresas locales emergentes. Por otro lado, las aproximaciones académicas tradicionales, que suelen utilizar
+	distancias euclidianas para reducir costos computacionales, sacrifican el realismo operativo. \citet{Boyaci2021} 
+	cuantificaron este impacto, demostrando que las distancias lineales subestiman los trayectos reales entre un 17\% y 
+	un 40\%, invalidando las estimaciones de tiempos de entrega (ETA) y degradando la calidad del servicio.
+
+	\subsection{La hostilidad topológica de La Paz, B.C.S.}
+	Esta problemática de subestimación se agudiza drásticamente en el contexto local de La Paz, B.C.S., cuya topología 
+	dista de ser un plano euclidiano ideal o una retícula urbana densa como las grandes metrópolis. La ciudad presenta
+	restricciones geográficas severas:
+
 	\begin{itemize}
-		\item \textbf{Geometría de red}: OSM captura la topología de la red vial como un grafo, donde nodos 
-		representan intersecciones y arcos representan segmentos de calle. Cada arco tiene atributos como nombre, 
-		tipo de vía (autopista, calle, callejón), y restricciones de circulación (sentido único, prohibiciones 
-		de acceso).
-				
-		\item \textbf{Metadatos de accesibilidad}: OSM registra restricciones de acceso (callejones sin salida, 
-		zonas peatonales, etc.) que afectan el ruteo. Esto es especialmente importante en entrega urbana donde 
-		ciertas rutas pueden estar prohibidas para vehículos de transporte comercial.
-		
-		\item \textbf{Escalabilidad temporal}: OSM permite trabajar con descargas históricas de datos, facilitando 
-		reproducibilidad exacta: un experimento de 2025 puede ser replicado exactamente con la versión de OSM de 
-		2025, sin depender de actualizaciones futuras que cambien resultados.
+		\item \textbf{Barreras Naturales:} La ensenada de La Paz obliga a realizar rodeos extensos (en forma de "U") 
+		para trayectos que linealmente parecen cortos a través del agua.
+
+		\item \textbf{Estructura Vial Jerárquica:} La dependencia de pocas arterias diagonales estructurantes (como el Blvd. 
+		Forjadores o Pino Pallas) crea cuellos de botella que los modelos euclidianos ignoran.
+
+		\item \textbf{Zonas de Exclusión:} Áreas como el aeropuerto o zonas militares, que aparecen como espacios 
+		transitables en un mapa lineal, representan bloqueos físicos en la realidad.
+
 	\end{itemize}
+
+	Un cálculo de ruta basado en distancia lineal en este entorno no solo es inexacto, sino que frecuentemente resulta
+	en rutas infactibles, alterando drásticamente la viabilidad operativa en las entregas de comida de última milla.
+
+	\subsection{La brecha en la eficiencia algorítmica}
+	Si bien \citet{Reyes2018} demostraron que las políticas de despacho basadas en horizonte rodante (Rolling Horizon) 
+	pueden alcanzar eficiencias cercanas al 96\% respecto al óptimo teórico, su validación se restringió a instancias 
+	sintéticas de grandes urbes con alta conectividad y, crucialmente, empleó distancias euclidianas.
+
+	Actualmente, se desconoce el grado de degradación que sufren estas políticas de optimización al ser trasladadas a 
+	un entorno de "baja conectividad" y "alta penalización por error" como La Paz. La falta de validación de estas 
+	estrategias en topologías hostiles deja a los desarrolladores y empresas locales sin una base científica para
+	implementar sistemas de logística automatizada eficientes, perpetuando la dependencia de la gestión manual 
+	empírica y limitando su competitividad frente a plataformas transnacionales.
 	
-	\subsection{OSRM: Infraestructura de ruteo de código abierto basada en Contraction Hierarchies}
-	
-	Aunque OSM proporciona datos abiertos, la pregunta operacional permanece: ¿cómo calcular rutas óptimas 
-	eficientemente sobre esta red? Este es precisamente el problema que resuelve OSRM (Open Source Routing 
-	Machine), una herramienta de código abierto que implementa algoritmos avanzados de ruteo sobre datos de OSM.
-	
-	OSRM fue originalmente desarrollada por Dennis Luxen en 2010 como respuesta a la necesidad de consultas de 
-	ruteo rápidas, reproducibles y sin dependencias comerciales. La característica técnica que vuelve a OSRM 
-	viable para aplicaciones dinámicas es su implementación del algoritmo de Contraction Hierarchies (CH).
-	
-	Geisberger et al. (2008) introdujeron Contraction Hierarchies, un algoritmo de preprocesamiento jerárquico 
-	que acelera consultas de camino más corto (shortest path queries) en redes de carreteras en órdenes de 
-	magnitud \cite{Geisberger2008}. La idea es ingeniosamente simple: antes de responder consultas, el algoritmo 
-	preprocesa la red de carreteras de OSM, identificando y añadiendo ``atajos'' jerárquicos que reflejan 
-	estructuras naturales de la red (por ejemplo, autopistas que conectan rápidamente regiones distantes). Este 
-	preprocesamiento (ejecutado una sola vez) permite responder consultas de ruta en milisegundos, incluso para 
-	redes con millones de nodos.
-	
-	¿Por qué es esto crítico para MDRP? Una simulación de horizonte rodante requiere recalcular rutas 
-	repetidamente---potencialmente decenas o centenas de consultas en cada época de reoptimización. Si cada 
-	consulta tomara segundos (como en un algoritmo de Dijkstra simple o una API comercial con latencia de 
-	comunicación), la simulación sería computacionalmente inviable. OSRM, usando CH, realiza estas consultas 
-	en milisegundos, haciendo viable el pipeline completo.
-	
-	Formalmente, CH funciona en dos fases:
-	
-	\begin{enumerate}
-		\item \textbf{Preprocesamiento}: Dado una red de carreteras con $n$ nodos y $m$ arcos, CH identifica una 
-		ordenación jerárquica de nodos. Para cada nodo, se computan ``atajos'' que conectan sus vecinos, omitiendo 
-		el nodo intermedio. Esto se realiza iterativamente, contrayendo nodos (de menor importancia primero) y 
-		registrando los atajos generados.
-		
-		\item \textbf{Consulta}: Para encontrar el camino más corto entre dos nodos, el algoritmo ejecuta búsqueda 
-		bidireccional Dijkstra sobre la red aumentada (red original + atajos), deteniéndose cuando el punto de 
-		encuentro supera la distancia conocida. Los atajos garantizan que la búsqueda no explora la mayoría de la red.
-	\end{enumerate}
-	
-	El resultado empírico es dramático: en una red de carreteras de Europa (aproximadamente 18 millones de nodos), 
-	CH realiza consultas de distancia en aproximadamente 1-2 milisegundos, comparado con 100-500 milisegundos para 
-	Dijkstra simple, y segundos para APIs comerciales con latencia de comunicación.
-	
-	OSRM implementa CH junto con optimizaciones adicionales (caching, paralelización, compresión de datos) que lo 
-	hacen viable para aplicaciones del mundo real. Típicamente, OSRM se despliega como un servicio containerizado 
-	(Docker) que escucha consultas HTTP, preprocesa la red OSM una sola vez al inicio, y responde consultas en 
-	tiempo real.
-	
-	\subsection{Viabilidad del pipeline: OSM + OSRM para simulación reproducible}
-	
-	La combinación de OSM y OSRM crea una arquitectura que es simultáneamente precisa, rápida y reproducible:
-	
+	\section{Objetivos}
+
+	\subsection{Objetivo general}
+	Evaluar la eficiencia operativa de la política de despacho \textit{Rolling Horizon} frente a una estrategia 
+	reactiva (FCFS) en el problema MDRP, mediante el desarrollo de un entorno de simulación reproducible que integre 
+	restricciones topológicas reales de la ciudad de La Paz, B.C.S. y patrones de demanda estocásticos.
+
+	\subsection{Objetivos específicos}
 	\begin{itemize}
-		\item \textbf{Precisión}: Utiliza geometría de red real (no distancias euclidianas), capturando topología 
-		y topografía urbana. Figliozzi (2007) demostró que esta precisión es crítica: errores en estimaciones de 
-		tiempo de viaje se propagan directamente a errores en SLA y utilización de recursos.
+		\item Generar un conjunto de instancias sintéticas calibradas que proyecten los patrones temporales
+		 de demanda de la literatura (LaDe) sobre la estructura demográfica real de La Paz, garantizando la 
+		 validez geoespacial de los puntos de entrega y recolección.
 		
-		\item \textbf{Velocidad}: CH permite consultas en milisegundos, habilitando reoptimización dinámica en 
-		simulaciones sin penalidad computacional.
+		\item Integrar un motor de simulación de eventos discretos con la infraestructura de ruteo OSRM sobre 
+		cartografía OpenStreetMap, validando la conectividad del grafo vial y la precisión de los tiempos de 
+		viaje frente a distancias euclidianas.
 		
-		\item \textbf{Reproducibilidad}: Ambos componentes son abiertos (código fuente disponible), abiertos 
-		(datos auditables), y versionables (ambos tienen versiones explícitas). Un investigador en 2030 puede 
-		replicar exactamente un experimento de 2025 usando OSRM v5.26.0 y OSM snapshot de 2025.
+		\item Implementar computacionalmente la heurística de Horizonte Rodante (\textit{Rolling Horizon})
+		 con capacidad de agrupamiento dinámico (\textit{bundling}) y la política de control \textit{First-Come,
+		  First-Served}, instrumentando la recolección de métricas de desempeño.
 		
-		\item \textbf{Transferibilidad}: Funciona para cualquier región con cobertura OSM, permitiendo aplicación 
-		a contextos geográficos distintos de aquellos en benchmarks estándar (por ejemplo, Manhattan). Para ciudades 
-		medianas latinoamericanas, esto es particularmente relevante.
+		\item Cuantificar las diferencias de desempeño entre ambas políticas mediante análisis estadístico de 
+		los KPIs críticos: tiempos \textit{Click-to-Door}, latencia \textit{Ready-to-Pickup} y eficiencia de la 
+		flota, determinando la significancia de las mejoras observadas.
+	
+		\item Contenerizar el flujo de trabajo completo mediante Docker para garantizar la reproducibilidad 
+		técnica de los experimentos y facilitar la transferibilidad del estudio a otros contextos urbanos de 
+		características similares.
 	\end{itemize}
-	
-	Esta arquitectura contrasta agudamente con el status quo académico donde simulaciones MDRP utilizan distancias 
-	euclidianas o matrices sintéticas (sin validación a redes reales), y con la práctica comercial donde APIs 
-	propietarias generan dependencias que inhiben reproducibilidad. El pipeline OSM + OSRM + Docker ofrece una 
-	tercera vía: rigor académico con realismo operacional y reproducibilidad completa.
-	
-	\section{Brecha de reproducibilidad y motivación del pipeline} % Merkel2014, Pillac2013, Reyes2018
-	
-	La visión de un pipeline integrado de simulación MDRP usando OSM+OSRM+Docker no surge del vacío, sino que 
-	responde a brechas específicas en cómo la literatura contemporánea aborda el problema de validación de 
-	políticas dinámicas de despacho. Para contextualizar, es útil revisar brevemente el panorama de herramientas 
-	y aproximaciones disponibles.
-	
-	\subsection{Panorama de herramientas y simuladores: Estado del arte}
-	
-	Existen varias clases de soluciones para simular y evaluar políticas de ruteo:
-	
-	\textbf{(1) Plataformas comerciales de ruteo (Google Maps, Mapbox, Here Maps):} Proporcionan APIs que 
-	calculan rutas óptimas usando datos de red vial real, actualizados continuamente. Ventajas: precisión, 
-	integración con datos de tráfico real, interfaz estándar. Desventajas: costo prohibitivo (\$50-\$150/día 
-	para volúmenes de simulación), dependencia externa, no reproducible (resultados pueden variar entre versiones 
-	o regiones), imposible auditar algoritmos subyacentes.
-	
-	\textbf{(2) Simuladores académicos con distancias euclidianas (CVRP, VRPTW, MDVRP):} La mayoría de trabajos 
-	en optimización combinatoria (desde Dantzig \& Ramser 1959 hasta trabajos contemporáneos) utilizan matrices 
-	de distancia euclidiana o sintéticas, sin relación con geometría real. Ventajas: costo cero, fácil de 
-	implementar, énfasis en algoritmos de optimización. Desventajas: falta de realismo (Figliozzi 2007 documenta 
-	errores de 30-50\%), no transferible a contextos reales, resultados pueden no generalizarse.
-	
-	\textbf{(3) Frameworks de simulación general (SUMO, AnyLogic, Simul8):} Plataformas de simulación de eventos 
-	discretos que pueden modelar transporte urbano, pero requieren configuración manual de redes viales y típicamente 
-	se integran con APIs comerciales o matrices sintéticas. Ventajas: flexibilidad, soporte comercial. Desventajas: 
-	complejidad, costo, dependencias externas.
-	
-	\textbf{(4) Herramientas de código abierto especializadas (OSRM, Vroom, GraphHopper):} Software de código 
-	abierto que implementa ruteo eficiente. OSRM (Open Source Routing Machine) es específicamente diseñado para 
-	consultas rápidas de camino más corto. Vroom (Vehicle Routing Open Optimization Machine) añade soporte para 
-	VRP. GraphHopper es alternativa general de ruteo. Ventajas: código abierto, reproducible, rápido. Desventajas: 
-	menor soporte comercial, requiere integración manual.
-	
-	\subsection{Heterogeneidad y fragmentación del ecosistema}
-	
-	La realidad actual del ecosistema de ruteo es fragmentada: no existe un estándar integrado que combine precisión, 
-	velocidad, reproducibilidad y transferibilidad. En cambio, investigadores típicamente \textit{eligen}:
-	
-	\begin{itemize}
-		\item \textbf{Precisión + velocidad pero sin reproducibilidad}: Usar APIs comerciales (Google Maps). 
-		Resultados publicados no pueden ser auditados ni replicados exactamente.
+
+	\section{Hipótesis}
+	La implementación de una política de despacho anticipatoria (Horizonte Rodante), alimentada con una matriz de
+	costos de viaje reales (OSRM) sobre la topología de La Paz, superará significativamente en eficiencia operativa
+	('órdenes por hora') y nivel de servicio ('Ready-to-Door') a la estrategia reactiva estándar (FCFS con estimación
+	euclidiana), demostrando la viabilidad de soluciones de optimización logística de alto rendimiento basadas
+	exclusivamente en software de código abierto.
 		
-		\item \textbf{Reproducibilidad + bajo costo pero sin realismo}: Usar distancias euclidianas. Resultados 
-		no generalizan a contextos reales.
-		
-		\item \textbf{Parcialmente reproducible pero con complejidad}: Usar frameworks generales (SUMO, AnyLogic). 
-		Integración manual, dependencias múltiples.
-	\end{itemize}
-	
-	Para MDRP específicamente, Reyes et al. (2018) utilizó distancias euclidianas en sus experimentos publicados, 
-	logrand demostraciones teóricas convincentes (99\% mejora RH vs FCFS), pero sin validación empírica contra 
-	redes reales. Esta no es una crítica al trabajo de Reyes; refleja simplemente el estado de la práctica académica.
-	
-	\subsection{Motivación del pipeline: Cerrando la brecha con Docker}
-	
-	El presente trabajo propone un pipeline integrado que resuelve simultáneamente las dimensiones de precisión, velocidad, reproducibilidad y transferibilidad detalladas en la sección anterior. El componente unificador para garantizar la reproducibilidad técnica es la containerización.
-	
-	Merkel (2014) introdujo Docker como herramienta estándar para reproducibilidad en investigación e 
-	ingeniería \cite{Merkel2014}. Docker permite capturar el estado completo de un experimento (versión de OSRM, 
-	configuración de preprocesamiento, datasets, scripts de análisis) en un contenedor inmutable que puede 
-	ejecutarse idénticamente en cualquier máquina. Para simulación MDRP, esto significa que un investigador 
-	en 2030 puede descargar el contenedor original, ejecutarlo, y obtener exactamente los mismos resultados, 
-	sin depender de actualizaciones de software o cambios en servicios externos.
-	
-	\subsection{Contribución específica del presente trabajo}
-	
-	La contribución de esta tesis no es inventar nuevos algoritmos de ruteo (CH ya existe desde 2008), ni 
-	proponer nuevas políticas de despacho (RH ya existe desde Reyes 2018). En su lugar, la contribución es 
-	\textit{integración y validación local}: construir un pipeline que combine componentes maduros (OSM, OSRM, 
-	Docker) de una manera coherente, y validar que políticas de despacho abstractas (RH, FCFS) funcionan 
-	efectivamente en contextos reales (La Paz, B.C.S.) con geometría y topografía específica.
-	
-	Pillac et al. (2013) enfatizaron que las políticas de reoptimización periódica (como RH) son un enfoque 
-	estándar pero bien establecido para problemas dinámicos \cite{Pillac2013}. La pregunta abierta que permanece 
-	es: ¿generalizan estas políticas a contextos urbanos no estudiados? ¿Funcionan en ciudades medianas latinoamericanas? 
-	¿Qué configuraciones de parámetros (horizonte $\Delta$, frecuencia de reoptimización) son óptimas localmente?
-	
-	Este trabajo responde estas preguntas de forma reproducible y auditables, creando además un pipeline que 
-	puede servir como referencia metodológica para trabajos futuros en otros contextos urbanos.
-	
-	\subsection{Sugerencias para mejora del pipeline (Extensiones futuras)}
-	
-	Durante la construcción del pipeline, varias mejoras potenciales han emergido, que se documentan aquí como 
-	direcciones futuras:
-	
-	\begin{itemize}
-		\item \textbf{Integración con datos de tráfico real}: OSRM actualmente usa velocidades promedio por tipo 
-		de vía. Integración con datos de tráfico históricos (disponibles en plataformas como TomTom, AggData) 
-		podría refinar estimaciones de tiempo de viaje, particularmente en horarios pico.
-		
-		\item \textbf{Modelado estocástico de tiempos de preparación}: Actualmente, tiempos de prep se sampleen 
-		de distribuciones paramétricas. Usar datos históricos reales de restaurantes (si disponibles) podría 
-		mejorar fidelidad.
-		
-		\item \textbf{Algoritmos de optimización más avanzados}: Actualmente se usa heurística simple (nearest 
-		neighbor + 2-opt) para resolver VRP en cada época. Metaheurísticas (Tabu Search, Genetic Algorithms) o 
-		solvers comerciales (Gurobi) podrían mejorar calidad de soluciones.
-		
-		\item \textbf{Machine Learning para predicción de demanda}: Actualmente se asume patrones estocásticos 
-		conocidos. Usar ML (LSTM, XGBoost) para predicción de órdenes futuras podría refinar horizonte rodante.
-		
-		\item \textbf{Extensión a múltiples ciudades}: Validar el pipeline en otras ciudades medianas 
-		latinoamericanas (Bogotá, Medellín, Quito) para confirmar generalización.
-		
-		\item \textbf{Integración con aprendizaje por refuerzo}: El pipeline construido podría servir como 
-		``gym'' (entorno de simulación) para entrenar agentes de RL, como los descritos en Asadi et al. (2025) 
-		y papers recientes de Meituan.
-	\end{itemize}
-	
-	Estas extensiones no son requisitos para el trabajo actual, pero representan direcciones naturales de 
-	investigación futura que construirían sobre la base reproducible aquí establecida.
-	
-	
-	\chapter{Descripción del problema}
-	
-	El Problema de Enrutamiento de Entrega de Comida (MDRP) en ciudades medianas 
-	presenta un desajuste fundamental entre los requisitos operacionales y la 
-	viabilidad técnico-económica de las soluciones disponibles. Por un lado, 
-	sistemas comerciales de ruteo (Google Maps, Mapbox) proporcionan precisión 
-	geográfica mediante datos de red vial real, pero generan costos operacionales 
-	prohibitivos (\$50-\$150 USD/día) que limitan su adopción por microempresas 
-	urbanas \cite{Figliozzi2007}. Por otro lado, aproximaciones académicas basadas 
-	en distancias euclidianas o matrices sintéticas reducen costos al eliminar 
-	dependencias de APIs comerciales, pero sacrifican realismo: Figliozzi (2007) 
-	documentó que distancias euclidianas subestiman tiempos reales de viaje en 
-	30-50\% en redes urbanas complejas, comprometiendo la precisión de estimaciones 
-	de SLA y utilización de couriers.
-	
-	Aunque la literatura reciente proporciona métodos promisorios, existe una 
-	brecha de validación sin resolver. Reyes et al. (2018) propusieron una política 
-	de horizonte rodante (Rolling Horizon) que demuestra mejoras de aproximadamente 
-	99\% en eficiencia comparada con el baseline FCFS, pero esta validación se 
-	limita a instancias sintéticas de Grubhub (contexto de metrópolis estadounidenses) 
-	sin evidencia empírica de generalización a ciudades medianas ni vinculación 
-	comprobada a geometría real de red vial. Consecuentemente, permanece sin resolver 
-	la pregunta de investigación central: ¿generalizan las políticas de despacho 
-	dinámico a topologías urbanas y contextos geográficos distintos de aquellos 
-	usados en su validación original?
-	
-	Tres limitaciones específicas están asociadas a esta brecha y sirven como  
-	motivación directa del presente trabajo. Primero, la dependencia de infraestructura 
-	de ruteo propietaria inhibe reproducibilidad: estudios que utilizan APIs comerciales 
-	no pueden ser auditados o replicados exactamente sin acceso a los mismos servicios 
-	y versiones \cite{Merkel2014}. Segundo, la abstracción o simplificación de redes 
-	viales en trabajos académicos compromete la transferencia a operaciones reales, 
-	donde la complejidad topológica impacta directamente en estimaciones de tiempo 
-	y eficiencia. Tercero, no existe en la literatura un pipeline de referencia que 
-	integre datos abiertos (OpenStreetMap), herramientas de código abierto (OSRM), 
-	y métodos reproducibles (containerización, control de semillas), que sirva como 
-	estándar de validación local para algoritmos académicos en contextos urbanos 
-	latinoamericanos.
-	
-	\chapter{Objetivos}
-	\section{Objetivo general}
-	Implementar un simulador reproducible 
-	del MDRP que integre cartografía abierta (OSM) y ruteo optimizado (OSRM), 
-	comparando una política de horizonte rodante (RH) contra FCFS mediante 
-	instancias sintéticas con demanda calibrada en contextos urbanos de tamaño mediano.
-	
-	\section{Objetivos específicos}
-	\begin{itemize}
-		\item Construir e integrar un simulador de eventos discretos con OSRM v5.26.0 
-		y OSM, validando cobertura del 100\% en La Paz urbana mediante grid testing.
-		
-		\item Implementar la política RH de Reyes et al. (2018) con bundling dinámico y comparar contra FCFS.
-		
-		\item Generar dataset sintético reproducible (seed=2025) con 1,038 órdenes 
-		y 58 couriers, inspirado en patrones de demanda real (LaDe, Grubhub).
-		
-		\item Ejecutar análisis estadístico riguroso (Mann-Whitney U, Cliff's Delta) 
-		sobre KPIs: Click-to-Door, Ready-to-Pickup, Ready-to-Door, bundling.
-		
-		\item Documentar y containerizar el pipeline para garantizar reproducibilidad 
-		y transferencia a otros contextos urbanos.
-	\end{itemize}
-		
-	\chapter{Justificación}
-	
-	El MDRP combina dinámicas de demanda real (llegada estocástica de órdenes) con 
-	restricciones de red compleja \cite{Reyes2018}. A diferencia de métodos exactos 
-	\cite{Letchford2004} que requieren tiempo exponencial, y de Deep RL que demanda 
-	entrenamiento costoso \cite{Lin2018GreedRL}, el horizonte rodante \cite{Pillac2013} 
-	ofrece soluciones prácticas y evaluables. La brecha de investigación es local: 
-	validar esta heurística en contextos urbanos específicos con infraestructura real 
-	en lugar de simplificaciones.
-	
-	\section{Brecha científica y metodológica}
-	Reyes et al. (2018) introdujeron el MDRP y demostraron que el RH con bundling 
-	supera a políticas miopes. Sin embargo, su validación se limitó a instancias 
-	sintéticas sin vinculación explícita a datos de red vial real. Figliozzi (2007) 
-	demostró que las distancias reales difieren significativamente de euclidianas; 
-	nuestro aporte es cerrar esa brecha usando OSM+OSRM en contexto real.
-	
-	\section{Viabilidad técnica: OSM y reproducibilidad}
-	OSM proporciona cobertura del 100\% en La Paz urbana \cite{Haklay2010}. Docker 
-	\cite{Merkel2014} garantiza reproducibilidad del código y del contenedor OSRM, 
-	eliminando dependencias de APIs comerciales. Juan et al. (2015) validan que la 
-	simulación es el método apropiado para evaluar políticas dinámicas con estocasticidad.
-	
-	\section{Impacto y transferibilidad}
-	Resultados preliminares muestran 99.31\% mejora en órdenes/courier-hora, con 
-	significancia estadística ($p < 0.0001$). El método es transferible a cualquier 
-	ciudad con cobertura OSM, proporcionando alternativa económica a APIs propietarias.
-	
-	\section{Originalidad}
-	Primera validación local del RH en La Paz usando infraestructura de código abierto, 
-	con análisis estadístico robusto y documentación reproducible.
+	\section{Justificación}
 
+	La creciente demanda de servicios de entrega bajo demanda (on-demand delivery) ha transformado la logística urbana,
+	imponiendo desafíos que los métodos exactos tradicionales no pueden resolver en tiempo real debido a su complejidad 
+	exponencial. Si bien el modelo de \textit{Rolling Horizon} \citep{Reyes2018} ofrece una solución teórica prometedora,
+	su aplicabilidad práctica en ciudades latinoamericanas de escala media se ve limitada por la carencia de validación
+	en topologías viales restrictivas y la dependencia de costos prohibitivos de software propietario. La presente
 	
-	\chapter{Alcance y limitaciones}
-	\section{Alcance funcional}
-	\subsection{Ruteo con OSRM y OSM (La Paz)}
-	El alcance funcional del ruteo se limita a explotar una instancia específica de OSRM v5.26.0
-	preparada con el extracto \.pbf de La Paz urbana descargado en enero de 2025. El perfil
-	vehicular se basa en el modo \texttt{car.lua}, ajustando únicamente las velocidades
-	promedio para asemejarse al desempeño de motocicletas y bicicletas utilizadas por los
-	couriers locales; cualquier modelado avanzado de tráfico o restricciones contextuales
-	se documentará posteriormente en la metodología. El preprocesamiento se ejecuta con el
-	pipeline \texttt{osrm-extract/partition/customize} y habilita Contraction Hierarchies para
-	garantizar consultas en milisegundos \cite{Geisberger2008}. La precisión cartográfica se
-	sustenta en la cobertura reportada por OpenStreetMap para La Paz (\textgreater 90\% de la
-	red vial urbana), lo que permite prescindir de APIs propietarias sin sacrificar fidelidad
-	geométrica \cite{Haklay2010}. En este capítulo solo se declara que el simulador utilizará
-	esa infraestructura como ``caja negra'' confiable; los detalles operativos (mallas de
-	validación, tamaños de caché, despliegue en Docker) se describirán en la metodología.
+	investigación se justifica bajo las siguientes dimensiones:
 
-	\subsection{Políticas FCFS y RH (según Reyes2018)}
-	El estudio confronta dos políticas ya caracterizadas en la sección de antecedentes: (i)
-		extbf{First-Come-First-Served (FCFS)} como línea base operacional y (ii) \textbf{Rolling
-	Horizon (RH)} como política anticipatoria propuesta por \citet{Reyes2018}. En términos de
-	alcance, únicamente se implementarán las reglas mínimas necesarias para comparar ambas
-	estrategias bajo idénticos parámetros de simulación: FCFS asigna cada orden lista al
-	courier disponible con menor distancia OSRM al restaurante, mientras que RH acumula las
-	órdenes liberadas durante un horizonte configurable (10--20 minutos), resuelve un VRP
-	simplificado y ejecuta la primera ruta resultante, siguiendo el criterio anticipatorio
-	descrito por \citet{Ichoua2006DDARP}. No se exploran variantes híbridas ni heurísticas
-	adicionales; el objetivo funcional es establecer una referencia cuantitativa clara entre
-	ambos extremos de complejidad. La instrumentación detallada (estructuras de datos,
-	heurísticas de bundling o metaheurísticas internas) se traslada a la sección de
-	metodología para evitar redundancia.
+	\subsection{Relevancia Científica}
+	Existe una disonancia documentada entre los modelos teóricos de ruteo, que asumen espacios euclidianos o redes
+	ideales, y la realidad operativa de la "última milla". \citet{Figliozzi2007} advierte que las aproximaciones 
+	lineales distorsionan significativamente los costos de viaje. Esta tesis cierra esa brecha al validar empíricamente
+	si las eficiencias reportadas en la literatura (cercanas al óptimo) se sostienen al introducir las restricciones 
+	"hostiles" de la topología de La Paz, B.C.S., aportando nueva evidencia sobre la robustez de las heurísticas de 
+	horizonte rodante.
 
-	\subsection{Generación de datos sintéticos (inspirados en LaDe)} % Wu2023LaDe
-	La generación de datos sintéticos constituye el componente con mayor detalle en el
-	alcance funcional, dado que condiciona todas las métricas posteriores. El escenario base
-	se compone de 1,038 órdenes distribuidas entre las 11:00 y las 23:00 horas, con llegadas
-	estocásticas calibradas contra los patrones bursátiles reportados para plataformas tipo
-	LaDe \cite{Wu2023LaDe}. Cada orden incluye: restaurante origen (extraído del catálogo
-	local con 142 ubicaciones georreferenciadas), domicilio destino (muestreado dentro del
-	polígono urbano mediante densidades kernel ajustadas a datos históricos), valor del
-	tiempo de preparación (log-normal truncada dependiente del tipo de cocina) y ventana
-	implícita de servicio (click-to-door $\leq$ 60 minutos). La cohorte de 58 couriers se divide
-	en dos turnos (matutino y vespertino) y se inicializa con posiciones reales para minimizar
-	los efectos de arranque en frío. Todos los elementos del dataset se generan bajo una semilla
-	determinística (\texttt{seed}=2025) y se almacenan tanto en formato CSV como Parquet para
-	facilitar reproducción y trazabilidad. Aspectos como validación estadística de las
-	distribuciones, sensibilidad a la semilla o incorporación de datos reales se desarrollarán
-	en la metodología y en los anexos experimentales.
-	\section{Alcance no funcional}
-	\subsection{Pipeline reproducible (Docker, seeds, scripts)}
-	El alcance no funcional contempla la entrega de un entorno containerizado que elimine
-	dependencias externas y asegure replicabilidad inter-plataforma. La arquitectura mínima
-	incluye dos contenedores Docker: uno para OSRM (preparado con la imagen oficial
-		exttt{osrm/osrm-backend:5.26.0} y volúmenes persistentes para los artefactos
-		exttt{.osrm}) y otro para el simulador/scheduler escrito en Python 3.12. Ambos se
-	orquestan mediante \texttt{docker-compose} y comparten variables explícitas para las
-	semillas PRNG (\texttt{SIM	extunderscore SEED}, \texttt{ROUTE	extunderscore SEED}) y la ruta del
-	snapshot OSM. Esta sección únicamente fija el compromiso de versionar los contenedores y
-	scripts de arranque dentro del repositorio, siguiendo las buenas prácticas de
-	containerización descritas por \citet{Merkel2014}; los detalles de construcción de
-	imágenes, capas y artefactos auxiliares se documentarán posteriormente en la metodología.
+	\subsection{Aporte Tecnológico y Reproducibilidad}
+	La crisis de reproducibilidad en ciencias computacionales \citep{Merkel2014} exige nuevos estándares de ingeniería.
+	Este proyecto aporta a la comunidad académica y de desarrollo un \textit{framework} de simulación totalmente 
+	contenerizado (Docker) y basado en datos abiertos (OpenStreetMap). A diferencia de estudios previos que actúan
+	como "cajas negras", este enfoque garantiza la transparencia algorítmica y permite la replicación exacta de 
+	los experimentos, estableciendo una base sólida para futuras investigaciones en logística urbana en México.
 
-	\subsection{Trazabilidad de experimentos}
-	Se adopta un esquema de trazabilidad que permita reconstruir cualquier corrida del
-	simulador a partir de metadatos mínimos. Cada ejecución genera un manifiesto JSON que
-	registra: semilla, fecha, hash del dataset sintético, commit de código, parámetros de
-	política (horizonte, tamaño máximo de bundle) y ruta a los outputs (CSV/Parquet de KPIs,
-	mapas HTML). Además, se mantiene un catálogo de experimentos en formato tabular que
-	funciona como ``catálogo de evidencia'' para análisis estadístico. Este compromiso no
-	entra en detalles de herramientas específicas (por ejemplo, MLflow o DVC); solamente
-	establece que toda evidencia cuantitativa deberá quedar enlazada a su corrida
-	generadora, facilitando auditoría y reproducción en etapas posteriores del proyecto.
-	\section{Supuestos y limitaciones}
-	\subsection{Tráfico estático y velocidades promedio}
-	El ruteo depende de perfiles OSRM estáticos; aun cuando el perfil \texttt{car.lua}
-	se ajustó para asemejarse al desempeño de motocicletas y bicicletas locales, las
-	velocidades asociadas a cada tipo de vía permanecen fijas durante toda la
-	simulación. Esto implica que fenómenos de congestión intrahoraria, cierres
-	temporales o patrones de marea urbana no se representan explícitamente: todas las
-	consultas heredan los tiempos de viaje promedio aprendidos durante la fase de
-	preprocesamiento con Contraction Hierarchies \cite{Geisberger2008}. La
-	consecuencia directa es que las métricas Click-to-Door tenderán a subestimar los
-	picos reales en horas punta, justo como advierte \citet{Figliozzi2007} cuando se
-	utilizan aproximaciones deterministas. Aceptar tráfico estático es un compromiso
-	para privilegiar la reproducibilidad (no dependemos de APIs externas con datos en
-	tiempo real), pero delimita el alcance de los resultados: cualquier despliegue en
-	operación debería recalibrar velocidades o integrar feeds de tráfico, algo que se
-	deja documentado como trabajo futuro.
-	\subsection{Datos sintéticos vs. datos reales}
-	Como se describió en la subsección de alcance funcional, el escenario de 1,038
-	órdenes proviene íntegramente del generador sintético basado en patrones LaDe
-	\cite{Wu2023LaDe}. Se conservará allí la descripción detallada de cómo se
-	muestrean restaurantes, domicilios y tiempos de preparación, porque forma parte
-	del alcance declarativo; en esta subsección sólo se explicita la limitación: no
-	se cuenta con datos transaccionales reales debido a acuerdos de confidencialidad
-	y restricciones de protección de información. En consecuencia, las demandas,
-	tiempos de preparación y comportamiento de couriers reflejan distribuciones
-	paramétricas calibradas mediante observaciones indirectas (análisis de densidad
-	urbana, tasas de captura de órdenes y cuadros horarios reportados en
-	\cite{Wu2023LaDe}), lo que implica que cualquier sesgo en esas suposiciones se
-	propaga a los resultados. Para mitigar el riesgo se mantendrá versionado el
-	dataset sintético (hash, semilla y scripts) y se propone como línea futura la
-	validación cruzada con registros reales agregados cuando exista autorización.
+	\subsection{Impacto Económico y Social}
+	Para las PyMES y startups locales en Baja California Sur, la dependencia de APIs comerciales (como Google Maps) 
+	representa una barrera de entrada económica. Al demostrar la viabilidad técnica de optimizar rutas utilizando
+	 exclusivamente herramientas \textit{Open Source} (OSRM), esta tesis ofrece una alternativa de "Soberanía Tecnológica"
+	  que reduce los costos operativos. Esto democratiza el acceso a logística de alto nivel, permitiendo que empresas
+	   locales compitan en eficiencia contra plataformas transnacionales, fomentando así la economía digital regional.
 
-	\section{Alcance metodológico}
+	\subsection{Delimitación frente a métodos de Aprendizaje Profundo}
+    Aunque existen métodos avanzados de Inteligencia Artificial (como Aprendizaje Profundo), estos requieren grandes
+	 cantidades de datos históricos para funcionar. En ciudades como La Paz, donde no existen registros previos de rutas
+	  y pedidos, estos modelos enfrentan el problema de "arranque en frío": no pueden operar sin entrenamiento previo.
 
-	\subsection{Justificación del enfoque de simulación}
+    Por ello, esta tesis utiliza \textit{Rolling Horizon}, un algoritmo que no necesita datos históricos y funciona desde
+	 el primer día de operación. Además, al ser computacionalmente ligero, permite a las empresas locales operar con 
+	 servidores económicos. Este sistema servirá, a su vez, para generar los datos necesarios que permitirán entrenar 
+	 modelos de IA en el futuro.
+	
+	\section{Alcance y limitaciones}
 
-	La evaluación cuantitativa de políticas de despacho dinámico para el MDRP enfrenta un desafío metodológico fundamental: la naturaleza estocástica y dinámica del problema impide el uso de técnicas de optimización exacta tradicionales para determinar el desempeño de una política bajo condiciones operacionales realistas. A diferencia de problemas de ruteo estáticos, donde el conjunto completo de órdenes es conocido \textit{ex-ante} y puede resolverse mediante métodos de programación entera mixta o metaheurísticas deterministas, el MDRP requiere tomar decisiones de asignación y ruteo \textbf{bajo incertidumbre}: las órdenes arriban estocásticamente a lo largo del horizonte de operación, los tiempos de preparación de restaurantes varían de forma impredecible, y el estado del sistema (posiciones de couriers, órdenes pendientes) evoluciona continuamente.
+El presente trabajo de investigación se circunscribe al desarrollo, implementación y evaluación de 
+un entorno de simulación para el problema MDRP. A continuación se detallan las fronteras funcionales, 
+geográficas y técnicas del proyecto, así como las restricciones operativas asumidas.
 
-	En este contexto, \citet{Juan2015} establecen que para problemas de ruteo vehicular con componentes estocásticos o dinámicos, \textbf{los enfoques puramente analíticos son insuficientes}. Los métodos exactos requieren conocer la distribución completa de probabilidad de todos los eventos futuros y resolver un problema de optimización estocástica de gran escala, lo cual es computacionalmente intratable para instancias realistas. Las aproximaciones deterministas (por ejemplo, resolver el problema reemplazando variables estocásticas por sus valores esperados) ignoran la variabilidad inherente del sistema y producen estimaciones sesgadas del desempeño real de las políticas.
+\subsection{Alcance Geográfico y de Datos}
+\subsubsection{Infraestructura Vial (La Paz, B.C.S.)}
+La validación espacial se limita estrictamente a la zona urbana de La Paz, Baja California Sur. Se 
+utiliza una instancia local de \textbf{OSRM v5.26.0} alimentada con el extracto \texttt{.pbf} de 
+OpenStreetMap (descarga: Enero 2025). 
 
-	\paragraph{Simulación de eventos discretos como método de evaluación}
+El alcance cartográfico cubre el polígono urbano con una fidelidad geométrica superior al 90\% 
+respecto a la red vial física \cite{Haklay2010}. No se consideran áreas rurales ni interurbanas
+ fuera del \textit{bounding box} de preprocesamiento.
 
-	La \textbf{simulación de eventos discretos} (Discrete Event Simulation, DES) emerge como el enfoque metodológico apropiado para evaluar políticas de despacho dinámico en el MDRP. Como argumentan \citet{Juan2015} en su revisión de simheurísticas, la simulación permite:
+\subsubsection{Instancias de Demanda}
+El estudio no utiliza datos transaccionales reales por restricciones de confidencialidad. El alcance
+ se limita a la generación y uso de \textbf{instancias sintéticas calibradas}, construidas bajo 
+ los siguientes parámetros:
 
-	\begin{enumerate}
-		\item \textbf{Modelar explícitamente la estocasticidad:} Los tiempos de preparación de restaurantes se muestrean de distribuciones log-normales calibradas, los arribos de órdenes siguen procesos de Poisson no homogéneos con intensidad variable por hora del día, y las decisiones de las políticas se toman con información parcial sobre el futuro, reflejando fielmente las condiciones operacionales reales.
+\begin{itemize}
+    \item \textbf{Volumen:} Escenarios de 1,038 órdenes distribuidas en una ventana de 11 horas (11:00 - 23:00).
+   
+	\item \textbf{Patrones:} Distribución estocástica basada en los picos de demanda del 
+	dataset LaDe \cite{Wu2023LaDe}.
+    
+	\item \textbf{Reproducibilidad:} Todos los datasets se generan mediante semillas 
+	determinísticas (\texttt{seed=2025}), garantizando que el escenario de entrada sea inmutable 
+	entre experimentos.
+\end{itemize}
 
-		\item \textbf{Capturar la dinámica temporal:} El simulador avanza mediante eventos discretos (llegada de orden, orden lista, courier disponible, inicio de recogida, completación de entrega), actualizando el estado del sistema de manera consistente y permitiendo que las políticas reaccionen a información en tiempo real.
+\subsection{Alcance Funcional y Algorítmico}
+El sistema compara exclusivamente dos políticas de despacho, dejando fuera 
+del alcance algoritmos híbridos o de aprendizaje profundo:
 
-		\item \textbf{Evaluar el desempeño a largo plazo:} Ejecutando múltiples réplicas de simulación con diferentes semillas aleatorias, es posible estimar las distribuciones de métricas de desempeño (Click-to-Door time, órdenes por courier-hora, utilización de flota) y cuantificar la variabilidad inherente al sistema, algo imposible con métodos deterministas.
+\begin{enumerate}
+    \item \textbf{Política Base (FCFS):} Asignación reactiva inmediata basada en minimización 
+	de distancia al restaurante, sin consolidación de órdenes.
 
-		\item \textbf{Comparar políticas bajo condiciones controladas:} Al ejecutar FCFS y Rolling Horizon sobre exactamente las mismas instancias sintéticas (mismas órdenes, mismos tiempos de preparación, misma red vial), la simulación aísla el efecto puro de la política de despacho, eliminando variables confusoras.
-	\end{enumerate}
+    \item \textbf{Política Propuesta (Rolling Horizon):} Implementación de la heurística de
+	 \citet{Reyes2018} con un horizonte de visión configurable (10-20 minutos) y capacidad de a
+	 grupamiento (\textit{bundling}) dinámico de hasta 6 órdenes por courier.
 
-	\paragraph{Validez y limitaciones del enfoque de simulación}
+    \item \textbf{Escenario de Control (Aislamiento de Variables):} Se contempla la ejecución de un escenario de control (FCFS sobre OSRM) para aislar la contribución marginal del algoritmo de optimización frente a la mejora atribuible puramente a la precisión del mapa, permitiendo un análisis de sensibilidad robusto.
+\end{enumerate}
 
-	La validez de los resultados obtenidos mediante simulación depende críticamente de dos factores:
+La simulación se ejecuta bajo un esquema de \textbf{Eventos Discretos (DES)}. A diferencia de 
+los modelos analíticos, este enfoque permite capturar la estocasticidad en los tiempos de preparación 
+y la llegada de órdenes, tal como validan \citet{Juan2015} para entornos dinámicos.
 
-	\textbf{(1) Fidelidad del modelo de simulación:} El simulador debe representar fielmente la estructura del sistema real, incluyendo las restricciones del MDRP (capacidades de couriers, ventanas de servicio, precedencia pickup-delivery), la infraestructura de ruteo (red vial real de La Paz mediante OSRM + OSM), y las distribuciones de eventos estocásticos (calibradas contra patrones LaDe \cite{Wu2023LaDe}). La sección de Metodología (Capítulo 7) documenta exhaustivamente la arquitectura del simulador, los procedimientos de calibración, y las pruebas de verificación y validación realizadas para garantizar que el modelo de simulación es una representación fiel del sistema MDRP.
+\subsection{Alcance Técnico: Reproducibilidad}
+El proyecto entrega un artefacto de software contenerizado. El alcance técnico garantiza:
+\begin{itemize}
+   
+	\item \textbf{Independencia de APIs:} El motor de ruteo opera de forma autónoma (offline) 
+	mediante Docker, sin consumo de créditos de Google Maps o Mapbox.
+   
+	\item \textbf{Trazabilidad:} Generación automática de manifiestos JSON que vinculan cada 
+	resultado (KPIs) con el código (Git Commit) y los datos (Hash SHA-256) que lo produjeron.
 
-	\textbf{(2) Reproducibilidad y control de aleatoriedad:} Todos los experimentos de simulación se ejecutan bajo control estricto de semillas aleatorias (\texttt{seed}=2025 para generación de instancias sintéticas, semillas independientes para réplicas de simulación), garantizando reproducibilidad bit-a-bit de los resultados. Como establecen \citet{Juan2015}, la reproducibilidad no es solo un requisito técnico, sino una condición necesaria para la verificación científica de los hallazgos.
+\end{itemize}
 
-	En síntesis, el enfoque de simulación de eventos discretos adoptado en este trabajo no es una elección arbitraria de conveniencia, sino la \textbf{consecuencia metodológica necesaria} de las características intrínsecas del MDRP: dinamicidad, estocasticidad, y complejidad combinatoria. La simulación constituye el método estándar en la literatura de ruteo dinámico \cite{Pillac2013} y es el único enfoque viable para evaluar rigurosamente el desempeño relativo de políticas de despacho bajo condiciones operacionales realistas. Las limitaciones de este enfoque (dependencia de la fidelidad del modelo, necesidad de múltiples réplicas para obtener estimaciones confiables) son reconocidas explícitamente y mitigadas mediante los procedimientos de validación y diseño experimental descritos en la Metodología.
+\subsection{Supuestos y Limitaciones}
+Las conclusiones del estudio deben interpretarse bajo las siguientes restricciones metodológicas:
 
-	\section{Supuestos y limitaciones}
+\subsubsection{Modelo de Tráfico Estático}
+El cálculo de tiempos de viaje asume velocidades promedio constantes por tipo de vía 
+(perfil \texttt{car.lua} ajustado). \textbf{Limitación:} No se modela la congestión 
+vehicular dinámica (tráfico en hora pico), accidentes o cierres viales temporales. 
+Esto implica que las métricas de tiempo de entrega (Click-to-Door) representan un límite
+ inferior optimista respecto a la realidad operativa.
 
-	\subsection{Eventos no modelados (cancelaciones, rechazos)}
-	La simulación actual carece de eventos ``irregulares'' como cancelaciones de
-	clientes, rechazos de couriers, reasignaciones sobre la marcha, múltiples apps
-	por courier o tiempos muertos por incidencias (clima, inspecciones, accidentes).
-	Las órdenes, una vez colocadas, se asumen irrevocables y siempre listas tras su
-	tiempo de preparación; los couriers tampoco abandonan rutas ni se salen del
-	servicio antes del fin de turno. Esta simplificación permite concentrar la
-	evaluación en el efecto puro de las políticas FCFS vs. RH \cite{Reyes2018}, pero
-	limita la transferencia directa a operaciones donde la tasa de cancelación puede
-	superar el 5-8\%. Cualquier adopción industrial debería incorporar un módulo de
-	eventos estocásticos y mecanismos de replaneación en caliente, aspecto que se
-	documenta como restricción metodológica.
+\subsubsection{Simplificación de Eventos Operativos}
+La simulación asume un flujo de "camino feliz" (\textit{happy path}) para aislar la 
+eficiencia del algoritmo de ruteo. Quedan fuera del alcance:
 
+\begin{itemize}
+    \item Cancelaciones de órdenes por parte de clientes o restaurantes.
+    \item Rechazo de asignaciones por parte de los repartidores (se asume cumplimiento total).
+    \item Tiempos muertos por fallas mecánicas o gestión de efectivo.
+    \item Multihoming (repartidores trabajando para múltiples apps simultáneamente).
+\end{itemize}
+
+\subsubsection{Validez de Datos Sintéticos}
+Aunque las distribuciones estadísticas (Poisson para llegadas, Log-Normal para preparación) 
+se calibran con literatura vigente \cite{Wu2023LaDe}, los resultados no reflejan la idiosincrasia 
+específica del comportamiento del consumidor paceño, al carecer de datos históricos locales para 
+una validación cruzada fina.
 	
 \chapter{Marco teórico}
 
@@ -916,10 +632,8 @@ operacionales ausentes en la literatura clásica del VRP: (i) múltiples depósi
 (restaurantes con tiempos de preparación independientes), (ii) llegada estocástica de órdenes en
 tiempo real, (iii) ventanas de servicio Click-to-Door estrictas, (iv) capacidades limitadas de
 couriers con requisitos de temperatura, y (v) estructura pickup-delivery con secuenciación forzada.
-A continuación se formaliza la representación matemática del MDRP tal como se implementa en el
-pipeline de simulación de este trabajo.
-
-\subsection{Conjuntos y parámetros}
+	A continuación se formaliza la representación matemática del MDRP tal como se implementa en el
+	flujo de trabajo de simulación de este trabajo.\subsection{Conjuntos y parámetros}
 
 El modelo se construye sobre la base de los siguientes conjuntos fundamentales, siguiendo la notación
 establecida por \citet{Reyes2018}:
@@ -1008,7 +722,7 @@ en términos de **eficiencia del sistema**, medida como:
 \end{equation}
 
 Esta métrica de **órdenes por courier-hora** captura directamente el impacto de las decisiones de
-bundling y ruteo sobre la productividad del sistema, siendo coherente con las métricas reportadas
+agrupamiento (bundling) y ruteo sobre la productividad del sistema, siendo coherente con las métricas reportadas
 por \citet{Reyes2018} en sus experimentos con datos de Grubhub.
 
 \subsection{Restricciones del modelo}
@@ -1090,9 +804,23 @@ listas (estrategia reactiva), o el sistema debe esperar estratégicamente para a
 consolidar rutas (estrategia anticipatoria)? Esta sección formaliza matemáticamente ambas políticas,
 establece sus fundamentos teóricos y caracteriza sus diferencias estructurales.
 
-\subsection{Política Reactiva: First-Come-First-Served (FCFS)}
+	\subsection{Ciclo de Control del Despacho Dinámico}
+	
+	Independientemente de la política específica, Reyes et al. (2018) formularon el MDRP como un problema de despacho dinámico 
+	donde, en cada época de reoptimización (cada $\Delta$ minutos), el sistema debe ejecutar el siguiente ciclo de control:
+	
+	\begin{enumerate}
+		\item Acumular el conjunto de órdenes aún no asignadas $O^t$
+		\item Determinar cuáles órdenes están lista para recogida (han superado el tiempo de preparación)
+		\item Asignar estas órdenes a couriers disponibles $C$, considerando ubicación, capacidad y ventanas de tiempo.
+		\item Secuenciar los pasos de recogida y entrega para minimizar tiempo total de ruta
+		\item Comprometerse a la primera etapa del plan (decision commitment) y desechar el resto
+	\end{enumerate}
+	
+	Esta formalización genera un problema de optimización de gran complejidad, que es NP-duro incluso para 
+	instancias medianas.
 
-La política FCFS representa el baseline operacional más simple para el MDRP y sirve como referencia
+	\subsection{Política Reactiva: First-Come-First-Served (FCFS)}La política FCFS representa el baseline operacional más simple para el MDRP y sirve como referencia
 contra la cual se evalúan estrategias más sofisticadas. Su principio rector es la inmediatez: tan
 pronto como una orden alcanza su tiempo de preparación (i.e., $t \geq e_o$), el sistema ejecuta una
 asignación inmediata al courier disponible con menor costo de acceso.
@@ -1178,7 +906,7 @@ por Ichoua et al. (2006) en el contexto del Dial-a-Ride Problem dinámico, donde
 políticas con acceso a información sobre solicitudes futuras (aunque imperfecta) superan consistentemente
 a políticas puramente reactivas \cite{Ichoua2006DDARP}. El mecanismo subyacente es la \textit{flexibilidad
 de consolidación}: al esperar brevemente, el sistema puede identificar órdenes geográficamente cercanas
-o compatibles en tiempo, agrupándolas (bundling) en rutas consolidadas que reducen la distancia total
+o compatibles en tiempo, agrupándolas en rutas consolidadas (agrupamiento o bundling) que reducen la distancia total
 de viaje y aumentan la utilización de la capacidad de los couriers.
 
 Para el MDRP, este principio es especialmente poderoso porque los tiempos de preparación de los
@@ -1278,7 +1006,7 @@ El desempeño del Rolling Horizon depende críticamente de cuatro parámetros fu
     \item \textbf{Horizonte de asignación ($\Delta_u$):} Ventana de visibilidad para órdenes futuras.
     Valores típicos: 15-30 minutos. Un $\Delta_u$ mayor permite identificar más oportunidades de
     consolidación, pero introduce riesgo de incumplimiento si la demanda es subestimada; un $\Delta_u$
-    menor es más conservador pero pierde oportunidades de bundling.
+    menor es más conservador pero pierde oportunidades de agrupamiento (bundling).
     
     \item \textbf{Horizontes de lookahead ($\Delta_1, \Delta_2$):} Definen la ventana para calcular el
     tamaño objetivo de bundles $Z_t$. Como se describe en Reyes et al. (2018, Sección 3.1), el sistema
@@ -1312,7 +1040,7 @@ históricos reales de Grubhub (Chicago, EUA), abarcando instancias con 50-150 co
     se mantuvo bajo control (35-40 minutos vs. 30-35 minutos de FCFS), y el cumplimiento de SLA (porcentaje
     de órdenes entregadas dentro de 60 minutos) superó consistentemente 95\%.
     
-    \item \textbf{Utilización de couriers:} El bundling incrementó la utilización promedio de couriers
+    \item \textbf{Utilización de couriers:} El agrupamiento (bundling) incrementó la utilización promedio de couriers
     de 60-65\% (FCFS) a 80-85\%, reduciendo el tiempo muerto y maximizando el valor de cada turno.
 \end{itemize}
 
@@ -1462,7 +1190,7 @@ A pesar de ser un principio fundamental del método científico, la reproducibil
     
     \item En el ámbito de la investigación de operaciones y optimización combinatoria (incluyendo problemas de ruteo vehicular), trabajos que reportan resultados de algoritmos heurísticos o metaheurísticos frecuentemente no proporcionan el código fuente, especificaciones detalladas del entorno de ejecución, o semillas aleatorias, haciendo imposible la verificación independiente de los resultados.
     
-    \item La comparación de algoritmos de optimización para problemas DVRP (Dynamic Vehicle Routing Problems) se ve frecuentemente dificultada por la falta de \textit{benchmarks} estandarizados ejecutables y de pipelines de evaluación compartidos.
+    \item La comparación de algoritmos de optimización para problemas DVRP (Dynamic Vehicle Routing Problems) se ve frecuentemente dificultada por la falta de \textit{benchmarks} estandarizados ejecutables y de flujos de trabajo de evaluación compartidos.
 \end{itemize}
 
 Las causas principales de la no-reproducibilidad en experimentos computacionales incluyen:
@@ -1616,16 +1344,16 @@ Compartir un entorno reproducible sin Docker requeriría documentar manualmente 
 
 Esto facilita no solo la reproducción por terceros, sino también la \textbf{verificación por revisores de publicaciones científicas}: un revisor puede ejecutar los experimentos del artículo en su propia computadora sin necesidad de instalar manualmente decenas de dependencias.
 
-\paragraph{Integración con Pipelines de CI/CD}
+\paragraph{Integración con Flujos de Trabajo de CI/CD}
 
 Los contenedores Docker se integran naturalmente con sistemas de integración continua (Continuous Integration, CI) y despliegue continuo (Continuous Deployment, CD), permitiendo que los experimentos se ejecuten automáticamente cada vez que se modifica el código, garantizando que los resultados permanecen reproducibles a lo largo del desarrollo del proyecto.
 
 %======================================
 % Subsección: Implementación de Docker en el MDRP
 %======================================
-\subsection{Implementación de Docker en el Pipeline MDRP}
+\subsection{Implementación de Docker en el Flujo de Trabajo MDRP}
 
-En el presente trabajo, Docker se emplea para encapsular dos componentes críticos del pipeline de simulación:
+En el presente trabajo, Docker se emplea para encapsular dos componentes críticos del flujo de trabajo de simulación:
 
 \paragraph{Servidor OSRM}
 
@@ -1648,16 +1376,16 @@ Este comando monta el directorio \texttt{osrm\_data} (que contiene los archivos 
 
 \paragraph{Entorno de Simulación (Futuro)}
 
-Aunque en la versión actual del proyecto el simulador Python se ejecuta directamente en el sistema host, una extensión natural del trabajo (recomendada para publicación) sería containerizar también el simulador, creando una imagen Docker que incluya Python 3.10, todas las dependencias listadas en \texttt{requirements.txt}, el código fuente del simulador, y los datos de entrada. Esto permitiría ejecutar el pipeline completo con un solo comando \texttt{docker run}, garantizando reproducibilidad absoluta.
+Aunque en la versión actual del proyecto el simulador Python se ejecuta directamente en el sistema host, una extensión natural del trabajo (recomendada para publicación) sería containerizar también el simulador, creando una imagen Docker que incluya Python 3.10, todas las dependencias listadas en \texttt{requirements.txt}, el código fuente del simulador, y los datos de entrada. Esto permitiría ejecutar el flujo de trabajo completo con un solo comando \texttt{docker run}, garantizando reproducibilidad absoluta.
 
-En resumen, la adopción de Docker como infraestructura de containerización constituye una contribución metodológica relevante del presente trabajo: mientras que trabajos previos en MDRP (incluyendo \citealt{Reyes2018}) no proporcionan mecanismos para reproducir sus experimentos de manera automatizada, el pipeline desarrollado en esta tesis puede ser ejecutado por cualquier investigador con acceso a Docker, contribuyendo al avance hacia la ciencia abierta y reproducible en el campo de la optimización de ruteo dinámico.
+En resumen, la adopción de Docker como infraestructura de containerización constituye una contribución metodológica relevante del presente trabajo: mientras que trabajos previos en MDRP (incluyendo \citealt{Reyes2018}) no proporcionan mecanismos para reproducir sus experimentos de manera automatizada, el flujo de trabajo desarrollado en esta tesis puede ser ejecutado por cualquier investigador con acceso a Docker, contribuyendo al avance hacia la ciencia abierta y reproducible en el campo de la optimización de ruteo dinámico.
 
 
-\chapter{Metodología}
+\chapter{Desarrollo de la Investigación}
 
 \section{Arquitectura del sistema de simulación}
 
-El pipeline de simulación del MDRP desarrollado en este trabajo adopta una arquitectura modular de tres capas que separa las responsabilidades de ruteo, lógica de negocio, y persistencia de resultados. Esta sección documenta la estructura técnica del sistema, las interfaces de comunicación entre componentes, y el modelo de eventos discretos que gobierna la evolución temporal del sistema.
+El flujo de trabajo de simulación del MDRP desarrollado en este trabajo adopta una arquitectura modular de tres capas que separa las responsabilidades de ruteo, lógica de negocio, y persistencia de resultados. Esta sección documenta la estructura técnica del sistema, las interfaces de comunicación entre componentes, y el modelo de eventos discretos que gobierna la evolución temporal del sistema.
 
 \subsection{Componentes: simulador, OSRM, orquestación Docker}
 
@@ -2056,7 +1784,7 @@ El resultado es un archivo \texttt{lapaz\_filtered.osm} (formato XML sin comprim
 
 \paragraph{Conversión a formato OSRM}
 
-El archivo \texttt{.osm} filtrado se convierte al formato interno de OSRM mediante el pipeline de preprocesamiento descrito en la siguiente subsección. Este archivo constituye la entrada fundamental para todos los cálculos de ruteo en la simulación.
+El archivo \texttt{.osm} filtrado se convierte al formato interno de OSRM mediante la secuencia de preprocesamiento descrita en la siguiente subsección. Este archivo constituye la entrada fundamental para todos los cálculos de ruteo en la simulación.
 
 \subsection{Preprocesamiento en OSRM (extract/partition/customize)}
 
@@ -2166,7 +1894,7 @@ Si el servidor inicia sin errores y responde correctamente a consultas de prueba
 
 \paragraph{Persistencia y reutilización}
 
-El conjunto completo de archivos \texttt{.osrm.*} generados por el pipeline de preprocesamiento se almacena en el directorio \texttt{osrm\_data/} del proyecto. Estos archivos constituyen un \textbf{artefacto reproducible crítico}: mientras el archivo \texttt{.osm} original y el perfil \texttt{car.lua} permanezcan sin cambios, el preprocesamiento generará exactamente los mismos archivos binarios, garantizando que consultas idénticas produzcan rutas idénticas en ejecuciones futuras de la simulación.
+El conjunto completo de archivos \texttt{.osrm.*} generados por la secuencia de preprocesamiento se almacena en el directorio \texttt{osrm\_data/} del proyecto. Estos archivos constituyen un \textbf{artefacto reproducible crítico}: mientras el archivo \texttt{.osm} original y el perfil \texttt{car.lua} permanezcan sin cambios, el preprocesamiento generará exactamente los mismos archivos binarios, garantizando que consultas idénticas produzcan rutas idénticas en ejecuciones futuras de la simulación.
 
 El tamaño típico del conjunto de archivos preprocesados para La Paz es de aproximadamente 30-50 MB (sin comprimir), lo cual permite su inclusión en repositorios Git LFS para distribución junto con el código del proyecto.
 
@@ -3404,7 +3132,7 @@ python scripts/generate_results.py --analyze-only
 
 \paragraph{Verificación de reproducibilidad}
 
-Para verificar la reproducibilidad del pipeline completo, se ejecuta el protocolo anterior dos veces en computadoras independientes y se comparan los archivos de resultados:
+Para verificar la reproducibilidad del flujo de trabajo completo, se ejecuta el protocolo anterior dos veces en computadoras independientes y se comparan los archivos de resultados:
 
 \begin{verbatim}
 # Máquina 1
@@ -3795,7 +3523,7 @@ La verificación confirma que la implementación del simulador es correcta y rep
 El protocolo de verificación por regresión es:
 
 \begin{enumerate}
-	\item Ejecutar pipeline completo con semilla fija (\texttt{seed=2025}):
+	\item Ejecutar flujo de trabajo completo con semilla fija (\texttt{seed=2025}):
 	\begin{verbatim}
 python scripts/make_synth_orders.py --seed=2025
 python scripts/run_fcfs_instance.py data/synthetic_lapaz_orders_limited.csv
@@ -4480,7 +4208,7 @@ Si todos los hashes coinciden, la reproducibilidad es completa.
 
 
 \chapter{Resultados}
-\chapter{Conclusiones y trabajo futuro}
+\chapter{Conclusiones}
 	
 	
 

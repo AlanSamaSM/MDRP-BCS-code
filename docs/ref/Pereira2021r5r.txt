@@ -1,0 +1,228 @@
+TRANSPORT FINDINGS
+r5r: Rapid Realistic Routing on Multimodal Transport Networks with R5
+in R
+Rafael H. M. Pereira
+1
+, Marcus Saraiva
+1
+, Daniel Herszenhut 1
+, Carlos Kaue Vieira Braga
+1
+, Matthew Wigginton Conway
+2
+1
+Ipea - Institute for Applied Economic Research, 2 School of Geographical Sciences and Urban Planning, Arizona State University
+Keywords: travel impedance, accessibility, travel time, transport networks, routing, software
+https://doi.org/10.32866/001c.21262
+Findings
+Routing is a key step in transport planning and research. Nonetheless, researchers
+and practitioners often face challenges when performing this task due to long
+computation times and the cost of licensed software. R5
+is a multimodal
+transport network router that offers multiple routing features, such as calculating
+travel times over a time window and returning multiple itineraries for origin/
+destination pairs. This paper describes r5r, an open-source R package that
+leverages R5
+to efficiently compute travel time matrices and generate detailed
+itineraries between sets of origins and destinations at no expense using seamless
+parallel computing.
+Questions
+Transport routing is the process of finding the fastest or lowest-cost routes
+that connect places in a given transport network, and is a key step in transport
+accessibility analysis, fleet allocation and transport simulation and planning
+more broadly (Levinson et al. 2020). However, researchers and practitioners
+often face practical challenges when carrying out routing tasks due to the costs
+of licensed software, limited data availability, and the long computation times
+required to run multiple routing scenarios, particularly in large and complex
+multimodal transport networks.
+While there are several open-source routing packages available for R, they
+either do not support public transport networks (Padgham 2019), or primarily
+focus on providing point-to-point routes rather than origin-destination travel
+time matrices (Morgan et al. 2019; Lovelace and Ellison 2019). Most routing
+algorithms find paths to all points in the network while finding a single route.
+Storing these paths rather than computing them for one origin-destination
+pair at a time is orders of magnitude more efficient. To our knowledge, no R
+package exists that supports these efficient many-to-many queries for public
+transport networks.
+To fill this gap, this paper presents r5r, a new open-source R package for
+routing on multimodal transport networks based on the Rapid Realistic
+Routing on Real-world and Reimagined networks (R5
+) package. R5
+is an open
+access routing engine written in Java and developed at Conveyal (Conway,
+Byrd, and van der Linden 2017; Conway, Byrd, and van Eggermond 2018)
+to provide an efficient backend for analytic applications, such as accessibility
+analysis. The r5r package provides an interface to run R5
+locally from within
+Pereira, Rafael H. M., Marcus Saraiva, Daniel Herszenhut, Carlos Kaue Vieira Braga, and
+Matthew Wigginton Conway. 2021. “R5r: Rapid Realistic Routing on Multimodal
+Transport Networks with R5 in R.” Findings, March.
+https://doi.org/10.32866/001c.21262.
+R using seamless parallel computing. This tool can be used to address a variety
+of questions that require the efficient calculation of travel time matrices or the
+examination of multimodal transport routes.
+Methods
+The r5r package has low data requirements and is easily scalable, allowing fast
+computation of routes and travel times for either city or region-level analysis.
+It creates a routable transport network using street network data from
+OpenStreetMap (OSM) and optionally public transport data in the General
+Transit Feed Specification (GTFS) format.
+The r5r package has 3 fundamental functions:
+Both routing functions are versatile so users can easily set customized inputs
+such as transport modes, departure dates and times, walking and cycling
+speeds, maximum trip duration, walking distances and number of public
+transport transfers. In the following section, we will focus on results obtained
+from travel_time_matrix().
+Findings
+After it is installed with the install.packages("r5r") command, the package can be
+attached (alongside other packages to reproduce this article), as in Code 1.
+• setup_r5(): builds a multimodal transport network used for routing in
+R5
+. This function automatically (1) downloads/updates a compiled
+R5
+JAR file and stores it locally for future use; and (2) combines the
+OSM and GTFS datasets to build a routable network object.
+• travel_time_matrix(): computes travel time estimates between one or
+multiple origin/destination pairs for a single departure time or for
+multiple departure times over a time_window set by the user. This
+function uses an R5
+-specific extension to the RAPTOR routing
+algorithm which provides an efficient and systematic sampling of
+multiple simulated schedules when using frequency-based GTFS data
+(Conway, Byrd, and van der Linden 2017).
+• detailed_itineraries(): computes detailed information on routes between
+one or multiple origin/destination pairs for a single departure time.
+The output includes detailed information on route alternatives such
+as the transport mode, waiting time, travel time and distance of each
+segment of the trip. This function uses an R5
+-specific extension1
+to
+the McRAPTOR (Delling, Pajor, and Werneck 2015) routing
+algorithm to find both optimal and slightly suboptimal paths.
+1 The specific extension to McRAPTOR to do suboptimal path routing is not documented yet.
+r5r: Rapid Realistic Routing on Multimodal Transport Networks with R^5^ in R
+Findings 2
+Code 1: Load required libraries
+Code 2: Set up routable transport network
+For this article, we used r5r version v0.3-2 and R5
+version v6.0.1.
+The package includes sample datasets for the cities of São Paulo and Porto
+Alegre (both in Brazil). Each dataset includes:
+Building a routable transport network
+To build a routable transport network with r5r and load it into memory, the
+user needs to call setup_r5 with the path to the directory where OSM and GTFS
+data are stored. In the examples herein, we use the provided Porto Alegre
+dataset (Code 2).
+The function uses the .pbf and the GTFS.zip files in the directory pointed by
+data_path to create a multimodal transport network used for routing by R5
+. If
+multiple GTFS files are present, R5 will merge them into a single transport
+network. The resulting network.dat as well as some other files used by R5
+are saved
+inside the supplied directory for later reuse.
+• An OSM network in .pbf format.
+• A public transport network in GTFS.zip format.
+• The spatial coordinates of points covering the area in .csv format,
+including information on the size of resident population and the
+number of schools in each location.
+r5r: Rapid Realistic Routing on Multimodal Transport Networks with R^5^ in R
+Findings 3
+Calculating a travel time matrix
+The travel_time_matrix() function takes, as inputs, the spatial location of origins/
+destinations (either as a spatial sf POINT object, or as a data.frame containing the
+columns id, lon and lat) and a few travel parameters such as maximum trip
+duration, or walking distance. It outputs travel time estimates for each origindestination pair at a set departure_datetime.
+Since service levels can significantly vary across the day (Stępniak et al. 2019),
+r5r provides a time_window parameter that can help address the aggregation
+component of the modifiable temporal unit problem (MTUP) (Pereira 2019).
+When this parameter is set, R5 will compute travel times for trips at the
+specified departure time and every minute for time_window minutes after. The
+percentiles parameter allows the user to retrieve travel time estimates at different
+points of the distribution (by default the median). These percentiles reflect
+service variation over the time window, but do not reflect schedule deviation
+not represented in the GTFS, though tools exist to create GTFS which reflects
+schedule deviations (Wessel, Allen, and Farber 2017).
+An example of the function’s usage is presented in Code 3. Computing this
+1227x1227 travel time matrix with a 120-minute time window takes less than a
+minute on a Windows machine with a 1.9GHz Intel i7 and 16GB RAM.
+visualizing travel-time uncertainty
+Figure 1 shows how the travel times to arrive at the central bus station from
+several origin points vary within the time window (5th, 25th, 50th, 75th, and
+95th percentiles), reflecting that travel times are more uncertain when leaving
+from some places than others. While there is little to no uncertainty when
+departing from places that are very close (walking distance) to the central bus
+station, travel times from places farther away are more affected by departure
+time variations and service frequency levels.
+visualizing isochrones
+In our example, we can visualize the isochrone (area reachable within a certain
+amount of time) departing from the central bus station in Figure 2.
+creating accessibility metrics
+Accessibility metrics measure the opportunities, such as jobs, a traveler could
+reach from a particular location (Levinson et al. 2020). One of the simplest
+forms is a cumulative-opportunities metric, which sums all of the
+opportunities accessible from each location in less than a cutoff time. Using the
+travel time matrix and information on the number of opportunities available at
+each location, we can calculate and map accessibility. In Figure 3 we compute
+the number of schools accessible by public transport in less than 20 minutes.
+r5r: Rapid Realistic Routing on Multimodal Transport Networks with R^5^ in R
+Findings 4
+Code 3: Compute travel time matrix
+Acknowledgments
+The R5
+routing engine is developed at Conveyal with contributions from
+several developers. This work was supported by the Brazilian Institute for
+Applied Economic Research (Ipea).
+Submitted: January 27, 2021 AEDT, Accepted: February 25, 2021 AEDT
+r5r: Rapid Realistic Routing on Multimodal Transport Networks with R^5^ in R
+Findings 5
+Code: Figure 1
+Figure 1: Travel time uncertainty by trip origin
+r5r: Rapid Realistic Routing on Multimodal Transport Networks with R^5^ in R
+Findings 6
+Code: Figure 2
+Figure 2: Isochrones by public transport departing from the central bus station
+r5r: Rapid Realistic Routing on Multimodal Transport Networks with R^5^ in R
+Findings 7
+Code: Figure 3
+Figure 3: Number of schools accessible by public transport in less than 20 minutes
+This is an open-access article distributed under the terms of the Creative Commons Attribution 4.0
+International License (CCBY-SA-4.0). View this license’s legal deed at https://creativecommons.org/
+licenses/by-sa/4.0 and legal code at https://creativecommons.org/licenses/by-sa/4.0/legalcode for more
+information.
+r5r: Rapid Realistic Routing on Multimodal Transport Networks with R^5^ in R
+Findings 8
+references
+Conway, Matthew Wigginton, Andrew Byrd, and Michael van Eggermond. 2018. “Accounting for
+Uncertainty and Variation in Accessibility Metrics for Public Transport Sketch Planning.” Journal
+of Transport and Land Use 11 (1). https://doi.org/10.5198/jtlu.2018.1074.
+Conway, Matthew Wigginton, Andrew Byrd, and Marco van der Linden. 2017. “Evidence-Based
+Transit and Land Use Sketch Planning Using Interactive Accessibility Methods on Combined
+Schedule and Headway-Based Networks.” Transportation Research Record: Journal of the
+Transportation Research Board 2653 (1): 45–53. https://doi.org/10.3141/2653-06.
+Delling, Daniel, Thomas Pajor, and Renato F. Werneck. 2015. “Round-Based Public Transit
+Routing.” Transportation Science 49 (3): 591–604. https://doi.org/10.1287/trsc.2014.0534.
+Levinson, David et al. 2020. “Transport Access Manual: A Guide for Measuring Connection
+Between People and Places.” https://ses.library.usyd.edu.au/handle/2123/23733.
+Lovelace, Robin, and Richard Ellison. 2019. “Stplanr: A Package for Transport Planning.” The R
+Journal 10 (2): 7. https://doi.org/10.32614/rj-2018-053.
+Morgan, Malcolm, Marcus Young, Robin Lovelace, and Layik Hama. 2019. “OpenTripPlanner for
+R.” Journal of Open Source Software 4 (44): 1926. https://doi.org/10.21105/joss.01926.
+Padgham, Mark. 2019. “Dodgr: An R Package for Network Flow Aggregation.” Transport
+Findings, January. https://doi.org/10.32866/6945.
+Pereira, Rafael H.M. 2019. “Future Accessibility Impacts of Transport Policy Scenarios: Equity and
+Sensitivity to Travel Time Thresholds for Bus Rapid Transit Expansion in Rio de Janeiro.” Journal
+of Transport Geography 74 (January): 321–32. https://doi.org/10.1016/j.jtrangeo.2018.12.005.
+Stępniak, Marcin, John P. Pritchard, Karst T. Geurs, and Sławomir Goliszek. 2019. “The Impact of
+Temporal Resolution on Public Transport Accessibility Measurement: Review and Case Study in
+Poland.” Journal of Transport Geography 75 (February): 8–24. https://doi.org/10.1016/
+j.jtrangeo.2019.01.007.
+Wessel, Nate, Jeff Allen, and Steven Farber. 2017. “Constructing a Routable Retrospective Transit
+Timetable from a Real-Time Vehicle Location Feed and GTFS.” Journal of Transport Geography 62
+(June): 92–97. https://doi.org/10.1016/j.jtrangeo.2017.04.012.
+r5r: Rapid Realistic Routing on Multimodal Transport Networks with R^5^ in R
+Findings 9
+supplementary materials
+Code to reproduce paper
+Download: https://findingspress.org/article/21262-r5r-rapid-realistic-routing-on-multimodal-transportnetworks-with-r-5-in-r/attachment/54700.zip
+r5r: Rapid Realistic Routing on Multimodal Transport Networks with R^5^ in R
+Findings 10
