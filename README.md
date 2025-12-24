@@ -34,7 +34,7 @@ El objetivo es maximizar la eficiencia operativa mientras se mantiene la calidad
 
 3.  Inicia el servidor OSRM local (requerido para ruteo):
     
-    docker run -d -p 5000:5000 -v "${PWD}/osrm_data:/data" osrm/osrm-backend osrm-routed --algorithm mld /data/bcs-latest.osrm
+    docker run -d -p 5000:5000 -v "${PWD}/osrm_data:/data" osrm/osrm-backend osrm-routed --algorithm ch /data/bcs-latest.osrm
     
 
 ## Reproducción de Resultados

@@ -10,7 +10,7 @@ SERVICE_TIME = timedelta(minutes=4)  # minutos (tiempo que incluye pickup + drop
 
 
 MAX_TARGET_BUNDLE_SIZE = 5  # Evita bundles irreales bajo alta demanda
-MAX_BUNDLE_SIZE = 6         # Límite duro para inserciones paralelas
+MAX_BUNDLE_SIZE = 4         # Límite duro para inserciones paralelas
 TARGET_ORDERS_PER_COURIER = 18  # Promedio de pedidos por courier por turno
 
 # Penalizaciones para clasificación de grupos 

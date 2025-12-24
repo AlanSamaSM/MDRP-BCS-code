@@ -184,11 +184,12 @@
 	\subsection{Última milla y contexto urbano} % Jazemi2023
 	
 	La última milla de entrega---el segmento final desde un centro de distribución o 
-	punto de recogida hasta el domicilio del cliente---representa el componente más 
-	costoso, complejo y crítico en logística urbana. Jazemi et al. (2023) documentan 
-	que la última milla puede representar entre el 30\% y el 60\% del costo total de 
-	una operación de envío, dependiendo de la densidad urbana, la dispersión geográfica 
-	de clientes y la volatilidad de la demanda \cite{Jazemi2023}.
+	punto de recogida hasta el domicilio del cliente---representa uno de los desafíos 
+	más significativos en la logística urbana moderna. Jazemi et al. (2023) destacan 
+	que la gestión de la última milla enfrenta desafíos significativos debido al 
+	creciente volumen de entregas y los estrictos cronogramas requeridos para satisfacer 
+	las expectativas de los clientes, lo que complica la planificación logística en 
+	entornos urbanos \cite{Jazemi2023}.
 	
 	En el contexto de entrega de comida rápida, la última milla presenta desafíos 
 	específicos adicionales: (1) alta urgencia---los clientes esperan entregas 
@@ -414,10 +415,7 @@
 	\section{Planteamiento del problema}
 
 	\subsection{La ineficacia de las aproximaciones tradicionales}
-	El problema de ruteo para entrega de comida (MDRP) en ciudades medianas enfrenta una disyuntiva crítica. Por un lado,
-	las herramientas comerciales de ruteo garantizan precisión geográfica, pero imponen costos de licenciamiento prohibitivos 
-	para las empresas locales emergentes. Por otro lado, las aproximaciones académicas tradicionales, que suelen utilizar
-	distancias euclidianas para reducir costos computacionales, sacrifican el realismo operativo. \citet{Boyaci2021} 
+	El MDRP en ciudades medianas enfrenta una disyuntiva crítica: las herramientas comerciales ofrecen precisión geográfica a costos prohibitivos para empresas locales, mientras que las aproximaciones académicas tradicionales sacrifican realismo operativo al depender de distancias euclidianas. \citet{Boyaci2021} 
 	cuantificaron este impacto, demostrando que las distancias lineales subestiman los trayectos reales entre un 17\% y 
 	un 40\%, invalidando las estimaciones de tiempos de entrega (ETA) y degradando la calidad del servicio.
 
@@ -432,9 +430,6 @@
 
 		\item \textbf{Estructura Vial Jerárquica:} La dependencia de pocas arterias diagonales estructurantes (como el Blvd. 
 		Forjadores o Pino Pallas) crea cuellos de botella que los modelos euclidianos ignoran.
-
-		\item \textbf{Zonas de Exclusión:} Áreas como el aeropuerto o zonas militares, que aparecen como espacios 
-		transitables en un mapa lineal, representan bloqueos físicos en la realidad.
 
 	\end{itemize}
 
@@ -477,9 +472,9 @@
 		los KPIs críticos: tiempos \textit{Click-to-Door}, latencia \textit{Ready-to-Pickup} y eficiencia de la 
 		flota, determinando la significancia de las mejoras observadas.
 	
-		\item Contenerizar el flujo de trabajo completo mediante Docker para garantizar la reproducibilidad 
-		técnica de los experimentos y facilitar la transferibilidad del estudio a otros contextos urbanos de 
-		características similares.
+		\item Implementar una arquitectura híbrida que contenerice la infraestructura crítica de ruteo (OSRM) mediante 
+		Docker y gestione el código de simulación mediante control de versiones, garantizando la reproducibilidad técnica 
+		 y facilitando la transferibilidad del estudio.
 	\end{itemize}
 
 	\section{Hipótesis}
@@ -496,23 +491,19 @@
 	exponencial. Si bien el modelo de \textit{Rolling Horizon} \citep{Reyes2018} ofrece una solución teórica prometedora,
 	su aplicabilidad práctica en ciudades latinoamericanas de escala media se ve limitada por la carencia de validación
 	en topologías viales restrictivas y la dependencia de costos prohibitivos de software propietario. La presente
-	
 	investigación se justifica bajo las siguientes dimensiones:
 
 	\subsection{Relevancia Científica}
 	Existe una disonancia documentada entre los modelos teóricos de ruteo, que asumen espacios euclidianos o redes
 	ideales, y la realidad operativa de la "última milla". \citet{Figliozzi2007} advierte que las aproximaciones 
-	lineales distorsionan significativamente los costos de viaje. Esta tesis cierra esa brecha al validar empíricamente
+	lineales distorsionan significativamente los costos de viaje. El presente trabajo busca cerrar esa brecha al validar
 	si las eficiencias reportadas en la literatura (cercanas al óptimo) se sostienen al introducir las restricciones 
-	"hostiles" de la topología de La Paz, B.C.S., aportando nueva evidencia sobre la robustez de las heurísticas de 
+	de la topología de La Paz, B.C.S., aportando nueva evidencia sobre la robustez de las heurísticas de 
 	horizonte rodante.
 
-	\subsection{Aporte Tecnológico y Reproducibilidad}
-	La crisis de reproducibilidad en ciencias computacionales \citep{Merkel2014} exige nuevos estándares de ingeniería.
-	Este proyecto aporta a la comunidad académica y de desarrollo un \textit{framework} de simulación totalmente 
-	contenerizado (Docker) y basado en datos abiertos (OpenStreetMap). A diferencia de estudios previos que actúan
-	como "cajas negras", este enfoque garantiza la transparencia algorítmica y permite la replicación exacta de 
-	los experimentos, estableciendo una base sólida para futuras investigaciones en logística urbana en México.
+	\subsection{Aporte Tecnológico y Ciencia Abierta}
+	Este proyecto contribuye con una arquitectura de software diseñada bajo principios de Ciencia Abierta. Se integra el 
+	motor de ruteo OSRM desplegando su \textbf{imagen oficial en Docker}, lo que permite sustituir las distancias euclidianas por tiempos de viaje reales sobre la red vial, asegurando la consistencia del entorno de cálculo \citep{Merkel2014}. Esta integración desacopla la complejidad de la infraestructura de ruteo de la lógica de simulación, facilitando que la comunidad académica replique los experimentos sin enfrentar problemas de configuración.
 
 	\subsection{Impacto Económico y Social}
 	Para las PyMES y startups locales en Baja California Sur, la dependencia de APIs comerciales (como Google Maps) 
@@ -523,103 +514,135 @@
 
 	\subsection{Delimitación frente a métodos de Aprendizaje Profundo}
     Aunque existen métodos avanzados de Inteligencia Artificial (como Aprendizaje Profundo), estos requieren grandes
-	 cantidades de datos históricos para funcionar. En ciudades como La Paz, donde no existen registros previos de rutas
-	  y pedidos, estos modelos enfrentan el problema de "arranque en frío": no pueden operar sin entrenamiento previo.
+	cantidades de datos históricos para funcionar. En ciudades como La Paz, donde no existen registros previos de rutas
+	y pedidos, estos modelos enfrentan el problema de "arranque en frío": no pueden operar sin entrenamiento previo.
 
     Por ello, esta tesis utiliza \textit{Rolling Horizon}, un algoritmo que no necesita datos históricos y funciona desde
-	 el primer día de operación. Además, al ser computacionalmente ligero, permite a las empresas locales operar con 
-	 servidores económicos. Este sistema servirá, a su vez, para generar los datos necesarios que permitirán entrenar 
-	 modelos de IA en el futuro.
+	el primer día de operación. Además, al ser computacionalmente ligero, permite a las empresas locales operar con 
+	servidores económicos. Este sistema servirá, a su vez, para generar los datos necesarios que permitirán entrenar 
+	modelos de IA en el futuro.
 	
 	\section{Alcance y limitaciones}
 
-El presente trabajo de investigación se circunscribe al desarrollo, implementación y evaluación de 
+El presente trabajo de investigación se enfoca en el desarrollo, implementación y evaluación de 
 un entorno de simulación para el problema MDRP. A continuación se detallan las fronteras funcionales, 
 geográficas y técnicas del proyecto, así como las restricciones operativas asumidas.
 
 \subsection{Alcance Geográfico y de Datos}
 \subsubsection{Infraestructura Vial (La Paz, B.C.S.)}
-La validación espacial se limita estrictamente a la zona urbana de La Paz, Baja California Sur. Se 
-utiliza una instancia local de \textbf{OSRM v5.26.0} alimentada con el extracto \texttt{.pbf} de 
-OpenStreetMap (descarga: Enero 2025). 
+Geográficamente nos limitamos estrictamente a la zona urbana de La Paz, Baja California Sur. Se 
+implementa una instancia local del servidor de ruteo \textbf{OSRM v5.26.0} que opera sobre 
+\texttt{localhost}, eliminando la dependencia de conectividad externa a internet y garantizando 
+latencia mínima. Este servidor procesa el extracto en formato \texttt{.pbf} de 
+OpenStreetMap correspondiente a la ciudad de La Paz.
 
-El alcance cartográfico cubre el polígono urbano con una fidelidad geométrica superior al 90\% 
-respecto a la red vial física \cite{Haklay2010}. No se consideran áreas rurales ni interurbanas
- fuera del \textit{bounding box} de preprocesamiento.
-
-\subsubsection{Instancias de Demanda}
-El estudio no utiliza datos transaccionales reales por restricciones de confidencialidad. El alcance
- se limita a la generación y uso de \textbf{instancias sintéticas calibradas}, construidas bajo 
- los siguientes parámetros:
+\subsubsection{Instancias de Demanda y Patrones Temporales}
+El alcance se limita a la generación de \textbf{instancias sintéticas calibradas}, construidas bajo 
+los siguientes parámetros:
 
 \begin{itemize}
-    \item \textbf{Volumen:} Escenarios de 1,038 órdenes distribuidas en una ventana de 11 horas (11:00 - 23:00).
+    \item \textbf{Volumen:} Escenarios de aproximadamente 1,000 órdenes distribuidas en una ventana 
+	operativa de 11 horas (08:00 - 19:00).
    
-	\item \textbf{Patrones:} Distribución estocástica basada en los picos de demanda del 
-	dataset LaDe \cite{Wu2023LaDe}.
+    \item \textbf{Patrones Estocásticos:} Distribución de pedidos basada en los picos de demanda del 
+    dataset de referencia \textit{LaDe} \cite{Wu2023LaDe}, adaptados a la zona horaria local.
     
-	\item \textbf{Reproducibilidad:} Todos los datasets se generan mediante semillas 
-	determinísticas (\texttt{seed=2025}), garantizando que el escenario de entrada sea inmutable 
-	entre experimentos.
 \end{itemize}
 
 \subsection{Alcance Funcional y Algorítmico}
-El sistema compara exclusivamente dos políticas de despacho, dejando fuera 
-del alcance algoritmos híbridos o de aprendizaje profundo:
+El sistema compara exclusivamente dos políticas de despacho::
 
 \begin{enumerate}
-    \item \textbf{Política Base (FCFS):} Asignación reactiva inmediata basada en minimización 
-	de distancia al restaurante, sin consolidación de órdenes.
+    \item \textbf{Política Base First-Come-First-Served (FCFS):} Asignación reactiva inmediata 
+	basada en minimización de distancia al restaurante, sin consolidación de órdenes.
 
     \item \textbf{Política Propuesta (Rolling Horizon):} Implementación de la heurística de
-	 \citet{Reyes2018} con un horizonte de visión configurable (10-20 minutos) y capacidad de a
-	 grupamiento (\textit{bundling}) dinámico de hasta 6 órdenes por courier.
+     \citet{Reyes2018} con un horizonte de visión configurable (10-20 minutos) y capacidad de 
+     agrupamiento (\textit{bundling}) dinámico de hasta 4 órdenes por repartidor.
 
-    \item \textbf{Escenario de Control (Aislamiento de Variables):} Se contempla la ejecución de un escenario de control (FCFS sobre OSRM) para aislar la contribución marginal del algoritmo de optimización frente a la mejora atribuible puramente a la precisión del mapa, permitiendo un análisis de sensibilidad robusto.
+    \item \textbf{Escenario de Control (Aislamiento de Variables):} Se contempla la ejecución de un 
+	escenario de control (FCFS sobre OSRM) para aislar la contribución del algoritmo de 
+	optimización frente a la mejora atribuible puramente a la precisión del mapa, permitiendo un 
+	análisis independiente de ambas variables.
 \end{enumerate}
 
-La simulación se ejecuta bajo un esquema de \textbf{Eventos Discretos (DES)}. A diferencia de 
-los modelos analíticos, este enfoque permite capturar la estocasticidad en los tiempos de preparación 
-y la llegada de órdenes, tal como validan \citet{Juan2015} para entornos dinámicos.
+La simulación se ejecuta bajo un esquema de \textbf{pasos de tiempo fijos}, una 
+simulación donde el estado del sistema se evalúa y actualiza en intervalos regulares de reoptimización 
+($f=5$ min). Este enfoque se alinea con la naturaleza periódica del algoritmo \textit{Rolling Horizon} propuesto 
+por \citet{Reyes2018}, permitiendo capturar la estocasticidad en la llegada de órdenes mientras se mantiene la 
+sincronización con los ciclos de decisión de la flota.
 
-\subsection{Alcance Técnico: Reproducibilidad}
-El proyecto entrega un artefacto de software contenerizado. El alcance técnico garantiza:
+\subsection{Alcance Técnico: Reproducibilidad e Infraestructura}
+El proyecto entrega software reproducible, diseñado para facilitar la auditoría y la extensión futura. El alcance técnico garantiza:
+
 \begin{itemize}
-   
-	\item \textbf{Independencia de APIs:} El motor de ruteo opera de forma autónoma (offline) 
-	mediante Docker, sin consumo de créditos de Google Maps o Mapbox.
-   
-	\item \textbf{Trazabilidad:} Generación automática de manifiestos JSON que vinculan cada 
-	resultado (KPIs) con el código (Git Commit) y los datos (Hash SHA-256) que lo produjeron.
+    
+    \item \textbf{Infraestructura de Ruteo Contenerizada:} El motor de ruteo OSRM se despliega mediante \textbf{Docker} (imagen \texttt{osrm/osrm-backend}), 
+	configurado con el algoritmo CH (Contraction Hierarchies). Esto asegura que el entorno de cálculo de rutas sea idéntico en cualquier máquina anfitriona, 
+	eliminando discrepancias por versiones de librerías del sistema operativo.
+    
+    \item \textbf{Independencia de APIs:} El sistema opera de forma autónoma (offline) sobre \texttt{localhost}, sin consumo de créditos de Google Maps o Mapbox, 
+	eliminando barreras económicas para la replicación de experimentos.
 
+
+    \item \textbf{Requisitos Computacionales:} El entorno está diseñado para ejecutarse en hardware de consumo estándar (CPU x86/ARM, 8GB RAM), democratizando 
+	el acceso a herramientas de optimización logística avanzada.
 \end{itemize}
 
 \subsection{Supuestos y Limitaciones}
-Las conclusiones del estudio deben interpretarse bajo las siguientes restricciones metodológicas:
+Las conclusiones del estudio deben interpretarse bajo las siguientes restricciones metodológicas y simplificaciones del modelo:
 
 \subsubsection{Modelo de Tráfico Estático}
 El cálculo de tiempos de viaje asume velocidades promedio constantes por tipo de vía 
 (perfil \texttt{car.lua} ajustado). \textbf{Limitación:} No se modela la congestión 
-vehicular dinámica (tráfico en hora pico), accidentes o cierres viales temporales. 
-Esto implica que las métricas de tiempo de entrega (Click-to-Door) representan un límite
- inferior optimista respecto a la realidad operativa.
+vehicular dinámica en tiempo real (accidentes o cierres viales temporales). 
+Esto implica que las métricas de tiempo de entrega (\textit{Click-to-Door}) representan un caso optimista 
+respecto a la realidad operativa con tráfico saturado.
 
-\subsubsection{Simplificación de Eventos Operativos}
-La simulación asume un flujo de "camino feliz" (\textit{happy path}) para aislar la 
-eficiencia del algoritmo de ruteo. Quedan fuera del alcance:
+\subsubsection{Simplificación de la Logística de Última Milla}
+El modelo asume tiempos de servicio deterministas divididos en dos componentes:
+\begin{itemize}
+    \item \textbf{Tiempo de Recolección (Pickup):} Se aplica una penalización fija de $T_{pickup} = 4$ min por visita a cada restaurante asignado por visitar.
+
+    \item \textbf{Tiempo de Entrega (Drop-off):} Se añade un tiempo de servicio de $T_{drop} = 4$ min por cada orden 
+	entregada al cliente.
+
+    \item \textbf{Ausencia de Variabilidad Estocástica:} No se modelan retrasos aleatorios por búsqueda de estacionamiento, acceso a edificios 
+	complejos o clientes ausentes; los tiempos son constantes.
+\end{itemize}\subsubsection{Comportamiento de la Flota}
 
 \begin{itemize}
-    \item Cancelaciones de órdenes por parte de clientes o restaurantes.
-    \item Rechazo de asignaciones por parte de los repartidores (se asume cumplimiento total).
-    \item Tiempos muertos por fallas mecánicas o gestión de efectivo.
-    \item Multihoming (repartidores trabajando para múltiples apps simultáneamente).
+    \item \textbf{Velocidad Constante:} Los repartidores viajan a la velocidad constante estimada por OSRM, sin desviaciones por comportamiento humano.
+
+    \item \textbf{Sin Retorno a Base:} Al finalizar una entrega, los repartidores permanecen estáticos en la ubicación del último cliente hasta recibir
+	 una nueva asignación. No se modelan estrategias de reposicionamiento o retorno a zonas de alta demanda.
+
+    \item \textbf{Energía y combustible} No se modelan paradas técnicas por recarga de combustible o batería durante el turno operativo.
 \end{itemize}
 
-\subsubsection{Validez de Datos Sintéticos}
-Aunque las distribuciones estadísticas (Poisson para llegadas, Log-Normal para preparación) 
-se calibran con literatura vigente \cite{Wu2023LaDe}, los resultados no reflejan la idiosincrasia 
-específica del comportamiento del consumidor paceño, al carecer de datos históricos locales para 
-una validación cruzada fina.
+\subsubsection{Limitaciones Algorítmicas}
+\begin{itemize}
+    \item \textbf{Heurística de Asignación Jerárquica:} Siguiendo la metodología de \citet{Reyes2018}, se adopta una estrategia 
+	secuencial que prioriza órdenes críticas (Grupos de prioridad).
+
+    \item \textbf{Compromiso en Dos Etapas:} La lógica de "Compromiso Parcial" permite redirigir a un repartidor en ruta, lo cual es
+	 una simplificación operativa que asume obediencia total y comunicación instantánea sin fricción.
+\end{itemize}
+
+\subsubsection{Escenario Nominal de Operación}
+La simulación asume condiciones de flujo ideal. Quedan fuera del alcance:
+\begin{itemize}
+    \item Cancelaciones de órdenes por parte de clientes o restaurantes.
+    \item Rechazo de asignaciones por parte de los repartidores.
+    \item Fallas mecánicas de la flota o gestión de efectivo.
+    \item \textit{Multihoming} (repartidores trabajando para múltiples apps simultáneamente).
+    \item \textbf{Homogeneidad de carga:} Se asume que todas las órdenes poseen dimensiones estándar compatibles con
+	 la mochila del repartidor, ignorando restricciones de volumen físico o peso excesivo.
+\end{itemize}
+
+\subsubsection{Generalización de Patrones de Consumo}
+Aunque las distribuciones estadísticas (llegadas Poisson) se calibran con literatura vigente \cite{Wu2023LaDe}, 
+se asume que los patrones de comportamiento de consumo son universales y transferibles al contexto de La Paz. 
 	
 \chapter{Marco teórico}
 
@@ -935,9 +958,20 @@ son ignoradas en esta época (serán consideradas en épocas futuras).
 \textbf{Fase 2: Generación de bundles y solución del problema de matching.} Para las órdenes en
 $\mathcal{U}_t$, el algoritmo genera \textit{bundles} (rutas consolidadas) mediante una heurística de
 inserción paralela (detallada en el Procedimiento~1 de Reyes et al., 2018). Posteriormente, resuelve
-un problema de matching bipartito para asignar bundles a couriers disponibles. La formulación del
-matching se basa en maximizar un peso compuesto que balancea eficiencia (órdenes por hora) contra
-calidad de servicio (penalizaciones por retrasos):
+un problema de matching bipartito para asignar bundles a couriers disponibles.
+
+\paragraph{Esquema de Prioridad Jerárquica (Priority Scheme)}
+Para garantizar que las órdenes más urgentes reciban atención preferente, se implementa el esquema de prioridad propuesto por \citet{Reyes2018} (Sección 3.2). Antes de resolver el matching, los bundles candidatos se clasifican en tres grupos mutuamente excluyentes:
+
+\begin{itemize}
+    \item \textbf{Grupo I (Críticos):} Órdenes cuyo tiempo objetivo de entrega (\textit{Click-to-Door}) ya es imposible de cumplir dado el estado actual de la flota. Estas se asignan primero para minimizar el retraso inevitable.
+    \item \textbf{Grupo II (Riesgo de Recogida):} Órdenes que no pertenecen al Grupo I, pero que ya no pueden ser recogidas en su tiempo de preparación ideal ($t_{pickup} > t_{ready}$). Se asignan en segunda instancia.
+    \item \textbf{Grupo III (Nominales):} El resto de las órdenes, que aún pueden ser atendidas dentro de los parámetros ideales de servicio.
+\end{itemize}
+
+El algoritmo resuelve el problema de asignación secuencialmente: primero empareja los bundles del Grupo I con los mejores couriers disponibles; luego, con los couriers remanentes, resuelve para el Grupo II, y finalmente para el Grupo III. Esta descomposición jerárquica sacrifica la optimalidad global teórica en favor de la robustez operativa, asegurando que las órdenes en crisis no sean desplazadas por optimizaciones marginales de eficiencia en órdenes no urgentes.
+
+La formulación del matching para cada grupo se basa en maximizar un peso compuesto que balancea eficiencia (órdenes por hora) contra calidad de servicio:
 
 \begin{equation}
 \max \sum_{b \in \mathcal{B}} \sum_{c \in \mathcal{C}_{\text{avail}}} w_{bc} \cdot x_{bc}
@@ -1369,7 +1403,7 @@ El contenedor se inicia mediante el comando:
 
 \begin{verbatim}
 docker run -d -p 5000:5000 -v ./osrm_data:/data \
-  osrm/osrm-backend osrm-routed --algorithm mld /data/map.osrm
+  osrm/osrm-backend osrm-routed --algorithm ch /data/map.osrm
 \end{verbatim}
 
 Este comando monta el directorio \texttt{osrm\_data} (que contiene los archivos preprocesados \texttt{.osrm}) en el contenedor y expone el servidor en el puerto 5000 del host.
@@ -1430,7 +1464,7 @@ El contenedor OSRM se inicia mediante el siguiente comando Docker:
 docker run -d -p 5000:5000 \
   -v $(pwd)/osrm_data:/data \
   osrm/osrm-backend:5.26.0 \
-  osrm-routed --algorithm mld /data/map.osrm
+  osrm-routed --algorithm ch /data/map.osrm
 \end{verbatim}
 
 Este comando realiza las siguientes operaciones:
@@ -1438,7 +1472,7 @@ Este comando realiza las siguientes operaciones:
 	\item \texttt{-d}: Ejecuta el contenedor en modo background (daemon)
 	\item \texttt{-p 5000:5000}: Expone el puerto 5000 del contenedor en el host
 	\item \texttt{-v \$(pwd)/osrm\_data:/data}: Monta el directorio local \texttt{osrm\_data/} (que contiene archivos \texttt{.osrm} preprocesados) en \texttt{/data} dentro del contenedor
-	\item \texttt{osrm-routed --algorithm mld}: Inicia el servidor de ruteo usando el algoritmo MLD (Multi-Level Dijkstra, variante de Contraction Hierarchies)
+	\item \texttt{osrm-routed --algorithm ch}: Inicia el servidor de ruteo usando el algoritmo CH (Contraction Hierarchies)
 \end{itemize}
 
 El servidor OSRM responde a consultas HTTP en \texttt{http://localhost:5000}, proporcionando tiempos de respuesta típicos de 1-2 milisegundos para consultas punto-a-punto en la red de La Paz. Esta latencia baja es crítica para la viabilidad computacional del Rolling Horizon, que puede requerir cientos de consultas de ruteo por época de optimización.
@@ -1836,59 +1870,35 @@ Este comando ejecuta las siguientes operaciones:
 
 Esta etapa tiene complejidad $O(|E| + |V|)$ y típicamente requiere 5-10 segundos para la red de La Paz.
 
-\paragraph{Etapa 2: Partition (particionamiento jerárquico)}
+\paragraph{Etapa 2: Contract (Contracción de Jerarquías)}
 
-La segunda etapa implementa el algoritmo de Contraction Hierarchies descrito en la Sección 6.3 del Marco Teórico. El comando es:
+La segunda etapa implementa el algoritmo de Contraction Hierarchies (CH) descrito en la Sección 6.3 del Marco Teórico. El comando es:
 
 \begin{verbatim}
-osrm-partition lapaz_filtered.osrm
+osrm-contract lapaz_filtered.osrm
 \end{verbatim}
 
-Esta etapa realiza:
+Esta etapa realiza la contracción del grafo para acelerar las consultas de ruteo:
 
 \begin{enumerate}
-	\item \textbf{Cálculo del ordenamiento jerárquico de nodos:} Asigna un rango (nivel de importancia) a cada nodo del grafo mediante heurísticas que minimizan el número de atajos generados. Los nodos en intersecciones principales (e.g., Álvaro Obregón con 5 de Febrero) reciben rangos altos, mientras que nodos en calles residenciales reciben rangos bajos.
-	
-	\item \textbf{Contracción secuencial de nodos:} Procesa los nodos en orden ascendente de importancia, eliminándolos del grafo y creando atajos que preservan distancias más cortas. Para cada nodo $v$ eliminado, OSRM verifica todos los pares de vecinos $(u, w)$ y crea un atajo $(u, w)$ si el camino más corto de $u$ a $w$ pasaba por $v$.
-	
-	\item \textbf{Optimización del grafo aumentado:} El número de atajos creados determina el tamaño del grafo preprocesado y el tiempo de consulta. OSRM implementa optimizaciones para minimizar atajos redundantes.
+	\item \textbf{Ordenamiento de nodos:} Asigna un nivel de importancia a cada nodo.
+	\item \textbf{Contracción:} Elimina nodos en orden de importancia, añadiendo "atajos" (shortcuts) para preservar las distancias más cortas entre los vecinos restantes.
 \end{enumerate}
-
-La complejidad de esta etapa es $O(|V| \cdot |E| \log |V|)$ en el peor caso, pero en redes viales con estructura jerárquica natural (como La Paz), el tiempo de ejecución es significativamente menor. Para la red de La Paz, esta etapa requiere aproximadamente 30-60 segundos.
 
 Archivos generados:
 \begin{itemize}
-	\item \texttt{lapaz\_filtered.osrm.partition}: Información de particionamiento
-	\item \texttt{lapaz\_filtered.osrm.cells}: Estructura de celdas jerárquicas
-\end{itemize}
-
-\paragraph{Etapa 3: Customize (customización de pesos)}
-
-La tercera y última etapa preprocesa los atajos con los pesos finales del grafo:
-
-\begin{verbatim}
-osrm-customize lapaz_filtered.osrm
-\end{verbatim}
-
-Esta etapa calcula y almacena los pesos exactos (tiempos de viaje) de todos los atajos creados en la etapa de particionamiento. Esto permite que el servidor de ruteo responda consultas sin necesidad de recalcular pesos en tiempo de ejecución.
-
-La etapa \texttt{customize} es especialmente útil cuando se desea experimentar con diferentes perfiles de velocidad (e.g., escenarios de tráfico congestionado vs. fluido) sin recomputar todo el particionamiento: solo se reejecutaría \texttt{customize} con los nuevos pesos.
-
-Archivos finales generados:
-\begin{itemize}
 	\item \texttt{lapaz\_filtered.osrm.hsgr}: Grafo jerárquico completo (Hierarchical Sparse Graph Representation)
-	\item \texttt{lapaz\_filtered.osrm.datasource\_names}: Metadatos de fuente de datos
 \end{itemize}
 
 \paragraph{Validación del preprocesamiento}
 
-Al finalizar las tres etapas, se verifica la integridad del grafo preprocesado iniciando el servidor de ruteo en modo de prueba:
+Al finalizar, se verifica la integridad del grafo preprocesado iniciando el servidor de ruteo:
 
 \begin{verbatim}
-osrm-routed --algorithm mld lapaz_filtered.osrm
+osrm-routed --algorithm ch lapaz_filtered.osrm
 \end{verbatim}
 
-El parámetro \texttt{--algorithm mld} especifica el uso de Multi-Level Dijkstra (MLD), una variante de Contraction Hierarchies implementada en OSRM v5.26.0 que optimiza el uso de memoria para grafos grandes.
+El parámetro \texttt{--algorithm ch} especifica el uso de Contraction Hierarchies (CH).
 
 Si el servidor inicia sin errores y responde correctamente a consultas de prueba (e.g., \texttt{http://localhost:5000/route/v1/driving/-110.31,24.14;-110.30,24.15}), el preprocesamiento se considera exitoso.
 
@@ -3465,7 +3475,7 @@ El simulador debe preservar cuatro invariantes fundamentales en todo momento:
 	
 	\textit{Verificación:} El script \texttt{generate\_results.py} verifica automáticamente esta condición para todas las órdenes y emite advertencias si detecta inconsistencias.
 	
-	\item \textbf{Capacidad de couriers:} Ningún courier debe llevar simultáneamente más de \texttt{MAX\_BUNDLE\_SIZE} = 6 órdenes.
+	\item \textbf{Capacidad de couriers:} Ningún courier debe llevar simultáneamente más de \texttt{MAX\_BUNDLE\_SIZE} = 4 órdenes.
 	
 	\textit{Verificación:} Durante la ejecución, antes de asignar cada bundle, se verifica:
 	\begin{verbatim}
@@ -3860,7 +3870,7 @@ docker run -d \
   -p 5000:5000 \
   -v "${PWD}/osrm_data:/data" \
   osrm/osrm-backend:v5.26.0 \
-  osrm-routed --algorithm mld /data/bcs-latest.osrm
+  osrm-routed --algorithm ch /data/bcs-latest.osrm
 \end{verbatim}
 
 \textbf{Explicación de parámetros:}
@@ -3869,7 +3879,7 @@ docker run -d \
 	\item \texttt{-d}: Modo detached (background), el contenedor sigue corriendo tras cerrar la terminal.
 	\item \texttt{-p 5000:5000}: Mapeo de puerto 5000 del contenedor al puerto 5000 del host (endpoint accesible en \texttt{localhost:5000}).
 	\item \texttt{-v "\$\{PWD\}/osrm\_data:/data"}: Montaje de volumen que mapea el directorio local \texttt{osrm\_data/} (conteniendo archivos \texttt{.osrm} preprocesados) al directorio \texttt{/data} dentro del contenedor.
-	\item \texttt{osrm-routed --algorithm mld}: Comando que inicia el servidor OSRM usando algoritmo Multi-Level Dijkstra (MLD) sobre el archivo de red especificado.
+	\item \texttt{osrm-routed --algorithm ch}: Comando que inicia el servidor OSRM usando algoritmo Contraction Hierarchies (CH) sobre el archivo de red especificado.
 	\item \texttt{/data/bcs-latest.osrm}: Ruta al archivo de red preprocesado (contiene grafo vial, índices de particiones, metadatos).
 \end{itemize}
 
@@ -3899,9 +3909,7 @@ El directorio \texttt{osrm\_data/} contiene 28 archivos binarios generados duran
 \textbf{Archivo} & \textbf{Descripción} \\
 \hline
 \texttt{bcs-latest.osrm} & Archivo principal (contiene grafo de aristas comprimido) \\
-\texttt{bcs-latest.osrm.cells} & Células de partición geográfica (MLD) \\
-\texttt{bcs-latest.osrm.mldgr} & Grafo multi-nivel para consultas rápidas \\
-\texttt{bcs-latest.osrm.partition} & Índice de particiones jerárquicas \\
+\texttt{bcs-latest.osrm.hsgr} & Grafo de jerarquías contraídas (CH) \\
 \texttt{bcs-latest.osrm.geometry} & Geometrías de aristas (coordenadas de polilíneas) \\
 \texttt{bcs-latest.osrm.names} & Nombres de calles (string pool) \\
 ... (23 archivos adicionales) & Índices, metadatos, ponderaciones de giros \\
@@ -3935,7 +3943,7 @@ services:
       - "5000:5000"
     volumes:
       - ./osrm_data:/data
-    command: osrm-routed --algorithm mld /data/bcs-latest.osrm
+    command: osrm-routed --algorithm ch /data/bcs-latest.osrm
   
   simulator:
     build: .
@@ -4134,12 +4142,12 @@ Se puede implementar un sistema de logging JSON que registre metadatos de cada e
   "osrm": {
     "version": "v5.26.0",
     "network_file": "bcs-latest.osrm",
-    "algorithm": "mld"
+    "algorithm": "ch"
   },
   "parameters": {
     "OPTIMIZATION_FREQUENCY": "5 minutes",
     "ASSIGNMENT_HORIZON": "20 minutes",
-    "MAX_BUNDLE_SIZE": 6,
+    "MAX_BUNDLE_SIZE": 4,
     "TARGET_CLICK_TO_DOOR": "40 minutes",
     "PICKUP_DELAY_THETA": 0.1
   },
