@@ -16,8 +16,8 @@ El objetivo es maximizar la eficiencia operativa mientras se mantiene la calidad
 ## Requisitos Previos
 
 *   Python 3.8 o superior
-*   Docker (para ejecutar servidor OSRM local)
-*   Un servidor OSRM local corriendo en `localhost:5000`. El proyecto incluye archivos `.osrm` precompilados para La Paz/BCS.
+*   Docker y Docker Compose (para ejecutar servidor OSRM local)
+*   El proyecto incluye archivos `.osrm` precompilados para La Paz/BCS en `osrm_data/`.
 
 ## Instalación
 
@@ -33,8 +33,18 @@ El objetivo es maximizar la eficiencia operativa mientras se mantiene la calidad
 
 
 3.  Inicia el servidor OSRM local (requerido para ruteo):
-    
-    docker run -d -p 5000:5000 -v "${PWD}/osrm_data:/data" osrm/osrm-backend osrm-routed --algorithm ch /data/bcs-latest.osrm
+
+    ```bash
+    docker-compose up -d
+    ```
+
+    Esto levanta el contenedor `osrm/osrm-backend:5.26.0` con el algoritmo CH sobre la red vial de La Paz, expuesto en `localhost:5000`. Para verificar que está activo:
+
+    ```bash
+    curl http://localhost:5000/route/v1/driving/-110.31,24.14;-110.30,24.15
+    ```
+
+    Para detenerlo: `docker-compose down`
     
 
 ## Reproducción de Resultados

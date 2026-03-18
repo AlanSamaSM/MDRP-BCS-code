@@ -1,8 +1,9 @@
 **/__pycache__/
-
 *.py[cod]
 
+# OSRM raw source (not needed, precompiled .osrm files are tracked)
 /osrm_data/*.pbf
-/osrm_data/mexico-251010.osrm*
-/results/maps
+
+# Generated map HTML files (regenerable via scripts)
+/results/maps/
 

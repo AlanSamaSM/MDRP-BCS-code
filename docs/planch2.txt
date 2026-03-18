@@ -1,0 +1,155 @@
+Voy a darte una evaluación honesta y pragmática sobre las tres preguntas.
+
+1. ¿Es suficiente para una maestría? — Sí, es sólido.
+Tu proyecto tiene los tres pilares que un comité evaluador busca:
+
+Pilar	Lo que tienes	Veredicto
+Novedad	Validación de Rolling Horizon en topología hostil (La Paz) con OSRM — nadie ha hecho esto	Fuerte
+Rigor técnico	Implementación completa de Reyes (2018): bundling, Hungarian, two-stage commitment, 3 grupos de prioridad	Fuerte
+Reproducibilidad	Docker + OSRM + OSM + código abierto — cualquiera puede replicar	Excepcional para maestría
+Lo que lo diferencia de un proyecto "genérico":
+
+No solo implementaste un algoritmo — lo validaste contra una topología real adversa que la literatura no ha estudiado
+La brecha Euclidiana→Red vial (17-40%, Boyaci 2021) es un argumento publicado y tu trabajo lo demuestra empíricamente en un contexto nuevo
+El stack 100% open-source es un aporte tangible para la comunidad
+Lo que NO necesitas para que sea suficiente: Hostinger, una app web, ni interfaz gráfica. El aporte es científico/algorítmico, no un producto.
+
+2. ¿Hostinger? — No lo recomiendo como prioridad
+Subir algo a Hostinger (¿una demo web? ¿el mapa de simulación?) sería un "nice-to-have" que:
+
+Consume tiempo de desarrollo frontend que no aporta a la evaluación académica
+No sustituye lo que sí necesitas: capítulos 2-5 escritos
+Tu simulación ya genera los HTML interactivos en /maps/ y el mdrp_simulation.html
+Lo que sí aportaría más que Hostinger: Subir el repositorio a GitHub público con un README bien documentado y el Docker Compose. Eso sí es Ciencia Abierta demostrable y tu comité lo valorará.
+
+3. Estrategia para terminar rápido — Priorización brutal
+Basándome en lo que ya tienes escrito vs. lo que falta:
+
+Lo que ya está hecho y NO hay que tocar:
+Capítulo 1 (~500 líneas): Completo y bien argumentado
+Código funcional: Resultados ya generados
+KPI comparison: CSV con datos reales
+Orden de ataque para los capítulos restantes:
+Capítulo 3 (Desarrollo) — Escribir PRIMERO, ~2-3 días
+
+Es el más fácil porque es descriptivo: "el código hace X, así"
+Cada sección = un archivo de src explicado con diagramas de flujo
+Ya tienes toda la información, solo hay que redactar
+Capítulo 4 (Resultados) — Escribir SEGUNDO, ~2 días
+
+Volcar kpi_comparison.csv en tablas LaTeX
+Agregar las gráficas que ya generaste
+Análisis estadístico (Mann-Whitney U ya está en tu script)
+Es mecánico: datos → tabla → interpretación de 2-3 párrafos por KPI
+Capítulo 2 (Marco Teórico) — Escribir TERCERO, ~3-4 días
+
+Aquí va mi sugerencia clave: recorta la estructura propuesta
+Marco Teórico — Versión acelerada
+De las 7 secciones que propuse, solo 4 son indispensables:
+
+2. Marco Teórico
+
+   2.1 Modelo formal del MDRP (Reyes 2018)
+       → Notación, función objetivo, restricciones
+       → Esto justifica TODO tu código
+       → ~3-4 páginas
+
+   2.2 Política Rolling Horizon y heurísticas
+       → Épocas, bundling, grupos de prioridad,
+         compromiso en dos etapas, Algoritmo Húngaro
+       → Fusionar las secciones 2.2, 2.3 y 2.4 del plan
+         en UNA sola sección narrativa
+       → ~5-6 páginas
+
+   2.3 Infraestructura de enrutamiento (OSM + OSRM)
+       → Ya tienes ~36 líneas escritas, expandir a ~3 páginas
+       → Agregar CH con más detalle + Docker
+
+   2.4 Generación de demanda y métricas
+       → Fusionar 2.6 y 2.7 del plan original
+       → Poisson no homogéneo + definición de KPIs
+       → ~2-3 páginas
+
+       Total estimado del Marco Teórico: ~15 páginas, suficiente para maestría.
+
+Capítulo 5 (Conclusiones) — Último, ~1 día
+
+1-2 páginas: qué se demostró, limitaciones reconocidas, trabajo futuro
+Es lo más corto de todo
+Timeline realista:
+Día	Tarea	Producto
+1-3	Cap. 3 Desarrollo	Describir arquitectura, flujo de simulación, cada módulo
+4-5	Cap. 4 Resultados	Tablas KPI, gráficas, Mann-Whitney, interpretación
+6-9	Cap. 2 Marco Teórico	Las 4 secciones compactas
+10	Cap. 5 Conclusiones	Cierre, limitaciones, trabajo futuro
+11	Revisión global	Consistencia de notación, bibliografía completa
+Resumen ejecutivo
+¿Es buen trabajo de maestría? Sí. Tienes novedad (topología hostil), rigor (Reyes 2018 completo), y reproducibilidad (Docker/OSRM/OSM).
+¿Hostinger? No. Invierte ese tiempo en escribir. Si quieres visibilidad, sube a GitHub.
+¿Cómo acabar rápido? Escribe Desarrollo primero (es el más fácil), luego Resultados (es mecánico), luego Marco Teórico (compactado a 4 secciones), y Conclusiones al final.
+¿Quieres que empiece a redactar alguno de estos capítulos?
+
+
+Estructura de siguientes capitulos: 
+
+Estructura propuesta — Capítulo 3: Desarrollo
+
+3. Desarrollo
+   3.1 Arquitectura del sistema
+       - Diagrama general: OSRM (Docker) ↔ Simulador Python ↔ Resultados
+       - docker-compose.yml y despliegue contenerizado
+       - Flujo de datos: OSM → .osrm (preprocesamiento CH) → API REST
+
+   3.2 Generación de instancias sintéticas
+       - make_synth_orders.py: proceso Poisson no-homogéneo
+       - Calibración con LaDe (picos 09:00, 17:00)
+       - Distribución geoespacial: polígono urbano La Paz
+       - Tiempo de preparación: N(12,3) min
+       - Dimensionamiento automático de flota (synth_loader.py)
+
+   3.3 Motor de simulación
+       - Ciclo de simulación por épocas (f = 5 min)
+       - Máquina de estados de órdenes y couriers
+       - Integración con OSRM (getrouteOSMR.py, caché)
+
+   3.4 Política FCFS (baseline)
+       - Lógica de asignación reactiva: nearest available courier
+       - Activación vía FCFS_POLICY=1
+
+   3.5 Política Rolling Horizon
+       3.5.1 Clasificación de órdenes (Grupos I, II, III)
+       3.5.2 Bundling por restaurante (bundling.py)
+       3.5.3 Matching courier-bundle: Algoritmo Húngaro (asignaciontentativa.py)
+       3.5.4 Compromiso en dos etapas y lookahead (Δ₁, Δ₂)
+
+   3.6 Diseño experimental
+       - run_experiments.py: 5 escenarios de saturación (18:1 → 75:1)
+       - Variación paramétrica (--bundle-sizes, --seeds)
+       - Pipeline: generación → FCFS → RH → KPIs
+
+   3.7 Métricas de evaluación (generate_results.py)
+       - 21 KPIs: CTD, RTP, RTD, utilización, costo/orden, SLA
+       - Modelo de compensación: max(p₁·orders, p₂·hours)
+
+       Estructura propuesta — Capítulo 2: Marco Teórico (compacto, para después)
+
+       2. Marco Teórico
+   2.1 Formulación matemática del MDRP
+       - Notación formal (Reyes 2018): conjuntos, variables, función objetivo
+       - Restricciones de capacidad, ventanas de tiempo, precedencia
+
+   2.2 Heurística de Horizonte Rodante
+       - Épocas τ, frecuencia f, horizonte Δu
+       - Bundling: target bundle size, inserción paralela
+       - Grupos de prioridad y forzamiento de compromiso
+       - Matching bipartito: formulación como problema de asignación → Húngaro
+
+   2.3 Enrutamiento sobre grafos viales
+       - OSM: modelo de datos (nodos, ways, relations)
+       - Contraction Hierarchies (Geisberger 2008)
+       - OSRM: preprocesamiento y consulta en O(ms)
+
+   2.4 Generación estocástica de demanda y métricas
+       - Proceso Poisson no-homogéneo con tasa λ(t)
+       - Definición formal de KPIs (CTD, RTP, eficiencia)
+
