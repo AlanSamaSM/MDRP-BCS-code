@@ -1,9 +1,10 @@
-"""Generador de pedidos sintéticos calibrado con LaDe (Wu et al., 2025).
+"""Generador de pedidos sintéticos basado en LaDe dataset (Wu et al., 2025).
 
 Produce aproximadamente 1,000 pedidos distribuidos entre las 08:00 y las 19:00,
-con picos de demanda alrededor de las 09:00 y 17:00 horas. El script reemplaza
-las ubicaciones de restaurantes por puntos uniformes dentro del polígono urbano
-definido y asigna destinos cercanos para replicar la densidad observada (~1 km).
+con picos de demanda alrededor de las 09:00 y 17:00 horas. El script asigna
+restaurantes a clientes en rango de distancia realista: 2-5 km (matching real
+food delivery patterns). Las ubicaciones se generan uniformemente dentro del
+polígono urbano de La Paz.
 """
 
 import argparse
@@ -16,10 +17,10 @@ import pandas as pd
 from shapely.geometry import Point, Polygon
 
 
-DEFAULT_START = datetime(2025, 7, 3, 8, 0, 0)
-DEFAULT_SHIFT_MINUTES = 11 * 60  # 08:00 a 19:00
+DEFAULT_START = datetime(2025, 7, 3, 8, 0, 0) 
+DEFAULT_SHIFT_MINUTES = 11 * 60  # 08:00 a 19:00  
 DEFAULT_TARGET_ORDERS = 1000
-DEFAULT_SEED = 2025
+DEFAULT_SEED = 2025 
 
 MORNING_PEAK_HOUR = 9
 EVENING_PEAK_HOUR = 17
@@ -28,12 +29,14 @@ BASE_INTENSITY = 0.6
 MORNING_PEAK_WEIGHT = 2.4
 EVENING_PEAK_WEIGHT = 2.0
 
+
+"""e utiliza para definir el área urbana de La Paz y no crear pedidos fuera de esta zona o en el mar."""
 POLYGON_COORDS = [
     (24.124041, -110.311612),
     (24.133011, -110.335855),
     (24.159317, -110.309647),
     (24.147104, -110.292893),
-]
+] 
 
 
 def locate_restaurants():
@@ -119,10 +122,35 @@ def generate_orders(rng, target_orders, output_path):
     rest_x = gdf_rest.geometry.x.values
     rest_y = gdf_rest.geometry.y.values
     rest_idx = []
+    
+    # Distancia en grados (~111 km por grado en esta latitud)
+    MIN_DISTANCE_KM = 2.0
+    MAX_DISTANCE_KM = 5.0
+    KM_PER_DEGREE = 111.0
+    MIN_DISTANCE_DEG = MIN_DISTANCE_KM / KM_PER_DEGREE
+    MAX_DISTANCE_DEG = MAX_DISTANCE_KM / KM_PER_DEGREE
+    
     for point in dest_points:
         dx = rest_x - point.x
         dy = rest_y - point.y
-        rest_idx.append(int(np.argmin(dx * dx + dy * dy)))
+        distances = np.sqrt(dx * dx + dy * dy)
+        
+        # Filtrar restaurantes en rango 2-5 km
+        valid_mask = (distances >= MIN_DISTANCE_DEG) & (distances <= MAX_DISTANCE_DEG)
+        valid_indices = np.where(valid_mask)[0]
+        
+        if len(valid_indices) > 0:
+            # Elegir aleatoriamente de los válidos
+            rest_idx.append(int(rng.choice(valid_indices)))
+        else:
+            # Fallback: si no hay restaurantes en rango, usar el más cercano en [MIN, ∞)
+            far_enough = distances >= MIN_DISTANCE_DEG
+            if np.any(far_enough):
+                closest_far = int(np.argmin(np.where(far_enough, distances, np.inf)))
+                rest_idx.append(closest_far)
+            else:
+                # Último recurso: usar el más cercano disponible
+                rest_idx.append(int(np.argmin(distances)))
 
     df = pd.DataFrame(
         {

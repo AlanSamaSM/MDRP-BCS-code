@@ -1,40 +1,51 @@
-# Simulación y Optimización del Despacho de Órdenes para Entrega de Comida en La Paz, BCS
+# Simulación y Optimización del Despacho de Órdenes para Entrega de Comida - Enfoque Rolling Horizon
 
-Este repositorio contiene el código fuente y los experimentos para la tesis de optimización de despacho de órdenes en sistemas de entrega de comida. El proyecto implementa un simulador para el Problema de Enrutamiento de Entrega de Comida (MDRP) y compara dos políticas de asignación de repartidores:
+Este repositorio contiene la implementación del **algoritmo Rolling Horizon (RH)** para el Problema de Enrutamiento de Entregas de Comida (MDRP - Meal Delivery Routing Problem) en La Paz, Baja California Sur, basado en la investigación de Reyes et al. (2018).
 
-1.  **First-Come, First-Served (FCFS):** Una política base simple donde las órdenes se asignan al repartidor disponible más cercano a medida que están listas.
-2.  **Rolling Horizon (RH):** Una heurística de optimización que agrupa (bundle) órdenes y planifica rutas en intervalos de tiempo periódicos para mejorar la eficiencia.
+## Descripción del Proyecto
 
-El objetivo es demostrar la mejora en la calidad del servicio y la eficiencia operativa del enfoque RH sobre FCFS utilizando un conjunto de datos sintético basado en la ciudad de La Paz, BCS.
+El proyecto implementa un **simulador multi-agente basado en eventos** que modela dinámicamente el sistema de entrega de comida utilizando:
+
+- **Bundling de órdenes:** Agrupación inteligente de múltiples órdenes por restaurante según su disponibilidad y geometría espacial
+- **Asignación de dos fases:** Asignación tentativa seguida de un compromiso finalizador (two-stage commitment)
+- **Optimización de rutas:** Integración con servidor OSRM para cálculo de distancias y tiempos reales
+- **Horizonte rodante:** Replaneamiento periódico de bundles y asignaciones de couriers
+
+El objetivo es maximizar la eficiencia operativa mientras se mantiene la calidad del servicio a través de métricas de experiencia de cliente según Reyes et al. (2018).
 
 ## Requisitos Previos
 
 *   Python 3.8 o superior
-*   Docker (para ejecutar servidor OSRM local)
-*   Un servidor OSRM local corriendo en `localhost:5000`. El proyecto incluye archivos `.osrm` precompilados para La Paz.
+*   Docker y Docker Compose (para ejecutar servidor OSRM local)
+*   El proyecto incluye archivos `.osrm` precompilados para La Paz/BCS en `osrm_data/`.
 
 ## Instalación
 
 1.  Clona este repositorio:
-    ```bash
+    
     git clone https://github.com/AlanSamaSM/MDRP-BCS-code.git
     cd MDRP-BCS-code
-    ```
+    
 
 2.  Instala las dependencias de Python:
-    ```bash
+    
     pip install -r requirements.txt
-    ```
+
 
 3.  Inicia el servidor OSRM local (requerido para ruteo):
+
     ```bash
-    docker run -d -p 5000:5000 -v "${PWD}:/data" osrm/osrm-backend osrm-routed --algorithm mld /data/mexico-251010.osrm
+    docker-compose up -d
     ```
+
+    Esto levanta el contenedor `osrm/osrm-backend:5.26.0` con el algoritmo CH sobre la red vial de La Paz, expuesto en `localhost:5000`. Para verificar que está activo:
+
+    ```bash
+    curl http://localhost:5000/route/v1/driving/-110.31,24.14;-110.30,24.15
+    ```
+
+    Para detenerlo: `docker-compose down`
     
-    Para Windows PowerShell:
-    ```powershell
-    docker run -d -p 5000:5000 -v "${PWD}:/data" osrm/osrm-backend osrm-routed --algorithm mld /data/mexico-251010.osrm
-    ```
 
 ## Reproducción de Resultados
 
@@ -55,11 +66,10 @@ Este script realizará automáticamente los siguientes pasos:
 
 ### Solo Análisis (sin ejecutar simulaciones)
 
-Si ya ejecutaste las simulaciones y solo quieres recalcular los KPIs:
+Si solo quieres recalcular los KPIs:
 
-```bash
 python scripts/generate_results.py --analyze-only
-```
+
 
 ### Ejecución Manual de Políticas
 
@@ -113,62 +123,45 @@ El sistema calcula las siguientes métricas según Reyes et al. (2018):
 - Ganancias de couriers por entregas
 - Fracción de couriers con compensación mínima
 
-## Estructura del Proyecto
+## Visualización de Resultados
 
-```
-MDRP-BCS-code/
-├── data/                 # Datos de entrada
-│   ├── couriers.csv                        # Definición de repartidores
-│   ├── restaurants.csv                     # Restaurantes base
-│   ├── la_paz_restaurants.geojson         # Restaurantes de La Paz
-│   └── synthetic_lapaz_orders_limited.csv # Órdenes sintéticas generadas
-├── results/              # Resultados de simulaciones
-│   ├── raw/              # Resultados detallados por política
-│   ├── maps/             # Mapas de visualización de rutas
-│   └── kpi_comparison.csv # Comparación final de métricas
-├── scripts/              # Scripts de ejecución
-│   ├── generate_results.py    # Orquestador principal del pipeline
-│   ├── make_synth_orders.py   # Generador de órdenes sintéticas
-│   ├── run_fcfs_instance.py   # Ejecutor de política FCFS
-│   ├── run_synth_instance.py  # Ejecutor de política Rolling Horizon
-│   ├── plot_synth_on_map.py   # Visualizador de órdenes en mapa
-│   └── validate_datasets.py   # Validador de conjuntos de datos
-├── src/                  # Código fuente principal
-│   ├── main.py           # Simulador principal y clases de dominio
-│   ├── bundling.py       # Algoritmos de agrupación de órdenes
-│   ├── asignaciontentativa.py # Algoritmos de asignación
-│   ├── getrouteOSMR.py   # Cliente OSRM y cálculo de rutas
-│   ├── config.py         # Parámetros de configuración global
-│   ├── synth_loader.py   # Cargador de datos sintéticos
-│   ├── grubhub_loader.py # Cargador de benchmark Grubhub
-│   └── lade_loader.py    # Cargador de benchmark LaDe
-├── docs/                 # Documentación
-│   └── project_pseudocode.txt # Pseudocódigo del proyecto
-├── tests/                # Pruebas unitarias
-├── mexico-251010.osm.pbf # Mapa base de México (OSRM)
-├── mexico-251010.osrm*   # Archivos precompilados de OSRM
-├── README.md             # Este archivo
-└── requirements.txt      # Dependencias de Python
-```
+Los resultados de las simulaciones incluyen:
 
-## Visualización
+- **Mapas interactivos de rutas:** Visualización de cada entrega con rutas detalladas en `results/maps/{policy_name}/delivery_XX.html`
+- **Índice de bundles completos:** Vista general de todos los bundles en `results/maps/{policy_name}/complete_bundles_index.html`
+- **Comparación de KPIs:** Tabla comparativa en `results/kpi_comparison.csv`
 
-Para visualizar las órdenes sintéticas generadas en un mapa interactivo:
+Para visualizar un mapa específico, abre el archivo HTML en tu navegador web.
 
-```bash
-python scripts/plot_synth_on_map.py data/synthetic_lapaz_orders_limited.csv
-```
+## Algoritmo de Rolling Horizon - Resumen Técnico
 
-Esto generará un archivo HTML en `results/maps/` que puedes abrir en tu navegador.
+### Proceso de Simulación
+
+1. **Horizonte de asignación (Δt):** Se procesan eventos cada cierto intervalo de tiempo
+2. **Generación de bundles:** Para cada restaurante se crean bundles de órdenes listas
+3. **Asignación tentativa:** Se asignan bundles a couriers según scoring
+4. **Compromiso finalizador:** Se valida viabilidad y se confirman asignaciones
+5. **Optimización de rutas:** Se calculan rutas reales usando OSRM
+
+### Parámetros Configurables
+
+Todos los parámetros se definen en `src/config.py`:
+
+- `ASSIGNMENT_HORIZON`: Intervalo de replaneamiento (minutos)
+- `MAX_CLICK_TO_DOOR`: Objetivo máximo de click-to-door (minutos)
+- `SERVICE_TIME`: Tiempo de servicio en restaurante (segundos)
+- `PAY_PER_ORDER`: Compensación por orden entregada
+- `MIN_PAY_PER_HOUR`: Compensación mínima por hora
 
 ## Documentación Adicional
 
-- **Pseudocódigo del proyecto:** Ver `docs/project_pseudocode.txt` para una descripción detallada de la arquitectura y flujo del sistema.
+- **Manual técnico de OSRM:** Ver `docs/osrm_manual.md` para detalles de preprocesamiento, endpoints y troubleshooting.
 - **Paper de referencia:** Reyes et al. (2018) - "The Meal Delivery Routing Problem"
+- **Dashboard OSRM:** Ver `docs/osrm_dashboard.html` para visualizar el estado del servidor
 
 ## Contribuciones
 
-Este proyecto es parte de una tesis de maestría. Para preguntas o sugerencias, contacta al autor.
+Este proyecto es parte de una investigación académica. Para preguntas o sugerencias, contacta al autor.
 
 ## Licencia
 
@@ -177,4 +170,4 @@ Este proyecto es parte de una tesis de maestría. Para preguntas o sugerencias, 
 ## Autor
 
 Alan Sama
-Universidad Autónoma de Baja California Sur
+Instituto Tecnológico de La Paz (ITLP)

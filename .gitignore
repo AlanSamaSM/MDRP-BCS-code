@@ -1,19 +1,9 @@
-# -------------------------------------------------
-# Python artefacts
-# -------------------------------------------------
-# every __pycache__ directory anywhere in the tree
 **/__pycache__/
-# single files that sometimes sneak in
 *.py[cod]
 
-# -------------------------------------------------
-# Your project build artefacts
-# -------------------------------------------------
-# generated maps
-maps/
+# OSRM raw source (not needed, precompiled .osrm files are tracked)
+/osrm_data/*.pbf
 
-# -------------------------------------------------
-# OSRM data files
-# -------------------------------------------------
-/mexico-251010.osm.pbf
-/mexico-251010.osrm*
+# Generated map HTML files (regenerable via scripts)
+/results/maps/
+

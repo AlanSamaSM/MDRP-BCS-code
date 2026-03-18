@@ -1,0 +1,2 @@
+# This file ensures the osrm_data/ directory is tracked by Git
+# Place your OSRM files (mexico-251010.osm.pbf, mexico-251010.osrm*) in this directory

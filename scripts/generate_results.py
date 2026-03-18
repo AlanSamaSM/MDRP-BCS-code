@@ -1,9 +1,6 @@
 import os
 import sys
 import pandas as pd
-import numpy as np
-import subprocess
-from datetime import datetime
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -240,9 +237,23 @@ def analyze_results():
     improvement = {}
     for key in rh_metrics:
         if key != 'Policy':
-            if fcfs_metrics[key] > 0:
-                imp = ((rh_metrics[key] - fcfs_metrics[key]) / fcfs_metrics[key]) * 100
+            fcfs_val = fcfs_metrics[key]
+            rh_val = rh_metrics[key]
+            
+            # Handle negative values (invalid timestamps or data quality issues)
+            if fcfs_val < 0 or rh_val < 0:
+                improvement[key] = 'INVALID'
+            # Both values are zero - no improvement but both optimal
+            elif fcfs_val == 0 and rh_val == 0:
+                improvement[key] = '✓ Both 0%'
+            # Only FCFS is zero - show absolute difference instead of percentage
+            elif fcfs_val == 0 and rh_val > 0:
+                improvement[key] = f'Δ={rh_val:.2f}'
+            # Normal case - calculate percentage improvement
+            elif fcfs_val > 0:
+                imp = ((rh_val - fcfs_val) / fcfs_val) * 100
                 improvement[key] = f'{imp:.2f}%'
+            # Fallback for edge cases
             else:
                 improvement[key] = 'N/A'
     improvement['Policy'] = 'Improvement (%)'

@@ -1,0 +1,1092 @@
+Analysis of the efficiency of urban commercial vehicle
+tours: Data collection, methodology, and policy implications
+Miguel Andres Figliozzi *
+The University of Sydney, Institute of Transport and Logistics Studies, Faculty of Economics & Business Sydney, NSW 2006, Australia
+Abstract
+The emphasis of this research is on the analysis of commercial vehicle tours. Tours are disaggregated by their routing
+constraints. The generation of vehicle kilometers traveled (VKT) by tour type is analytically modeled and analyzed. The
+relative influence of the number of stops per tour, tour duration, and time window constraints on VKT is discussed using
+an analytical framework. Multistop tours are shown to generate more VKT than direct deliveries even for equal payloads.
+Intuition about the impacts of network/logistics changes and policy implications on VKT is derived. Implications for the
+calibration of trip generation and distribution models are discussed. In the tour model, it is proven that the percentage of
+empty trips has no correlation with the efficiency of the tours regarding VKT generation. The shape of trip length distributions (TLD) is discussed. It is shown that the average trip length and the TLD shape are strongly dependent on the tour
+type, distance from the depot/distribution center to the service area, density of stops, and number of stops per tour. Implications for data collection needs are analyzed.
+ 2007 Elsevier Ltd. All rights reserved.
+Keywords: Urban freight transportation; City logistics; Commercial vehicle tours; Truck trip distribution; Freight data collection; Empty
+trips; Trip length distribution
+1. Introduction
+It is increasingly recognized that urban freight movements play a critical role in the quality and performance of urban transportation systems. A recent USA based study of 13 cities indicates that commercial vehicles account on average for almost 10% of the VKT1
+; a predominant share of trips that contribute to freight
+VKT originate at distribution centers (DC) or warehouses (Outwater et al., 2005). However, the overall impact
+of urban freight on congestion can be significantly higher than the sheer number suggested by the VKT alone.
+This is indicated by the highway capacity manual with the use of equivalency factors for light and heavy vehicles. A commercial vehicle impact on congestion can be equivalent to the impact of several cars depending on
+0191-2615/$ - see front matter  2007 Elsevier Ltd. All rights reserved.
+doi:10.1016/j.trb.2007.04.006
+* Tel.: +61 2 93510095; fax: +61 2 93510088.
+E-mail address: miguel@itls.usyd.edu.au 1 Vehicle kilometers traveled (VKT) and vehicle miles traveled (VMT) differ only by a constant factor.
+Transportation Research Part B 41 (2007) 1014–1032
+www.elsevier.com/locate/trb
+the truck dimensions, engine power and truck weight, geometric design, and prevalent traffic conditions (TRB,
+2000). A similar statement can be said about the relatively higher impact of commercial vehicles on such urban
+issues as noise, pollution, accidents, and transport infrastructure damage costs.
+Urban freight transportation modeling is not yet a mature field (Regan and Garrido, 2001). In particular,
+urban commercial vehicle tours or trip chains are completely ignored in traditional four-stage transportation
+modeling approaches borrowed from the passenger modeling literature or in most urban freight models. A
+recent and comprehensive survey of urban freight modeling efforts across nine industrialized countries of
+America, Europe, Oceania, and Asia2 confirms the absence of urban commercial vehicle tour analytical models (Ambrosini and Routhier, 2004).
+Incipient work regarding commercial vehicle tour data collection and modeling has recently begun. Data
+collection efforts that aim to capture the complex logistical relationships of commercial tours have been undertaken in Canada (Stefan et al., 2005; Hunt et al., 2006; Hunt and Stefan, this issue), USA (Holguin-Veras and
+Patil, 2005), the Netherlands (Vleugel and Janic, 2004), and Australia (Figliozzi et al., 2007). In the modeling
+arena and to the best of the author’s knowledge, if commercial vehicle tours are taken into account they are
+simulated. The tour simulation can combine a tour optimization embedded in a dynamic traffic simulation
+environment (Taniguchi and Van der Heijden, 2000) or the simulation can be combined with discrete choice
+modeling (Hunt and Stefan, this issue). In the latter, tour stops (number, purpose, location, and duration) are
+modeled using regression and logit models and then micro-simulated.
+To the best of the author’s knowledge, the only research that attempts to study properties of urban tours
+analytically was performed by Figliozzi (2006). This work classifies tours according to the commercial activity
+that generates the tour and routing constraints faced by the carriers. The likely impacts of information and
+communication technologies on commercial vehicles tours are discussed using an analytical framework.
+Despite these advances in tour modeling and data collection, there is still no theoretical understanding of
+the properties of urban freight tours in relation to their efficiency and contribution to VKT. This research will
+contribute by filling this gap in the urban freight literature; however the emphasis of this research is not on trip
+or tour generation models or methods but on the mathematical analysis of tour characteristics and VKT generated. The contributions of this research are threefold: (a) study commercial vehicle tours in relation to the
+VKT generated, (b) explore the impact of certain network and policy changes by commercial tour types, and
+(c) discuss data collection, empty trips, trip length distributions (TLD), and trip generation/distribution modeling implications. The research is organized as follows: Section 2 defines the modeling framework and notation used in the research. Section 3 classifies and analyzes tour types. Section 4 studies the impact of tour types
+on VKT. Section 5 discusses relevant policy implications. Section 6 analyzes empty trips, TLD, and implications for trip generation and distribution models. Section 7 discusses data collection issues. Section 8 ends with
+conclusions.
+2. Tour definition, assumptions, and notation
+This research focuses on one type of structure: a distribution or service center that provides to several retailers or customers. Within this basic distribution structure, the number of retailers/customers in a given route
+can increase or decrease in order to satisfy routing constraints. This configuration has been chosen because
+recent studies in urban areas in the United States have shown that deliveries from DCs or warehouses have
+one of the largest impacts on VKT in urban areas and can account for 80–98% of the commercial VKT related
+to the distribution of products or packages (Outwater et al., 2005). On the service side, the commercial vehicles
+with the largest impact on VKT (excluding rental cars) are also business and public service vehicles which
+mostly operate from a central depot (Outwater et al., 2005).
+An urban tour is defined in this research as the path that a commercial vehicle follows since it leaves its
+depot or DC and visits different destinations (two or more destination or stops) in a sequence before returning
+to the depot or DC during a single driver shift. These tours usually amount to less than 300 km s from the DC
+since they are restricted by the average travel speed, loading/unloading time, number of stops, and number of
+2 USA Canada, Japan, Australia, Germany, UK, Netherlands, France, and Switzerland.
+M.A. Figliozzi / Transportation Research Part B 41 (2007) 1014–1032 1015
+working hours in a shift. USA data estimates that warehouse delivery vehicles have an average of 105 kms
+(approximately 65 miles) per day per vehicle (Cambridge Systematics, 2004).
+Distribution centers are increasingly located in the outskirts or low-density suburban areas. The efficient
+operation of DCs requires affordable tracts of land, good connectivity to the highway system, and reduced
+congestion. Therefore, it is increasingly common that tours from a DC to a service area start with a connecting
+distance, often along a primary highway system. This is followed by the tour itself in the service area and by
+the final return trip to the DC.
+A crucial requirement to study urban freight tours analytically is to find a mathematical expression that can
+link tour length with the number of customers (stops) per tour, the proximity among the customers, and the
+proximity of the DC to the customers. Using continuous approximations, Daganzo (1984) analytically derived
+a formula to predict the travel distance in capacitated vehicle routing problems (VRP) with elongated service
+areas. Daganzo’s formula estimates travel distances using the average distance between depot and customers,
+the number of routes needed, the service area extent, the number of customers, and two parameters that
+depend on the shape of the service area.
+Continuous approximations are a powerful modeling tool that can be used to solve and gain insights into
+complex logistics problems. The insights gained using continuous approximations can be used to understand
+system trade-offs that can be difficult to obtain with solutions to instance specific data. Daganzo (1991) presents a wide range of continuous approximation models which he applied to routing and distribution problems; a recent application of continuous approximations to logistics problems is to the package industry
+(Smilowitz and Daganzo, 2007).
+The expression used in this research to approximate the length of a VRP tour distance l(n) starting and ending at the DC or depot is
+lðnÞ ¼ kzz þ kl
+n
+ffiffiffi
+d
+p þ
+kb
+ffiffiffi
+d
+p ¼ kzz þ kl
+ffiffiffiffiffi
+an p þ kb
+ffiffiffiffiffiffiffi
+a=n p ð1Þ
+where n is the number of stops, z is the number of routes, d is the density of stops, kz, kl, kb is constants that
+depend on the location of the depot, routing constraints, and spatial distribution of customers, and a is the
+extent of the area of service comprised by the n customers.
+The first and second term of expression (1) are comparable to Daganzo’s formula (see Appendix). However,
+expression (1) is a more robust approximation to predict the length of TSP3 and VRP problems in randomly
+generated problems and real urban networks. Expression (1) has been tested with different patterns of customer spatial distribution, time windows, customer demands, and depot locations. Regression is used to estimate the parameters kz, kl, kb and the fit of Expression (1) is high with R2 > 0.99 and the mean absolute
+percentage error (MAPE) less than 5% (Figliozzi, 2007).
+The first component represents the connecting distance to the delivery area (including return trip), the second component is the local Traveling Salesman Tour (TST) connecting the customers or stops, and the third
+component can be interpreted as the bridging distance between the local tour and the connecting distance.
+Fig. 1 illustrates the three components where r is the connecting distance from the DC to the border of the
+delivery region a. As the number of customers increases, the length of the local tour per customer is proven
+to converge with probability one (Bearwood et al., 1959). However, with randomly and uniformly distributed
+customers, the distance between the ends of the local tour and the border of the service area quickly decreases
+as n increases.
+2.1. The basic model
+This research considers a system with one DC or depot and n stops or customers. Let customer i, i 2 I =
+{1,...,n} with a location in the plane xi, i 2 I. The annual demand of location xi,i 2 I is denoted di, i 2 I and
+the size of the order requested by qi, i 2 I. Let X = {x1,...,xn} be the set of demand locations, with ri the distance from location xi to the connecting link r as shown in Fig. 1.
+3 Traveling Salesman Problem.
+1016 M.A. Figliozzi / Transportation Research Part B 41 (2007) 1014–1032
+The set of demand locations is partitioned into service regions. Each time a customer is serviced in a given
+region, the service is made by a vehicle that services during a tour all other customers in the region as well. Let
+p = {X1,...,Xz} denote a partition of X. Let {a1,...,az} denote the set of service areas generated by partition
+p. The set of corresponding tours is denoted J = {1,...,z}, where z indicates the number of zones or service
+regions and Xj(j 2 J) denotes the collection of demand locations. Let mj = jXjj(j 2 J) be the number of stops or
+demand points in tour j. Let b the vehicle capacity, f the minimum delivery or service frequency; dj the annual
+demand for tour j, with Ri2Xjdi ¼ dj. Total demand is Rj2JRi2Xjdi ¼ D; qj the payload for tour j, with
+Ri2Xjqi ¼ qj; tl the time to load a unit of product into the truck; tu the time to unload a unit of product from
+the truck (loading–unloading times are highly dependent on the loading–unloading equipment used – manual,
+forklift, conveyor, etc. – and the distance to/from the truck to the receiving area). to the fixed time needed for
+order receiving when stopping at the retailers (this time includes order receiving, order checking/inspection,
+paperwork and documentation, etc). s the average truck speed. w the driver effective working hours or time
+available for truck operations (i.e. driver maximum working hours per day minus lunch or mandatory breaks);
+q the time window factor, representing the ratio between time window delivery length and working shift
+length, 0 < q < 1. In particular the time window length for any given customer is represented by the product
+qw. hj the qj/b = tour j fill rate or vehicle capacity utilization.
+2.2. Notation convention
+The upper bar is used to indicate an average; for example qi; i 2 I indicates the average order size across all
+customers and qj;j 2 J indicates the average order size only for the customers in tour j. A subscript is used to
+denote the type of tour; 0 to 3, as indicated in the next section. For example, p1 denotes the partition generated
+by tour type 1 and J2 is the set of type 2 tours.
+Expression (1) is more intuitively understood if the coefficient kz can be replaced by the term 2r, where r
+represents the average distance between the depot and customers. The value of 0.5 kz usually falls in the interval (0.97 r, 1.05 r) as indicated by simulation results (Figliozzi, 2007). Therefore,
+r  kz=2 where r ¼ r þ ri and ri ¼ X
+i
+ri=n
+r
+TST
+Stops or customers
+Depot or distribution center
+Service area a
+Connecting Link (r)
+Link of the TST
+Link connecting the TST and r
+i
+ri
+Link connecting r and customer i
+ri
+Fig. 1. Basic tour.
+M.A. Figliozzi / Transportation Research Part B 41 (2007) 1014–1032 1017
+Then,
+lðnÞ ¼ 2rz þ kl
+n
+ffiffiffi
+d
+p þ
+kb
+ffiffiffi
+d
+p ¼ 2zr þ kl
+ffiffiffiffiffi
+an p þ kb
+ffiffiffiffiffiffiffi
+a=n p ð2Þ
+Expression (2) is used in this research as a continuous approximation of the length of TSP and VRP instances.
+2.3. Tour example and assumptions
+To compare tour efficiency, fixed routes are assumed in this research. The fixed route assumption is congruent with practice; the configuration of tours is in many cases linked to sales or driver’s territories which
+have been predefined in advance (Assad, 1988). This is confirmed by data from the Netherlands where fixed
+routes comprise 70–80% percent of the truck trips (Vleugel and Janic, 2004). It is assumed that retailers, customers, or specific business settings articulate the characteristics of the service through such terms as order
+size, frequency, or time windows; the demand for freight transportation is a derived demand. Accordingly,
+routes are delineated in order to satisfy these requests by the central distribution or service center; a fleet operator must plan tours that satisfy tour constraints such as vehicle capacity, route time length, driver-working
+hours, allowed delivery windows, etc., as appropriate.
+Tour data from different cities indicate that the average number of stops per tour is significantly higher than
+two stops. The city of Calgary reports approximately 6 stops per tour (Hunt and Stefan, 2005), Denver reports
+5.6 (Holguin-Veras and Patil, 2005) and data from Amsterdam indicate 6.2 stops per tour (Vleugel and Janic,
+2004). In the case of Denver, approximately 50% of single and combination truck tours include 5–23 stops per
+tour. Further data collection are needed to generalize these results but it appears that the average number of
+stops per tour ranges between 5 and 6 for midsize to large cities.
+Data from Amsterdam indicate that the amount of time that is taken during unloading/loading stops is
+21 min on average (mode 10 min) and that the average time to reach the service/delivery area is 25 min (mode
+10 min). The data suggest a skewed distribution which may be due to the impact of congestion and delays at
+stops. The skewed distribution of service time and travel time are confirmed by disaggregated tour data in the
+city of Sydney (Figliozzi et al., 2007). Using the previously defined notation in Amsterdam: tuqi ¼ 21 min,
+average ðr=sÞ ¼ 25 min, and mj ¼ 6:2. Assuming that the average time between customers (includes driving,
+waiting/parking, and loading/unloading) is k=ðs ffiffiffi
+d
+p Þ þ t0 þ tuqi ¼ 55 min and with mj = 7, the tour duration
+in route j is of approximately 7.25 h. In such a tour, assuming 1/2 hour for the driver lunch break, the length
+of the tour is 7.75 h. Approximately 11% of the time is spent driving to the service area, 32% loading/unloading, and 51% waiting or driving between customers, and 6% for the driver’s lunch time or personal needs.
+Clearly, these values are city dependent and are related to such factors as city density/shape, average speeds,
+distance between warehouse/distribution districts to delivery areas, driver working hours, etc. In the case of
+service tours (no deliveries or pickups), the same logic applies but replacing time unloading/loading for
+in situ service time.
+3. Tour classification and properties
+Following the framework suggested by Figliozzi (2006), two fundamental dimensions are used to classify
+the constraints imposed by commercial activities on urban vehicle routing: (1) the time sensitivity of the activity, and (2) the value of the activity itself in relation to the cost of transport.
+The transportation decisions associated with low value, low time sensitive products, are driven by trade-offs
+between inventory and transport/order costs. An example of these kinds of products include the urban distribution of fuel to service stations. Economies of scale drive delivery size determination and vehicle capacity is a
+key constraint.
+The transportation decisions associated with low value – high time sensitive products are driven by the necessary replenishment frequency. This frequency can be determined by organizational issues (personnel
+assigned to receive orders on a given time/day), commercial activity (retailer limited shelf space), or product
+characteristics (perishables). Examples of these kind of activities include the urban distribution of newspapers,
+fresh baked bread, and garbage collection services. Service frequency is a key constraint.
+1018 M.A. Figliozzi / Transportation Research Part B 41 (2007) 1014–1032
+The transportation decisions associated with high value – high time sensitive products, are the most
+demanding activities in terms of transport service requirements. Product order sizes are small and the most
+frequent delivery mode is package or direct delivery (courier) services. A Make to Order-JIT production fits
+in this category (e.g. Dell Computers) as well as emergency repair work. Time windows are a key constraint.
+For a carrier or transport service provider, there are several constraints associated with the operation of an
+urban distribution fleet; these are: the type and capacity of the vehicles, drivers’ working hours or maximum
+tour lengths, and the design of balanced tours (Bodin et al., 2003). For a given set of customer requests, the
+fleet operator delineates routes that satisfy these requests taking into account routing constraints such as vehicle capacity, route time length, driver-working hours, allowed delivery windows, etc. as appropriate.
+Tours are classified in four different types according to the binding constraint that determines the characteristics of the tour:
+(a) Truck capacity – type 0 tour.
+(b) Frequency of service – type 1 tour.
+(c) Tour length – type 2 tour, and
+(d) Time window length – type 3 tour.
+If each order is equal to the capacity of the truck there is space for just one customer per tour, otherwise
+known as a direct delivery truckload (TL) tour or type 0 tour. If the required replenishment frequency or high
+inventory costs preclude the use of TL order, a tour can service two or more customers; this is called a type 1
+tour. In type 1 tours, customers request less-than-truckload (LTL) order sizes. If the constraints include not
+only the replenishment frequencies but also the length of the tour, the tour is of type 2. Finally, if the number
+of stops per tour is limited by time windows, the tour is of type 3.
+Although VKT efficiency is mainly analyzed in this paper, it is worth mentioning that carriers try to minimize two different types of costs: (a) fix costs and (b) variable costs. Fix costs are highly dependent on fleet size
+and variable costs are mostly dependent on both tour duration and distance. Expression (1) was derived in
+VRP instances where the primary objective was minimizing the number of vehicles needed, the secondary
+objective was minimizing distance. This is the standard objective in the VRPTW literature (Braysy and Gendreau, 2005). Tour duration and distance are usually highly correlated and expression (1) is also a good approximation for total travel time (Figliozzi, 2007).
+Urban freight movements are extremely complex; the parsimonious classification utilized in this paper covers essential tour types. In particular, it is expected that in real applications tours may have a mixture of customers, vehicle types, and constraints. For example, only a subset of the tour customers require deliveries
+within a given time windows. In that case, the efficiency of the tour will be bounded by the efficiency of tours
+with and without time windows. Notwithstanding the limited number of tour types analyzed, the proposed
+classification is considered a helpful starting point to improve the understanding of freight tours and its properties. Those readers interested in other classifications and a general introduction to the urban freight literature are referred to the work of Ogden (1992).
+3.1. Direct delivery tour – tour type 0
+As indicated in Section 2, tours are defined as the path that a commercial vehicle follows from the DC to
+visit a series of destinations in a sequence before returning to the depot during a single driver shift. Type 0 is a
+degenerate type of tour since it is characterized by visiting only one destination before returning to the depot. It
+is included in the analysis since it is a basic point of reference regarding VKT and tour efficiency as explained
+in Section 4. The binding constraints in this type of tour are:
+qi ¼ b 8i 2 I
+mj ¼ 1 8j 2 J 0
+Since there is one customer per tour, there are n different tours. Tours are trivially identified by the only customer served in the tour, Xj = {xj} and n = z0. For any customer i the total number of trips per year is equal to
+di/b. For any tour j, the annual VKT is
+M.A. Figliozzi / Transportation Research Part B 41 (2007) 1014–1032 1019
+VKT0;j ¼ dj
+b ð2r þ 2rjÞ
+The total distance traveled per year in the region is obtained summing across the set of tours:
+VKT0 ¼ X
+j2J 0
+VKT0;j ¼ X
+j2J 0
+dj
+b ð2r þ 2rjÞ ¼ 2 r
+D
+b þX
+j2J 0
+dj
+b rj
+ ! ð3Þ
+Expression (3) indicates that distance VKT0 is influenced by the ratio between total demand and truck capacity as well as individual customer demands and truck capacity. In the special case where demand levels are the
+same for all customers, d ¼ di ¼ di
+08i; i
+0 2 I or the demand is uniformly distributed, expression (2) becomes:
+VKT0 ¼ 2
+ndi
+b ð Þ¼ r þ ri 2
+D
+b ð Þ¼ r þ ri 2r
+D
+b ð4Þ
+3.2. Frequency constrained tour – tour type 1
+In this type of tour customer requests are less than truckloads (LTL). Due to the low demand of customer i
+and/or the characteristics of the commercial activity (e.g. perishable products, organizational issues, or storage area capacity) full truckloads are not a viable alternative; a higher frequency of service would be required
+(Figliozzi, 2006). The frequency constraint in this type of tour determines the order size:
+di=qi ¼ f > di=b 8i 2 I
+Tours still satisfy capacity constraints but tours can have more than one customer:
+X
+i2Xj
+qi ¼ miqj 6 b 8j 2 J 1
+The average order or delivery size tends to decrease as the number of customers in the tour increases since
+mjqj 6 b. The optimal partition of the n customers into tours that minimizes total distance traveled is equivalent to solving a vehicle routing problem. This is a generalization of the traveling salesman problem.
+The VKT per year per tour j is equal to:
+VKT1 ¼ X
+j2J 0
+dj
+qj
+2r þ kl
+ffiffiffiffiffiffiffiffiffi
+ajmj
+p þ kb
+ffiffiffiffiffiffiffiffiffiffiffi
+aj=mj
+  q
+Tours are balanced if the numbers of stops, payloads, and service areas are the same across tours; Fig. 2 presents an example of a partition that is tour balanced and subareas are not overlapping. Achieving balanced
+tours is an important objective in practical applications (Tang and Miller-Hooks, 2006). It is highly desirable
+that service areas are compact and tours do not cross, especially when drivers are responsible for their own
+service areas or when service areas correspond to sales districts. Assuming balanced tours:
+VKT1 ¼ dj
+hjb
+X
+j2J 1
+2r þ kl
+ffiffiffiffiffiffiffiffiffi
+ajmj
+p þ kb
+ffiffiffiffiffiffiffiffiffiffiffi
+aj=mj
+  q
+¼ dj
+h1;jb 2rz1 þ kl
+ffiffiffiffiffi
+mj
+p X
+j2J 1
+ffiffiffiffi
+aj
+p þ kb
+ffiffiffiffiffiffiffiffiffiffi
+1=mj
+q X
+j2J 1
+ffiffiffiffi
+aj
+p
+ !
+With fixed service tours, overlapping leads to higher VKT1. Assuming that subareas are not overlapping and
+that tours are balanced, then aj = a/z1, mj = n/z1, h1 = hj, D/z1 = dj " j 2 J1:
+VKT1 ¼ D
+h1z1b 2rz1 þ klz1
+ffiffiffiffiffiffiffiffiffi
+n=z1
+p ffiffiffiffiffiffiffiffiffi a=z1
+p þ kbz1
+ffiffiffiffiffiffiffiffiffi
+z1=n p ffiffiffiffiffiffiffiffiffi a=z1
+  p
+For a given delivery region, the average distance saved when a route is eliminated can be estimated taking the
+derivative of expression (1) with respect to the number of routes (Figliozzi, 2007). In addition, it is easily proven that assuming Euclidian distances, less routes result in less VKTs. Hence, in the last expression the VKT1
+is minimized if the number of delivery regions is one, z1 = 1. Thus, the VKT in the most efficient type 1 tour
+can be expressed as:
+1020 M.A. Figliozzi / Transportation Research Part B 41 (2007) 1014–1032
+VKT1 ¼ D
+h1b 2r þ kl
+ffiffiffiffiffi
+an p þ kb
+ffiffiffiffiffiffiffi
+a=n
+  p ð5Þ
+This is intuitively expected. One tour that services all n customers has two additional advantages: (a) higher
+delivery frequency and smaller average order size since q 6 b=n and (b) it is easier to reach high fill rate ratios
+h1 as a higher number of smaller orders can be consolidated into one tour. A higher delivery frequency is in
+general beneficial for customers as inventory holding costs are reduced. A high fill truck ratio is a measure of
+the efficiency of the tour regarding the utilized truck capacity.
+3.3. Route length constrained tour – tour type 2
+In this type of tour the customer demands are also less than truckloads (LTL), however, the binding constraint is the length of the tour. Not all customers can be served in the same tour; hence, the service area j must
+be split into two or more delivery regions. The binding constraint for each tour j with mj stops can be
+expressed as
+1
+S
+2r þ kl
+ffiffiffiffiffiffiffiffiffi
+ajmj
+p þ kb
+ffiffiffiffiffiffiffiffiffiffiffi
+aj=mj
+  q
+þ mjt0 þ tu þ tuqj 6 w 8j 2 J 2 ð6Þ
+di=qi ¼ f > di=b 8i 2 I ð7Þ
+Expression (6) can be interpreted as the sum of two terms tr or time spent to/from the service area and tc the
+time spent in the service area per customer:
+tr ¼ 2r=S
+mjtc ¼ kl
+ffiffiffiffiffiffiffiffiffi
+ajmj
+p þ kb
+ffiffiffiffiffiffiffiffiffiffiffi
+aj=mj
+q
+þ mjto þ tuqj:
+The term ðkl=sÞ ffiffiffiffiffiffiffiffiffi
+ajmj
+p ¼ kl=ðs ffiffiffi
+d
+p Þ measures the average ‘‘routing proximity’’ between two stops and it is
+mostly determined by network and geography characteristics of the service area. The average routing proximity of stops or customers can have an important impact on the trip length distributions as seen in section six.
+Stops or customers
+Depot or DC
+Service area
+Connecting Links
+Link of a TST
+Link connecting a TST to r
+Boundary separating service areas
+r
+TST1
+TST2
+Fig. 2. Balanced tours.
+M.A. Figliozzi / Transportation Research Part B 41 (2007) 1014–1032 1021
+The solution to the vehicle routing problem in this type of tour is finding the optimal partition (tours) that
+minimize expression (8) subject to tour length constraint (6) and customer frequency constraints (7):
+J 2 2 arg min VKT2 ¼ X
+j2J 2
+dj
+h2;jb 2r þ kl
+ffiffiffiffiffiffiffiffiffi
+ajmj
+p þ kb
+ffiffiffiffiffiffiffiffiffiffiffi
+aj=mj
+  q
+ð8Þ
+If tours are balanced, expression (8) becomes:
+VKT2 ¼ D
+h2z2b z22r þ kl
+ffiffiffiffiffi
+na p þ kbz2
+ffiffiffiffiffiffiffi
+a=n
+  p ð9Þ
+The average number of customers per tour is m2 ¼ n=z2.
+If tour length is binding, the fleet operator can increase the average number of stops by reducing the time
+spent per customer. This could be achieved: (a) with handling equipment to reduce tu, e.g. using a forklift, (b)
+with technology to reduce fixed processing times t0, e.g. RFID4 tags and readers to reduce paperwork and
+inspection time, and (c) with better facilities to reduce tc, e.g. a loading–unloading bay that can reduce time
+searching for parking and shorten distance between truck and customer. In tours with a large number of stops,
+time reduction per customer can have a significant impact on the efficiency of the tour. If the median number
+of stops in the soft drink industry is 25 (Golden and Wasil, 1987), a 5 min saving per stop represents a saving
+of 26% of the total 8 h driver working day. The time that a truck spends in a delivery–pickup area can be
+increased by adding DCs and reducing the average distance between DCs and service areas.
+3.4. Time window constrained tour – tour type 3
+The main constraint in this type of tour is the time window length. Time windows have a significant impact
+on decreasing the efficiency of tours. A time window not only reduces the proportion of time available per
+service area but also can decrease the density of customers per tour. To illustrate the latter assume that all
+locations in a set X are initially served in a driver’s eight-hour tour. Let’s assume that customers start demanding shorter time windows: either morning (8 a.m. to 12 p.m.) or afternoon (12 p.m. to 4 p.m.) service. Further,
+assume that customers are split evenly between the two service times but they are still randomly dispersed
+across the whole service area. With the introduction of morning and afternoon time windows, at least two
+tours are needed. With two tours, the customer density is reduced to d/2 and the average distance between
+stops increases as indicated by expression (2).
+This section analyzes the reduction in the number of stops when a time window is introduced. The delivery
+time window is equal to qw and the reduction in customer density is approximated by qd, i.e. for an eight-hour
+shift and q = 1/16 the time window length is 1/2 hour. It is also assumed that customers split evenly between
+the service times but they are still randomly dispersed across the whole service area:
+1
+S
+2r þ kb
+ffiffiffiffiffiffiffi
+amj
+p þ kl
+ffiffiffiffiffiffiffiffiffiffi
+a=mj
+  q
+þ mjt0 þ tuqj 6 qw 8j 2 J 3 ð10Þ
+Notice in (10) that the left hand side increases since the whole service area is used and the right hand side decreases; tour time length constraints are tighter. The solution to the vehicle routing problem in this type of
+tour is finding the optimal partition (tours) that minimize expression (11) subject to tour duration constraint
+(6) and customer frequency constraints (7):
+J 3 2 arg min VKT3 ¼ X
+j2J 3
+dj
+h3;jb 2r þ k1
+ffiffiffiffiffiffiffi
+amj
+p þ kb
+ffiffiffiffiffiffiffiffiffiffi
+a=mj
+  q
+ð11Þ
+If tours are balanced, expression (8) becomes:
+VKT3 ¼ D
+h3z3b 2rz3 þ k1
+ffiffiffiffi
+z3
+p ffiffiffiffiffi
+an p þ kbz3
+ffiffiffiffi
+z3
+p ffiffiffiffiffiffiffi
+a=n
+  p ð12Þ
+The average number of customers per tour is m3 ¼ n=z3.
+4 RFID stands for radio frequency identification.
+1022 M.A. Figliozzi / Transportation Research Part B 41 (2007) 1014–1032
+3.5. Comparison between m2 and m3 when time constraints are binding
+If tour length constraints (6) and (10) are binding, it is possible to compare the average tour lengths as
+follows:
+1
+s
+2r þ kl
+ffiffiffiffiffiffiffiffiffi
+ajm2
+p þ kb
+ffiffiffiffiffiffiffiffiffiffiffiffi
+aj=m2
+  q
+þ m2t0 þ tum2q2  1
+sq
+2r þ kl
+ffiffiffiffiffiffiffiffi
+am2
+p þ kb
+ffiffiffiffiffiffiffiffiffiffi
+a=m3
+  p þ m3to þ tum3q3
+The average times spent in the service area per customer are t2c and t3c:
+m2t2c ¼ kl=s ffiffiffiffiffiffiffiffiffi
+ajm2
+p þ kb=s
+ffiffiffiffiffiffiffiffiffiffiffiffi
+aj=m2
+q
+þ m2to þ tum2q2
+m3t3c ¼ kl=s ffiffiffiffiffiffiffiffi
+am3
+p þ kb=s ffiffiffiffiffiffiffiffiffiffi
+a=m3
+p þ m3to þ tum3q3
+Since time constraints are less tight in tours type (2), then m2 P m3. It follows that t2c < t3c given that
+m2 P m3; a > a=z2 ¼ aj, and the service frequency is the same (q2 ¼ q3).
+Replacing t2c and t3c, then solving for the value of m3:
+2r
+s
+q  1
+q
+  þ m2t2c ¼ m3
+q
+t3c
+2r
+s ðq  1Þ þ qm2t2c ¼ m3t3c
+m3 ¼ qm2
+t2c
+t3c
+ 2r
+st3c
+ð1  qÞ
+ð13Þ
+Since the second term in (13) is always positive and t2c < t3c, the reduction of customers is larger than the value
+of q itself, m3 < qm2 and z2/z3 < q. Shortening time windows has a severe impact on the number of stops that
+can be served per tour; therefore, it may have a negative impact on the number of truck tours and VKT that
+are needed to satisfy the same number of customers.
+The value of m3 cannot be negative; a lower bound on the feasible values of q is obtained setting m3 ¼ 1 in
+expression (13) and solving for the lower bound q:
+m2
+m3
+1
+0
+1 ρ
+ρ
+Fig. 3. Impact of time windows on the average number of customers per tour.
+M.A. Figliozzi / Transportation Research Part B 41 (2007) 1014–1032 1023
+qm2
+t2c
+t3c
+ 2r
+st3c
+1  q
+  ¼ 1
+q m2
+t2c
+t3c
+þ
+2r=s
+t3c
+  ¼ 1 þ
+2r=s
+t3c
+q ¼ t3c þ 2r=s
+ð Þ m2t2c þ 2r=s
+Fig. 3 shows the change in m3 as a function of q as expressed in (13). As expected, for q = 1 the equality
+m3 ¼ m2 holds. The feasible values of q are closer to 1 when the importance of the connecting time grows
+in relation to the delivery time; if q is closer to 1 the curve has a steeper slope and the feasible values of m3
+quickly decrease as seen in Fig. 3. Therefore, urban areas with considerable urban sprawl tend to suffer a higher reduction in the number of customers per tour as the time windows shorten.
+4. VKT relative impact by tour type
+This section explores the efficiency of commercial vehicle tours by VKT generated. Assuming the basic
+model of one DC serving a given set of n locations, changes in VKT are studied as the tour type changes ceteris
+paribus.
+4.1. Comparing VKT for types 0 and 1
+Taking the ratio of expressions (3) and (5):
+#0=1 ¼ VKT0
+VKT1
+¼
+2 r D
+b þ P
+j2J 0
+dj
+b rj
+ 
+D
+h1b 2r þ kl
+ffiffiffiffiffi
+an p þ kb
+ffiffiffiffiffiffiffi
+a=n
+  p ¼
+h1 2r þ 2
+D
+P
+j2J 0
+djrj
+ 
+2r þ kl
+ffiffiffiffiffi
+an p þ kb
+ffiffiffiffiffiffiffi
+a=n p
+Assuming that demand locations and levels are randomly but evenly distributed, using expression (4):
+#0=1 ¼ h12ðr þ riÞ
+2r þ kl
+ffiffiffiffiffi
+an p þ kb
+ffiffiffiffiffiffiffi
+a=n p ¼ h12r
+2r þ kl
+ffiffiffiffiffi
+an p þ kb
+ffiffiffiffiffiffiffi
+a=n p ð14Þ
+Then the efficiency factor #0/1 < 1 as the length of the local tour is always longer than the average distance to
+the locations for Euclidian distances and n > 1. Further, for a given area, #0/1 decreases as n ! 1 since the
+local tour distance increases proportional to ffiffiffi
+n p but ri and r do not change. As expected, a reduction in
+the fill rate factor h1 increases the inefficiency of type 1 tours. Direct deliveries are more efficient than ‘‘complete’’ LTL5 tours that cover all the customers.
+A critical fill rate factor hc
+1 equalizes the efficiency of partially loaded direct deliveries and fully loaded complete LTL deliveries:
+hc
+1 ¼ 2r
+2r þ kl
+ffiffiffiffiffi
+an p þ kb
+ffiffiffiffiffiffiffi
+a=n p ð15Þ
+Whenever the minimum delivery frequencies allow fill rates to be higher than hc
+1 direct deliveries are the most
+efficient delivery method regarding VKT. Otherwise, ‘‘complete’’ LTL tours that cover all the customers and
+depart from the DC fully loaded are more efficient regarding VKT. As the denominator grows faster than the
+numerator when n ! 1, the critical fill rate factor hc
+1 decreases as n increases.
+Type 1 tours can satisfy minimum frequency constraints and higher fill rate factors since the average delivery decreases nqi 6 b:
+f 6 din=b 6 d=qi ð16Þ
+5 Less than truckload (LTL), each shipment is less than the capacity of the truck but the truck is fully loaded upon leaving the warehouse
+in a ‘‘complete’’ LTL tour
+1024 M.A. Figliozzi / Transportation Research Part B 41 (2007) 1014–1032
+Expression (16) indicates that as the number of customers per region increases, it is easier to satisfy minimum
+frequency delivery constraints departing from the DC fully loaded.
+4.2. Comparing VKT for types 1 and 2
+Taking the ratio of expressions (5) and (9):
+#1=2 ¼ VKT1
+VKT2
+¼
+D
+h1b 2r þ kl
+ffiffiffiffiffi
+an p þ kb
+ffiffiffiffiffiffiffi
+a=n
+  p
+D
+h2z2b z22r þ kl
+ffiffiffiffiffi
+na p þ kbz2
+ffiffiffiffiffiffiffi
+a=n
+  p ¼
+z2h2 2r þ kl
+ffiffiffiffiffi
+an p þ kb
+ffiffiffiffiffiffiffi
+a=n
+  p
+h1 z22r þ kl
+ffiffiffiffiffi
+na p þ kbz2
+ffiffiffiffiffiffiffi
+a=n
+  p
+Assuming same service frequency and order sizes h1 ¼ nqi=b; h2 ¼ nqi=z2b, then h1/h2 = z2. Replacing:
+#1=2 ¼ 2r þ kl
+ffiffiffiffiffi
+an p þ kb
+ffiffiffiffiffiffiffi
+a=n p
+z22r þ kl
+ffiffiffiffiffi
+na p þ kbz2
+ffiffiffiffiffiffiffi
+a=n p ð17Þ
+Then #1/2 < 1 as long as z2 > 1, i.e. increasing the number of subareas decreases the efficiency regarding VKT
+generated; this is reinforced when the relative importance of the connecting distance 2r is high. Since the ratio
+of rill rate is h1/h2 = z2, type 1 tours can satisfy simultaneously tighter minimum frequency constraints and
+higher fill rate factors than type 2 tours.
+4.3. Comparing VKT for types 2 and 3
+Taking the ratio of expressions (9) and (12):
+#2=3 ¼ VKT2
+VKT3
+¼
+D
+h2z2b z22r þ kl
+ffiffiffiffiffi
+na p þ kbz2
+ffiffiffiffiffiffiffi
+a=n
+  p
+D
+h3z3b 2rz3 þ kl
+ffiffiffiffi
+z3
+p ffiffiffiffiffi
+an p þ kbz3
+ffiffiffiffi
+z3
+p ffiffiffiffiffiffiffi
+a=n
+  p ¼
+h3z3 z22r þ kl
+ffiffiffiffiffi
+na p þ kbz2
+ffiffiffiffiffiffiffi
+a=n
+  p
+h2z2 2rz3 þ kl
+ffiffiffiffi
+z3
+p ffiffiffiffiffi
+an p þ kbz3
+ffiffiffiffi
+z3
+p ffiffiffiffiffiffiffi
+a=n
+  p
+Assuming same service frequency and order sizes h2 ¼ nqi=z2b; h3 ¼ nqi=z3b, then h2/h3 = z3/z2. Replacing:
+#2=3 ¼ z22r þ kl
+ffiffiffiffiffi
+an p þ kbz2
+ffiffiffiffiffiffiffi
+a=n p
+2rz3 þ kl
+ffiffiffiffi
+z3
+p ffiffiffiffiffi
+an p þ kbz3
+ffiffiffiffi
+z3
+p ffiffiffiffiffiffiffi
+a=n p ð18Þ
+Then #2/3 < 1 as long as z2/z3 < 1, i.e. increasing the number of subareas due to time window constraints
+decreases the efficiency regarding VKT generated. When the relative importance of the local tour increases
+the efficiency factor tends to #2=3 ! 1= ffiffiffiffi
+z3
+p as n ! 1; when the relative importance of the connecting distance
+increases the efficiency factor tends to #2/3 ! z2/z3, with z2/z3 < q.
+5. Policy implications
+This section applies the insights and expressions obtained in sections three and four to evaluate how policy
+changes or network changes may affect generated VKT. Changes are analyzed, ceteris paribus, and disaggregated by tour type. Four different changes are analyzed: (1) limitations in vehicle dimensions (i.e. reducing
+maximum truck size), (2) limitations to the free circulation of commercial vehicles (i.e. banning trucks in parts
+of the network, introduction of one-way streets, etc.), (3) restrictions on commercial vehicle parking or loading–unloading zones, (4) an increase in road congestion, and (5) a move towards JIT production systems or
+smaller shipments. The policy measures can be translated into the following notation:
+(1) a reduction in the truck capacity b,
+(2) an increase of the circuitry factor k or distance to the service area r,
+(3) an increase in the fixed delivery time and/or per unit loading time, to and tu respectively, and
+(4) a reduction in the average speed s,
+(5) a reduction in the payload per tour qj or vehicle capacity utilization hj.
+M.A. Figliozzi / Transportation Research Part B 41 (2007) 1014–1032 1025
+A truck capacity reduction would increase the VKT as indicated by expression (4) for type 0 tours. Type 0
+tours will be strongly affected since truck capacity is always binding (by definition). For type 1 tours, the
+increase in VKT would take place only in those tours where capacity is binding or where capacity becomes
+a binding constraint. No change is expected in those tours where capacity is not a binding constraint after
+the policy change.
+An increase in the circuitry factor k or average distance r, would increase the VKT for all types as indicated
+by expressions (3), (5), (9), and (12). However, the highest impact would be on type 3 tours since they are more
+constrained. Restrictions on commercial vehicle parking or loading–unloading zones will increase the average
+time to serve a customer and the average tour length. The higher the number of stops per tour, the larger the
+additional time needed to serve the same number of customers per tour is. Type 2 and 3 tours will be greatly
+affected if route length constraints are already binding. Type 0 tours are not affected.
+An increase in congestion will reduce the travel speed and therefore increase the travel time. In this case, the
+impact on VKT alone is insufficient to describe the effects of congestion; the impact on VHT (vehicle hour
+traveled) must also be considered. Type 0 tours are not changed; the same distance is traveled and VKT
+remains constant. However, it may take longer to travel the same tour and then the VHT increases. Even
+though the distance traveled remains constant, the negative effect of commercial vehicle flows on the urban
+traffic flows is increased. The same reasoning can be applied to type 1 tours. Type 2 and 3 tours are severely
+affected since congestion reduces the ability to serve customers per working shift or time window.
+A reduction in shipment sizes will affect vehicle capacity utilization and increase the frequency of deliveries.
+The reduction in shipment size may move tours from type 0 to more inefficient type 1 tours. Type 1 tours will
+be directly affected by the higher delivery frequency. The increase in delivery frequency may potentially affect
+tour types 1, 2, and 3. However, type 2 or 3 will not be affected if the binding constraints are route duration
+and time windows respectively.
+Impacts by tour type are summarized in Table 1. A ‘‘+’’ sign indicates a likely simultaneous increase in
+VKT and VHT indicators. A ‘‘++’’ sign indicates a significantly higher increase in VKT/VHT indicators,
+and so on. A ‘‘=’’ sign indicates no change. The signs are to be interpreted as relative to each other on a
+row-by-row basis. When examining Table 1, it is crucial to bear in mind that:
+(1) For a given fix route, a change in VKT takes place only when a constraint is violated but a change in
+VHT can take place even if the tour remains unchanged.
+(2) The number of stops per tour m is an integer variable, therefore the VKT/VHT change function is not
+continuous or proportional.
+(3) In a deterministic setting, tours do not change unless a constraint is violated. Therefore, if the constraints
+are not binding a larger change magnitude is needed to show an increase or decrease in VKT/VHT.
+(4) The final magnitude of the change in overall VKT/VHT across the whole urban area will depend on the
+relative significance of each tour type in the urban area, and,
+(5) Second order effects have not been analyzed.
+Second order effects can be very important when the percentage of trucks in the network is significant. For
+example, a congestion related second order effect is the decrease in travel speed, which in turn increases the
+number of truck trips, which in turn reduces travel speed, and so on. A downward spiraling cycle is created
+Table 1
+Likely impact of policy/network changes on VKT
+Change Tour type
+0 1 23
+(1) Limit vehicle size ++ = /+ = =
+(2) Limit circulation + + ++ +++
+(3) Reduce loading zones = = /+ ++ +++
+(4) Increased congestion = VKT + VHT =VKT + VHT ++ +++
+(5) JIT – smaller shipments ++ ++ + =/+
+1026 M.A. Figliozzi / Transportation Research Part B 41 (2007) 1014–1032
+even if the total demand in the service areas remains constant or decreases slightly, i.e. for activities that are
+largely inelastic to changes in transportation cost. For a case study and a detailed analysis of the relative
+impact of delivery size and road congestion on distribution costs the reader is referred to the work of Sankaran
+and Wood (this issue).
+The five policy/network changes analyzed in this section do not pretend to be a complete or exhaustive representation of the changes that may take place in an urban area. However, their analysis is used to illustrate
+that policy/network shifts can have significantly different effects on the VKT generated disaggregating by tour
+type. A key advantage of analytical framework is that although VKT changes are network/area data/instance
+dependent, helpful intuition can be derived from the framework analysis. The next section discusses the implications of tour type, the disaggregation on data collection, and efficiency measures.
+6. Implications for trip generation and distribution models
+Efficient truck repositioning, avoiding deadheading or long empty trips, is an especially important issue for
+the fleet operator who deals with long hauls6 and truckload movements (Figliozzi et al., forthcoming). In
+urban settings, reducing deadheading is not feasible in many cases and can be possible only in certain commercial trips such as the drayage of containers to/from a port. When the fill rate is less than one it is possible
+to combine or consolidate LTL shipments and reduce the length and frequency of deadheading, i.e. forming a
+tour consolidating LTL shipments reduces total deadheading.
+Repositioning is in general not possible in urban pickup or delivery tours that originate and end at DCs or
+warehouses. Efficient repositioning requires a significantly higher degree of coordination and operational complexity and two or more depots/DCs in the urban area. With only one depot or DC, shipment consolidation is
+possible but not empty trucks repositioning.
+The most efficient type of tour, type 0, generates one empty trip for each loaded trip. In many cases, loaded
+and empty trips are just the mirror image of each other (opposite directions but traveling over the same streets/
+highways). On the other hand, less VKT efficient multistop tours will generate several loaded trips and one return
+empty trip. Table 2 summarizes number of annual trips, number of empty trips, and their ratio by tour type.
+As can be observed in Table 2, the number of annual trips increases with the tour type, type 0 has the lowest
+number of annual trips while type 3 has the highest number of annual trips. As observed in Section 4, VKT generation also increases with the tour type. Therefore, the percentage of empty trips has no correlation with the
+number of annual trips or the efficiency of the tours regarding VKT generation. By simply observing changes
+in the percentage of empty vehicles it is impossible to ascertain whether efficiency has increased (higher percentage of type 0 tours) or decreased (higher percentage of type 2 and 3 tours). Therefore, in the presented tour model
+the percentage of empty trips alone is a poor proxy for the efficiency of commercial vehicle tours or as a characterization of commercial vehicle activity in a given urban area. Empirical data also corroborates the lack of linkage between empty distance traveled, percentage of empty trips per tour, and tour distance (Figliozzi et al., 2007).
+In urban areas, this is a crucial observation for estimation methods that generate truck trips from commodity tonnage flows after accounting for truck type and local data on average payload and percentage of empty
+trips per truck type. These models are frequently used in practice as indicated in the Truck Trip Generation
+manual (Fisher and Han, 2001). As seen in Table 2, the percentage of empty trips can widely vary widely by
+tour type and number of stops. Furthermore, the percentage of empty trips data may drastically change according to where the data collection is performed. For example, the percentage of empty trips will be very different in
+the connecting part of the tour (represented by r) from the percentage of empty trips in the proper TSP tour
+within the delivery region. For types 1, 2, or 3 the percentage of ‘‘measured’’ empty trips in the connecting
+leg is fifty percent, but the percentage of ‘‘measured’’ empty trips in the TSP tour (before the last stop) is zero.
+The number of ‘‘garage trips’’, trips starting or ending at the DC or depot, can be expressed as: 2zyD/(hyb)
+with y 2 {0, 1, 2, 3}, and z0 = z1 = 1. If the depot and warehouse do not share the same physical location, an
+empty trip between the depot and warehouse must be added. The same ideas and table can be applied to pure
+6 When the trip duration exceeds a shift or working day it is not considered an urban trip in this research according to the definition
+provided in Section 2. Truck repositioning is increasingly important as trip length grows.
+M.A. Figliozzi / Transportation Research Part B 41 (2007) 1014–1032 1027
+collection (or pickup) tours, with the only two differences: (a) the initial trip of the tour is the empty trip and
+(b) there might be an extra empty trip at the end of the tour if the depot and warehouse do not share the same
+location. A tour with mixed collection and deliveries will tend to have less or even no empty trips. The analysis
+presented applies to both common and private carriers.
+Clearly, aggregated distribution models based on empty and loaded trips are useful and necessary (Holguin-Veras and Thorson, 2003; Raothanachonkun et al., 2007). However, no general claims about the
+VKT related efficiency of urban freight tours can be made unless there is disaggregated information about
+individual tour types. Even if ‘‘systemwide’’ percentages of empty trips are similar in many urban areas, this
+aggregate measure alone cannot be used with certainty to draw conclusions about freight system efficiency or
+VKT generated. Further, close attention must be paid to data collection and the estimation of empty trip
+percentages. Otherwise, aggregated distribution models based on percentage of empty and loaded trips may
+provide a poor representation of empty and loaded trips generated by multistop tours.
+6.1. Trip length distribution
+The gravity model is still a popular technique to model trip distribution. This model is usually calibrated by
+comparing the trip length distribution (TLD) and trip length averages in the model against the observed trip
+length distribution and average. The average trip length in a tour type 1, 2, or 3 (using the appropriate m or
+number of stops per tour) can be expressed as:
+lðmÞ
+m þ 1 ¼ 2r
+m þ 1 þ
+kl
+ffiffiffi
+d
+p
+m
+m þ 1 þ
+kb
+m þ 1
+ffiffiffiffi
+a
+m
+r
+8m > 1
+The average trip length with direct deliveries (type 0) can be expressed as
+lðmÞ
+m þ 1 ¼ r þ ri ¼ r; m ¼ 1
+All things equal, type 0 average trip lengths are longer than the average trip lengths of other types. The average trip length clearly depends on the number of stops per tour, which in turn depends on the type of tour and
+the routing constraints. In turn, the number of customers per tour can be limited by the commercial vehicle
+travel speed and the value of the time spent to/from the service area tr, time spent serving customers or
+t0 + qtu, and the average time proximity between stops kl=ðs ffiffiffi
+d
+p Þ. In addition, reduced time windows lengths
+can further reduce the number of customers per tour as shown in Fig. 3.
+If the magnitudes of the connection distance rj and the average distance between stops kl= ffiffiffiffi
+dj
+p are significantly different it is not surprising that the TLD is bimodal or even multimodal if all tour types are included in
+one TLD. In order to calibrate gravity models it is typically assumed that there is a decrease in the number of
+trips as distance or time between origins and destinations increases, i.e. a unimodal impedance function. However, if the magnitudes of the connection distance and the average distance between stops are significantly different, a unimodal impedance function may not be able to represent adequately the distribution of trip lengths.
+These observations strongly suggest that network assignment and calibration should be at least disaggregated
+by tour type or number of stops per tour.
+Table 2
+Trips and empty trips per tour type
+Tour type Annual trips Trips per tour (1) Empty trips per tour(2) Ratio (2)/(1)
+Type 0 D
+b 2 2 1 1
+2
+Type 1 D
+h1b
+ðn þ 1Þ n+1 1 1
+n þ 1
+Type 2 z2D
+h2b ðm2 þ 1Þ m2 þ 1 1 1
+m2 þ 1
+Type 3 z3D
+h3b ðm3 þ 1Þ m3 þ 1 1 1
+m3 þ 1
+1028 M.A. Figliozzi / Transportation Research Part B 41 (2007) 1014–1032
+Empirical observations confirm that multimodal TLD are found in practice (Holguin-Veras and Thorson,
+2000). It is also clear that the relative location of major freight generators (i.e. large DCs, intermodal facilities,
+etc.) in relation to their service areas will also affect the shape of the TLD. In fact, that is also found using
+empirical data (Holguin-Veras and Thorson, 2000). Furthermore, the average distance between stops is related
+to the dispersion of the TLD around the modal points. This is observed in the empirical analysis of disaggregated tour data. For distribution tours, the multimodal shape of the TLD is related to the distance between the
+depot and industrial suburbs or trip attracting areas (Figliozzi et al., 2007).
+7. Implications for data collection
+The insights derived from the analytical framework have important implications for data collection efforts.
+It was mentioned in Section 6 that the percentage of empty trips data might drastically change according to
+where the data collection is performed; the percentage of empty trips will be very different in the connecting or
+local part of the tour. In addition, truck trip generation tables are commonly based on linear regressions by
+land-use category and as a function of employment by industry sector (Fisher and Han, 2001). These employment-based aggregated methods are ill suited for forecasting since they cannot reflect changes in labor productivity. In addition, the available linear models do not provide any information regarding the type of tours that
+is likely to be generated since tour constraints are not yet taken into account.
+Even in the relatively few cities or metropolitan regions that collect commercial vehicle tour information,
+the level of detail is far from desirable. For example, Holguin-Veras and Patil (2005) indicate that in regards to
+the quality of the Denver data, ‘‘DRCOG7 data had several limitations. First, no distinction was made
+between pickups and deliveries. This prevents the estimation of commodity flows and underlying economic
+linkages. A second limitation is that empty trips—, which represent a sizable portion (30–40%) of the total
+commercial vehicle trips—were not identified. This eliminates any possibility of using the DRCOG data set
+to test the validity of empty trip models.’’
+The logistics industry already uses truck payloads and fill truck rates as efficiency measures that indicate
+what percentage (Fernie and Mckinnon, 2003); these measures capture what percentage of the available weight
+and volume truck hauling capacity is effectively utilized. In almost all urban areas, transportation planning
+agencies has no systematic data collection efforts to track payload and percentage fill truck time-trends. Most
+of the truck weight and payload information is generated for pavement management purposes although it can
+be used to estimate the distribution of payloads as in Figliozzi et al. (2000). However, disaggregation by tour
+type is necessary in urban areas since truck size is not always a binding constraint. Furthermore, if the product
+cubes out,8 commercial vehicle utilization factors cannot be estimated by simply looking at the weight of the
+truck. Tracking payload changes is crucial as the economy moves towards a service-oriented economy; the
+average payload is likely to decrease but the value of the payload per ton may increase significantly.
+The temporal dimensions of the trips have also been largely neglected. The temporal dimension is important for two reasons. Firstly, the average travel speed is time dependent and the impact of commercial vehicles
+on the urban environment depends on the departure and return time to the depot. Secondly, time window constraints are crucial to understand the impact of truck tours at different times of the day (e.g., peak and off-peak
+travel). To the best of the authors’ knowledge, there are no systematic data collection efforts linking the number of stops, tour durations, and time windows. The only temporal information available is the distribution of
+trips during daylight hours from road surveys (Cambridge Systematics, 2003). However, this information is
+insufficient for explaining or predicting tour departure time.
+Table 2 shows that the number of truck trips generated depends on the characteristics of the tour employed.
+In turn, tour types are a function of the commercial activity that generates the transport demand, network
+characteristics, and routing constraints. In addition, the analysis of expression (3), (5), (9), and (12) indicates
+that to understand changes in VKT in relation to network/policy changes, the following parameters need to be
+quantified:
+7 DRCOG stands for Denver Regional Council of Governments. 8 Light commodities ordinarily ‘‘cube out’’ or reach the truck volume capacity before reaching the truck weight capacity or allowable
+axle weight limit.
+M.A. Figliozzi / Transportation Research Part B 41 (2007) 1014–1032 1029
+– distribution of tour types by commercial activity;
+– distribution of order sizes and vehicle types by tour type;
+– distribution of the number of stops and tour lengths by tour type; and
+– distribution of time windows, tour durations, and departure times.
+Freight behavioral analysis and data collection are particularly difficult due to the multiplicity of agents or
+decision makers (Hutchinson, 1985). Shippers, consignees, carriers, and third party logistics providers (3PLs)
+have different objectives, decision power, knowledge, and perceptions about supply chain and transport
+related choices. Commercial delivery tours are the materialization of service requests and service decisions
+across one or more supply chains and several decision makers. Keeping track of the observable tour parameters, such as number of customers per route, sequencing, time of service, vehicle used, distance, links traveled,
+etc, can provide valuable information and insights into supply chain agents’ decision-making and behavior.
+Linking commercial activities to tour characteristics and vehicle routing constraints was first suggested by Figliozzi (2006). This work links the time sensitivity of the activity and the value of the activity itself to tour characteristics such as number of stops or time windows. Further research efforts are necessary to provide
+transportation analysts and practitioners with activity based data collection and modeling approaches.
+8. Conclusions
+The emphasis of this research is on the disaggregation of commercial vehicle tours by their routing characteristics. Although a few key assumptions are made about the distribution system including the one DC/
+depot structure and constant deterministic travel times and demand rates, valuable intuition can be obtained
+from the derived analytical expressions. In particular, the distinction between VHT and VKT and the discrimination of policy changes by tour type provide original insights.
+In the presented analytical framework, it is proven that the VKT generated can be strongly influenced by
+the tour type. Direct deliveries are the most efficient type of tour up to a critical fill rate factor. As average
+order size decreases and time windows shorten, the efficiency of the tours also decreases. Multistop tours
+are proven to generate more VKT than direct deliveries even for equal payloads. The proposed analytical
+framework and tour classification seems a promising tool to derive insights regarding policy/network changes
+on VKT and VHT generated. Implications for the calibration of trip generation and distribution models are
+discussed. In the tour model, it is proven that the percentage of empty trips has no correlation with the efficiency of the tours regarding VKT generation or annual number of trips. The shape of Trip Length Distributions (TLD) is discussed. It is shown that the average trip length and the TLD shape is strongly dependent on
+the tour type.
+A new level of urban commercial vehicle data collection and modeling efforts are needed to understand the
+workings of urban commercial vehicle tours. As illustrated in this research, efforts must be directed to comprehend the relationships between commercial activities, route designs and constraints, number of customers
+per route, and vehicle types in order to model the thinking and constraints faced by carriers and commercial
+vehicle fleet operators.
+Acknowledgements
+The author acknowledge the referees for their comments and suggestions. The author also acknowledge Jay
+Sankaran for his comments and suggestions in an earlier version of this paper. However, responsibility for
+errors or omissions in the final version of this paper rests entirely with the author. This research was possible
+due to a grant from the Business School at the University of Sydney.
+Appendix
+Daganzo’s formula for the capacitated VRP can be expressed as
+lðnÞ ¼ k1ðr þ riÞ þ k2
+ffiffiffiffiffi
+an p ¼ k1r þ k2
+ffiffiffiffiffi
+an p ð19Þ
+1030 M.A. Figliozzi / Transportation Research Part B 41 (2007) 1014–1032
+In this expression z is the number of vehicles needed to satisfy customer demands and k1, k2 are parameters
+derived analytically for elongated service areas. With less restrictive assumptions about service areas and customers’ distributions and characteristics, the parameters k1, k2 can be estimated using linear regressions.
+Expression (1) is derived and verified using real network and simulated data in (Figliozzi, 2007):
+lðnÞ ¼ kzz þ kl
+ffiffiffiffiffi
+an p þ kb
+ffiffiffiffiffiffiffi
+a=n p ð1Þ
+The results and intuition obtained in this paper are not altered even if Daganzo’s formula (expression (19)) is
+used. Expression (1) is used because it is a more robust approximation to real network and simulated data, i.e.,
+higher R2 and lower mean average percentage error. An even better fit is obtained if the parameter kl can be
+adjusted to the number of routes and customers as follows:
+kl / ðn  zÞ
+n
+As explained in Figliozzi (2007), to serve n customer with z routes it is necessary to have n + z links, n  z links
+between the customers and 2z links between the depot and the first/last customer per route. Hence, the second
+term approaches the theoretical value for the TSP case when the ratio n/z increases. As expected, the second
+term becomes zero when n = z, i.e., there is no local tour.
+References
+Ambrosini, C., Routhier, J.L., 2004. Objectives, methods and results of surveys carried out in the field of urban freight transport: an
+international comparison. Transport Reviews 24 (1), 57–77.
+Assad, A., 1988. Modeling and implementation issues in vehicle routing. In: Golden, B., Assad, A. (Eds.), Vehicle Routing: Methods and
+Studies. North-Holland, Amsterdam.
+Bearwood, J., Halton, H., Hammersley, J., 1959. The shortest path through many points. Proceedings of the Cambridge Philosophical
+Society 55, 299–327.
+Bodin, L., Maniezzo, V., Mingozzi, A., 2003. Street routing and scheduling problems. In: Hall, R.W. (Ed.), Handbook of Transportation
+Science, second ed. Kluwer Academic Publishers, Norwell, MA.
+Braysy, I., Gendreau, M., 2005. Vehicle routing problem with time windows, part 1: Route construction and local search algorithms.
+Transportation Science 39 (1), 104–118.
+Cambridge Systematics, 2003. Accounting for Commercial Vehicles in Urban Transportation Models – Task 3 – Magnitude and
+Distribution. Prepared for Federal Highway Administration – Prepared by Cambridge Systematics, Inc. Cambridge, MA.
+Cambridge Systematics, 2004. Accounting for Commercial Vehicles in Urban Transportation Models – Task 4 – Methods, Parameters,
+and Data Sources. Prepared for Federal Highway Administration – Prepared by Cambridge Systematics, Inc. Cambridge, MA.
+Daganzo, C.F., 1984. The distance traveled to visit N-points with a maximum of C-stops per vehicle – an analytic model and an
+application. Transportation Science 18 (4), 331–350.
+Daganzo, C.F., 1991. Logistics systems-analysis. Lecture Notes In Economics And Mathematical Systems 361, 1–321.
+Fernie, J., Mckinnon, A., 2003. The grocery supply chain in the UK: improving efficiency in the logistics network. International Review of
+Retail, Distribution & Consumer Research 13 (2), 161–175.
+Figliozzi, M., 2006. Modeling the impact of technological changes on urban commercial trips by commercial activity routing type.
+Transportation Research Record 1964, 118–126.
+Figliozzi, M., 2007. Planning approximations to the length of TSP and VRP problems. Working Paper ITLS-WP-07-03, Institute of
+Transport and Logistics Studies, University of Sydney.
+Figliozzi, M., Harrison, R., Mccray, J.P., 2000. Using weigh-in-motion data to calibrate trade-derived estimates of Mexican trade truck
+volumes in Texas. Transportation Research Record 1719, 129–135.
+Figliozzi, M., Kingdon, L., Wilkitzki, A., 2007. Commercial vehicle tours and road congestion in urban areas: implications for carriers’
+operations and public data collection and dissemination efforts. In: Proceeding of the 86th Transportation Research Board Annual
+Meeting CD rom – January 2007, Washington, DC, USA.
+Figliozzi, M., Mahmassani, H., Jaillet, P., forthcoming. Pricing in dynamic vehicle routing problems, Transportation Science.
+Fisher, M., Han, M., 2001. NCHRP Synthesis 298, Truck Trip Generation Data. Transportation Research Board – National Academy
+Press, Washington, DC.
+Golden, B.L., Wasil, E.A., 1987. Computerized vehicle-routing in the soft drink industry. Operations Research 35 (1), 6–17.
+Holguin-Veras, J., Patil, G., 2005. Observed trip chain behavior of commercial vehicles. Transportation Research Record 1906, 74–80.
+Holguin-Veras, J., Thorson, E., 2000. Trip length distributions in commodity-based and trip-based freight demand modeling –
+Investigation of relationships. Transportation Research Record 1707, 37–48.
+Holguin-Veras, J., Thorson, E., 2003. Modeling commercial vehicle empty trips with a first order trip chain model. Transportation
+Research Part B 37 (2), 129–148.
+M.A. Figliozzi / Transportation Research Part B 41 (2007) 1014–1032 1031
+Hunt, J., Stefan, K., 2005. Tour-based microsimulation of urban commercial movements. In: Presented at the 16th International
+Symposium on Transportation and Traffic Theory (ISTTT16), Maryland, July 2005.
+Hunt, J., Stefan, K., this issue. Tour-based microsimulation of urban commercial movements. Transportation Research Part B,
+doi:10.1016/j.trb.2007.04.009.
+Hunt, J.D., Stefan, K.J., Brownlee, A.T., 2006. Establishment-based survey of urban commercial vehicle movements in Alberta, Canada –
+Survey design, implementation, and results. Transportation Research Record 1957, 75–83.
+Hutchinson, B., 1985. Freight surveys. In: Ampt, E., Richardson, A., Brog, W. (Eds.) New Survey Methods in Transport – 2nd
+International Conference Hungerford Hill, Australia, 12–16 September 1983, VSP, The Netherlands.
+Ogden, K.W., 1992. Urban Goods Movement: A guide to Policy and Planning. Ashgate Publishing Company, Vermont, USA.
+Outwater, M., Islam, N., Spear, B., 2005. The Magnitude and Distribution of Commercial Vehicles in Urban Transportation. In: 84th
+Transportation Research Board Annual Meeting – Compendium of Papers CD-ROM.
+Raothanachonkun, P., Sano, K., Wisetjindawat, W., Matsumoto, S., 2007. Truck trips origin destination using commodity based model
+combined with an empty trip model. In: Proceeding of the 86th Transportation Research Board Annual Meeting CD rom, January
+2007, Washington, DC, USA.
+Regan, A.C., Garrido, R.A., 2001. Modelling freight demand and shipper behaviour: state of the art, future directions. In: Hensher, D.
+(Ed.), Travel Behaviour Research. Pergamon – Elsevier Science.
+Sankaran, J., Wood, L., this issue. The relative impact of consignee behaviour and road traffic congestion on distribution costs.
+Transportation Research Part B, doi:10.1016/j.trb.2007.04.005.
+Smilowitz, K., Daganzo, C., 2007. Cost modeling and design techniques for integrated package distribution systems. Networks.
+Stefan, K.J., McMillan, J.D.P., Hunt, J.D., 2005. Urban commercial vehicle movement model for Calgary, Alberta, Canada.
+Transportation Research Record 1921, 1–10.
+Tang, H., Miller-Hooks, E., 2006. Interactive heuristic for practical vehicle routing problem with solution shape constraints.
+Transportation Research Record 1964, 9–18.
+Taniguchi, E., Van der Heijden, R., 2000. An evaluation methodology for city logistics. Transport Reviews 20 (1), 65–90.
+TRB, 2000. Highway Capacity Manual. Transportation Research Board, Washington, DC.
+Vleugel, J., Janic, M., 2004. Route choice and the impact of ‘logistic routes’. In: Taniguchi, E., Thompson, R. (Eds.), Logistics Systems for
+Sustainable Cities. Elsevier.
+1032 M.A. Figliozzi / Transportation Research Part B 41 (2007) 1014–1032

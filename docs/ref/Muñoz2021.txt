@@ -1,0 +1,494 @@
+logistics
+Article
+Measuring Disruptions in Last-Mile Delivery Operations
+Andrés Muñoz-Villamizar 1,* , Elyn L. Solano-Charris 1
+, Lorena Reyes-Rubiano 1 and Javier Faulin 2
+
+
+Citation: Muñoz-Villamizar, A.;
+Solano-Charris, E.L.; Reyes-Rubiano,
+L.; Faulin, J. Measuring Disruptions
+in Last-Mile Delivery Operations.
+Logistics 2021, 5, 17. https://doi.org/
+10.3390/logistics5010017
+Received: 19 February 2021
+Accepted: 8 March 2021
+Published: 15 March 2021
+Publisher’s Note: MDPI stays neutral
+with regard to jurisdictional claims in
+published maps and institutional affiliations.
+Copyright: © 2021 by the authors.
+Licensee MDPI, Basel, Switzerland.
+This article is an open access article
+distributed under the terms and
+conditions of the Creative Commons
+Attribution (CC BY) license (https://
+creativecommons.org/licenses/by/
+4.0/).
+1
+International School of Economic and Administrative Sciences, Universidad de La Sabana,
+140013 Chía, Colombia; erlyn.solano@unisabana.edu.co (E.L.S.-C.); lorenareru@unisabana.edu.co (L.R.-R.)
+2 Department of Statistics, Computer Science, and Mathematics, Institute of Smart Cities,
+Public University of Navarra, 31006 Pamplona, Spain; javier.faulin@unavarra.es
+* Correspondence: andresmunvi@unisabana.edu.co
+Abstract: The rapid growth of urbanisation and e-commerce has increased the number of home deliveries that need to be made in retail operations. Consequently, there is also an increase in unexpected
+incidents, such as adverse traffic, unavailability of parking space, and vehicle breakdowns. These
+disruptions result in delays, higher costs, and lower service levels in the last-mile delivery operation.
+Motivated by free, innovative, and efficient tools, such as the Google application programming
+interface (API) and Google OR, we built a model to measure the impact of disruptions in the last-mile
+delivery operation. Our model considers customers’ geographic information, speed estimation
+between nodes, routing optimisation, and disruption evaluation. Disruptions are considered here
+as external factors such as accidents and road works that imply the closure of or slow access to
+certain roads. Computational experiments, based on a set of real data from three different cities
+around the world, which contrast in size and characteristics (i.e., Boston, US; Bogotá, Colombia; and
+Pamplona, Spain), were conducted to validate our approach. The tests consider 50 different instances
+of up to 100 customers per city and analyse the impact of disruptions in terms of travelled time and
+distance. Our results provide managerial insights for key stakeholders (i.e., carriers, consumers, and
+government) to define policies and development plans that improve the resilience and capabilities of
+cities’ transportation systems.
+Keywords: last-mile delivery; disruptions; Google API; Google OR
+1. Introduction
+In the last decade, e-commerce has grown due to the increased demand of consumers [1]. Thus, last-mile deliveries (LMDs) have become crucial for delivering goods
+to customers, making city centres one of the most important and complex areas. City
+centres are characterised by a limited area structure, road disruptions, traffic accidents, and
+congestion, making freight deliveries within cities a challenge [2–4].
+As observed by Ref. [5], deliveries in city centres require a large number of trips, vehicles, and kilometres travelled, generating higher costs in goods distribution. Considering
+this fact, technology has emerged as an essential component for mitigating uncertain future
+events, e.g., the Internet of things, big data analytics, blockchain technologies, and artificial
+intelligence [6]. Among the emerging technologies for LMDs, web mapping platforms and
+application programming interfaces (APIs) are extensively considered due to their stronger
+spatial analysis capability for route efficiency, route optimisation, travel cost, etc. [7,8].
+Even though LMD problems have been widely studied, there is still an opportunity
+for innovative last-mile delivery solutions [9]. This paper aims to contribute to fulfilling
+this gap and proposes an analytical model, based on Google API and Google OR, to
+measure the impact of an n-number of disruptions in the last-mile delivery operation. To
+validate our approach, we conducted computational experiments using real data from
+three different cities (i.e., Boston, US; Bogotá, Colombia; and Pamplona, Spain) to evaluate
+the impact of up to 100 disruptions in different city contexts. These cities were selected
+Logistics 2021, 5, 17. https://doi.org/10.3390/logistics5010017 https://www.mdpi.com/journal/logistics
+Logistics 2021, 5, 17 2 of 9
+because they are located in different geographical areas and present different characteristics
+in population, history, and urban development. Our results provide managerial insights
+for key stakeholders (i.e., carriers, consumers, and government) to improve the resilience
+and capabilities of the cities’ transportation systems.
+The remainder of this paper is organised as follows. In Section 2, we present a related
+literature review. In Section 3, we introduce the proposed approach. The multicase study
+details and results are discussed in Section 4. Finally, we provide some conclusions and
+future research directions in Section 5.
+2. Literature Review
+Last-mile logistics refers to the direct connection between the service provider and
+the end customer [10]. Due to its relevance, the number of articles on city logistics for
+determining issues, modelling efforts, trends, and gaps has increased [10]. In this context,
+understanding and analysing transport behaviour in different cities allows estimating the
+impact of last-mile operations in cities [11].
+The type of city and its infrastructure play an important role in transport behaviour.
+From a practical perspective, Ref. [12] present an analysis of developed and developing
+countries’ logistics efficiency. The authors affirm there is a wide range of logistics performance levels among cities due to discrepancies between transport networks, infrastructure,
+and transport regulations, as well as the influence of the economic sector. In order to
+control decision making by companies, local governments have established strategies for
+transport management. Policies and management strategy provision for city logistics tend
+to be against the management strategies of logistics enterprises [13]. Refs. [13,14] present
+a collection and analysis of different public policies for urban transport behaviour. Thus,
+the significant challenges facing last-mile logistics are the infrastructure, local government
+management, and transport behaviour for decision making [10].
+The inclusion of communication and information technologies makes part of the
+solution to deal with last-mile logistics [15]. Some solutions are aimed at understanding
+urban transport behaviour by collecting and analysing large amounts of data. For example,
+the use of application programming interfaces (APIs) to carry out efficient scheduling
+and real-time optimisation of last-mile logistics [15]. Ref. [16] recognises the importance
+of urban transport data to understand transport behaviour in a city for efficient logistics
+decisions. As a result, the efforts in the development of models and API have increased [17].
+Ref. [18] presents the strengths and limitations of an API-based approach to studying
+urban transport.
+The accessibility to a massive amount of data has motivated the development of
+methodologies to treat and use data efficiently. In general, these methodologies focus on
+data cleaning strategies and data accuracy validation [6]. From a logistics perspective,
+managing large amounts of data and making transport decisions are among the challenges
+of logistics operations [8]. The inclusion of these data in the models for decision making
+gives the opportunity to estimate the travelling demand, travelling cost, and the level of
+congestion in urban areas [19].
+Data models that interact with the geographical structure of cities allow extracting
+macro- and microscale transport information [20]. As a result, web mapping platforms,
+such as OpenStreetMap and Google Maps, have emerged for supporting decision making
+in transport operations [8,21,22]. Ref. [8] presents an analysis in which they look at the
+relationship between travel times and congestion levels in a city. The authors show that
+these studies shed light on transport behaviour. Similar studies show the relevance of these
+studies for policymaking, urban transport [8,18,23,24], emergency management [25], and
+environment protection [25,26].
+Some applications of Google Maps API include vehicle routing problems [25]. Ref. [27]
+studies the public transport of 13 German cities to determine the average of a reasonable
+detour in passenger transport. Although studies on traffic behaviour and its potential
+disruptions have been found, there is a lack of research related to measuring the impact of
+Logistics 2021, 5, 17 3 of 9
+multiple disruptions on transportation operations [28]. Several commercial and industrial
+projects are looking to develop strategies to manage and reduce the impact of disruptions
+in transport operations [29]. This leads us to the following research questions:
+• How can we measure the impact of disruptions in transportation operations?
+• How can we manage disruptions to improve the resilience and capabilities of transportation systems?
+Aiming to close the research and practical gap, this article presents routing strategies
+to manage disruptions in urban transport. Routing decisions are based on a statistical
+analysis of data from the Google Maps API to understand urban transport behaviour and
+the impact of disruptions in terms of congestion. In this field, studies determine the routing
+decisions under the criterion of the shortest path. These studies do not consider possible
+variations in the route, i.e., the occurrence of a disruption in the shortest path.
+3. Proposed Approach
+In this section, we present a new method for the collection of data and the analysis of
+disruptions in last-mile delivery operations that allows comparing different cities and/or
+regions. Figure 1 shows the general representation of the proposed approach.
+Logistics 2021, 5, x FOR PEER REVIEW 3 of 10
+disruptions have been found, there is a lack of research related to measuring the impact
+of multiple disruptions on transportation operations [28]. Several commercial and industrial projects are looking to develop strategies to manage and reduce the impact of disruptions in transport operations [29]. This leads us to the following research questions:
+• How can we measure the impact of disruptions in transportation operations?
+• How can we manage disruptions to improve the resilience and capabilities of transportation systems?
+Aiming to close the research and practical gap, this article presents routing strategies
+to manage disruptions in urban transport. Routing decisions are based on a statistical
+analysis of data from the Google Maps API to understand urban transport behaviour and
+the impact of disruptions in terms of congestion. In this field, studies determine the routing decisions under the criterion of the shortest path. These studies do not consider possible variations in the route, i.e., the occurrence of a disruption in the shortest path.
+3. Proposed Approach
+In this section, we present a new method for the collection of data and the analysis of
+disruptions in last-mile delivery operations that allows comparing different cities and/or
+regions. Figure 1 shows the general representation of the proposed approach.
+Figure 1. Proposed approach.
+In the first step, we select the city to be studied. Using a geographic information system (GIS) software, a polygon in a geospatial vector data format defines the geographic
+boundaries of the city. These geographic boundaries may correspond to any region, neighbourhood, or other geographic area specified a priori by the decision maker. Once the
+polygon has been defined, we generate m random points (i.e., customers) inside its geographic boundaries. As pointed out by Ref. [30], this random generation makes it possible
+to subsequently estimate real traffic data.
+The second step consists of estimating the corresponding distances and speeds between each pair of points generated in the previous step. To do so, we use the Google
+Maps Directions API [31]. According to Ref. [25], the main benefits of using Google Maps
+API are the easy preparation of the data set, the utilisation of updated road data and road
+congestion, and the distinction between peak hours and off-peak hours. Therefore, using
+the travel information calculated by Google API is a promising, easy-to-use, and low-cost
+method to retrieve real-time traffic data [30].
+Thirdly, we optimise the routing operation to visit n different combinations of the
+random customers generated in the first step (see Figure 2). This optimisation is done by
+solving the traditional vehicle routing problem (VRP) through Google OR-Tools and using the tabu search heuristic [32]. On the one hand, Google OR-Tools is an open-source
+optimisation library, tuned for solving the VRP and its several variants, as well as other
+traditional problems in operations research [33]. On the other hand, tabu-search-based
+heuristics is a very competitive procedure that has traditionally provided very practical
+results [34]. Although we used Google OR-Tools due to its high performance [35], there
+are other well-known and open-source libraries such as VRPy or VRPH that could be
+adapted to our approach. Other valuable approaches to solving VRPs are those based on
+simheuristics procedures [36], which also allow the resolution of routing problems
+quickly.
+1.City
+selection
+Polygon and points
+identification
+2. Speeds
+estimation
+Real travel-time
+computation
+3. Routes
+optimization
+Optimal routing
+problem
+4. Disruption
+generation
+Arcs removal
+evaluation
+Figure 1. Proposed approach.
+In the first step, we select the city to be studied. Using a geographic information
+system (GIS) software, a polygon in a geospatial vector data format defines the geographic
+boundaries of the city. These geographic boundaries may correspond to any region,
+neighbourhood, or other geographic area specified a priori by the decision maker. Once
+the polygon has been defined, we generate m random points (i.e., customers) inside its
+geographic boundaries. As pointed out by Ref. [30], this random generation makes it
+possible to subsequently estimate real traffic data.
+The second step consists of estimating the corresponding distances and speeds between each pair of points generated in the previous step. To do so, we use the Google
+Maps Directions API [31]. According to Ref. [25], the main benefits of using Google Maps
+API are the easy preparation of the data set, the utilisation of updated road data and road
+congestion, and the distinction between peak hours and off-peak hours. Therefore, using
+the travel information calculated by Google API is a promising, easy-to-use, and low-cost
+method to retrieve real-time traffic data [30].
+Thirdly, we optimise the routing operation to visit n different combinations of the
+random customers generated in the first step (see Figure 2). This optimisation is done
+by solving the traditional vehicle routing problem (VRP) through Google OR-Tools and
+using the tabu search heuristic [32]. On the one hand, Google OR-Tools is an open-source
+optimisation library, tuned for solving the VRP and its several variants, as well as other
+traditional problems in operations research [33]. On the other hand, tabu-search-based
+heuristics is a very competitive procedure that has traditionally provided very practical
+results [34]. Although we used Google OR-Tools due to its high performance [35], there
+are other well-known and open-source libraries such as VRPy or VRPH that could be
+adapted to our approach. Other valuable approaches to solving VRPs are those based on
+simheuristics procedures [36], which also allow the resolution of routing problems quickly.
+Logistics 2021, 5, 17 4 of 9 Logistics 2021, 5, x FOR PEER REVIEW 4 of 10
+Figure 2. Route optimisation pseudocode.
+In the fourth step, we generate 1-to-d disruptions into the optimal routes founded
+during the third step (see Figure 3). Disruptions in last-mile delivery can be caused by
+different internal factors (e.g., mechanical failures) and external factors (e.g., car accidents
+or road works) [37]. In our approach, we consider only external factors and assume that
+those accidents (or road works) imply the closure or slow access to certain roads. Therefore, disruptions mathematically mean the removal of up to d arcs in the optimal routing
+solution and entail a nonoptimal route with overtime associated. Finally, we compute and
+compare these overtimes to define the impact of d disruptions in the last-mile delivery
+operation.
+Figure 3. Disruptions evaluation pseudocode.
+Figure 2. Route optimisation pseudocode.
+In the fourth step, we generate 1-to-d disruptions into the optimal routes founded
+during the third step (see Figure 3). Disruptions in last-mile delivery can be caused by
+different internal factors (e.g., mechanical failures) and external factors (e.g., car accidents
+or road works) [37]. In our approach, we consider only external factors and assume that
+those accidents (or road works) imply the closure or slow access to certain roads. Therefore,
+disruptions mathematically mean the removal of up to d arcs in the optimal routing solution
+and entail a nonoptimal route with overtime associated. Finally, we compute and compare
+these overtimes to define the impact of d disruptions in the last-mile delivery operation.
+Logistics 2021, 5, x FOR PEER REVIEW 4 of 10
+Figure 2. Route optimisation pseudocode.
+In the fourth step, we generate 1-to-d disruptions into the optimal routes founded
+during the third step (see Figure 3). Disruptions in last-mile delivery can be caused by
+different internal factors (e.g., mechanical failures) and external factors (e.g., car accidents
+or road works) [37]. In our approach, we consider only external factors and assume that
+those accidents (or road works) imply the closure or slow access to certain roads. Therefore, disruptions mathematically mean the removal of up to d arcs in the optimal routing
+solution and entail a nonoptimal route with overtime associated. Finally, we compute and
+compare these overtimes to define the impact of d disruptions in the last-mile delivery
+operation.
+Figure 3.
+Figure 3.
+Disruptions evaluation pseudocode.
+Disruptions evaluation pseudocode.
+4. Computational Experiments and Results
+Delivering goods inside cities is a complex and dynamic operation that, according
+to each context, has unique issues to deal with [38]. For example, unstable local freight
+Logistics 2021, 5, 17 5 of 9
+policies, lack of infrastructure, unplanned settlements (e.g., slums) with difficult access,
+etc., are some of the peculiar aspects that are addressed by larger cities in developing
+economies [30]. Moreover, although European and US cities share similar living standards
+and levels of wealth, their characteristics are quite different. For example, there are less
+dense but larger cities in the US [39], while Europe has medieval-structured cities, and their
+citizens have a higher proportion of using green modes of urban mobility [38]. In order
+to evaluate and compare the impact of disruptions in different cities’ context, a multicase
+study was carried out using three different cities around the world: Boston (US), Bogotá
+(Colombia), and Pamplona (Spain).
+Boston (US), founded in 1630, has an area of about 127 km2
+. Although Boston has
+an estimated resident population of 700,000, the Greater Boston population is more than
+8 million inhabitants [40]. Bogotá, founded in 1538, is the capital of Colombia and is the
+largest city. Its population is around 7.5 million inhabitants (DANE, 2020) and has an area
+of about 497 km2. Finally, Pamplona (Spain), the capital of the Autonomous Community of
+Navarre and founded in 75 BC, has an estimated resident population of 210.000 and an area
+of about 25 km2 [41]. We implement the proposed approach in each of these three cities,
+which contrasts in size, culture, and infrastructure characteristics, in order to measure and
+compare the impact of disruptions in the last-mile delivery operation (see Figure 4).
+Logistics 2021, 5, x FOR PEER REVIEW 4. Computational Experiments and Results
+Delivering goods inside cities is a complex and dynamic operation that, accordeach context, has unique issues to deal with [38]. For example, unstable local freighcies, lack of infrastructure, unplanned settlements (e.g., slums) with difficult accesare some of the peculiar aspects that are addressed by larger cities in developing emies [30]. Moreover, although European and US cities share similar living standardlevels of wealth, their characteristics are quite different. For example, there are less but larger cities in the US [39], while Europe has medieval-structured cities, and theizens have a higher proportion of using green modes of urban mobility [38]. In orevaluate and compare the impact of disruptions in different cities’ context, a mustudy was carried out using three different cities around the world: Boston (US), B(Colombia), and Pamplona (Spain).
+Boston (US), founded in 1630, has an area of about 127 km2. Although Boston hestimated resident population of 700,000, the Greater Boston population is more tmillion inhabitants [40]. Bogotá, founded in 1538, is the capital of Colombia and largest city. Its population is around 7.5 million inhabitants (DANE, 2020) and has aof about 497 km2. Finally, Pamplona (Spain), the capital of the Autonomous Commof Navarre and founded in 75 BC, has an estimated resident population of 210.000 aarea of about 25 km2 [41]. We implement the proposed approach in each of thesecities, which contrasts in size, culture, and infrastructure characteristics, in order to ure and compare the impact of disruptions in the last-mile delivery operation (see FigFigure 4. Road networks of the cities under study.
+Figure 4. Road networks of the cities under study.
+The approach was run using the Python interface version 3.7.4 and a time limit of
+5 min per instance on an Intel(R) 8-Core (TM) i9 personal computer with 2.3 GHz and 16
+GB RAM. First, we generated 50 different instances from 20 to 70 customers to visit per city.
+Logistics 2021, 5, 17 6 of 9
+After implementing the tabu search procedure (Figure 2), we generated 1-to-d disruptions,
+where d is the number of customers evaluated in each instance (Figure 3). The objective is
+to analyse the relationship between the number of customers, disruptions, and both the
+total travelled time and distance. Table 1 and Figure 5 show the obtained results in terms
+of travelled distance and time. In the average results, Bogotá has the highest travelled time
+(10.5 h) and distance (199.5 km), followed by Boston and Pamplona. However, regarding
+the impact of disruptions, each arc removed increases the average travelled time by 3.2%,
+8.0%, and 9.7% in Bogotá, Boston, and Pamplona, respectively. That is, the impact of
+disruptions is smaller in larger cities. We obtained similar results in terms of distance,
+as each arc removed increases the average travelled distance by 4.0%, 5.1%, and 8.1% in
+Bogotá, Boston, and Pamplona, respectively. There is no linear proportion between time
+and distance, as in urban logistics the shortest path does not guarantee the shortest time.
+Table 1. Average results for instances from 20 to 70 customers.
+City Distance (km) Time (h)
+Bogotá 199.5 10.5
+Boston 90.1 3.3
+Pamplona 38.5 2.1
+Logistics 2021, 5, x FOR PEER REVIEW 6 of 10
+The approach was run using the Python interface version 3.7.4 and a time limit of 5
+min per instance on an Intel(R) 8-Core (TM) i9 personal computer with 2.3 GHz and 16
+GB RAM. First, we generated 50 different instances from 20 to 70 customers to visit per
+city. After implementing the tabu search procedure (Figure 2), we generated 1-to-d disruptions, where d is the number of customers evaluated in each instance (Figure 3). The
+objective is to analyse the relationship between the number of customers, disruptions, and
+both the total travelled time and distance. Table 1 and Figure 5 show the obtained results
+in terms of travelled distance and time. In the average results, Bogotá has the highest travelled time (10.5 h) and distance (199.5 km), followed by Boston and Pamplona. However,
+regarding the impact of disruptions, each arc removed increases the average travelled
+time by 3.2%, 8.0%, and 9.7% in Bogotá, Boston, and Pamplona, respectively. That is, the
+impact of disruptions is smaller in larger cities. We obtained similar results in terms of
+distance, as each arc removed increases the average travelled distance by 4.0%, 5.1%, and
+8.1% in Bogotá, Boston, and Pamplona, respectively. There is no linear proportion between time and distance, as in urban logistics the shortest path does not guarantee the
+shortest time.
+Table 1. Average results for instances from 20 to 70 customers.
+City Distance (km) Time (h)
+Bogotá 199.5 10.5
+Boston 90.1 3.3
+Pamplona 38.5 2.1
+Figure 5. Number of companies using operation and continuous improvement schemes.
+Secondly, we generated 50 different instances with 100 different customers to evaluate the impact of a larger number of disruptions in scenarios with the same name of potential customers to visit per city. The results obtained for this configuration are shown in
+Table 2 and Figure 6. It is evident, again, that size and congestion in a larger city such as
+Bogotá imply both the longest travel time and distance. On average, delivering to 100
+customers is 3.5 and 1.4 times slower in Bogotá than in Boston and Pamplona, respecFigure 5. Number of companies using operation and continuous improvement schemes.
+Secondly, we generated 50 different instances with 100 different customers to evaluate
+the impact of a larger number of disruptions in scenarios with the same name of potential
+customers to visit per city. The results obtained for this configuration are shown in Table 2
+and Figure 6. It is evident, again, that size and congestion in a larger city such as Bogotá
+imply both the longest travel time and distance. On average, delivering to 100 customers
+is 3.5 and 1.4 times slower in Bogotá than in Boston and Pamplona, respectively. We can
+also see that variance is higher in Bogotá than in the other cities. Specifically, the standard
+deviation is 0.46 h and 10.45 km in Bogotá, 0.25 h and 6.1 km in Boston, and 0.21 h and
+3.74 km in Pamplona. Finally, regarding the impact of disruptions, each arc removed (for
+100-customer instances) increases on average the travelled time by 4%, 8%, and 10% in
+Logistics 2021, 5, 17 7 of 9
+Bogotá, Boston, and Pamplona, respectively. These results are similar to those obtained in
+smaller instances (i.e., 20 to 70 customers) and endorse the conclusion that larger cities are
+more sensitive to the disruption of arcs.
+Table 2. Average results for instances with 100 customers.
+City Distance (km) Time (h)
+Bogotá 338.5 17.8
+Boston 138.6 6.0
+Pamplona 74.6 3.9
+tively. We can also see that variance is higher in Bogotá than in the other cities. Specifically, the standard deviation is 0.46 h and 10.45 km in Bogotá, 0.25 h and 6.1 km in Boston,
+and 0.21 h and 3.74 km in Pamplona. Finally, regarding the impact of disruptions, each
+arc removed (for 100-customer instances) increases on average the travelled time by 4%,
+8%, and 10% in Bogotá, Boston, and Pamplona, respectively. These results are similar to
+those obtained in smaller instances (i.e., 20 to 70 customers) and endorse the conclusion
+that larger cities are more sensitive to the disruption of arcs.
+Table 2. Average results for instances with 100 customers.
+City Distance (km) Time (h)
+Bogotá 338.5 17.8
+Boston 138.6 6.0
+Pamplona 74.6 3.9
+Figure 6. Analysis 2: total time/distance vs. the number of disruptions in larger scenarios.
+Finally, the results allow us to conclude that the impact of disruptions in the transportation network depends on the city’s road network and the dispersion of customers’
+location. This fact is related to the number of streets and alternative routes connecting
+customers and distribution centres. For example, a disruption in cities with a limited road
+network can cause the route to be completely redefined due to the absence of alternative
+routes. In terms of customer location, the distribution could be scattered depending on
+the city size. For example, customers can be dispersed in cities like Bogotá or Boston, while
+in Pamplona, the customers tend to be concentrated in certain zones. Thus, a disruption
+in small cities such as Pamplona can restrict access to a set of customers, while in large
+cities, a disruption may affect one or few customers due to the number of customers per
+km2. In these cases, the greater the number of disruptions, the longer the travel times and
+distances are.
+5. Conclusions
+This paper proposed a model based on Google API and Google OR-Tools to measure
+the impact of disruptions in the last-mile delivery operation. Our model considers customers’ geographic information, speed estimation between nodes, routing optimisation,
+and disruption evaluation. The proposed method was validated on a set of real data from
+three different cities, i.e., Boston, US; Bogotá, Colombia; and Pamplona, Spain. For the
+computational experiments, we generated random locations of customers for each city,
+and the evaluated disruptions considered the total travelled time and distance. The results
+allow us to conclude that the impact of disruptions in the transportation network depends
+Figure 6. Analysis 2: total time/distance vs. the number of disruptions in larger scenarios.
+Finally, the results allow us to conclude that the impact of disruptions in the transportation network depends on the city’s road network and the dispersion of customers’
+location. This fact is related to the number of streets and alternative routes connecting
+customers and distribution centres. For example, a disruption in cities with a limited road
+network can cause the route to be completely redefined due to the absence of alternative
+routes. In terms of customer location, the distribution could be scattered depending on the
+city size. For example, customers can be dispersed in cities like Bogotá or Boston, while in
+Pamplona, the customers tend to be concentrated in certain zones. Thus, a disruption in
+small cities such as Pamplona can restrict access to a set of customers, while in large cities,
+a disruption may affect one or few customers due to the number of customers per km2
+.
+In these cases, the greater the number of disruptions, the longer the travel times and
+distances are.
+5. Conclusions
+This paper proposed a model based on Google API and Google OR-Tools to measure
+the impact of disruptions in the last-mile delivery operation. Our model considers customers’ geographic information, speed estimation between nodes, routing optimisation,
+and disruption evaluation. The proposed method was validated on a set of real data from
+three different cities, i.e., Boston, US; Bogotá, Colombia; and Pamplona, Spain. For the
+computational experiments, we generated random locations of customers for each city,
+and the evaluated disruptions considered the total travelled time and distance. The results
+allow us to conclude that the impact of disruptions in the transportation network depends
+on the city size, the city’s road network, and the dispersion of customers’ location. In this
+paper, the larger the city is, the most sensitive the disruption of arcs is, having an increase
+in the travelled distance up to 4% instead of 8% obtained by the smaller city. Additionally,
+Logistics 2021, 5, 17 8 of 9
+the results provided managerial insights for key stakeholders to improve the resilience and
+capabilities of the cities’ transportation systems.
+In terms of future research, there are opportunities to include a city’s population density or real delivery information of a parcel company to represent more real-like scenarios.
+Moreover, the impact of disruptions in peak times in terms of costs and CO2 emissions,
+considering different levels of disruptions, can also be studied. Furthermore, another direction for future research is to design robust routes for having a minimal impact on deliveries
+when disruptions occur. Finally, other solution methods and cities could be tested.
+Author Contributions: Conceptualization, A.M.-V., E.L.S.-C., L.R.-R. and J.F.; validation, A.M.-V.,
+E.L.S.-C., L.R.-R. and J.F.; formal analysis, A.M.-V., E.L.S.-C., L.R.-R. and J.F.; investigation, A.M.-V.,
+E.L.S.-C., L.R.-R., and J.F.; data curation, A.M.-V., E.L.S.-C., L.R.-R., and J.F.; writing—original draft
+preparation, A.M.-V., E.L.S.-C., L.R.-R. and J.F.; writing—review and editing, A.M.-V., E.L.S.-C.,
+L.R.-R. and J.F.; visualization, A.M.-V., E.L.S.-C., L.R.-R. and J.F. All authors have read and agreed to
+the published version of the manuscript.
+Funding: This research received no external funding.
+Institutional Review Board Statement: Not applicable.
+Informed Consent Statement: Not applicable.
+Data Availability Statement: Not applicable.
+Acknowledgments: This work has been partially supported by the Spanish Ministry of Science, Innovation, and Universities (RED2018-102642-T; PID2019-111100RB-C22/AEI/10.13039/501100011033).
+Moreover, we appreciate the financial support of the Erasmus+ Program (2018-1-ES01-KA103-049767).
+Conflicts of Interest: The authors declare no conflict of interest.
+References
+1. Pronello, C.; Camusso, C.; Valentina, R. Last mile freight distribution and transport operators’ needs: Which targets and
+challenges? Transp. Res. Procedia 2017, 25, 888–899. [CrossRef]
+2. Antún, J.P.; Reis, V.; Macário, R. Strategies to Improve Urban Freight Logistics in Historical Centers: The Cases of Lisbon and
+Mexico City. In City Logistics 3; John Wiley & Sons, Inc.: Hoboken, NJ, USA, 2018; pp. 349–366.
+3. Aljohani, K.; Thompson, R.G. Impacts of logistics sprawl on the urban environment and logistics: Taxonomy and review of
+literature. J. Transp. Geogr. 2016, 57, 255–263. [CrossRef]
+4. Marcucci, E.; Gatta, V.; Scaccia, L. Urban freight, parking and pricing policies: An evaluation from a transport providers’
+perspective. Transp. Res. Part A Policy Pract. 2015, 74, 239–249. [CrossRef]
+5. Teo, J.S.E.; Taniguchi, E.; Qureshi, A.G. Evaluating City Logistics Measure in E-Commerce with Multiagent Systems. Procedia Soc.
+Behav. Sci. 2012, 39, 349–359. [CrossRef]
+6. Lau, B.P.L.; Marakkalage, S.H.; Zhou, Y.; Hassan, N.U.; Yuen, C.; Zhang, M.; Tan, U.-X. A survey of data fusion in smart city
+applications. Inf. Fusion 2019, 52, 357–374. [CrossRef]
+7. Timm, A.; Kluge, B.; Wessolek, G. Hydrological balance of paved surfaces in moist mid-latitude climate – A review. Landsc. Urban
+Plan. 2018, 175, 80–91. [CrossRef]
+8. Xia, N.; Cheng, L.; Chen, S.; Wei, X.; Zong, W.; Li, M. Accessibility based on Gravity-Radiation model and Google Maps API: A
+case study in Australia. J. Transp. Geogr. 2018, 72, 178–190. [CrossRef]
+9. Lim, S.F.W.T.; Jin, X.; Srai, J.S. Consumer-driven e-commerce. Int. J. Phys. Distrib. Logist. Manag. 2018, 48, 308–332. [CrossRef]
+10. Bosona, T. Urban Freight Last Mile Logistics—Challenges and Opportunities to Improve Sustainability: A Literature Review.
+Sustainability 2020, 12, 8769. [CrossRef]
+11. Hu, W.; Dong, J.; Hwang, B.; Ren, R.; Chen, Z. A Scientometrics Review on City Logistics Literature: Research Trends, Advanced
+Theory and Practice. Sustainability 2019, 11, 2724. [CrossRef]
+12. Mareï, N.; Savy, M. Global South countries: The dark side of city logistics. Dualisation vs Bipolarisation. Transp. Policy 2021, 100,
+150–160. [CrossRef]
+13. Holguín-Veras, J.; Kalahasthi, L.; Campbell, S.; González-Calderón, C.A.; Wang, X. Freight mode choice: Results from a nationwide
+qualitative and quantitative research effort. Transp. Res. Part A Policy Pract. 2021, 143, 78–120. [CrossRef]
+14. Zenezini, G.; Marco, A. De City logistics policy evaluation with system dynamics. Transp. Res. Procedia 2020, 46, 253–260.
+[CrossRef]
+15. Juhász, J.; Bányai, T. Last mile logistics: An integrated view. IOP Conf. Ser. Mater. Sci. Eng. 2018, 448, 012026. [CrossRef]
+16. Bell, M.G.H. City logistics and the urban environment. In Urban Form and Accessibility; Elsevier: Amsterdam, The Netherlands,
+2021; pp. 359–378.
+Logistics 2021, 5, 17 9 of 9
+17. Ullah, Z.; Al-Turjman, F.; Mostarda, L.; Gagliardi, R. Applications of Artificial Intelligence and Machine learning in smart cities.
+Comput. Commun. 2020, 154, 313–323. [CrossRef]
+18. Meire, S.; Derudder, B. A bimodal accessibility analysis of Australia through application programming interfaces. Transp. A
+Transp. Sci. 2020, 16, 695–715. [CrossRef]
+19. Richardson, D.B. Real-Time Space–Time Integration in GIScience and Geography. Ann. Assoc. Am. Geogr. 2013, 103, 1062–1071.
+[CrossRef]
+20. Chen, P.-H.; Nguyen, T.C. Integrating web map service and building information modeling for location and transportation
+analysis in green building certification process. Autom. Constr. 2017, 77, 52–66. [CrossRef]
+21. Socharoentum, M.; Karimi, H.A. A comparative analysis of routes generated by Web Mapping APIs. Cartogr. Geogr. Inf. Sci. 2015,
+42, 33–43. [CrossRef]
+22. Weiss, D.J.; Nelson, A.; Gibson, H.S.; Temperley, W.; Peedell, S.; Lieber, A.; Hancher, M.; Poyart, E.; Belchior, S.; Fullman, N.; et al.
+A global map of travel time to cities to assess inequalities in accessibility in 2015. Nature 2018, 553, 333–336. [CrossRef]
+23. May, T.H.N.; Win, Z.H. Design and Construction of Navigation Based Auto Self Driving Vehicle using Google Map API with GPS.
+Int. J. Trend Sci. Res. Dev. 2019, 39, 65–68. [CrossRef]
+24. Park, Y.; Mount, J.; Liu, L.; Xiao, N.; Miller, H.J. Assessing public transit performance using real-time data spatiotemporal patterns
+of bus operation enhanced Reader. J. Int. J. Geogr. Inf. Sci. 2019, 34, 367–392. [CrossRef]
+25. Wang, F.; Xu, Y. Estimating O–D travel time matrix by Google Maps API: Implementation, advantages, and implications. Ann.
+GIS 2011, 17, 199–209. [CrossRef]
+26. Viergutz, K.; Krajzewicz, D. Analysis of the Travel Time of Various Transportation Systems in Urban Context. Transp. Res. Procedia
+2019, 41, 313–323. [CrossRef]
+27. Masłowski, D.; Kuli ´nska, E.; Kuli ´nska, K. Application of routing methods in city logistics for sustainable road traffic. Transp. Res.
+Procedia 2019, 39, 309–319. [CrossRef]
+28. Camargo, C.Q.; Bright, J.; McNeill, G.; Raman, S.; Hale, S.A. Estimating Traffic Disruption Patterns with Volunteered Geographic
+Information. Sci. Rep. 2020, 10, 1271. [CrossRef]
+29. Kivimaa, P.; Laakso, S.; Lonkila, A.; Kaljonen, M. Moving beyond disruptive innovation: A review of disruption in sustainability
+transitions. Environ. Innov. Soc. Transitions 2021, 38, 110–126. [CrossRef]
+30. Costa, C.; Ha, J.; Lee, S. Spatial disparity of income-weighted accessibility in Brazilian Cities: Application of a Google Maps API.
+J. Transp. Geogr. 2021, 90, 102905. [CrossRef]
+31. Google Google Maps Platform. Available online: https://cloud.google.com/maps-platform (accessed on 8 March 2021).
+32. Google Vehicle Routing. Available online: https://developers.google.com/optimization/routing (accessed on 8 March 2021).
+33. Zhang, K.; He, F.; Zhang, Z.; Lin, X.; Li, M. Multi-vehicle routing problems with soft time windows: A multi-agent reinforcement
+learning approach. Transp. Res. Part C Emerg. Technol. 2020, 121, 102861. [CrossRef]
+34. Gendreau, M.; Laporte, G.; Potvin, J.-Y. Metaheuristics for the Capacitated VRP. In The Vehicle Routing Problem; Society for
+Industrial and Applied Mathematics: Philadelphia, PA, USA, 2002; pp. 129–154.
+35. VRPy Performance Profiles. Available online: https://vrpy.readthedocs.io/en/latest/benchmarks.html#benchmarks (accessed on
+8 March 2021).
+36. Juan, A.A.; David Kelton, W.; Currie, C.S.M.; Faulin, J. Simheuristics applications: Dealing with uncertainty in logistics,
+transportation, and other supply chain areas. In Proceedings of the 2018 Winter Simulation Conference (WSC), Gothenburg,
+Sweden, 9–12 December 2018; pp. 3048–3059.
+37. Dettenbach, A.M.C.; Ubber, S. Managing Disruptions in Last Mile Distribution. In Proceedings of the 2015 48th Hawaii
+International Conference on System Sciences, Kauai, HI, USA, 5–8 January 2015; pp. 1078–1087.
+38. Verlinden, T.; Van de Voorde, E.; Dewulf, W. Ho.Re.Ca. logistics and European medieval structured cities: A search for cost
+generators. Transp. Policy 2020, 99, 419–429. [CrossRef]
+39. Beghelli, S.; Guastella, G.; Pareglio, S. Governance fragmentation and urban spatial expansion: Evidence from Europe and the
+United States. Rev. Reg. Res. 2020, 40, 13–32. [CrossRef]
+40. US Census Bureau Boston city MA 2018 Population Estimates. Available online: https://www.census.gov/programs-surveys/
+popest.html?intcmp=serp (accessed on 8 March 2021).
+41. Ayuntamiento de Pamplona Población Total Pamplona/Iruña a 2 de enero de 2020. Available online: https://www.pamplona.
+es/sites/default/files/2020-01/Pamplona-barriospoblaciontotalenero2020_0.pdf (accessed on 8 March 2021).

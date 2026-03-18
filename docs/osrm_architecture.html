@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSRM Architecture - MDRP-BCS Communication Flow</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+        
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .diagram-section {
+            margin-bottom: 50px;
+        }
+        
+        .diagram-title {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .diagram-title::before {
+            content: "📊";
+            font-size: 1.5em;
+        }
+        
+        .mermaid {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            overflow-x: auto;
+        }
+        
+        .description {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+            line-height: 1.6;
+            color: #1565c0;
+        }
+        
+        .code-block {
+            background: #272822;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        
+        .step {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 4px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .legend-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 1px solid #999;
+        }
+        
+        .color-python { background: #3776ab; }
+        .color-docker { background: #2496ed; }
+        .color-osrm { background: #ff6b6b; }
+        .color-network { background: #4ecdc4; }
+        .color-data { background: #ffd93d; }
+        
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+        
+        .timeline-item {
+            margin-left: 30px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-left: 3px solid #667eea;
+            position: relative;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 0;
+            width: 17px;
+            height: 17px;
+            background: #667eea;
+            border-radius: 50%;
+            border: 3px solid white;
+        }
+        
+        .timeline-item h4 {
+            color: #667eea;
+            margin: 0 0 5px 0;
+            font-size: 1.1em;
+        }
+        
+        .timeline-item p {
+            margin: 0;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .legend {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏗️ OSRM Architecture</h1>
+            <p>Communication Flow: MDRP-BCS Code → OSRM Docker Engine</p>
+        </div>
+        
+        <div class="content">
+            <!-- Diagram 1: High Level Architecture -->
+            <div class="diagram-section">
+                <div class="diagram-title">1. Arquitectura de Alto Nivel</div>
+                
+                <div class="mermaid">
+                    graph TB
+                    subgraph Python["🐍 Python Code (MDRP-BCS)"]
+                        A["main.py<br/>generate_results.py"]
+                        B["bundling.py<br/>routing logic"]
+                        C["getrouteOSMR.py<br/>OSRM client"]
+                    end
+                    
+                    subgraph Network["🌐 Network Communication"]
+                        D["HTTP/REST<br/>Port 5000"]
+                    end
+                    
+                    subgraph Docker["🐳 Docker Container"]
+                        E["osrm-backend<br/>v5.26.0"]
+                    end
+                    
+                    subgraph Data["💾 Data Files"]
+                        F["bcs-latest.osrm<br/>(preprocessed)"]
+                        G["Road Network<br/>Graph"]
+                    end
+                    
+                    A --> B --> C
+                    C -->|HTTP GET| D
+                    D -->|localhost:5000| E
+                    E --> F
+                    F --> G
+                    G -->|Dijkstra/MLD<br/>Algorithm| E
+                    E -->|JSON Response| D
+                    D -->|HTTP 200| C
+                    C --> B
+                    B --> A
+                    
+                    style Python fill:#3776ab,stroke:#1d3557,stroke-width:2px,color:#fff
+                    style Network fill:#4ecdc4,stroke:#1d7874,stroke-width:2px,color:#fff
+                    style Docker fill:#2496ed,stroke:#0066b2,stroke-width:2px,color:#fff
+                    style Data fill:#ffd93d,stroke:#c9a227,stroke-width:2px,color:#333
+                </div>
+                
+                <div class="description">
+                    <strong>Componentes principales:</strong>
+                    <ul>
+                        <li><strong>Python Code:</strong> Tu lógica de simulación MDRP (Rolling Horizon, bundling)</li>
+                        <li><strong>HTTP/REST:</strong> Protocolo de comunicación simple (requests library)</li>
+                        <li><strong>Docker Container:</strong> Motor de routing OSRM en v5.26.0</li>
+                        <li><strong>Data Files:</strong> Grafo de carreteras de La Paz (preprocessado)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Diagram 2: Detailed Request-Response Cycle -->
+            <div class="diagram-section">
+                <div class="diagram-title">2. Ciclo Detallado: Request → Response</div>
+                
+                <div class="mermaid">
+                    sequenceDiagram
+                        participant Python as Python Script
+                        participant Requests as requests library
+                        participant HTTP as HTTP Client/Server
+                        participant Docker as Docker Container
+                        participant OSRM as OSRM Engine
+                        participant Graph as Road Network
+                        
+                        Python->>Requests: get_route_details(origin, waypoints)
+                        Requests->>HTTP: GET /route/v1/driving/{lon,lat};{lon,lat}?overview=false
+                        HTTP->>Docker: Route request on port 5000
+                        Docker->>OSRM: Process routing query
+                        OSRM->>Graph: Find shortest path using MLD
+                        Graph-->>OSRM: Distance & duration
+                        OSRM-->>Docker: Route result
+                        Docker-->>HTTP: JSON response (status 200)
+                        HTTP-->>Requests: {"code":"Ok","routes":[...]}
+                        Requests-->>Python: Dictionary with distance/duration
+                        Python->>Python: Use data in bundling logic
+                </div>
+                
+                <div class="description">
+                    <strong>Flujo temporal (típicamente <100ms):</strong>
+                    <ol>
+                        <li>Python prepara coordenadas (restaurante → cliente)</li>
+                        <li>Envía GET HTTP request a localhost:5000</li>
+                        <li>Docker recibe en puerto 5000</li>
+                        <li>OSRM carga grafo de carreteras en RAM</li>
+                        <li>Ejecuta algoritmo MLD (Multi-Level Dijkstra)</li>
+                        <li>Retorna JSON con distance (metros) y duration (segundos)</li>
+                        <li>Python procesa resultado para bundling/asignación</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <!-- Diagram 3: File Structure -->
+            <div class="diagram-section">
+                <div class="diagram-title">3. Estructura de Archivos y Volúmenes Docker</div>
+                
+                <div class="mermaid">
+                    graph LR
+                    subgraph Local["Windows Local Machine<br/>C:\\Users\\Alan Sama\\Desktop..."]
+                        A["MDRP-BCS-code/"]
+                        A1["osrm_data/"]
+                        A1a["bcs-latest.osm.pbf<br/>(14.7 MB)"]
+                        A1b["bcs-latest.osrm<br/>(preprocessed)"]
+                        A1c["bcs-latest.osrm.*<br/>(auxiliary files)"]
+                        A2["scripts/"]
+                        A2a["generate_results.py"]
+                        A3["src/"]
+                        A3a["getrouteOSMR.py<br/>(OSRM client)"]
+                        A --> A1
+                        A --> A2
+                        A --> A3
+                        A1 --> A1a
+                        A1 --> A1b
+                        A1 --> A1c
+                        A2 --> A2a
+                        A3 --> A3a
+                    end
+                    
+                    subgraph Docker["Docker Container<br/>(Inside: /data)"]
+                        B["Mount Volume -v"]
+                        B1["/data/"]
+                        B1a["bcs-latest.osm.pbf"]
+                        B1b["bcs-latest.osrm"]
+                        B1c["(auxiliary files)"]
+                        B --> B1
+                        B1 --> B1a
+                        B1 --> B1b
+                        B1 --> B1c
+                    end
+                    
+                    A1 -.->|volume mount| B
+                    
+                    style Local fill:#f0f0f0,stroke:#999,stroke-width:2px
+                    style Docker fill:#2496ed,stroke:#0066b2,stroke-width:2px,color:#fff
+                    style A1 fill:#ffd93d,stroke:#c9a227
+                    style B1 fill:#ffd93d,stroke:#c9a227
+                </div>
+                
+                <div class="description">
+                    <strong>Docker Volume Mapping:</strong>
+                    <p>La carpeta <code>osrm_data/</code> en Windows se monta como <code>/data/</code> dentro del contenedor Docker. Esto permite que OSRM acceda a los archivos preprocessados sin duplicarlos.</p>
+                    <div class="code-block">
+-v "c:\Users\Alan Sama\Desktop\MDRP RH\MDRP-BCS-code\osrm_data:/data"
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Diagram 4: Python Call Stack -->
+            <div class="diagram-section">
+                <div class="diagram-title">4. Stack de Llamadas Python → OSRM</div>
+                
+                <div class="mermaid">
+                    graph TD
+                    A["generate_results.py<br/>(main pipeline)"]
+                    B["run_simulation()<br/>src/main.py"]
+                    C["assign_bundles_to_couriers()<br/>src/asignaciontentativa.py"]
+                    D["calculate_bundle_score()<br/>src/bundling.py"]
+                    E["get_route_details()<br/>src/getrouteOSMR.py"]
+                    F["requests.get()<br/>(HTTP library)"]
+                    G["Docker Port 5000"]
+                    H["OSRM Engine"]
+                    
+                    A --> B
+                    B --> C
+                    C --> D
+                    D --> E
+                    E --> F
+                    F --> G
+                    G --> H
+                    
+                    I["⏱️ ~50ms per call"]
+                    H -.-> I
+                    
+                    style A fill:#667eea,color:#fff
+                    style B fill:#667eea,color:#fff
+                    style C fill:#667eea,color:#fff
+                    style D fill:#667eea,color:#fff
+                    style E fill:#3776ab,color:#fff,stroke:#ff9500,stroke-width:3px
+                    style F fill:#4ecdc4,color:#fff,stroke:#ff9500,stroke-width:3px
+                    style G fill:#2496ed,color:#fff
+                    style H fill:#ff6b6b,color:#fff
+                    style I fill:#fff,stroke:#ff9500,stroke-width:2px
+                </div>
+                
+                <div class="description">
+                    <strong>Punto crítico:</strong> La función <code>get_route_details()</code> en <code>getrouteOSMR.py</code> es donde ocurre la comunicación HTTP con OSRM. Cada llamada toma ~50ms.
+                </div>
+            </div>
+            
+            <!-- Diagram 5: Request Format -->
+            <div class="diagram-section">
+                <div class="diagram-title">5. Formato de Requests HTTP → OSRM</div>
+                
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h4>📍 Step 1: Preparar Coordenadas</h4>
+                        <p>Convertir de (lat, lon) a (lon, lat) porque OSRM usa formato lon,lat</p>
+                        <div class="code-block">
+# Python
+origin = (24.1440, -110.3115)  # (lat, lon)
+waypoint = (24.1560, -110.2980)
+
+# Convertir para OSRM
+coords = f"{origin[1]},{origin[0]}"  # "-110.3115,24.1440"
+coords += f";{waypoint[1]},{waypoint[0]}"  # "...;-110.2980,24.1560"
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <h4>🔗 Step 2: Construir URL</h4>
+                        <p>Crear endpoint GET completo con parámetros</p>
+                        <div class="code-block">
+url = "http://localhost:5000/route/v1/driving/" + coords + "?overview=false"
+
+# Resultado:
+# http://localhost:5000/route/v1/driving/-110.3115,24.1440;-110.2980,24.1560?overview=false
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <h4>📤 Step 3: Enviar Request</h4>
+                        <p>Usar requests library con timeout de seguridad</p>
+                        <div class="code-block">
+response = requests.get(url, timeout=60)
+response.raise_for_status()  # Lanzar error si status != 200
+data = response.json()
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <h4>📥 Step 4: Procesar Response</h4>
+                        <p>Extraer distance y duration del JSON</p>
+                        <div class="code-block">
+if data.get('code') == 'Ok':
+    route = data['routes'][0]
+    distance_meters = route['distance']      # 4231.5
+    duration_seconds = route['duration']    # 305.2
+else:
+    # Error: NoRoute, InvalidCoordinates, etc
+    return None
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Diagram 6: Example Response -->
+            <div class="diagram-section">
+                <div class="diagram-title">6. Ejemplo Completo: Request ↔ Response</div>
+                
+                <div class="description">
+                    <strong>REQUEST:</strong>
+                    <div class="code-block">
+GET http://localhost:5000/route/v1/driving/-110.3115,24.1440;-110.2980,24.1560?overview=false HTTP/1.1
+Host: localhost:5000
+Connection: keep-alive
+User-Agent: python-requests/2.31.0
+                    </div>
+                </div>
+                
+                <div class="description">
+                    <strong>RESPONSE (200 OK):</strong>
+                    <div class="code-block">
+{
+  "code": "Ok",
+  "routes": [
+    {
+      "distance": 4231.5,         ← Distancia en metros
+      "duration": 305.2,          ← Duración en segundos
+      "geometry": "...",          ← Polyline encoded (ignorado aquí)
+      "legs": [
+        {
+          "distance": 4231.5,
+          "duration": 305.2,
+          "steps": []
+        }
+      ]
+    }
+  ],
+  "waypoints": [
+    { "hint": "...", "distance": 0.5, "name": "..." },
+    { "hint": "...", "distance": 1.2, "name": "..." }
+  ]
+}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Diagram 7: Error Handling -->
+            <div class="diagram-section">
+                <div class="diagram-title">7. Manejo de Errores y Fallbacks</div>
+                
+                <div class="mermaid">
+                    graph TD
+                    A["Call get_route_details()"]
+                    
+                    A --> B{OSRM Response?}
+                    
+                    B -->|✅ code:Ok| C["Return distance/duration<br/>for bundling"]
+                    
+                    B -->|❌ Connection Error| D["OSRM Server Down?"]
+                    D --> E["Use Euclidean<br/>Distance Fallback"]
+                    
+                    B -->|❌ code:NoRoute| F["Coordinates invalid?<br/>Outside road network?"]
+                    F --> E
+                    
+                    B -->|❌ Timeout 60s| G["OSRM Too Slow?<br/>Large graph?"]
+                    G --> E
+                    
+                    E --> H["Estimate Duration<br/>30 km/h avg speed"]
+                    
+                    C --> I["✅ Bundle Score Calculated"]
+                    H --> I
+                    
+                    E --> J["⚠️ Log Warning"]
+                    J --> I
+                    
+                    style C fill:#90EE90,stroke:#228B22,stroke-width:2px
+                    style E fill:#FFB6C1,stroke:#FF1493,stroke-width:2px
+                    style I fill:#87CEEB,stroke:#4682B4,stroke-width:2px
+                    style J fill:#FFD700,stroke:#FF8C00,stroke-width:2px
+                </div>
+                
+                <div class="description">
+                    <strong>Estrategia de Resiliencia:</strong>
+                    <ul>
+                        <li>🟢 <strong>Caso Normal:</strong> OSRM responde correctamente → usar datos reales</li>
+                        <li>🔴 <strong>OSRM No Disponible:</strong> Fallback a distancia euclidiana + estimación de tiempo</li>
+                        <li>⚠️  <strong>Coordenadas Inválidas:</strong> Detectar y loguear, usar fallback</li>
+                        <li>⏱️ <strong>Timeout:</strong> Después de 60 segundos, asumir OSRM está lento</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Diagram 8: Performance Metrics -->
+            <div class="diagram-section">
+                <div class="diagram-title">8. Métricas de Performance</div>
+                
+                <div class="mermaid">
+                    graph LR
+                    A["Simulation Start<br/>1,038 orders"]
+                    
+                    B1["Bundle 1<br/>5 routes"]
+                    B2["Bundle 2<br/>3 routes"]
+                    B3["..."]
+                    B4["Bundle N<br/>routes"]
+                    
+                    C1["OSRM Call 1<br/>~50ms"]
+                    C2["OSRM Call 2<br/>~50ms"]
+                    C3["..."]
+                    C_total["Total Routing Time"]
+                    
+                    A --> B1 --> C1
+                    A --> B2 --> C2
+                    A --> B3 --> C3
+                    A --> B4 --> C_total
+                    
+                    C_total --> D["~X hours simulation"]
+                    
+                    D --> E["KPI Analysis"]
+                    
+                    style A fill:#667eea,color:#fff
+                    style C1 fill:#ff6b6b,color:#fff
+                    style C2 fill:#ff6b6b,color:#fff
+                    style C3 fill:#ff6b6b,color:#fff
+                    style C_total fill:#ff6b6b,color:#fff,stroke:#ffff00,stroke-width:2px
+                    style E fill:#90EE90,stroke:#228B22,stroke-width:2px
+                </div>
+                
+                <div class="description">
+                    <strong>Estimaciones de Tiempo:</strong>
+                    <ul>
+                        <li><strong>Por ruta OSRM:</strong> 10-50 ms (típicamente ~30-50ms para La Paz)</li>
+                        <li><strong>Órdenes en simulación:</strong> 1,038</li>
+                        <li><strong>Bundles generados:</strong> ~100-200 por intervalo de RH</li>
+                        <li><strong>Llamadas OSRM totales:</strong> Miles (cada bundle → múltiples rutas)</li>
+                        <li><strong>Tiempo total estimado:</strong> 30-60 minutos para full pipeline</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Legend -->
+            <div class="diagram-section">
+                <div class="diagram-title" style="border-bottom: none;">Leyenda de Colores</div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color color-python"></div>
+                        <span><strong>Python Code:</strong> Tu lógica MDRP</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color color-docker"></div>
+                        <span><strong>Docker:</strong> Contenedor OSRM</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color color-osrm"></div>
+                        <span><strong>OSRM Engine:</strong> Motor de routing</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color color-network"></div>
+                        <span><strong>Network:</strong> HTTP/REST comunicación</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color color-data"></div>
+                        <span><strong>Data:</strong> Archivos OSM/OSRM</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'loose' });
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>

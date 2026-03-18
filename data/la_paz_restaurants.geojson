@@ -19,14 +19,14 @@
 { "type": "Feature", "properties": { "name": "Farmacorama" }, "geometry": { "type": "Point", "coordinates": [ -110.3108027, 24.1572701 ] } },
 { "type": "Feature", "properties": { "name": "Aramburo" }, "geometry": { "type": "Point", "coordinates": [ -110.3110924, 24.1574561 ] } },
 { "type": "Feature", "properties": { "name": "Oxxo" }, "geometry": { "type": "Point", "coordinates": [ -110.308811, 24.147748 ] } },
-{ "type": "Feature", "properties": { "name": null }, "geometry": { "type": "Point", "coordinates": [ -110.312245, 24.1574957 ] } },
-{ "type": "Feature", "properties": { "name": null }, "geometry": { "type": "Point", "coordinates": [ -110.3103754, 24.1579105 ] } },
-{ "type": "Feature", "properties": { "name": null }, "geometry": { "type": "Point", "coordinates": [ -110.305661, 24.149921 ] } },
+{ "type": "Feature", "properties": { "name": "Tacos Don Juan" }, "geometry": { "type": "Point", "coordinates": [ -110.312245, 24.1574957 ] } },
+{ "type": "Feature", "properties": { "name": "Hates el Mai" }, "geometry": { "type": "Point", "coordinates": [ -110.3103754, 24.1579105 ] } },
+{ "type": "Feature", "properties": { "name": "Tortas doña alicia" }, "geometry": { "type": "Point", "coordinates": [ -110.305661, 24.149921 ] } },
 { "type": "Feature", "properties": { "name": "HSBC" }, "geometry": { "type": "Point", "coordinates": [ -110.308691, 24.1472935 ] } },
-{ "type": "Feature", "properties": { "name": null }, "geometry": { "type": "Point", "coordinates": [ -110.3155258, 24.1501434 ] } },
-{ "type": "Feature", "properties": { "name": null }, "geometry": { "type": "Point", "coordinates": [ -110.3149483, 24.1490742 ] } },
+{ "type": "Feature", "properties": { "name": "El rincon chilango" }, "geometry": { "type": "Point", "coordinates": [ -110.3155258, 24.1501434 ] } },
+{ "type": "Feature", "properties": { "name": "Waffles" }, "geometry": { "type": "Point", "coordinates": [ -110.3149483, 24.1490742 ] } },
 { "type": "Feature", "properties": { "name": "Tacos de Pescado Estadio" }, "geometry": { "type": "Point", "coordinates": [ -110.315147, 24.155817 ] } },
 { "type": "Feature", "properties": { "name": "Taco Fish La Paz" }, "geometry": { "type": "Point", "coordinates": [ -110.3150857, 24.1490409 ] } },
-{ "type": "Feature", "properties": { "name": null }, "geometry": { "type": "Point", "coordinates": [ -110.3058004, 24.1491183 ] } }
+{ "type": "Feature", "properties": { "name": "Birria don juan" }, "geometry": { "type": "Point", "coordinates": [ -110.3058004, 24.1491183 ] } }
 ]
 }

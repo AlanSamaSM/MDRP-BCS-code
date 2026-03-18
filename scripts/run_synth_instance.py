@@ -6,7 +6,7 @@ from datetime import timedelta
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src import config
-from src.main import run_simulation, Restaurant
+from src.main import run_simulation
 from src.synth_loader import load_synth_instance
 
 
