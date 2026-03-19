@@ -2282,9 +2282,9 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	Este capítulo presenta los resultados obtenidos de la ejecución del simulador bajo cinco
 	escenarios de saturación de flota, comparando la política base FCFS contra la heurística
 	de horizonte rodante (RH) descrita en el Capítulo~2 e implementada según el Capítulo~3.
-	Cada escenario se ejecuta con tres semillas aleatorias ($s \in \{2025, 2026, 2027\}$)
+	Cada escenario se ejecuta con dos semillas aleatorias ($s \in \{2025, 2026\}$)
 	para garantizar la robustez estadística de los resultados; los valores reportados
-	corresponden al promedio de las tres réplicas salvo que se indique lo contrario.
+	corresponden al promedio de las dos réplicas salvo que se indique lo contrario.
 
 	\section{Configuración experimental}
 
@@ -2317,21 +2317,21 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	Contraction Hierarchies sobre el grafo vial de La Paz.
 
 	Para cada escenario y semilla se ejecutan secuencialmente las políticas FCFS y RH,
-	generando en total $4 \times 3 \times 2 = 24$ corridas de simulación.  Los 21 KPIs
+	generando en total $4 \times 2 \times 2 = 16$ corridas de simulación.  Los 21 KPIs
 	definidos en la Tabla~\ref{tab:kpis} (§3.7) se calculan para cada corrida.
 
 	% ──────────────────────────────────────────────────────────────────
 	\section{Calidad de servicio}
 
 	La Tabla~\ref{tab:res_ctd} presenta los indicadores de calidad de servicio promediados
-	sobre las tres réplicas.  El Click-to-Door (CtD) es la métrica principal de calidad
+	sobre las dos réplicas.  El Click-to-Door (CtD) es la métrica principal de calidad
 	percibida por el cliente, definida como el tiempo transcurrido desde que se confirma
 	el pedido hasta que se entrega en el domicilio.
 
 	\begin{table}[htbp]
 	\centering
 	\small
-	\caption{Indicadores de calidad de servicio: promedio de 3 réplicas.}
+	\caption{Indicadores de calidad de servicio: promedio de 2 réplicas.}
 	\label{tab:res_ctd}
 	\begin{tabular}{@{}l rr r rr r rr r@{}}
 	\toprule
@@ -2339,10 +2339,10 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10}
 	Esc. & FCFS & RH & $\Delta$\% & FCFS & RH & $\Delta$\% & FCFS & RH & $\Delta$\% \\
 	\midrule
-	S1 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} \\
-	S2 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} \\
-	S3 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} \\
-	S4 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} \\
+	S1 & 10.05 & 29.59 & $+194.4$ & 13.09 & 44.03 & $+236.4$ & 100.0 & 84.3 & $-15.7$ \\
+	S2 & 17.03 & 32.79 & $+92.5$  & 32.65 & 50.46 & $+54.5$  & 91.4  & 76.7 & $-16.1$ \\
+	S3 & 37.11 & 37.82 & $+1.9$   & 123.98 & 58.15 & $-53.1$ & 76.3  & 68.8 & $-9.8$  \\
+	S4 & 78.57 & 57.93 & $-26.3$  & 246.42 & 141.30 & $-42.7$ & 61.3  & 55.5 & $-9.5$ \\
 	\bottomrule
 	\end{tabular}
 	\end{table}
@@ -2370,7 +2370,7 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\begin{table}[htbp]
 	\centering
 	\small
-	\caption{Ready-to-Pickup y CTD Overage: promedio de 3 réplicas.}
+	\caption{Ready-to-Pickup y CTD Overage: promedio de 2 réplicas.}
 	\label{tab:res_rtp}
 	\begin{tabular}{@{}l rr r rr r@{}}
 	\toprule
@@ -2378,10 +2378,10 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\cmidrule(lr){2-4} \cmidrule(lr){5-7}
 	Esc. & FCFS & RH & $\Delta$\% & FCFS & RH & $\Delta$\% \\
 	\midrule
-	S1 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} \\
-	S2 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} \\
-	S3 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} \\
-	S4 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} \\
+	S1 & $-9.45$ & 8.03 & -- & 0.00 & 1.26 & -- \\
+	S2 & $-2.95$ & 10.14 & -- & 3.23 & 3.52 & $+9.2$ \\
+	S3 & 16.71 & 14.37 & $-14.0$ & 18.72 & 7.42 & $-60.4$ \\
+	S4 & 57.64 & 33.75 & $-41.5$ & 55.50 & 25.92 & $-53.3$ \\
 	\bottomrule
 	\end{tabular}
 	\end{table}
@@ -2404,7 +2404,7 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\begin{table}[htbp]
 	\centering
 	\small
-	\caption{Indicadores de eficiencia operativa: promedio de 3 réplicas.}
+	\caption{Indicadores de eficiencia operativa: promedio de 2 réplicas.}
 	\label{tab:res_eficiencia}
 	\begin{tabular}{@{}l rr r rr r rr r@{}}
 	\toprule
@@ -2412,10 +2412,10 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10}
 	Esc. & FCFS & RH & $\Delta$\% & FCFS & RH & $\Delta$\% & FCFS & RH & $\Delta$\% \\
 	\midrule
-	S1 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} \\
-	S2 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} \\
-	S3 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} \\
-	S4 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} \\
+	S1 & 1.63 & 1.63 & $0.0$   & 20.4 & 37.5 & $+83.6$ & 4.44 & 7.97 & $+79.6$ \\
+	S2 & 2.36 & 2.36 & $0.0$   & 31.5 & 46.2 & $+46.5$ & 4.79 & 6.69 & $+39.9$ \\
+	S3 & 3.15 & 3.15 & $0.0$   & 44.2 & 53.3 & $+20.6$ & 5.09 & 5.73 & $+12.6$ \\
+	S4 & 4.14 & 4.67 & $+12.8$ & 61.7 & 63.8 & $+3.5$  & 5.49 & 4.60 & $-16.1$ \\
 	\bottomrule
 	\end{tabular}
 	\end{table}
@@ -2424,21 +2424,26 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 
 	El indicador Orders/Courier/Hr mide la productividad individual.  Bajo ambas
 	políticas, este indicador crece con la saturación: con menos repartidores, cada uno
-	debe atender más pedidos.  La utilización (\% del turno en conducción) refleja la
-	fracción del turno que el courier dedica activamente al transporte, excluyendo tiempos
-	de espera.
+	debe atender más pedidos.  En los escenarios S1--S3, ambas políticas entregan la
+	totalidad de las órdenes, por lo que el throughput es idéntico.  En S4, la
+	política RH logra un throughput 12.8\% superior (4.67 vs 4.14~ord./c/hr) gracias a
+	la reducción de pedidos no entregados (1.2\% vs 12.4\%).
 
-	En el escenario de alta saturación (S4), la utilización bajo FCFS se acerca
-	al 100\%, indicando que los repartidores están permanentemente ocupados.  La política
-	RH, al coordinar la asignación, puede redistribuir la carga de trabajo de forma más
-	equilibrada.
+	La utilización (\% del turno en conducción) crece con la saturación bajo ambas
+	políticas, alcanzando 61.7\% (FCFS) y 63.8\% (RH) en S4.  Bajo RH, la utilización
+	es consistentemente mayor en todos los escenarios porque los agrupamientos generan
+	rutas multi-parada más largas, manteniendo al courier en movimiento durante una
+	fracción mayor del turno.
 
 	\subsection{Distancia y enrutamiento}
 
 	La distancia por pedido refleja la eficiencia geográfica del enrutamiento.
-	La formación de agrupamientos bajo RH permite que un solo viaje cubra múltiples
-	entregas cercanas, reduciendo la distancia recorrida por cada pedido.  Este efecto
-	es más pronunciado conforme aumenta la densidad de órdenes por restaurante.
+	En los escenarios S1--S3, la distancia por pedido es mayor bajo RH (+12.6\% a
+	+79.6\%), lo cual es consecuencia directa de los agrupamientos: las rutas
+	multi-parada recorren mayor distancia en total, aunque reparten dicha distancia
+	entre varios pedidos.  En S4, la tendencia se invierte: RH logra una distancia
+	por pedido 16.1\% menor (4.60~vs~5.49~km), porque al consolidar entregas evita
+	viajes redundantes en un entorno donde los repartidores están altamente saturados.
 
 	% ──────────────────────────────────────────────────────────────────
 	\section{Agrupamiento y costos}
@@ -2449,7 +2454,7 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\begin{table}[htbp]
 	\centering
 	\small
-	\caption{Indicadores de agrupamiento y costos: promedio de 3 réplicas.}
+	\caption{Indicadores de agrupamiento y costos: promedio de 2 réplicas.}
 	\label{tab:res_bundles}
 	\begin{tabular}{@{}l rr r rr r rr r@{}}
 	\toprule
@@ -2457,10 +2462,10 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10}
 	Esc. & FCFS & RH & $\Delta$\% & FCFS & RH & $\Delta$\% & FCFS & RH & $\Delta$\% \\
 	\midrule
-	S1 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} \\
-	S2 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} \\
-	S3 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} \\
-	S4 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} \\
+	S1 & 1.00 & 2.56 & $+156.4$ & 0.0 & 66.5 & $+66.5$ & 10.49 & 10.38 & $-1.1$ \\
+	S2 & 1.00 & 2.99 & $+198.8$ & 0.0 & 78.9 & $+78.9$ & 9.89  & 9.87  & $-0.3$ \\
+	S3 & 1.00 & 3.30 & $+230.1$ & 0.0 & 89.4 & $+89.4$ & 10.00 & 10.00 & $0.0$  \\
+	S4 & 1.00 & 3.57 & $+256.5$ & 0.0 & 95.4 & $+95.4$ & 9.82  & 9.84  & $+0.2$ \\
 	\bottomrule
 	\end{tabular}
 	\end{table}
@@ -2518,21 +2523,21 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\subsection{Resultados de la prueba Mann-Whitney $U$}
 
 	La Tabla~\ref{tab:mann_whitney} presenta los resultados de la prueba para el
-	Click-to-Door en cada escenario, con los datos agregados de las tres réplicas.
+	Click-to-Door en cada escenario, con los datos agregados de las dos réplicas.
 
 	\begin{table}[htbp]
 	\centering
 	\small
-	\caption{Prueba de Mann-Whitney $U$ para Click-to-Door: 3 réplicas agregadas.}
+	\caption{Prueba de Mann-Whitney $U$ para Click-to-Door: 2 réplicas agregadas.}
 	\label{tab:mann_whitney}
 	\begin{tabular}{@{}l rr cc cc@{}}
 	\toprule
 	Esc. & $\bar{x}_{\text{FCFS}}$ & $\bar{x}_{\text{RH}}$ & $U$ & $p$ & $r$ & Efecto \\
 	\midrule
-	S1 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} \\
-	S2 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} \\
-	S3 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} \\
-	S4 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} \\
+	S1 & 10.05 & 29.59 & 44\,784    & $<0.001$ & 0.979 & Grande \\
+	S2 & 17.03 & 32.79 & 487\,834   & $<0.001$ & 0.774 & Grande \\
+	S3 & 37.11 & 37.82 & 1\,102\,428 & $<0.001$ & 0.490 & Med.   \\
+	S4 & 78.57 & 57.93 & 1\,395\,659 & $<0.001$ & 0.255 & Peq.   \\
 	\bottomrule
 	\end{tabular}
 	\end{table}
@@ -2542,22 +2547,35 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	Los resultados revelan tres regímenes de comportamiento en función de la saturación.
 
 	\paragraph{Régimen de baja saturación (S1--S2).}
-	Con una flota holgada, la mayoría de los pedidos se atienden individualmente y la
-	diferencia entre FCFS y RH es pequeña.  La prueba de Mann-Whitney puede ser no
-	significativa o mostrar tamaños de efecto negligibles.  Esto es esperable: cuando
-	hay suficientes repartidores para cada pedido, la coordinación adicional del RH
-	ofrece poca ventaja marginal.
+	Con una flota holgada, FCFS logra tiempos CtD sustancialmente menores que RH
+	(10.05 vs 29.59~min en S1; 17.03 vs 32.79~min en S2).
+	La prueba de Mann-Whitney confirma diferencias significativas con tamaño de efecto
+	grande ($r = 0.979$ y $r = 0.774$, respectivamente), \emph{a favor de FCFS}.
+	Esto se explica porque, con exceso de repartidores, FCFS despacha cada pedido
+	inmediatamente al courier más cercano, mientras que RH introduce latencia al
+	esperar la formación de agrupamientos.  El componente negativo de RtP bajo FCFS
+	($-9.45$ y $-2.95$~min) refleja couriers que llegan al restaurante antes de que
+	el pedido esté listo, reduciendo el CtD aparente.  En este régimen, la
+	coordinación adicional del RH no aporta ventaja marginal en velocidad de entrega.
 
 	\paragraph{Régimen de saturación media (S3).}
-	La heurística RH comienza a mostrar ventajas significativas al coordinar
-	agrupamientos y sincronizar tiempos de pickup.  La reducción del CtD
-	se vuelve estadísticamente significativa con tamaño de efecto mediano.
+	Con 30~repartidores, los tiempos medios de CtD son prácticamente equivalentes
+	(37.11 vs 37.82~min), pero la distribución difiere drásticamente.
+	El P90~CtD bajo FCFS alcanza 123.98~min frente a 58.15~min bajo RH
+	($-53.1\%$), y el CTD Overage se reduce de 18.72 a 7.42~min ($-60.4\%$).
+	La prueba de Mann-Whitney detecta un efecto mediano ($r = 0.490$),
+	indicando que la heurística RH comprime la cola derecha de la distribución
+	mediante la coordinación de agrupamientos y la sincronización de tiempos de
+	recogida.
 
 	\paragraph{Régimen de alta saturación (S4).}
-	Las diferencias se acentúan.  La formación agresiva de agrupamientos permite
-	que un número reducido de repartidores atienda una demanda elevada.  El tamaño
-	de efecto es grande, confirmando que la mejora no es un artefacto estadístico
-	sino una ganancia operativa sustantiva.
+	Con 20~repartidores para $\sim$1\,040~órdenes, RH reduce el CtD promedio un
+	26.3\% (57.93 vs 78.57~min) y el P90~CtD un 42.7\%.  Lo más notable es la
+	reducción de pedidos no entregados: 1.2\% bajo RH frente a 12.4\% bajo FCFS.
+	El tamaño de efecto de la prueba Mann-Whitney es pequeño ($r = 0.255$),
+	lo cual refleja la alta variabilidad de ambas distribuciones en condiciones
+	extremadamente saturadas, no la ausencia de una diferencia operativamente
+	relevante.
 
 	\subsection{Comparación con la literatura}
 
@@ -2591,13 +2609,119 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\end{figure}
 
 	\chapter{Conclusiones}
-	
-	
-	
-	
-	
-	
-	
+
+	Este capítulo sintetiza los hallazgos principales del trabajo, verifica el
+	cumplimiento de los objetivos planteados en el Capítulo~1 y propone líneas de
+	investigación futura.
+
+	% ──────────────────────────────────────────────────────────────────
+	\section{Verificación de objetivos}
+
+	\subsection{Objetivo general}
+	El objetivo general --- evaluar la eficiencia operativa de la política de despacho
+	\emph{Rolling Horizon} frente a FCFS mediante un entorno de simulación reproducible
+	con restricciones topológicas reales de La Paz, B.C.S. --- se cumple
+	satisfactoriamente.  Se ejecutaron 16~corridas de simulación (4~escenarios
+	$\times$ 2~semillas $\times$ 2~políticas) sobre la red vial real, y se
+	cuantificaron las diferencias en 21~KPIs con pruebas estadísticas formales.
+
+	\subsection{Objetivos específicos}
+
+	\paragraph{OE\,1: Generación de instancias sintéticas.}
+	Se implementó un generador estocástico (\texttt{make\_synth\_orders.py}) que
+	proyecta patrones temporales de la literatura (LaDe) sobre la estructura
+	demográfica real de La Paz.  Las dos semillas ($s \in \{2025, 2026\}$) producen
+	instancias reproducibles de $\sim$1\,040~órdenes distribuidas en 25~restaurantes
+	geolocalizados.
+
+	\paragraph{OE\,2: Integración OSRM--simulador.}
+	El motor de simulación de eventos discretos se integró con OSRM v5.26 sobre
+	cartografía OpenStreetMap, utilizando el algoritmo MLD para el cálculo de
+	tiempos y rutas de viaje reales.  La cobertura del grafo vial se validó
+	verificando que el 100\% de los puntos de entrega y recolección obtienen
+	respuesta válida del servicio de enrutamiento.
+
+	\paragraph{OE\,3: Implementación de las políticas.}
+	Se implementaron ambas políticas (FCFS y RH) con instrumentación completa de
+	métricas.  El módulo de \emph{bundling} dinámico agrupa hasta $B_{max} = 4$
+	órdenes por restaurante, y el horizonte de anticipación ($\Delta_u = 20$~min)
+	sincroniza la asignación con la disponibilidad de los pedidos.
+
+	\paragraph{OE\,4: Cuantificación estadística.}
+	Se aplicó la prueba de Mann-Whitney~$U$ al Click-to-Door en los cuatro escenarios,
+	obteniendo $p < 0.001$ en todos los casos.  La correlación rank-biserial
+	varía de $r = 0.979$ (Grande) en S1 a $r = 0.255$ (Pequeño) en S4,
+	confirmando diferencias estadísticamente significativas cuya dirección e
+	intensidad dependen del nivel de saturación.
+
+	% ──────────────────────────────────────────────────────────────────
+	\section{Verificación de la hipótesis}
+
+	La hipótesis planteaba que la política RH superaría significativamente a FCFS en
+	eficiencia operativa y nivel de servicio.  Los resultados la confirman
+	\emph{parcialmente}, revelando una dependencia crítica del nivel de saturación:
+
+	\begin{itemize}
+		\item \textbf{Baja saturación (S1--S2).}  FCFS es superior en CtD promedio
+		      (10.05 vs 29.59~min en S1; 17.03 vs 32.79~min en S2) porque despacha
+		      cada pedido inmediatamente sin latencia de agrupamiento.  En este
+		      régimen, la hipótesis no se sostiene para la métrica CtD.
+		\item \textbf{Saturación media (S3).}  Los tiempos medios convergen
+		      (37.11 vs 37.82~min), pero RH comprime la cola derecha: P90~CtD
+		      $-53.1\%$ y CTD~Overage $-60.4\%$.  La hipótesis se sostiene
+		      para indicadores de robustez del servicio.
+		\item \textbf{Alta saturación (S4).}  RH reduce el CtD $-26.3\%$,
+		      el P90~CtD $-42.7\%$ y los pedidos no entregados de 12.4\% a 1.2\%.
+		      La hipótesis se confirma plenamente en este régimen.
+	\end{itemize}
+
+	En cuanto a la eficiencia de la flota, el throughput bajo RH es igual o superior
+	en todos los escenarios, alcanzando $+12.8\%$ en S4.  La utilización crece
+	consistentemente bajo RH ($+83.6\%$ en S1 a $+3.5\%$ en S4), lo que indica un
+	uso más intensivo de los recursos de transporte.
+
+	% ──────────────────────────────────────────────────────────────────
+	\section{Contribuciones principales}
+
+	\begin{enumerate}
+		\item \textbf{Entorno de simulación reproducible.}  Se desarrolló un simulador
+		      de código abierto que integra OSRM, cartografía OSM y generación
+		      estocástica de demanda, aplicado por primera vez a una ciudad
+		      latinoamericana de escala media.
+		\item \textbf{Evidencia empírica del efecto de la saturación.}  Se documentó
+		      cuantitativamente el punto de cruce en el que la política RH comienza
+		      a superar a FCFS ($\rho \approx 35$, escenario S3), aportando una guía
+		      práctica para operadores de \emph{delivery}.
+		\item \textbf{Validación sobre topología real.}  Los resultados confirman que
+		      las mejoras reportadas por \citet{Reyes2018} en redes euclidianas se
+		      mantienen al utilizar distancias reales sobre la red vial de La Paz.
+		\item \textbf{Arquitectura exclusivamente open-source.}  Toda la cadena
+		      --- OSRM, OSM, Python, Docker --- se basa en herramientas de código
+		      abierto, demostrando la viabilidad de soluciones de optimización
+		      logística sin dependencia de software propietario.
+	\end{enumerate}
+
+	% ──────────────────────────────────────────────────────────────────
+	\section{Trabajo futuro}
+
+	\begin{itemize}
+		\item \textbf{Demanda real.}  Sustituir las instancias sintéticas por datos
+		      operacionales de una plataforma de \emph{delivery} activa en La Paz
+		      para validar la transferibilidad de los resultados.
+		\item \textbf{Congestión dinámica.}  Incorporar perfiles de velocidad
+		      variables por hora del día en OSRM (traffic profiles) para capturar
+		      el efecto de la congestión sobre los tiempos de viaje.
+		\item \textbf{Calibración de pesos.}  Explorar métodos de ajuste automático
+		      de los pesos de la función de costo ($w_1, w_2, w_3, w_4$) mediante
+		      búsqueda bayesiana o aprendizaje por refuerzo.
+		\item \textbf{Escenarios multi-turno.}  Extender el horizonte de simulación
+		      a jornadas completas con relevos de repartidores y variación temporal
+		      de la demanda (picos de almuerzo y cena).
+		\item \textbf{Flota heterogénea.}  Modelar vehículos con diferentes
+		      velocidades y capacidades (bicicletas, motocicletas, automóviles)
+		      para evaluar el impacto en la formación de agrupamientos.
+	\end{itemize}
+
 	
 	%\bibliographystyle{plain}
 	\bibliographystyle{unsrtnat}

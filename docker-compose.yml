@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   osrm:
-    image: osrm/osrm-backend:5.26.0
+    image: osrm/osrm-backend:latest
     container_name: mdrp-osrm
     ports:
       - "5000:5000"
