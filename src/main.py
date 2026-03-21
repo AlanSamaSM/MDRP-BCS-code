@@ -173,13 +173,21 @@ def run_simulation(orders, couriers, restaurants, simulation_end, start_time=Non
                     # Incrementar bundles recogidos (una ruta = un bundle)
                     c.bundles_picked_up += 1
                 # actualizar ubicación al último punto de la ruta
-                if c.current_route['route']['legs']:
-                    last = c.current_route['route']['legs'][-1]['steps'][-1]['maneuver']['location']
-                    from src.getrouteOSMR import as_latlon
-                    c.location = as_latlon(last)
-                    c.total_distance += c.current_route['route']['distance'] / 1000 # convert to km
+                route_data = c.current_route['route']
+                if route_data.get('legs'):
+                    last_leg = route_data['legs'][-1]
+                    steps = last_leg.get('steps', [])
+                    if steps:
+                        from src.getrouteOSMR import as_latlon
+                        last = steps[-1]['maneuver']['location']
+                        c.location = as_latlon(last)
+                    else:
+                        # OSRM was called without steps=true; use the last
+                        # order's drop-off location as the courier's position.
+                        c.location = c.current_route['orders'][-1].dropoff_loc
+                    c.total_distance += route_data['distance'] / 1000 # convert to km
                     # Sumar tiempo de conducción (duration en segundos -> minutos)
-                    c.driving_time += c.current_route['route']['duration'] / 60.0
+                    c.driving_time += route_data['duration'] / 60.0
                 # almacenar la ruta completada antes de limpiarla y guardar mapa
                 c.route_history.append(c.current_route)
                 if visualized_deliveries_count < 10 and c.current_route['commitment_type'] == 'final':

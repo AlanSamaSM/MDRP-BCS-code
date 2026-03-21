@@ -1,2 +1,0 @@
-Scenario,Orders,Couriers,Ratio,FCFS Avg CTD (min),RH Avg CTD (min),Δ% Avg CTD (min),FCFS Cost/Order ($),RH Cost/Order ($),Δ% Cost/Order ($),FCFS Orders/Courier/Hr,RH Orders/Courier/Hr,Δ% Orders/Courier/Hr,FCFS Utilization (%),RH Utilization (%),Δ% Utilization (%),FCFS SLA Compliance (%),RH SLA Compliance (%),Δ% SLA Compliance (%),FCFS Dist/Order (km),RH Dist/Order (km),Δ% Dist/Order (km)
-S5 – Extrema (75:1),1038,14,74.1,82.44,71.39,-13.4,10.0,10.0,0.0,3.68,9.1,147.28,52.72,57.09,8.29,60.59,52.43,-13.47,5.4,2.12,-60.74

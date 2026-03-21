@@ -1,2 +1,0 @@
-
-[2025-10-24] Modified src/getrouteOSMR.py: Changed OSRM route request parameters to use "overview": "simplified" to reduce response size and mitigate MemoryError.
