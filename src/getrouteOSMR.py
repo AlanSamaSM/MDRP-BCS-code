@@ -93,10 +93,11 @@ def get_route_details(start_coords, waypoints):
         for a, b in zip(coords[:-1], coords[1:]):
             seg = haversine_distance(a, b)  # Use Haversine for meters
             distance += seg
-            legs.append({"steps": [{"maneuver": {"location": (b[1], b[0])}}]})
+            leg_duration = (seg / speed) * 60.0
+            legs.append({"duration": leg_duration, "distance": seg, "steps": [{"maneuver": {"location": (b[1], b[0])}}]})
         duration_sec = (distance / speed) * 60.0
         geometry = polyline.encode(coords)
-        result = {"distance": distance, "duration": duration_sec, "geometry": geometry, "legs": legs}
+        result = {"distance": distance, "duration": duration_sec, "geometry": geometry, "legs": legs, "routing_source": "euclidean"}
         _osrm_cache[cache_key] = result
         return result
 
@@ -117,6 +118,7 @@ def get_route_details(start_coords, waypoints):
         code = data.get('code')
         if code == 'Ok' and data.get('routes'):
             result = data['routes'][0]
+            result['routing_source'] = 'osrm'
             _osrm_cache[cache_key] = result
             return result
 
@@ -141,6 +143,7 @@ def get_route_details(start_coords, waypoints):
     fallback = os.environ.get('USE_EUCLIDEAN_ON_FAILURE', '1') == '1'
     if fallback:
         try:
+            print(f"OSRM fallback: using Euclidean routing for {start_coords} -> {waypoints}")
             speed = float(os.environ.get("METERS_PER_MINUTE", 320))
             coords = [start_coords] + waypoints
             distance = 0.0
@@ -148,10 +151,11 @@ def get_route_details(start_coords, waypoints):
             for a, b in zip(coords[:-1], coords[1:]):
                 seg = haversine_distance(a, b)  # Use Haversine for meters
                 distance += seg
-                legs.append({"steps": [{"maneuver": {"location": (b[1], b[0])}}]})
+                leg_duration = (seg / speed) * 60.0
+                legs.append({"duration": leg_duration, "distance": seg, "steps": [{"maneuver": {"location": (b[1], b[0])}}]})
             duration_sec = (distance / speed) * 60.0
             geometry = polyline.encode(coords)
-            return {"distance": distance, "duration": duration_sec, "geometry": geometry, "legs": legs}
+            return {"distance": distance, "duration": duration_sec, "geometry": geometry, "legs": legs, "routing_source": "euclidean_fallback"}
         except Exception as e:
             print(f"Euclidean fallback failed: {e}")
 

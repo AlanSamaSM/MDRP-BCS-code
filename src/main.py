@@ -8,10 +8,10 @@ import folium
 import polyline
 import os
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 from src.bundling import compute_target_bundle_size, generate_bundles_for_restaurant
 from src.asignaciontentativa import assign_bundles_to_couriers, assign_order_to_nearest_courier
-from src.config import PAY_PER_ORDER, MIN_PAY_PER_HOUR, ASSIGNMENT_HORIZON, OPTIMIZATION_FREQUENCY
+from src.config import PAY_PER_ORDER, MIN_PAY_PER_HOUR, ASSIGNMENT_HORIZON, OPTIMIZATION_FREQUENCY, SERVICE_TIME
 from collections import deque
 
 class Order:
@@ -27,6 +27,7 @@ class Order:
         self.id = order_id
         self.courier_id = None
         self.bundle_size = 1
+        self.routing_source = None
 
     def get_click_to_door(self):
         #calcula el click to door en minutos, que es la diferencia entre delivery_time y placement_time
@@ -161,15 +162,29 @@ def run_simulation(orders, couriers, restaurants, simulation_end, start_time=Non
         for c in active_couriers:
             if c.current_route and current_time >= c.current_route['completion_time']:
                 if c.current_route['commitment_type'] == 'final':
+                    # Compute actual pickup time per Reyes (2018):
+                    # pickup = max(bundle_ready_time, courier_arrival + service_half)
+                    route_data = c.current_route['route']
+                    _start = c.current_route['start_time']
+                    _inbound_sec = route_data['legs'][0]['duration'] if route_data.get('legs') else 0
+                    _service_half_sec = SERVICE_TIME.total_seconds() / 2
+                    _courier_arrival = _start + timedelta(seconds=_inbound_sec)
+                    _bundle_ready = max(o.ready_time for o in c.current_route['orders'])
+                    _actual_pickup = max(
+                        _bundle_ready,
+                        _courier_arrival + timedelta(seconds=_service_half_sec)
+                    )
+                    _routing_src = route_data.get('routing_source', 'osrm')
                     for o in c.current_route['orders']:
                         o.status = 'delivered'
-                        o.pickup_time = c.current_route['start_time']
+                        o.pickup_time = _actual_pickup
                         o.delivery_time = c.current_route['completion_time']
                         o.courier_id = c.id
                         o.bundle_size = len(c.current_route['orders'])
+                        o.routing_source = _routing_src
                         c.orders_delivered += 1
                         delivered_orders.append(o)
-                        print(f"Order {o.id} delivered.")
+                        print(f"Order {o.id} delivered via {_routing_src}.")
                     # Incrementar bundles recogidos (una ruta = un bundle)
                     c.bundles_picked_up += 1
                 # actualizar ubicación al último punto de la ruta
@@ -235,7 +250,8 @@ def run_simulation(orders, couriers, restaurants, simulation_end, start_time=Non
             'click_to_door': o.get_click_to_door(),
             'ready_to_pickup': o.get_ready_to_pickup(),
             'courier_id': o.courier_id,
-            'bundle_size': o.bundle_size
+            'bundle_size': o.bundle_size,
+            'routing_source': o.routing_source
         } for o in orders
     ])
     all_orders_df.to_csv(results_path, index=False)
