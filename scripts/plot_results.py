@@ -345,7 +345,14 @@ def main():
     comparison_df = None
     if comparison_path.exists():
         comparison_df = pd.read_csv(comparison_path)
-        print(f"  Comparison CSV: {len(comparison_df)} filas")
+        # Filtrar corridas fallidas (métricas en cero)
+        n_before = len(comparison_df)
+        comparison_df = comparison_df[comparison_df["FCFS Avg CTD (min)"] > 0].reset_index(drop=True)
+        n_dropped = n_before - len(comparison_df)
+        if n_dropped:
+            print(f"  Comparison CSV: {len(comparison_df)} filas válidas ({n_dropped} failed seeds filtradas)")
+        else:
+            print(f"  Comparison CSV: {len(comparison_df)} filas")
 
     # Generar gráficas
     print("\n  Generando gráficas...")

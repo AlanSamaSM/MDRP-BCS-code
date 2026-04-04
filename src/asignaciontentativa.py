@@ -149,6 +149,8 @@ def two_stage_commitment(courier, bundle, current_time):
             'completion_time': current_time + timedelta(seconds=route_data['duration']),
             'commitment_type': 'final'
         }
+        for o in bundle:
+            o.status = 'assigned'
         return True
 
     # Caso 1: Compromiso final si las ordenes están listas y el repartidor puede llegar al restaurante antes de current_time + OPTIMIZATION_FREQUENCY
@@ -160,6 +162,8 @@ def two_stage_commitment(courier, bundle, current_time):
             'completion_time': current_time + timedelta(seconds=route_data['duration']),
             'commitment_type': 'final'
         }
+        for o in bundle:
+            o.status = 'assigned'
         return True
     else:
         # Caso 2: Compromiso parcial si el repartidor termina su última asignación antes de current_time + OPTIMIZATION_FREQUENCY
@@ -172,6 +176,8 @@ def two_stage_commitment(courier, bundle, current_time):
                 'completion_time': current_time + timedelta(seconds=inbound_only['duration']),
                 'commitment_type': 'partial'
             }
+            # No marcar como 'assigned': partial commit solo desplaza al courier
+            # al restaurante; la orden debe ser re-evaluada en el siguiente ciclo.
             return True
 
     # Caso 3: Ignorar la asignación si no se cumple ninguna de las condiciones anteriores
