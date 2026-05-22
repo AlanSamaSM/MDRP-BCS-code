@@ -1,0 +1,18 @@
+\babel@toc {spanish}{}\relax 
+\babel@toc {spanish}{}\relax 
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {3.1}{\ignorespaces Módulos del simulador y su responsabilidad.}}{35}{table.3.1}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces Parámetros de configuración del simulador (\texttt {config.py}).}}{36}{table.3.2}%
+\contentsline {table}{\numberline {3.3}{\ignorespaces Escenarios experimentales de saturación ($|\mathcal {O}| \approx 1\,038$ pedidos).}}{50}{table.3.3}%
+\contentsline {table}{\numberline {3.4}{\ignorespaces Indicadores clave de desempeño (KPIs) evaluados.}}{54}{table.3.4}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {4.1}{\ignorespaces Escenarios de saturación de flota.}}{56}{table.4.1}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Indicadores de calidad de servicio: promedio de 7 réplicas.}}{56}{table.4.2}%
+\contentsline {table}{\numberline {4.3}{\ignorespaces Ready-to-Pickup y CTD Overage: promedio de 7 réplicas.}}{58}{table.4.3}%
+\contentsline {table}{\numberline {4.4}{\ignorespaces Indicadores de eficiencia operativa: promedio de 7 réplicas.}}{59}{table.4.4}%
+\contentsline {table}{\numberline {4.5}{\ignorespaces Indicadores de agrupamiento y costos: promedio de 7 réplicas.}}{60}{table.4.5}%
+\contentsline {table}{\numberline {4.6}{\ignorespaces Prueba de Mann-Whitney $U$ para Click-to-Door: 7 semillas ($\bar {r} \pm \sigma $).}}{62}{table.4.6}%
+\contentsline {table}{\numberline {4.7}{\ignorespaces Mann-Whitney $U$ para CTD Overage: 7 semillas ($\bar {r} \pm \sigma $).}}{63}{table.4.7}%
+\addvspace {10\p@ }

@@ -1,0 +1,5 @@
+Scenario,n,Mean_Delta_CTD,Median_Delta_CTD,Std_Delta_CTD,Kruskal_Wallis_H,p_value,Significant (α=0.05)
+S1_baja,7185,-22.223,-20.0,12.567,515.6665,0.0,Yes
+S2_moderada,7185,-19.56,-19.732,27.38,515.6665,0.0,Yes
+S3_media,7185,-8.275,-17.405,57.781,515.6665,0.0,Yes
+S4_alta,6253,13.74,-13.085,113.73,515.6665,0.0,Yes

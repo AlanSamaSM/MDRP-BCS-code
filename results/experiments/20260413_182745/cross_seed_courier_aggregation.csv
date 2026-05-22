@@ -1,0 +1,13 @@
+Base_Scenario,Metric,n_seeds,Mean_FCFS_avg,Mean_FCFS_std,Mean_RH_avg,Mean_RH_std,Median_FCFS_avg,Median_RH_avg,Rank_Biserial_r_avg,Rank_Biserial_r_std,All_Significant_BH
+S1 – Baja (18:1),Distance/Order (km),7,4.52,0.253,4.934,0.26,4.493,4.764,0.2426,0.1465,No
+S1 – Baja (18:1),Orders/Courier/Hr,10,1.004,0.693,1.048,0.723,0.991,1.007,0.0513,0.0402,No
+S1 – Baja (18:1),Utilization (%),10,12.595,8.726,14.66,10.156,12.55,14.631,0.2687,0.1889,No
+S2 – Moderada (26:1),Distance/Order (km),7,4.791,0.225,4.359,0.258,4.772,4.25,-0.5215,0.0905,Yes
+S2 – Moderada (26:1),Orders/Courier/Hr,10,1.446,0.998,1.501,1.036,1.44,1.476,0.0683,0.0573,No
+S2 – Moderada (26:1),Utilization (%),10,19.138,13.236,18.796,13.01,19.2,18.719,-0.0694,0.1287,No
+S3 – Media (35:1),Distance/Order (km),7,5.047,0.218,3.912,0.187,5.049,3.806,-0.8819,0.074,Yes
+S3 – Media (35:1),Orders/Courier/Hr,10,1.94,1.339,2.026,1.399,1.949,2.053,0.1423,0.1043,No
+S3 – Media (35:1),Utilization (%),10,26.864,18.583,22.882,15.827,26.85,22.828,-0.5996,0.4185,No
+S4 – Alta (52:1),Distance/Order (km),7,5.418,0.256,3.271,0.097,5.419,3.257,-1.0,0.0,Yes
+S4 – Alta (52:1),Orders/Courier/Hr,10,2.533,1.749,2.985,2.061,2.535,3.0,0.5665,0.3936,No
+S4 – Alta (52:1),Utilization (%),10,37.098,25.614,28.524,19.7,37.078,28.706,-0.7,0.483,No

@@ -1,0 +1,2 @@
+Scenario,Orders,Couriers,Ratio,FCFS Avg CTD (min),RH Avg CTD (min),Δ% Avg CTD (min),FCFS Cost/Order ($),RH Cost/Order ($),Δ% Cost/Order ($),FCFS Orders/Courier/Hr,RH Orders/Courier/Hr,Δ% Orders/Courier/Hr,FCFS Utilization (%),RH Utilization (%),Δ% Utilization (%),FCFS SLA Compliance (%),RH SLA Compliance (%),Δ% SLA Compliance (%),FCFS Dist/Order (km),RH Dist/Order (km),Δ% Dist/Order (km)
+S1 – Baja (18:1),1038,58,17.9,9.59,19.86,107.09,11.21,11.13,-0.71,1.44,1.51,4.86,16.97,19.41,14.38,100.0,99.33,-0.67,4.2,4.32,2.86

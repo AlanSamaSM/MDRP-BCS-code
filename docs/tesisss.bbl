@@ -1,0 +1,184 @@
+\begin{thebibliography}{23}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Lenstra and Kan(1981)]{Lenstra1981}
+Jan~Karel Lenstra and Alexander H. G.~Rinnooy Kan.
+\newblock Complexity of vehicle routing and scheduling problems.
+\newblock \emph{Networks}, 11\penalty0 (2):\penalty0 221--227, 1981.
+\newblock \doi{10.1002/net.3230110204}.
+
+\bibitem[Dantzig and Ramser(1959)]{Dantzig1959}
+G.~B. Dantzig and J.~H. Ramser.
+\newblock The truck dispatching problem.
+\newblock \emph{Management Science}, 6\penalty0 (1):\penalty0 80--91, 1959.
+
+\bibitem[Cáceres-Cruz et~al.(2014)Cáceres-Cruz, Arias, Guimarans, Riera, and
+  Juan]{Caceres-Cruz2014}
+Jose Cáceres-Cruz, Pol Arias, Daniel Guimarans, Daniel Riera, and Angel~A.
+  Juan.
+\newblock Rich vehicle routing problem: Survey.
+\newblock \emph{ACM Computing Surveys}, 47\penalty0 (2):\penalty0 32:1--32:28,
+  December 2014.
+\newblock \doi{10.1145/2666003}.
+
+\bibitem[Laporte(2009)]{Laporte2009VRPSurvey}
+Gilbert Laporte.
+\newblock Fifty years of vehicle routing.
+\newblock \emph{Transportation Science}, 43\penalty0 (4):\penalty0 408--416,
+  2009.
+\newblock \doi{10.1287/trsc.1090.0301}.
+
+\bibitem[Jazemi et~al.(2023)Jazemi, Alidadiani, Ahn, and Jang]{Jazemi2023}
+Reza Jazemi, Ensieh Alidadiani, Kwangseog Ahn, and Jaejin Jang.
+\newblock A review of literature on vehicle routing problems of last-mile
+  delivery in urban areas.
+\newblock \emph{Applied Sciences}, 13\penalty0 (2413015), 2023.
+
+\bibitem[Psaraftis(1980)]{Psaraftis1980}
+Harilaos~N. Psaraftis.
+\newblock A dynamic programming approach for the single‐vehicle
+  many‐to‐many immediate‐request dial‐a‐ride problem.
+\newblock \emph{Transportation Science}, 14\penalty0 (2):\penalty0 130--154,
+  1980.
+\newblock \doi{10.1287/trsc.14.2.130}.
+
+\bibitem[Cordeau and Laporte(2007)]{Cordeau2007}
+Jean-François Cordeau and Gilbert Laporte.
+\newblock The dial-a-ride problem: Models and algorithms.
+\newblock \emph{Annals of Operations Research}, 153:\penalty0 29--46, 2007.
+\newblock \doi{10.1007/s10479-007-0170-8}.
+
+\bibitem[Ichoua et~al.(2006)Ichoua, Gendreau, and Potvin]{Ichoua2006DDARP}
+Soumia Ichoua, Michel Gendreau, and Jean‐Yves Potvin.
+\newblock Exploiting knowledge about future demands for real‐time vehicle
+  dispatching.
+\newblock \emph{Transportation Science}, 40\penalty0 (2):\penalty0 211--225,
+  2006.
+\newblock \doi{10.1287/trsc.1050.0114}.
+
+\bibitem[Larsen(2000)]{Larsen2000DVRP}
+Jesper Larsen.
+\newblock The dynamic vehicle routing problem: Survey of classifications.
+\newblock \emph{Computers \& Operations Research}, 27\penalty0 (10):\penalty0
+  103--122, 2000.
+\newblock \doi{10.1016/S0305-0548(99)00100-X}.
+
+\bibitem[Pillac et~al.(2013)Pillac, Gendreau, Guéret, and
+  Medaglia]{Pillac2013}
+Victor Pillac, Michel Gendreau, Christelle Guéret, and Andrés~L. Medaglia.
+\newblock A review of dynamic vehicle routing problems.
+\newblock \emph{European Journal of Operational Research}, 225\penalty0
+  (1):\penalty0 1--11, 2013.
+\newblock \doi{10.1016/j.ejor.2012.08.015}.
+
+\bibitem[Pereira et~al.(2021)Pereira, Saraiva, Herszenhut, Braga, and
+  Conway]{Pereira2021}
+Rafael H.~M. Pereira, Marcus Saraiva, Daniel Herszenhut, Carlos~Kaue Braga, and
+  Matthew~Wigginton Conway.
+\newblock r5r: Rapid realistic routing on multimodal transport networks with
+  {R5} in {R}.
+\newblock \emph{Findings}, 2021.
+\newblock \doi{10.32866/001c.21262}.
+\newblock URL
+  \url{https://findingspress.org/article/21262-r5r-rapid-realistic-routing-on-multimodal-transport-networks-with-r5-in-r}.
+
+\bibitem[Boyac{\i} et~al.(2021)Boyac{\i}, Dang, and Letchford]{Boyaci2021}
+Burak Boyac{\i}, Thu~Huong Dang, and Adam~N. Letchford.
+\newblock Vehicle routing on road networks: How good is euclidean
+  approximation?
+\newblock \emph{Computers \& Operations Research}, 129:\penalty0 105197, 2021.
+\newblock \doi{10.1016/j.cor.2020.105197}.
+
+\bibitem[Reyes et~al.(2018)Reyes, Erera, Savelsbergh, Sahasrabudhe, and
+  O'Neil]{Reyes2018}
+Damian Reyes, Alan Erera, Martin Savelsbergh, Sagar Sahasrabudhe, and Ryan
+  O'Neil.
+\newblock The meal delivery routing problem.
+\newblock \emph{Optimization Online}, March 2018.
+\newblock URL
+  \url{http://www.optimization-online.org/DB_FILE/2018/03/6512.pdf}.
+
+\bibitem[Figliozzi(2007)]{Figliozzi2007}
+Miguel~Andres Figliozzi.
+\newblock Analysis of the efficiency of urban commercial vehicle tours: Data
+  collection, methodology, and policy implications.
+\newblock \emph{Transportation Research Part B: Methodological}, 41\penalty0
+  (9):\penalty0 1014--1032, 2007.
+\newblock \doi{10.1016/j.trb.2007.04.006}.
+
+\bibitem[Merkel(2014)]{Merkel2014}
+Dirk Merkel.
+\newblock Docker: Lightweight linux containers for consistent development and
+  deployment.
+\newblock \emph{Linux Journal}, 2014\penalty0 (239):\penalty0 2, 2014.
+\newblock URL
+  \url{http://www.linuxjournal.com/content/docker-lightweight-linux-containers-consistent-development-and-deployment}.
+
+\bibitem[Wu et~al.(2023)Wu, Wen, Hu, Wang, Li, Wang, Ye, Zhang, and
+  Xu]{Wu2023LaDe}
+Lin Wu, Haotian Wen, Hai Hu, Yong Wang, Yiran Li, Jian Wang, Jieping Ye, Haoyu
+  Zhang, and Meng Xu.
+\newblock Lade: The first comprehensive last-mile delivery dataset from
+  industry.
+\newblock In \emph{Proceedings of the 32nd ACM International Conference on
+  Information and Knowledge Management (CIKM '23)}, page 2619–2628, 2023.
+\newblock \doi{10.1145/3583780.3614820}.
+
+\bibitem[Kuhn(1955)]{Kuhn1955}
+Harold~W. Kuhn.
+\newblock The {H}ungarian method for the assignment problem.
+\newblock \emph{Naval Research Logistics Quarterly}, 2\penalty0
+  (1--2):\penalty0 83--97, 1955.
+\newblock \doi{10.1002/nav.3800020109}.
+
+\bibitem[Haklay(2010)]{Haklay2010}
+Mordechai Haklay.
+\newblock How good is volunteered geographical information? a comparative study
+  of openstreetmap and ordnance survey datasets.
+\newblock \emph{Environment and Planning B: Planning and Design}, 37\penalty0
+  (4):\penalty0 682--703, 2010.
+\newblock \doi{10.1068/b35097}.
+
+\bibitem[Geisberger et~al.(2008)Geisberger, Sanders, Schultes, and
+  Delling]{Geisberger2008}
+Robert Geisberger, Peter Sanders, Dominik Schultes, and Daniel Delling.
+\newblock Contraction hierarchies: Faster and simpler hierarchical routing in
+  road networks.
+\newblock In \emph{Proceedings of the 7th International Workshop on
+  Experimental Algorithms (WEA 2008)}, volume 5038 of \emph{Lecture Notes in
+  Computer Science}, pages 319--333, Berlin, Heidelberg, 2008. Springer.
+\newblock \doi{10.1007/978-3-540-68552-4_24}.
+
+\bibitem[Ross(2014)]{Ross2014}
+Sheldon~M. Ross.
+\newblock \emph{Introduction to Probability Models}.
+\newblock Academic Press, Amsterdam, 11th edition, 2014.
+\newblock ISBN 978-0-12-407948-9.
+
+\bibitem[Y{\i}ld{\i}z and Savelsbergh(2019)]{Yildiz2019MealDelivery}
+Bar{\i}\c{s} Y{\i}ld{\i}z and Martin Savelsbergh.
+\newblock Provably high-quality solutions for the meal delivery routing
+  problem.
+\newblock \emph{Transportation Science}, 53\penalty0 (5):\penalty0 1372--1388,
+  2019.
+\newblock \doi{10.1287/trsc.2018.0887}.
+
+\bibitem[Mann and Whitney(1947)]{MannWhitney1947}
+Henry~B. Mann and Donald~R. Whitney.
+\newblock On a test of whether one of two random variables is stochastically
+  larger than the other.
+\newblock \emph{The Annals of Mathematical Statistics}, 18\penalty0
+  (1):\penalty0 50--60, 1947.
+\newblock \doi{10.1214/aoms/1177730491}.
+
+\bibitem[Cohen(1988)]{Cohen1988}
+Jacob Cohen.
+\newblock \emph{Statistical Power Analysis for the Behavioral Sciences}.
+\newblock Lawrence Erlbaum Associates, 2 edition, 1988.
+\newblock ISBN 978-0-8058-0283-2.
+
+\end{thebibliography}

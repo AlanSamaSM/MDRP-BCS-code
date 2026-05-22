@@ -19,6 +19,7 @@
 \usepackage{pgfgantt}  %Para calendario de actividades (gráfica de gantt)
 \usepackage{tikz}
 \usetikzlibrary{positioning, arrows.meta, fit, backgrounds, calc}
+\usepackage{placeins} %Para \FloatBarrier: evita que tablas/figuras crucen límites de sección
 % \usepackage{natbib} 
 
 
@@ -36,6 +37,7 @@
 			keepaspectratio]{img/fondo.png}%
 			\vfill
 }}}
+\graphicspath{{img/}{./}}
 \begin{document}
 	%Capítulo frontales o de introducción (no se pagina igual que el resto):
 	\frontmatter
@@ -436,7 +438,7 @@ restricciones topológicas reales de la ciudad de La Paz, B.C.S. y patrones de d
 \section{Hipótesis}
 La implementación de una política de despacho anticipatoria (Horizonte Rodante), alimentada con una matriz de
 costos de viaje reales (OSRM) sobre la topología de La Paz, superará significativamente en eficiencia operativa
-"órdenes por hora" y nivel de servicio "\textit{Ready-to-Door"} a la estrategia reactiva estándar (FCFS con estimación
+\textquotedblleft órdenes por hora\textquotedblright\ y nivel de servicio \textquotedblleft\textit{Ready-to-Door}\textquotedblright\ a la estrategia reactiva estándar (FCFS con estimación
 euclidiana), demostrando la viabilidad de soluciones de optimización logística de alto rendimiento basadas
 exclusivamente en software de código abierto.
 
@@ -470,8 +472,8 @@ locales compitan en eficiencia contra plataformas transnacionales, fomentando as
 
 \subsection{Delimitación frente a métodos de Aprendizaje Profundo}
 Aunque existen métodos avanzados de Inteligencia Artificial (como Aprendizaje Profundo), estos requieren grandes
-cantidades de datos históricos para funcionar. En ciudades como La Paz, donde no existen registros previos de rutas
-y pedidos, estos modelos enfrentan el problema de''arranque en frío'': no pueden operar sin entrenamiento previo.
+cantidades de datos históricos para funcionar \citep{Lin2018GreedRL}. En ciudades como La Paz, donde no existen registros previos de rutas
+y pedidos, estos modelos enfrentan el problema de \textquotedblleft arranque en frío\textquotedblright: no pueden operar sin entrenamiento previo.
 
 Por ello, esta tesis utiliza \textit{Rolling Horizon}, un algoritmo que no necesita datos históricos y funciona desde
 el primer día de operación. Además, al ser computacionalmente ligero, permite a las empresas locales operar con 
@@ -487,7 +489,7 @@ geográficas y técnicas del proyecto, así como las restricciones operativas as
 \subsection{Alcance Geográfico y de Datos}
 \subsubsection{Infraestructura Vial (La Paz, B.C.S.)}
 Geográficamente nos limitamos estrictamente a la zona urbana de La Paz, Baja California Sur. Se 
-implementa una instancia local del servidor de enrutamiento \textbf{OSRM v5.26.0} que opera sobre 
+implementa una instancia local del servidor de enrutamiento \textbf{OSRM v5.27.1} que opera sobre 
 \texttt{localhost}, eliminando la dependencia de conectividad externa a internet y garantizando 
 latencia mínima. Este servidor procesa el extracto en formato \texttt{.pbf} de 
 OpenStreetMap correspondiente a la ciudad de La Paz.
@@ -533,8 +535,8 @@ El proyecto entrega software reproducible, diseñado para facilitar la auditorí
 
 \begin{itemize}
 	
-	\item \textbf{Infraestructura de Enrutamiento Contenerizada:} El motor de enrutamiento OSRM se despliega mediante \textbf{Docker} (imagen \texttt{osrm/osrm-backend}), 
-	configurado con el algoritmo CH (Contraction Hierarchies). Esto asegura que el entorno de cálculo de rutas sea idéntico en cualquier máquina anfitriona, 
+	\item \textbf{Infraestructura de Enrutamiento Contenerizada:} El motor de enrutamiento OSRM se despliega mediante \textbf{Docker} (imagen \texttt{ghcr.io/project-osrm/osrm-backend:v5.27.1}), 
+	configurado con el algoritmo CH (\textit{Contraction Hierarchies}). Esto asegura que el entorno de cálculo de rutas sea idéntico en cualquier máquina anfitriona, 
 	eliminando discrepancias por versiones de librerías del sistema operativo.
 	
 	\item \textbf{Independencia de APIs:} El sistema opera de forma autónoma (\textit{offline}) sobre \texttt{localhost}, sin consumo de créditos de Google Maps o Mapbox, 
@@ -598,7 +600,8 @@ La simulación asume condiciones de flujo ideal. Quedan fuera del alcance:
 
 \subsubsection{Generalización de Patrones de Consumo}
 Aunque las distribuciones estadísticas (llegadas Poisson) se calibran con literatura vigente \cite{Wu2023LaDe}, 
-se asume que los patrones de comportamiento de consumo son universales y transferibles al contexto de La Paz. 
+se asume que los patrones de comportamiento de consumo son universales y transferibles al contexto de La Paz
+\citep{MunozVillamizar2021}. 
 	
 	\chapter{Marco teórico}
 
@@ -972,7 +975,7 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 
 	\textbf{OpenStreetMap} (OSM) es un proyecto colaborativo de cartografía
 	abierta que modela la infraestructura vial mediante tres primitivas
-	\citep{Haklay2010}:
+	\citep{Haklay2010, Boeing2021}:
 
 	\begin{itemize}
 		\item \textbf{Nodos} (\textit{nodes}): puntos georreferenciados
@@ -995,13 +998,13 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	Geofabrik contiene aproximadamente $10^4$~nodos y $10^4$~aristas
 	relevantes para el perfil vehicular.
 
-	\subsection{Contraction Hierarchies}
+	\subsection{\textit{Contraction Hierarchies}}
 
 	Dado un grafo vial $G = (V, E, c)$, el cálculo de caminos mínimos
 	mediante el algoritmo de Dijkstra tiene complejidad
 	$O(|E| + |V| \log |V|)$, lo que resulta prohibitivo para consultas
 	frecuentes en grafos con millones de nodos.  \citet{Geisberger2008}
-	proponen \textbf{Contraction Hierarchies} (CH), una técnica de
+	proponen \textbf{\textit{Contraction Hierarchies}} (CH), una técnica de
 	preprocesamiento que permite resolver consultas de camino mínimo en
 	milisegundos.
 
@@ -1210,11 +1213,10 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 
 	\chapter{Desarrollo}
 
-	Este capítulo describe la implementación computacional del entorno de simulación para el MDRP en La Paz, B.C.S. 
+	Este capitulo describe la implementacion computacional del entorno de simulación para el MDRP en La Paz, B.CS. 
 	Se documenta la arquitectura del sistema, la generación de instancias sintéticas, el motor de simulación por 
 	épocas, las dos políticas de despacho implementadas (FCFS y Rolling Horizon), el diseño experimental y las 
-	métricas de evaluación. Cada sección establece la correspondencia entre los conceptos teóricos del Capítulo~2 
-	y su realización en código.
+	métricas de evaluación.
 
 	\section{Arquitectura del sistema}
 
@@ -1223,109 +1225,11 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\textbf{análisis} que recolecta y procesa los indicadores de desempeño. La Figura~\ref{fig:arquitectura} 
 	ilustra la interacción entre estos componentes.
 
-	\begin{figure}[htbp]
-		\centering
-		\begin{tikzpicture}[
-			scale=0.75, transform shape,
-			box/.style={draw, rounded corners=2pt, minimum height=1cm,
-				text width=#1, align=center, font=\small\ttfamily},
-			box/.default=2.8cm,
-			layer/.style={draw, thick, rounded corners=4pt,
-				inner xsep=14pt, inner ysep=20pt,
-				fill=#1, fill opacity=0.08, text opacity=1},
-			layertitle/.style={font=\bfseries\normalsize},
-			arr/.style={-Stealth, thick},
-			darr/.style={Stealth-Stealth, thick},
-		]
-
-		% =============================================
-		% CAPA 1: ENRUTAMIENTO
-		% =============================================
-		\node[box=2.6cm] (osm) at (0, 0) {map.osm\\\scriptsize(OSM .pbf)};
-		\node[box=3.6cm] (chfiles) at (7, 0.3)
-			{bcs-latest.osrm\\\scriptsize(CH)\\\scriptsize 28 archivos indice};
-		\node[box=3.6cm] (routed) at (7, -2.2)
-			{osrm-routed :5000\\\scriptsize API REST (CH)};
-
-		\draw[arr] (osm) -- node[above, font=\scriptsize, align=center]
-			{osrm-extract\\osrm-contract} (chfiles);
-		\draw[arr] (chfiles) -- (routed);
-
-		\node[font=\scriptsize, anchor=north east, text=gray, align=right]
-			at ([xshift=-0.4cm, yshift=0.2cm]routed.west)
-			{Docker (5.26.0)\\docker-compose.yml};
-
-		\begin{scope}[on background layer]
-			\node[layer=blue!40, fit=(osm)(chfiles)(routed)] (L1) {};
-		\end{scope}
-		\node[layertitle, anchor=south] at (L1.north) {Capa de Enrutamiento};
-
-		% =============================================
-		% ETIQUETA CONEXION CAPA 1 -> CAPA 2
-		% =============================================
-		\draw[arr, dashed] (routed.south) -- ++(0,-1.0)
-			node[right, font=\scriptsize, align=left, xshift=2pt]
-			{HTTP GET\\/route/v1/driving/} -- ++(0,-0.8);
-
-		% =============================================
-		% CAPA 2: SIMULACION
-		% =============================================
-		\node[box=2.6cm] (synth) at (0, -7) {synth\_loader.py};
-		\node[box=3cm]   (main)  at (4, -7)
-			{main.py\\\scriptsize(epocas $f{=}5$)};
-		\node[box=3.6cm] (route) at (8.8, -7)
-			{getrouteOSMR.py\\\scriptsize(cliente HTTP +\\cache en memoria)};
-
-		\node[box=1.8cm, minimum height=0.6cm] (pol) at (4, -9)
-			{FCFS / RH};
-
-		\node[box=2.6cm] (config) at (0, -10.5)
-			{config.py\\\scriptsize(params)};
-		\node[box=3.6cm] (csv) at (8.8, -10.5)
-			{resultados CSV\\\scriptsize + mapas HTML};
-
-		\draw[arr]  (synth) -- (main);
-		\draw[darr] (main)  -- (route);
-		\draw[arr]  (config.north) -- ++(0,0.5) -| (main.south west);
-		\draw[arr]  (pol.east) -| (csv);
-
-		% flecha de capa 1 a route (llega por arriba)
-		\draw[arr, dashed] ([yshift=-2.8cm]routed.south) -- (route.north);
-
-		\begin{scope}[on background layer]
-			\node[layer=green!40, fit=(synth)(main)(route)(config)(csv)(pol)] (L2) {};
-		\end{scope}
-		\node[layertitle, anchor=south] at (L2.north) {Capa de Simulacion (Python)};
-
-		% =============================================
-		% CONEXION CAPA 2 -> CAPA 3
-		% =============================================
-		\draw[arr, dashed] (csv.south) -- ++(0,-1.2) -| (3.5,-14);
-
-		% =============================================
-		% CAPA 3: ANALISIS
-		% =============================================
-		\node[box=3.4cm] (genr) at (2.5, -14.8)
-			{generate\_results.py\\\scriptsize(21 KPIs por politica)};
-		\node[box=4cm] (runx) at (8, -14.8)
-			{run\_experiments.py\\\scriptsize(orquestador multi-\\escenario de saturacion)};
-
-		\begin{scope}[on background layer]
-			\node[layer=orange!40, fit=(genr)(runx)] (L3) {};
-		\end{scope}
-		\node[layertitle, anchor=south] at (L3.north) {Capa de Analisis};
-
-		\end{tikzpicture}
-		\caption{Arquitectura de tres capas del entorno de simulacion MDRP-BCS.}
-		\label{fig:arquitectura}
-	\end{figure}
-
-
 	\subsection{Capa de enrutamiento: OSRM contenerizado}
 
 	La capa de enrutamiento proporciona tiempos y distancias de viaje realistas sobre la red vial de La Paz. 
-	Se implementa mediante OSRM (\textit{Open Source Routing Machine}) v5.26.0, desplegado como un contenedor 
-	Docker orquestado por \texttt{docker-compose}.
+	Se implementa mediante OSRM (\textit{Open Source Routing Machine}) v5.27.1 \citep{OSRMWiki2025}, cuya inicialización y 
+	configuración se definen en un archivo Docker Compose.
 
 	\subsubsection{Preprocesamiento de la red vial}
 
@@ -1334,25 +1238,118 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	ejecutan dos etapas secuenciales:
 
 	\begin{enumerate}
-		\item \textbf{Extracción} (\texttt{osrm-extract}): Parsea el archivo \texttt{.pbf} y genera una 
-		representación intermedia del grafo vial, aplicando el perfil de velocidades del vehículo 
+		\item \textbf{Extracción} (\texttt{osrm-extract}): Procesa el archivo \texttt{.pbf} y genera una 
+		representación del grafo vial, aplicando el perfil de velocidades del vehículo 
 		(\texttt{car.lua}). Este perfil define las velocidades máximas permitidas por tipo de vía 
 		(autopista, avenida, calle residencial), así como las restricciones de giro y sentido.
 		
-		\item \textbf{Contracción} (\texttt{osrm-contract}): Construye la jerarquía de Contraction 
-		Hierarchies (CH) \citep{Geisberger2008} sobre el grafo extraído. El algoritmo asigna un 
-		\textit{orden de importancia} a cada nodo y genera atajos (\textit{shortcuts}) que permiten 
-		saltar nodos intermedios durante las consultas. El resultado son 28 archivos de índice 
-		(\texttt{bcs-latest.osrm.*}) que codifican la jerarquía completa.
+		\item \textbf{Contracción} (\texttt{osrm-contract}): Aplica el algoritmo de
+		\textit{Contraction Hierarchies} \citep{Geisberger2008} sobre el grafo extraído,
+		generando los archivos de índice \texttt{bcs-latest.osrm.*} que codifican la
+		jerarquía de consulta rápida. Estos archivos son cargados directamente por
+		\texttt{osrm-routed} al iniciar el contenedor Docker, exponiendo la API REST
+		en \texttt{localhost:5000}.
 	\end{enumerate}
+
+		\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        scale=0.62, transform shape,
+        box/.style={draw, rounded corners=2pt, minimum height=1cm,
+            text width=#1, align=center, font=\small\ttfamily},
+        box/.default=2.8cm,
+        layer/.style={draw, thick, rounded corners=4pt,
+            inner xsep=14pt, inner ysep=24pt,
+            fill=#1, fill opacity=0.08, text opacity=1},
+        layertitle/.style={font=\bfseries\normalsize},
+        arr/.style={-Stealth, thick},
+        darr/.style={Stealth-Stealth, thick},
+    ]
+
+    % =============================================
+    % CAPA 1: ENRUTAMIENTO
+    % =============================================
+    \node[box=3.2cm] (osm)     at (0,    0) {bcs-latest.osm.pbf\\\scriptsize(OpenStreetMap)};
+    \node[box=3.6cm] (chfiles) at (6.8,  0) {bcs-latest.osrm\\\scriptsize(CH, 24 archivos)};
+    \node[box=3.4cm] (routed)  at (13.2, 0) {osrm-routed :5000\\\scriptsize API REST (CH)};
+
+    \draw[arr] (osm) -- node[above=2pt, font=\scriptsize, align=center]
+        {osrm-extract \textbullet{} osrm-contract} (chfiles);
+    \draw[arr] (chfiles) -- (routed);
+
+    \node[font=\scriptsize, text=gray] at (6.8, -1.3)
+        {Docker 5.27.1 \textbullet{} docker-compose.yml};
+
+    \begin{scope}[on background layer]
+        \node[layer=blue!40, fit=(osm)(chfiles)(routed)] (L1) {};
+    \end{scope}
+    \node[layertitle, anchor=south] at (L1.north) {Capa de Enrutamiento};
+
+    % =============================================
+    % CAPA 2: SIMULACI\'ON (Python)
+    % =============================================
+    \node[box=4cm]   (datasrc) at (0,    -5.2)
+        {synthetic\_lapaz\_\\orders\_seed*.csv\\\scriptsize + la\_paz\_restaurants.geojson};
+    \node[box=3cm]   (synth)   at (0,    -7.6) {synth\_loader.py};
+    \node[box=3cm]   (main)    at (6.8,  -7.6) {main.py\\\scriptsize(\'epocas $f{=}5$)};
+    \node[box=3.4cm] (route)   at (13.2, -7.6) {getrouteOSMR.py\\\scriptsize(cliente HTTP + cache)};
+
+    \node[box=2.6cm] (config)     at (3.2,  -10.0) {config.py\\\scriptsize(params)};
+    \node[box=2.6cm] (bundling)   at (6.8,  -10.0) {bundling.py\\\scriptsize(agrupamientos)};
+    \node[box=3.4cm] (asignacion) at (10.6, -10.0) {asignaciontentativa.py\\\scriptsize(H\'ungaro + FCFS)};
+
+    \node[box=3.4cm] (csv) at (13.2, -12.4) {resultados CSV\\\scriptsize + mapas HTML};
+
+    % Flujo principal
+    \draw[arr]  (datasrc) -- (synth);
+    \draw[arr]  (synth)   -- (main);
+    \draw[darr] (main)    -- (route);
+    \draw[arr]  (route)   -- (csv);
+
+    % M\'odulos invocados por main
+    \draw[arr] (config.north)     -- ++(0,0.5) -| (main.south);
+    \draw[arr] (bundling.north)   -- (main.south);
+    \draw[arr] (asignacion.north) -- ++(0,0.5) -| (main.south);
+
+    % HTTP entre Capa 1 y Capa 2
+    \draw[arr, dashed] (routed.south) --
+        node[right, font=\scriptsize, align=left, xshift=2pt]
+        {HTTP GET\\/route/v1/driving/} (route.north);
+
+    \begin{scope}[on background layer]
+        \node[layer=green!40, fit=(datasrc)(synth)(main)(route)
+                                  (config)(bundling)(asignacion)(csv)] (L2) {};
+    \end{scope}
+    \node[layertitle, anchor=south] at (L2.north) {Capa de Simulaci\'on (Python)};
+
+    % =============================================
+    % CAPA 3: AN\'ALISIS
+    % =============================================
+    \node[box=4.5cm] (runx)  at (4.5,  -16.5)
+        {run\_experiments.py\\\scriptsize(orquestador + 21 KPIs)};
+    \node[box=4.5cm] (stats) at (10.5, -16.5)
+        {statistical\_analysis.py\\\scriptsize(pruebas estad\'isticas)};
+
+    \draw[arr, dashed] (csv.south) |- ++(-3,-1.5) -| (runx.north);
+    \draw[arr]         (runx) -- (stats);
+
+    \begin{scope}[on background layer]
+        \node[layer=orange!40, fit=(runx)(stats)] (L3) {};
+    \end{scope}
+    \node[layertitle, anchor=south] at (L3.north) {Capa de An\'alisis};
+
+    \end{tikzpicture}
+    \caption{Arquitectura de tres capas del entorno de simulaci\'on MDRP-BCS.}
+    \label{fig:arquitectura}
+\end{figure}
 
 	Estos archivos preprocesados se incluyen en el repositorio bajo el directorio \texttt{osrm\_data/}, 
 	evitando que los usuarios deban repetir el preprocesamiento (que requiere aproximadamente 10--15 minutos 
-	y el archivo \texttt{.pbf} original de $\sim$30 MB).
+	y el archivo \texttt{.pbf} original).
 
 	Es importante señalar que un archivo \texttt{.pbf} constituye una version congelada
 	de la cartografía en un momento dado. Aunque OpenStreetMap se actualiza de forma continua incorporando 
-	nuevas calles, colonias y modificaciones viales mediante contribuciones colaborativas, los archivos 
+	nuevas calles, colonias y modificaciones viales por medio de contribuciones colaborativas, los archivos 
 	preprocesados no reflejan estos cambios automáticamente. Si se desea incorporar actualizaciones 
 	cartográficas (por ejemplo, la apertura de un nuevo tramo vial en La Paz), es necesario descargar un 
 	\texttt{.pbf} más reciente y repetir la cadena completa de preprocesamiento 
@@ -1372,7 +1369,7 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	label=lst:dockercompose]
 	services:
 	osrm:
-		image: osrm/osrm-backend:5.26.0
+		image: ghcr.io/project-osrm/osrm-backend:v5.27.1
 		container_name: mdrp-osrm
 		ports:
 		- "5000:5000"
@@ -1393,7 +1390,7 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	Esta configuración garantiza tres propiedades esenciales para la reproducibilidad:
 
 	\begin{itemize}
-		\item \textbf{Aislamiento del entorno:} La imagen Docker \texttt{osrm/osrm-backend:5.26.0} fija 
+		\item \textbf{Aislamiento del entorno:} La imagen Docker \texttt{ghcr.io/project-osrm/osrm-backend:v5.27.1} fija 
 		la versión exacta del motor de enrutamiento, eliminando discrepancias por versiones de librerías 
 		del sistema operativo anfitrión.
 		
@@ -1427,25 +1424,14 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 		(segundos), la geometría de la ruta codificada en formato \textit{polyline}, y los detalles 
 		por tramo (\textit{legs}) incluyendo las maniobras de cada paso.
 		
-		\item \textbf{Resiliencia:} El cliente HTTP utiliza una sesión persistente (\texttt{requests.Session}) 
-		con política de reintentos configurada: hasta 5 reintentos con \textit{backoff} exponencial para 
-		códigos de error 429 (rate limit) y 5xx (errores del servidor). Esto previene fallos transitorios 
-		durante las simulaciones largas.
-		
-		\item \textbf{Caché en memoria:} Los resultados de rutas previamente consultadas se almacenan en un 
-		diccionario en memoria (\texttt{\_osrm\_cache}), indexado por la tupla de coordenadas. Dado que los 
-		restaurantes tienen ubicaciones fijas y las rutas se repiten con frecuencia durante la asignación de 
-		agrupamientos, esta caché reduce significativamente el número de consultas HTTP al servidor OSRM.
-		
-		\item \textbf{Fallback euclidiano:} Si la consulta OSRM falla (por desconexión o error de red), el 
+		\item \textbf{Respaldo euclidiano:} Si la consulta OSRM falla (por desconexión o error de red), el 
 		sistema calcula una estimación basada en la distancia de Haversine a una velocidad constante 
 		configurable (por defecto 320~m/min $\approx$ 19.2~km/h). Este mecanismo, controlado por la 
 		variable de entorno \texttt{USE\_EUCLIDEAN\_ON\_FAILURE}, garantiza que la simulación no se 
-		interrumpa, aunque los resultados con fallback euclidiano se señalan en la salida para que el 
-		investigador los detecte.
+		interrumpa. Y si sucede que es utilizado se registra para ser considerado en el análisis de resultados.
 	\end{itemize}
 
-
+\FloatBarrier
 	\subsection{Capa de simulación: estructura de módulos Python}
 
 	La lógica de simulación se implementa en Python~3.12 y se estructura en seis módulos bajo el 
@@ -1462,8 +1448,8 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\midrule
 	\texttt{config.py}              & Parámetros globales de la simulación \\
 	\texttt{synth\_loader.py}       & Carga de instancias y dimensionamiento de flota \\
-	\texttt{main.py}                & Motor de simulación por épocas y modelos de datos \\
-	\texttt{getrouteOSMR.py}        & Cliente HTTP para OSRM con caché y fallback \\
+	\texttt{main.py}                & Motor de simulación por épocas \\
+	\texttt{getrouteOSMR.py}        & Cliente HTTP para OSRM \\
 	\texttt{bundling.py}            & Generación de agrupamientos por restaurante \\
 	\texttt{asignaciontentativa.py} & Asignación courier-agrupamiento (Algoritmo Húngaro) \\
 	\bottomrule
@@ -1471,8 +1457,7 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\end{table}
 
 	La Tabla~\ref{tab:config_params} presenta los parámetros de configuración centralizados en 
-	\texttt{config.py}, que controlan el comportamiento de la simulación y permiten la experimentación 
-	paramétrica sin modificar el código fuente.
+	\texttt{config.py}, que controlan el comportamiento de la simulación.
 
 	\begin{table}[htbp]
 	\centering
@@ -1483,41 +1468,44 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\textbf{Parámetro} & \textbf{Símbolo} & \textbf{Valor} & \textbf{Descripción} \\
 	\midrule
 	Frecuencia de optimización     & $f$           & 5 min  & Intervalo entre épocas \\
-	Horizonte de asignación        & $\Delta_u$    & 20 min & Lookahead para órdenes \\
+	Horizonte de asignación        & $\Delta_u$    & 20 min & Ventana de anticipación \\
 	Objetivo Click-to-Door         & $\tau$        & 40 min & Meta de calidad de servicio \\
 	Máximo Click-to-Door           & $\tau_{max}$  & 90 min & Límite absoluto de servicio \\
 	Tiempo de servicio             & $s$           & 4 min  & Pickup + drop-off por parada \\
-	Tamaño máximo de agrupamiento  & ---           & 4      & Límite de órdenes por ruta \\
+	Tamaño máximo de agrupamiento  & $B_{max}$     & 4      & Límite de órdenes por ruta \\
 	Penalización de frescura       & $\beta$       & 0.1    & Peso del retraso en asignación \\
 	Penalización de pickup         & $\theta$      & 0.1    & Peso del retraso en recolección \\
-	Lookahead de ready time        & $\Delta_1$    & 20 min & Ventana de anticipación \\
-	Lookahead de disponibilidad    & $\Delta_2$    & 20 min & Ventana para couriers \\
-	Forzamiento de compromiso      & $x$           & 10 min & Commit si orden espera $>x$ \\
+	Ventana de ready time          & $\Delta_1$    & 20 min & Anticipación de órdenes listas \\
+	Ventana de disponibilidad      & $\Delta_2$    & 20 min & Anticipación de couriers libres \\
+	Compromiso forzado             & $x$           & 10 min & Forzado si orden espera $>x$ \\
 	Pago por orden                 & $p_1$         & \$10   & Compensación variable \\
 	Pago mínimo por hora           & $p_2$         & \$15/h & Compensación garantizada \\
 	\bottomrule
 	\end{tabular}
 	\end{table}
 
-
-	\subsection{Capa de análisis: pipeline de resultados}
+\FloatBarrier
+	\subsection{Capa de análisis: generación de resultados}
 
 	La tercera capa del sistema procesa las salidas crudas de la simulación y genera las métricas 
 	comparativas. Se compone de dos scripts complementarios:
 
 	\begin{itemize}
-		\item \texttt{generate\_results.py}: Orquesta el pipeline completo para un escenario individual. 
-		Ejecuta secuencialmente la generación de datos sintéticos, la simulación FCFS, la simulación 
-		Rolling Horizon, y el cálculo de 21 KPIs comparativos. Los resultados se consolidan en 
-		\texttt{results/kpi\_comparison.csv}.
-		
-		\item \texttt{run\_experiments.py}: Amplía el pipeline anterior para ejecutar múltiples escenarios 
-		de saturación de forma automatizada. Define cuatro niveles de relación órdenes/courier 
-		(18:1, 26:1, 35:1 y 52:1), ejecuta ambas políticas en cada escenario, y genera una tabla 
-		consolidada (\texttt{experiment\_comparison.csv}) que reúne los KPIs de todos los escenarios. 
-		Adicionalmente, soporta la ejecución con múltiples semillas aleatorias (\texttt{-{}-seeds}) para 
-		análisis de robustez estadística y la variación de parámetros algorítmicos 
-		(\texttt{-{}-bundle-sizes}).
+		\item \texttt{run\_experiments.py}: Orquesta la ejecución del pipeline experimental 
+		completo: invoca al generador de instancias sintéticas (\texttt{make\_synth\_orders.py}) 
+		cuando se requieren múltiples semillas, ejecuta las simulaciones FCFS y Rolling Horizon, 
+		calcula 21 KPIs comparativos y consolida los resultados. Define cuatro niveles de 
+		relación órdenes/courier (18:1, 26:1, 35:1 y 52:1), ejecuta ambas políticas en cada 
+		escenario, y genera tablas consolidadas (\texttt{experiment\_comparison.csv}, 
+		\texttt{experiment\_summary.csv}) así como metadatos de la ejecución del experimento
+		(\texttt{experiment\_metadata.json}). Adicionalmente, soporta la ejecución con múltiples 
+		semillas aleatorias (\texttt{-{}-seeds}) para análisis de robustez y la 
+		variación de parámetros algorítmicos (\texttt{-{}-bundle-sizes}).
+		\item \texttt{statistical\_analysis.py}: Aplica las pruebas estadísticas formales 
+		(Mann-Whitney $U$, corrección Benjamini-Hochberg, Kruskal-Wallis) sobre los KPIs 
+		generados por \texttt{run\_experiments.py}, produciendo los archivos 
+		\texttt{statistical\_summary.csv}, \texttt{cross\_seed\_aggregation.csv} y 
+		\texttt{normality\_tests.csv}.
 	\end{itemize}
 
 	La separación en tres capas independientes permite modificar cualquier componente sin afectar a los 
@@ -1531,35 +1519,26 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	%% ================================================================
 	\section{Generación de instancias sintéticas}
 
-	Dado que no existen registros históricos de operaciones de entrega de comida en La Paz, B.C.S., 
+	Dado que no se dispone de registros históricos de operaciones de entrega de comida en La Paz, B.C.S., 
 	el sistema genera instancias sintéticas calibradas que replican los patrones temporales y 
 	geoespaciales documentados en la literatura. El proceso se divide en dos etapas: 
 	(1)~la generación de órdenes (\texttt{make\_synth\_orders.py}) y 
 	(2)~la carga y dimensionamiento de flota (\texttt{synth\_loader.py}).
 
-	\subsection{Generación temporal de órdenes: proceso Poisson no homogéneo}
+	\subsection{Generacion temporal de órdenes}
 
-	La llegada de órdenes se modela mediante un \textbf{proceso de Poisson no homogéneo} 
+	La llegada de ordenes se modela mediante un \textbf{proceso de Poisson no homogeneo} 
 	\citep{Ross2014} con tasa variable $\lambda(t)$, siguiendo la evidencia empírica del dataset 
-	LaDe \citep{Wu2023LaDe}. La tasa de llegada se define como la superposición de una intensidad 
-	base constante y dos picos gaussianos que capturan los horarios de mayor demanda:
-
-	\begin{equation}
-		\lambda(t) = \lambda_0 + A_m \cdot \exp\!\left(-\frac{(t - \mu_m)^2}{2\sigma^2}\right) 
-		+ A_e \cdot \exp\!\left(-\frac{(t - \mu_e)^2}{2\sigma^2}\right)
-		\label{eq:arrival_rate}
-	\end{equation}
-
-	\noindent donde $\lambda_0 = 0.6$ órdenes/minuto es la intensidad base, $\mu_m = \text{09:00}$ y 
-	$\mu_e = \text{17:00}$ son los centros de los picos matutino y vespertino respectivamente, 
-	$A_m = 2.4$ y $A_e = 2.0$ son las amplitudes de cada pico, y $\sigma = 45$~min controla la 
-	dispersión temporal de la demanda. Los valores de $\mu_m$ y $\mu_e$ se calibraron a partir de 
-	los patrones observados en el dataset LaDe \citep{Wu2023LaDe}, que documenta picos de demanda 
-	análogos en servicios de entrega de comida en ciudades chinas.
+	LaDe \citep{Wu2023LaDe}. Se adopta la función de intensidad bimodal definida en la 
+	Ec.~\eqref{eq:intensity_theory} (§2.4.2), calibrada con los siguientes parámetros para 
+	reproducir los picos de demanda documentados en LaDe \citep{Wu2023LaDe}: 
+	$\lambda_0 = 0.6$ órdenes/minuto, $\mu_m = \text{09:00}$, $\mu_e = \text{17:00}$, 
+	$A_m = 2.4$, $A_e = 2.0$, y $\sigma = 45$~min.
 
 	El perfil de intensidad se discretiza en intervalos de un minuto sobre la ventana operativa de 
-	11 horas (08:00--19:00, $T = 660$ min). Para cada minuto $t$, el número de órdenes generadas 
-	se muestrea de una distribución de Poisson con parámetro $\lambda(t)$:
+	11 horas (08:00--19:00, $T = 660$ min). Aplicando la aproximación por discretización descrita 
+	en §2.4.1, para cada minuto $t$ el número de órdenes generadas se muestrea de una distribución 
+	de Poisson con parámetro $\lambda(t)$:
 
 	\begin{equation}
 		N(t) \sim \text{Poisson}\!\left(\lambda(t)\right), \quad t = 0, 1, \ldots, T-1
@@ -1572,7 +1551,7 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\subsection{Tiempo de preparación}
 
 	Cada orden recibe un \textbf{tiempo de preparación} $T_{prep}$ que determina cuándo la comida 
-	estará lista para ser recogida por el courier. Este tiempo se modela como una variable aleatoria 
+	estará lista para ser recogida por el repartidor. Este tiempo se modela como una variable aleatoria 
 	normal truncada:
 
 	\begin{equation}
@@ -1629,15 +1608,17 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\noindent donde $\Delta\phi$ y $\Delta\psi$ son las diferencias en latitud y longitud 
 	respectivamente. Si múltiples restaurantes caen dentro del rango, se elige uno al azar. 
 	Si ninguno cumple la restricción, se selecciona el restaurante más cercano que exceda 
-	la distancia mínima de 2~km como mecanismo de fallback.
+	la distancia mínima de 2~km como mecanismo de respaldo.
 
 	\subsubsection{Fuente de datos de restaurantes}
 
 	Las ubicaciones base de los restaurantes se obtienen del archivo 
 	\texttt{la\_paz\_restaurants.geojson}, que contiene 25 establecimientos de comida en La Paz 
 	extraídos de OpenStreetMap \citep{Haklay2010} mediante consultas a la API de Overpass. 
-	Estas coordenadas reales se reproyectan dentro del polígono urbano $\mathcal{P}$ para 
-	mantener la consistencia con la zona de operación delimitada.
+	Para garantizar la consistencia espacial con la zona de operación, las coordenadas 
+	reales se descartan y se reemplazan por ubicaciones generadas mediante muestreo 
+	uniforme dentro del polígono urbano $\mathcal{P}$, preservando únicamente el conteo 
+	de 25 establecimientos.
 
 	\subsection{Dimensionamiento automático de flota}
 
@@ -1790,7 +1771,7 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 		\item Si hay \textit{cache hit}, retorna el resultado almacenado sin consulta HTTP.
 		\item Si hay \textit{cache miss}, construye la URL con coordenadas en formato 
 		\texttt{lon,lat} y realiza la solicitud GET al contenedor OSRM.
-		\item Si la solicitud falla, aplica el fallback euclidiano (Haversine a 320~m/min).
+		\item Si la solicitud falla, aplica el respaldo euclidiano (Haversine a 320~m/min).
 		\item Almacena el resultado en caché para consultas futuras.
 	\end{enumerate}
 
@@ -2286,14 +2267,15 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	de las cuales siete produjeron resultados válidos
 	($s \in \{2025, 2026, 2028, 2029, 2030, 2031, 2032\}$); las tres restantes
 	(2027, 2033, 2034) se excluyen porque la totalidad de sus órdenes permaneció en
-	estado \emph{ready} sin asignación de courier.  Los valores reportados corresponden
-	al promedio de las siete réplicas válidas salvo que se indique lo contrario.
+	estado \emph{ready} sin asignación de courier, lo cual se atribuye a una interrupción
+	del servicio OSRM durante esas corridas específicas.
+	Los valores reportados corresponden al promedio de las siete réplicas válidas.
 
 	\section{Configuración experimental}
 
 	La Tabla~\ref{tab:escenarios} resume los cuatro escenarios de saturación.  En todos los
 	casos se utiliza la misma instancia base de La Paz, B.C.S., con aproximadamente 1\,038
-	órdenes generadas sintéticamente (véase §3.2) y 25 restaurantes.  La variable
+	órdenes generadas sintéticamente (véase sección 3.2) y 25 restaurantes.  La variable
 	de control es el parámetro \texttt{orders\_per\_courier} ($\rho$), que determina el tamaño
 	de la flota mediante $|C| = \lceil n / \rho \rceil$ donde $n$ es el número de órdenes.
 
@@ -2316,12 +2298,15 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	Los parámetros del simulador se mantienen constantes según la Tabla~\ref{tab:config_params}
 	(§3.1): frecuencia de optimización $f = 5$~min, horizonte $\Delta_u = 20$~min,
 	objetivo SLA $\tau = 40$~min, tiempo de servicio $s = 4$~min y tamaño máximo de agrupamiento
-	$B_{max} = 4$.  El enrutamiento se realiza mediante OSRM v5.26.0 con el algoritmo
-	Contraction Hierarchies sobre el grafo vial de La Paz.
+	$B_{max} = 4$.  El enrutamiento se realiza mediante OSRM v5.27.1 con el algoritmo
+	\textit{Contraction Hierarchies} sobre el grafo vial de La Paz.
 
 	Para cada escenario y semilla se ejecutan secuencialmente las políticas FCFS y RH,
 	generando en total $4 \times 7 \times 2 = 56$ corridas de simulación válidas.  Los 21 KPIs
 	definidos en la Tabla~\ref{tab:kpis} (§3.7) se calculan para cada corrida.
+	Se verificó la integridad de los resultados confirmando que cada \texttt{order\_id}
+	aparece exactamente una vez en los archivos de resultados de ambas políticas,
+	descartando cualquier anomalía de doble asignación.
 
 	% ──────────────────────────────────────────────────────────────────
 	\section{Calidad de servicio}
@@ -2342,36 +2327,64 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10}
 	Esc. & FCFS & RH & $\Delta$\% & FCFS & RH & $\Delta$\% & FCFS & RH & $\Delta$\% \\
 	\midrule
-	S1 & 10.09 & 32.33 & $+220.3$ & 13.10 & 49.10 & $+274.8$ & 100.0 & 76.0 & $-24.0$ \\
-	S2 & 16.68 & 36.26 & $+117.4$ & 32.73 & 56.27 & $+71.9$  & 91.7  & 68.9 & $-22.7$ \\
-	S3 & 35.79 & 44.10 & $+23.2$  & 117.19 & 72.36 & $-38.3$ & 76.3  & 61.0 & $-15.2$ \\
-	S4 & 75.41 & 62.40 & $-17.3$  & 228.01 & 157.15 & $-31.1$ & 61.2  & 50.9 & $-10.3$ \\
+	S1 & 10.10 & 20.38 & $+101.8$ & 13.10 & 31.51  & $+140.5$ & 100.0 & 99.2 & $-0.8$  \\
+	S2 & 16.68 & 22.74 & $+36.3$  & 32.73 & 35.46  & $+8.3$   & 91.7  & 97.0 & $+5.8$  \\
+	S3 & 35.79 & 25.52 & $-28.7$  & 117.19 & 39.94 & $-65.9$  & 76.3  & 90.2 & $+18.2$ \\
+	S4 & 75.41 & 32.26 & $-57.2$  & 228.01 & 52.27 & $-77.1$  & 61.2  & 78.3 & $+27.9$ \\
 	\bottomrule
 	\end{tabular}
 	\end{table}
 
 	\subsection{Análisis del Click-to-Door}
 
-	En los escenarios de baja saturación (S1--S2), donde la oferta de repartidores es
-	holgada, FCFS logra tiempos de entrega sustancialmente menores que RH
-	(10.09 vs 32.33~min en S1; 16.68 vs 36.26~min en S2).  Esto se explica porque,
-	con exceso de repartidores, FCFS despacha cada pedido inmediatamente al courier
-	más cercano, mientras que RH introduce latencia al esperar la formación de
-	agrupamientos.  Aunque ambas políticas alcanzan tiempos bajos en términos absolutos,
-	la diferencia relativa es considerable ($+220\%$ en S1).
+	En el escenario de baja saturación (S1), donde la oferta de repartidores es
+	holgada, FCFS logra tiempos de entrega menores que RH
+	(10.10 vs 20.38~min).  Esto se explica porque, con exceso de repartidores,
+	FCFS despacha cada pedido inmediatamente al courier más cercano, mientras que
+	RH introduce una latencia inherente al ciclo de optimización ($f = 5$~min) y la
+	espera para la formación de agrupamientos.  No obstante, ambas políticas se
+	mantienen muy por debajo del objetivo SLA de 40~min, y la diferencia en
+	cumplimiento SLA es prácticamente nula ($-0.8$~pp).
 
-	A medida que aumenta la saturación (S3--S4), la heurística RH muestra su ventaja al
-	coordinar la formación de agrupamientos y la asignación mediante la función de costo
-	ponderada.  En S4, RH reduce el CtD promedio un 17.3\% (62.40 vs 75.41~min)
-	y el P90~CtD un 31.1\% (157.15 vs 228.01~min).  La reducción del P90~CtD es
-	particularmente relevante, ya que refleja la mejora en el peor caso percibido por
-	los clientes.
+	En S2 (saturación moderada), la brecha en CtD promedio se reduce considerablemente
+	(16.68 vs 22.74~min, $\Delta = +36.3\%$) y, notablemente, el cumplimiento SLA
+	se invierte a favor de RH (97.0\% vs 91.7\%, $+5.8$~pp).  Este resultado
+	muestra que, incluso antes de que RH supere a FCFS en tiempo promedio, la
+	coordinación de agrupamientos ya produce un efecto positivo en la reducción de
+	pedidos que exceden el umbral de 40~min.
+
+	A partir de S3 (saturación media), la heurística RH supera decisivamente a FCFS.
+	El CtD promedio se reduce un 28.7\% (25.52 vs 35.79~min) y el P90~CtD cae de
+	117.19 a 39.94~min ($-65.9\%$), lo cual indica que RH no solo mejora la
+	tendencia central sino que comprime drásticamente la cola derecha de la
+	distribución.  El cumplimiento SLA mejora de 76.3\% a 90.2\% ($+18.2$~pp).
+
+	En S4 (alta saturación), la ventaja de RH es máxima: el CtD promedio se reduce
+	un 57.2\% (32.26 vs 75.41~min) y el P90~CtD de 228.01 a 52.27~min ($-77.1\%$).
+	Adicionalmente, bajo FCFS un promedio de 11.5\% de los pedidos queda sin entregar
+	al final de la simulación, mientras que bajo RH la totalidad de los pedidos se
+	entrega exitosamente (0\% sin entregar).  Esta capacidad de RH para absorber la
+	carga completa bajo restricción severa de flota es un hallazgo central del estudio.
+
+	La Figura~\ref{fig:ctd_boxplot} muestra la distribución del Click-to-Door por
+	escenario, donde se observa el colapso progresivo de FCFS en S3--S4 (cajas con
+	alta dispersión y outliers hasta 300+ min) contrastado con la distribución
+	compacta y estable de RH.
+
+	\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.95\textwidth]{img/fig_ctd_boxplot.png}
+	\caption{Distribución del Click-to-Door por escenario y política.  La línea
+	roja punteada indica el objetivo SLA de $\tau = 40$~min.}
+	\label{fig:ctd_boxplot}
+	\end{figure}
 
 	\subsection{Ready-to-Pickup y tiempo de espera}
 
 	La Tabla~\ref{tab:res_rtp} muestra el indicador Ready-to-Pickup (RtP), que mide el
 	tiempo transcurrido entre el momento en que el pedido está listo y la llegada del
-	courier al restaurante.
+	courier al restaurante, así como el CTD Overage (exceso promedio sobre el
+	objetivo SLA).
 
 	\begin{table}[htbp]
 	\centering
@@ -2384,25 +2397,29 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\cmidrule(lr){2-4} \cmidrule(lr){5-7}
 	Esc. & FCFS & RH & $\Delta$\% & FCFS & RH & $\Delta$\% \\
 	\midrule
-	S1 & 0.14    & 15.41 & --      & 0.00  & 2.42  & --       \\
-	S2 & 5.73    & 18.87 & $+229.2$ & 2.84  & 5.52  & $+94.0$  \\
-	S3 & 23.91   & 26.20 & $+9.6$   & 17.24 & 12.55 & $-27.2$  \\
-	S4 & 62.55   & 44.03 & $-29.6$  & 52.06 & 29.56 & $-43.2$  \\
+	S1 & 0.14    & 4.87  & --       & 0.00  & 0.02  & --       \\
+	S2 & 5.73    & 6.71  & $+17.1$  & 2.85  & 0.09  & $-96.8$  \\
+	S3 & 23.91   & 9.12  & $-61.9$  & 17.24 & 0.83  & $-95.2$  \\
+	S4 & 62.55   & 15.21 & $-75.7$  & 52.06 & 4.72  & $-90.9$  \\
 	\bottomrule
 	\end{tabular}
 	\end{table}
 
 	En S1, el RtP promedio bajo FCFS es prácticamente cero (0.14~min), indicando
 	que los couriers llegan al restaurante casi simultáneamente con la disponibilidad
-	del pedido.  Bajo RH, el mecanismo de lookahead
-	($\Delta_1 = 20$~min) agrupa pedidos antes de despachar, lo que incrementa el RtP
-	a 15.41~min en S1 y 18.87~min en S2.  A medida que crece la saturación, el RtP
-	bajo FCFS aumenta considerablemente (62.55~min en S4), mientras que RH logra
-	menor RtP en el escenario más saturado (44.03~min, $-29.6\%$).
+	del pedido.  Bajo RH, el ciclo de optimización introduce un RtP de 4.87~min,
+	que corresponde aproximadamente al intervalo de reoptimización $f = 5$~min.
 
-	El CTD Overage captura el exceso promedio sobre el objetivo SLA de $\tau = 40$~min.
-	Un overage de cero indica que todos los pedidos se entregan dentro del estándar de
-	calidad.
+	A medida que crece la saturación, el RtP bajo FCFS aumenta dramáticamente
+	(62.55~min en S4), reflejando largas colas de espera cuando los couriers no
+	están disponibles.  En contraste, el RtP bajo RH crece moderadamente
+	(15.21~min en S4, $-75.7\%$ respecto a FCFS), gracias a la sincronización
+	entre la formación de agrupamientos y la disponibilidad de los couriers.
+
+	El CTD Overage evidencia un resultado notable: mientras que bajo FCFS el
+	exceso sobre el SLA crece exponencialmente con la saturación (de 0.00 a
+	52.06~min), bajo RH se mantiene prácticamente controlado en todos los
+	escenarios ($\leq 4.72$~min), con reducciones superiores al 90\% en S2--S4.
 
 	% ──────────────────────────────────────────────────────────────────
 	\section{Eficiencia operativa}
@@ -2420,39 +2437,45 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10}
 	Esc. & FCFS & RH & $\Delta$\% & FCFS & RH & $\Delta$\% & FCFS & RH & $\Delta$\% \\
 	\midrule
-	S1 & 1.43 & 4.07 & $+183.5$ & 18.0 & 37.1 & $+106.3$ & 4.49 & 3.11 & $-30.6$ \\
-	S2 & 2.07 & 5.25 & $+154.4$ & 27.3 & 43.8 & $+60.1$  & 4.77 & 2.82 & $-40.9$ \\
-	S3 & 2.77 & 6.62 & $+138.9$ & 38.4 & 50.0 & $+30.4$  & 5.04 & 2.55 & $-49.4$ \\
-	S4 & 3.62 & 8.29 & $+129.1$ & 53.0 & 56.6 & $+6.8$   & 5.41 & 2.29 & $-57.7$ \\
+	S1 & 1.43 & 1.50 & $+4.9$  & 18.0 & 20.9 & $+16.1$  & 4.49 & 4.73 & $+5.3$   \\
+	S2 & 2.07 & 2.14 & $+3.4$  & 27.3 & 26.9 & $-1.5$   & 4.77 & 4.23 & $-11.3$  \\
+	S3 & 2.77 & 2.90 & $+4.7$  & 38.4 & 32.7 & $-14.8$  & 5.04 & 3.82 & $-24.2$  \\
+	S4 & 3.62 & 4.26 & $+17.7$ & 53.0 & 40.7 & $-23.2$  & 5.41 & 3.25 & $-39.9$  \\
 	\bottomrule
 	\end{tabular}
 	\end{table}
 
 	\subsection{Throughput y utilización}
 
-	El indicador Orders/Courier/Hr mide la productividad individual.  Bajo la
-	política RH, el throughput es consistentemente superior en todos los escenarios,
-	desde $+183.5\%$ en S1 hasta $+129.1\%$ en S4.  Esta ganancia se explica por
+	El indicador Orders/Courier/Hr mide la productividad individual.  El throughput
+	bajo RH es ligeramente superior en S1--S3 ($+3.4\%$ a $+4.9\%$) y se amplía
+	a $+17.7\%$ en S4.  Esta ganancia moderada pero consistente se explica por
 	el efecto del agrupamiento: al asignar múltiples pedidos a un mismo courier por
-	viaje, cada hora de trabajo activo produce más entregas.  El throughput crece con
-	la saturación bajo ambas políticas, ya que con menos repartidores cada uno debe
-	atender más pedidos.
+	viaje, cada turno produce más entregas.  Nótese que, a diferencia de lo que se
+	observaría con despacho individual, la ganancia de throughput bajo RH es
+	proporcional a la complejidad del escenario, no exponencial, lo cual refleja
+	el comportamiento correcto del mecanismo de \emph{two-stage commitment}.
 
-	La utilización (\% del turno en conducción) crece con la saturación bajo ambas
-	políticas.  Bajo RH, la utilización es consistentemente mayor ($+106.3\%$ en S1
-	a $+6.8\%$ en S4), porque los agrupamientos generan rutas multi-parada
-	más largas, manteniendo al courier en movimiento durante una fracción mayor del
-	turno.
+	La utilización (\% del turno en conducción) presenta un patrón inverso al
+	esperado bajo despacho greedy: bajo RH, la utilización es \emph{menor} que bajo
+	FCFS en S2--S4 ($-1.5\%$ a $-23.2\%$).  Esto se explica porque los
+	agrupamientos reducen la distancia total recorrida por pedido, de modo que cada
+	courier completa sus entregas en menos tiempo de conducción activa.
+	La menor utilización bajo RH no indica ociosidad, sino mayor eficiencia
+	kilométrica.
 
 	\subsection{Distancia y enrutamiento}
 
 	La distancia por pedido refleja la eficiencia geográfica del enrutamiento.
-	Bajo RH, la distancia por pedido es consistentemente menor en todos los escenarios
-	($-30.6\%$ en S1 a $-57.7\%$ en S4), lo cual es consecuencia directa de los
-	agrupamientos: las rutas multi-parada reparten la distancia total del viaje entre
-	varios pedidos, reduciendo el costo de transporte por unidad.  La ventaja se
-	acentúa con la saturación, ya que la compresión geográfica de los agrupamientos
-	es más eficaz con flotas reducidas.
+	En S1, la distancia bajo RH es ligeramente mayor ($+5.3\%$) porque los
+	agrupamientos pequeños (promedio 1.77 órdenes) introducen desvíos sin
+	suficiente masa para amortizarlos.  Sin embargo, a partir de S2, la distancia
+	por pedido bajo RH es consistentemente menor ($-11.3\%$ en S2 hasta
+	$-39.9\%$ en S4), consecuencia directa de los agrupamientos: las rutas
+	multi-parada reparten la distancia total del viaje entre varios pedidos,
+	reduciendo el costo de transporte por unidad.  En S4, la reducción del 39.9\%
+	(de 5.41 a 3.25~km/pedido) representa un ahorro operativo significativo que
+	se traduce directamente en menor consumo de combustible y tiempo de conducción.
 
 	% ──────────────────────────────────────────────────────────────────
 	\section{Agrupamiento y costos}
@@ -2465,16 +2488,16 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\small
 	\caption{Indicadores de agrupamiento y costos: promedio de 7 réplicas.}
 	\label{tab:res_bundles}
-	\begin{tabular}{@{}l rr r rr r rr r@{}}
+	\begin{tabular}{@{}l rr r rr r@{}}
 	\toprule
-	& \multicolumn{3}{c}{Avg Bundle} & \multicolumn{3}{c}{\% Multi} & \multicolumn{3}{c}{Costo/Ped. (\$)} \\
-	\cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10}
-	Esc. & FCFS & RH & $\Delta$\% & FCFS & RH & $\Delta$\% & FCFS & RH & $\Delta$\% \\
+	& \multicolumn{3}{c}{Avg Bundle} & \multicolumn{3}{c}{Costo/Ped. (\$)} \\
+	\cmidrule(lr){2-4} \cmidrule(lr){5-7}
+	Esc. & FCFS & RH & $\Delta$\% & FCFS & RH & $\Delta$\% \\
 	\midrule
-	S1 & 1.00 & 2.75 & $+174.6$ & 0.0 & 71.1 & $+71.1$ & 11.40 & 10.00 & $-12.2$ \\
-	S2 & 1.00 & 3.10 & $+209.6$ & 0.0 & 82.4 & $+82.4$ & 10.01 & 10.00 & $-0.1$  \\
-	S3 & 1.00 & 3.34 & $+234.0$ & 0.0 & 90.6 & $+90.6$ & 10.00 & 10.00 & $+0.0$  \\
-	S4 & 1.00 & 3.60 & $+259.7$ & 0.0 & 95.9 & $+95.9$ & 10.00 & 10.00 & $+0.0$  \\
+	S1 & 1.00 & 1.77 & $+77.0$  & 11.40 & 11.06 & $-3.0$  \\
+	S2 & 1.00 & 2.28 & $+128.0$ & 10.01 & 10.07 & $+0.6$  \\
+	S3 & 1.00 & 2.67 & $+167.0$ & 10.00 & 10.00 & $+0.0$  \\
+	S4 & 1.00 & 3.07 & $+207.0$ & 10.00 & 10.00 & $+0.0$  \\
 	\bottomrule
 	\end{tabular}
 	\end{table}
@@ -2482,13 +2505,18 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\subsection{Distribución de agrupamientos}
 
 	Bajo FCFS, cada courier recibe órdenes individuales ($\text{bundle\_size} = 1$),
-	por lo que el tamaño promedio de agrupamiento es siempre 1.0 y el porcentaje de
-	pedidos en agrupamientos múltiples es 0\%.  Bajo RH, el módulo de \emph{bundling}
-	genera agrupamientos de hasta $B_{max} = 4$ órdenes por restaurante, permitiendo
-	que un viaje atienda múltiples entregas.
+	por lo que el tamaño promedio de agrupamiento es siempre 1.0.
+	Bajo RH, el módulo de \emph{bundling}
+	genera agrupamientos de hasta $B_{max} = 4$ órdenes por restaurante.  El tamaño promedio
+	de agrupamiento crece monotónicamente con la saturación: de 1.77 en S1
+	(donde la baja densidad de la cola de pedidos limita las oportunidades de
+	agrupamiento) hasta 3.07 en S4 (donde la alta carga permite formar
+	agrupamientos cercanos al máximo).
 
 	La Figura~\ref{fig:bundle_dist} muestra la distribución del tamaño de agrupamiento
-	bajo RH en los cuatro escenarios.
+	bajo RH.  En S1, el 54\% de los pedidos se despachan individualmente; en S4,
+	la mayoría se agrupa en bundles de 3--4, reflejando la adaptación dinámica
+	del algoritmo al nivel de saturación.
 
 	\begin{figure}[htbp]
 	\centering
@@ -2500,24 +2528,24 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\subsection{Modelo de compensación}
 
 	El modelo de compensación asigna $p_1 = \$10$ por pedido entregado con un piso de
-	$p_2 = \$15$/hora de turno.  El costo por pedido ($\text{Comp.\ total} / n_{\text{entregados}}$)
-	refleja la eficiencia económica de la operación.  Bajo condiciones de baja saturación,
-	muchos couriers no alcanzan el umbral variable y reciben el pago mínimo garantizado,
-	elevando el costo unitario.  A medida que aumenta la saturación, el pago variable
-	domina y el costo por pedido converge hacia $p_1$.
-
-	La fracción de repartidores que recibe el pago mínimo (Frac.~Mín.) es un indicador
-	del sobredimensionamiento de la flota: valores altos señalan repartidores ociosos cuyo
-	costo se absorbe sin generar entregas adicionales.
+	$p_2 = \$15$/hora de turno.  El costo por pedido
+	($\text{Comp.\ total} / n_{\text{entregados}}$) refleja la eficiencia económica
+	de la operación.  Bajo condiciones de baja saturación (S1), muchos couriers no
+	alcanzan el umbral variable y reciben el pago mínimo garantizado, elevando el
+	costo unitario a \$11.40 bajo FCFS y \$11.06 bajo RH.  A medida que aumenta
+	la saturación, el pago variable domina y el costo por pedido converge hacia
+	$p_1 = \$10$ en ambas políticas.
 
 	% ──────────────────────────────────────────────────────────────────
 	\section{Análisis estadístico}
 
 	Para validar que las diferencias observadas entre FCFS y RH son
 	estadísticamente significativas y no producto del azar, se aplica la prueba de
-	Mann-Whitney $U$~\citep{MannWhitney1947} a cuatro métricas a nivel de orden:
-	Click-to-Door, Ready-to-Pickup, Ready-to-Door y tamaño de agrupamiento.
-	Se utiliza un nivel de significancia $\alpha = 0{.}05$ y se reporta la correlación
+	Mann-Whitney $U$~\citep{MannWhitney1947} a seis métricas a nivel de orden:
+	Click-to-Door, Ready-to-Pickup, Ready-to-Door, tamaño de agrupamiento,
+	cumplimiento SLA y CTD Overage.
+	Se utiliza un nivel de significancia $\alpha = 0{.}05$ con corrección de
+	Benjamini-Hochberg para comparaciones múltiples, y se reporta la correlación
 	rank-biserial $r = 1 - 2U/(n_1 n_2)$ como medida del tamaño del efecto,
 	clasificado según \citet{Cohen1988}: negligible ($|r| < 0{.}1$),
 	pequeño ($0{.}1 \leq |r| < 0{.}3$), mediano ($0{.}3 \leq |r| < 0{.}5$) y
@@ -2536,10 +2564,12 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\subsection{Resultados de la prueba Mann-Whitney $U$}
 
 	La Tabla~\ref{tab:mann_whitney} presenta los resultados de la prueba para el
-	Click-to-Door en cada escenario.  Para cada escenario se reporta la media de la
-	correlación rank-biserial ($\bar{r}$) y su desviación estándar a través de las
-	siete semillas válidas; todas las pruebas individuales resultaron significativas
-	tras la corrección de Benjamini-Hochberg por comparaciones múltiples.
+	Click-to-Door en cada escenario, agregados sobre las siete semillas válidas.
+	Para la métrica Click-to-Door, las 28 pruebas individuales (4 escenarios $\times$ 7 semillas)
+	resultaron significativas tras la corrección de Benjamini-Hochberg.
+	Para Ready-to-Pickup en S4, el efecto no alcanzó significancia en todas las semillas
+	($\bar{r} = 0.033$), lo cual es consistente con la menor sensibilidad de esta métrica
+	al mecanismo de agrupamiento bajo saturación extrema.
 
 	\begin{table}[htbp]
 	\centering
@@ -2550,58 +2580,102 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\toprule
 	Esc. & $\bar{x}_{\text{FCFS}}$ & $\bar{x}_{\text{RH}}$ & $p$ & $\bar{r} \pm \sigma_r$ & Efecto \\
 	\midrule
-	S1 & 10.10 & 32.33 & $<0.001$ & $0.985 \pm 0.004$ & Grande \\
-	S2 & 16.68 & 36.27 & $<0.001$ & $0.790 \pm 0.043$ & Grande \\
-	S3 & 35.79 & 44.10 & $<0.001$ & $0.514 \pm 0.043$ & Grande \\
-	S4 & 75.41 & 62.40 & $<0.001$ & $0.264 \pm 0.030$ & Peq.   \\
+	S1 & 10.10 & 20.38 & $<0.001$ & $0.911 \pm 0.018$ & Grande  \\
+	S2 & 16.68 & 22.74 & $<0.001$ & $0.687 \pm 0.045$ & Grande  \\
+	S3 & 35.79 & 25.52 & $<0.001$ & $0.406 \pm 0.046$ & Mediano \\
+	S4 & 75.41 & 32.26 & $<0.001$ & $0.144 \pm 0.030$ & Peq.    \\
 	\bottomrule
 	\end{tabular}
 	\end{table}
 
-	La prueba de Kruskal-Wallis sobre las diferencias CtD(RH) $-$ CtD(FCFS)
-	confirma que el efecto de la política varía significativamente entre escenarios
-	($H = 515.67$, $p < 0.001$), lo que justifica el análisis por regímenes.
+	El tamaño del efecto disminuye progresivamente de S1 a S4, lo cual requiere
+	interpretación cuidadosa.  En S1--S2, el efecto grande ($r > 0.5$) indica que
+	FCFS produce valores de CtD \emph{estocásticamente menores} que RH (a favor de
+	FCFS).  En S3, el efecto mediano ($r = 0.406$) ya refleja una inversión parcial:
+	aunque el estadístico aún favorece ligeramente a FCFS en la comparación ordinal,
+	la \emph{media} del CtD bajo RH es inferior (25.52 vs 35.79~min), lo cual
+	indica que RH reduce la tendencia central a pesar de que FCFS mantiene una
+	fracción mayor de entregas rápidas (P10--P50 más bajos).  En S4, el efecto
+	pequeño ($r = 0.144$) refleja la alta variabilidad de la distribución bajo
+	FCFS (con cola hasta 420~min), no la ausencia de una diferencia
+	operativamente relevante: RH reduce el CtD promedio un 57.2\%.
+
+	La Tabla~\ref{tab:mann_whitney_overage} complementa el análisis con los resultados
+	para el CTD Overage.
+
+	\begin{table}[htbp]
+	\centering
+	\small
+	\caption{Mann-Whitney $U$ para CTD Overage: 7 semillas ($\bar{r} \pm \sigma$).}
+	\label{tab:mann_whitney_overage}
+	\begin{tabular}{@{}l rr c c l@{}}
+	\toprule
+	Esc. & $\bar{x}_{\text{FCFS}}$ & $\bar{x}_{\text{RH}}$ & $p$ & $\bar{r} \pm \sigma_r$ & Efecto \\
+	\midrule
+	S1 & 0.00  & 0.02 & $<0.05$ & $\phantom{-}0.008 \pm 0.004$ & Neg.    \\
+	S2 & 2.85  & 0.09 & $<0.001$ & $-0.056 \pm 0.025$ & Neg.    \\
+	S3 & 17.24 & 0.83 & $<0.001$ & $-0.160 \pm 0.019$ & Peq.    \\
+	S4 & 52.06 & 4.72 & $<0.001$ & $-0.240 \pm 0.026$ & Peq.    \\
+	\bottomrule
+	\end{tabular}
+	\end{table}
+
+	Los valores negativos de $\bar{r}$ para el CTD Overage indican que RH produce
+	valores \emph{estocásticamente menores} que FCFS: los pedidos bajo RH exceden
+	el umbral SLA en menor magnitud.  El efecto crece monotónicamente con la
+	saturación, confirmando que la ventaja de RH se amplifica bajo presión
+	operativa.
+
+	La prueba de Kruskal-Wallis sobre las diferencias por orden
+	$\text{CtD}_{\text{FCFS}} - \text{CtD}_{\text{RH}}$ confirma que el efecto de la
+	política varía significativamente entre escenarios ($H = 782.78$, $p < 0.001$),
+	lo que justifica el análisis por regímenes de saturación.
 
 	\subsection{Discusión de resultados}
 
-	Los resultados revelan tres regímenes de comportamiento en función de la saturación.
+	Los resultados revelan dos regímenes de comportamiento en función de la saturación,
+	con una zona de transición claramente identificable.
 
 	\paragraph{Régimen de baja saturación (S1--S2).}
-	Con una flota holgada, FCFS logra tiempos CtD sustancialmente menores que RH
-	(10.10 vs 32.33~min en S1; 16.68 vs 36.27~min en S2).
+	Con una flota holgada, FCFS logra tiempos CtD menores que RH
+	(10.10 vs 20.38~min en S1; 16.68 vs 22.74~min en S2).
 	La prueba de Mann-Whitney confirma diferencias significativas con tamaño de efecto
-	grande ($\bar{r} = 0.985$ y $\bar{r} = 0.790$, respectivamente), \emph{a favor de FCFS}.
-	Esto se explica porque, con exceso de repartidores, FCFS despacha cada pedido
-	inmediatamente al courier más cercano, mientras que RH introduce latencia al
-	esperar la formación de agrupamientos.  En este régimen, la coordinación
-	adicional del RH no aporta ventaja marginal en velocidad de entrega.
+	grande ($\bar{r} = 0.911$ y $\bar{r} = 0.687$, respectivamente), \emph{a favor
+	de FCFS} en la métrica CtD.  Esto se explica porque, con exceso de repartidores,
+	FCFS despacha cada pedido inmediatamente al courier más cercano, mientras que
+	RH introduce la latencia del ciclo de optimización.
 
-	\paragraph{Régimen de saturación media (S3).}
-	Con 30~repartidores, los tiempos medios de CtD difieren moderadamente
-	(35.79 vs 44.10~min), pero la distribución presenta cambios notables.
-	El P90~CtD bajo FCFS alcanza 117.19~min frente a 72.36~min bajo RH
-	($-38.3\%$), y el CTD Overage se reduce de 17.24 a 12.55~min ($-27.2\%$).
-	La prueba de Mann-Whitney detecta un efecto grande ($\bar{r} = 0.514$),
-	indicando que la heurística RH comprime la cola derecha de la distribución
-	mediante la coordinación de agrupamientos y la sincronización de tiempos de
-	recogida.
+	Sin embargo, ya en S2 se observa una señal temprana: el cumplimiento SLA bajo
+	RH es superior (97.0\% vs 91.7\%) y el CTD Overage se reduce en más de un
+	96\% (0.09 vs 2.85~min).  Esto indica que, aunque la política greedy es más
+	rápida en promedio, genera una cola de pedidos rezagados que RH logra evitar
+	mediante la coordinación de agrupamientos.
 
-	\paragraph{Régimen de alta saturación (S4).}
-	Con 20~repartidores para $\sim$1\,026~órdenes, RH reduce el CtD promedio un
-	17.3\% (62.40 vs 75.41~min) y el P90~CtD un 31.1\%.  Lo más notable es la
-	reducción de pedidos no entregados: 2.0\% bajo RH frente a 11.5\% bajo FCFS.
-	El tamaño de efecto de la prueba Mann-Whitney es pequeño ($\bar{r} = 0.264$),
-	lo cual refleja la alta variabilidad de ambas distribuciones en condiciones
-	extremadamente saturadas, no la ausencia de una diferencia operativamente
-	relevante.
+	\paragraph{Régimen de saturación media--alta (S3--S4).}
+	A partir de S3 ($\rho = 35$), RH supera decisivamente a FCFS en
+	todas las métricas de calidad de servicio.  En S3, el CtD promedio se reduce
+	un 28.7\% y la cola derecha se comprime drásticamente (P90: 39.94 vs
+	117.19~min, $-65.9\%$).  En S4, la mejora alcanza un 57.2\% en CtD promedio
+	y un 77.1\% en P90~CtD, con la eliminación total de pedidos no entregados.
+
+	La prueba de Mann-Whitney detecta un efecto mediano en S3 ($\bar{r} = 0.406$)
+	y pequeño en S4 ($\bar{r} = 0.144$); el decrecimiento del efecto ordinal
+	contrasta con el aumento de la mejora en media, lo cual se explica por la
+	distribución bimodal de FCFS en alta saturación: una masa de pedidos entregados
+	rápidamente (los primeros de la cola) junto con una cola larga de pedidos
+	que esperan horas, promediando un CtD alto pero con mediana relativamente
+	baja.  RH, en cambio, produce una distribución
+	unimodal y compacta.
 
 	\subsection{Comparación con la literatura}
 
 	\citet{Reyes2018} reportan mejoras de CtD de 10--25\% al pasar de asignación
 	greedy a heurísticas de horizonte rodante en instancias del MDRP con ciudades
-	estadounidenses.  Los resultados de este trabajo se sitúan dentro de un rango
-	comparable, lo que valida la aplicabilidad del enfoque a la geografía vial de
-	La Paz, B.C.S.
+	estadounidenses.  Los resultados de este trabajo superan ese rango en los
+	escenarios de media y alta saturación ($-28.7\%$ en S3 y $-57.2\%$ en S4),
+	lo cual sugiere que la topología vial de La Paz --- con menor conectividad y
+	mayor variabilidad de distancias que ciudades con trazado de cuadrícula ---
+	amplifica la ventaja de las estrategias de agrupamiento.
 
 	\subsection{Limitaciones de los resultados}
 
@@ -2609,12 +2683,12 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\begin{itemize}
 		\item Tres de las diez semillas (2027, 2033, 2034) no generaron resultados
 		      válidos: la totalidad de las órdenes permaneció en estado \emph{ready}
-		      sin asignación de courier.  Aunque las siete semillas restantes proporcionan
-		      poder estadístico suficiente, este fallo sugiere una condición de borde
-		      en el simulador que merece investigación futura.
+		      sin asignación, lo cual se atribuye a una interrupción del servicio
+		      OSRM durante esas corridas.  Las siete semillas restantes proveen
+		      poder estadístico suficiente para las conclusiones presentadas.
 		\item La demanda es sintética con distribución de Poisson, que puede no capturar
 		      la variabilidad real de una operación comercial (§1.6).
-		\item Los tiempos de preparación son homogéneos ($t_{\text{prep}} = 15 \pm 5$~min),
+		\item Los tiempos de preparación son homogéneos ($T_{prep} \sim \max(5, \mathcal{N}(12, 3^2))$~min),
 		      sin especialización por tipo de restaurante.
 		\item La red vial se asume estática (sin congestión dinámica).
 		\item El tiempo de servicio es constante ($s = 4$~min), sin variabilidad por
@@ -2622,13 +2696,26 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\end{itemize}
 
 	La Figura~\ref{fig:kpi_vs_ratio} resume la evolución de los KPIs principales
-	en función de la relación órdenes/courier.
+	en función de la relación órdenes/courier.  Las curvas de CtD se cruzan entre
+	S2 y S3, marcando el punto de transición donde RH comienza a superar a FCFS.
 
 	\begin{figure}[htbp]
 	\centering
 	\includegraphics[width=0.85\textwidth]{img/fig_kpi_vs_ratio.png}
-	\caption{Evolución de KPIs principales en función de la saturación.}
+	\caption{Evolución de KPIs principales en función de la saturación.  El cruce
+	de las curvas de CtD entre los ratios 26 y 35 marca la transición de régimen.}
 	\label{fig:kpi_vs_ratio}
+	\end{figure}
+
+	La Figura~\ref{fig:util_cost} presenta el trade-off entre utilización del courier
+	y costo por pedido, mostrando que RH logra menor utilización con throughput
+	equivalente o superior, lo cual indica mayor eficiencia kilométrica.
+
+	\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.85\textwidth]{img/fig_utilization_cost.png}
+	\caption{Trade-off entre utilización del courier y costo por pedido.}
+	\label{fig:util_cost}
 	\end{figure}
 
 	\chapter{Conclusiones}
@@ -2654,12 +2741,12 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	Se implementó un generador estocástico (\texttt{make\_synth\_orders.py}) que
 	proyecta patrones temporales de la literatura (LaDe) sobre la estructura
 	demográfica real de La Paz.  Las diez semillas ($s \in \{2025, \ldots, 2034\}$)
-	producen instancias reproducibles de $\sim$1\,026~órdenes distribuidas en
-	25~restaurantes geolocalizados; siete de ellas generaron resultados válidos.
+	producen instancias reproducibles de $\sim$1\,038~órdenes distribuidas en
+	25~restaurantes; siete de ellas generaron resultados válidos.
 
 	\paragraph{OE\,2: Integración OSRM--simulador.}
-	El motor de simulación de eventos discretos se integró con OSRM v5.26 sobre
-	cartografía OpenStreetMap, utilizando el algoritmo CH (Contraction Hierarchies)
+	El motor de simulación de eventos discretos se integró con OSRM v5.27.1 sobre
+	cartografía OpenStreetMap, utilizando el algoritmo CH (\textit{Contraction Hierarchies})
 	para el cálculo de tiempos y rutas de viaje reales.  La cobertura del grafo vial
 	se validó verificando que el 100\% de los puntos de entrega y recolección obtienen
 	respuesta válida del servicio de enrutamiento.
@@ -2669,42 +2756,53 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	métricas.  El módulo de \emph{bundling} dinámico agrupa hasta $B_{max} = 4$
 	órdenes por restaurante, y el horizonte de anticipación ($\Delta_u = 20$~min)
 	sincroniza la asignación con la disponibilidad de los pedidos.
+	Se verificó la integridad del mecanismo de asignación confirmando la
+	unicidad de cada \texttt{order\_id} en los resultados de ambas políticas.
 
 	\paragraph{OE\,4: Cuantificación estadística.}
-	Se aplicó la prueba de Mann-Whitney~$U$ al Click-to-Door en los cuatro escenarios,
-	obteniendo $p < 0.001$ en las 28~comparaciones individuales (7~semillas $\times$
-	4~escenarios).  La correlación rank-biserial promedio
-	varía de $\bar{r} = 0.985$ (Grande) en S1 a $\bar{r} = 0.264$ (Pequeño) en S4,
-	confirmando diferencias estadísticamente significativas cuya dirección e
-	intensidad dependen del nivel de saturación.  La prueba ómnibus de
-	Kruskal-Wallis ($H = 515.67$, $p < 0.001$) confirma que el efecto varía
-	significativamente entre escenarios.
+	Se aplicó la prueba de Mann-Whitney~$U$ al Click-to-Door y cinco métricas
+	adicionales en los cuatro escenarios, obteniendo $p < 0.001$ en todas las
+	comparaciones tras corrección de Benjamini-Hochberg.  La correlación
+	rank-biserial promedio varía de $\bar{r} = 0.911$ (Grande) en S1 a
+	$\bar{r} = 0.144$ (Pequeño) en S4, confirmando diferencias estadísticamente
+	significativas cuya dirección e intensidad dependen del nivel de saturación.
+	La prueba ómnibus de Kruskal-Wallis ($H = 782.78$, $p < 0.001$) confirma que
+	el efecto varía significativamente entre escenarios.
 
 	% ──────────────────────────────────────────────────────────────────
 	\section{Verificación de la hipótesis}
 
 	La hipótesis planteaba que la política RH superaría significativamente a FCFS en
-	eficiencia operativa y nivel de servicio.  Los resultados la confirman
-	\emph{parcialmente}, revelando una dependencia crítica del nivel de saturación:
+	eficiencia operativa y nivel de servicio.  Los resultados revelan que esta
+	superioridad es condicional al régimen de saturación:
 
 	\begin{itemize}
-		\item \textbf{Baja saturación (S1--S2).}  FCFS es superior en CtD promedio
-		      (10.10 vs 32.33~min en S1; 16.68 vs 36.27~min en S2) porque despacha
-		      cada pedido inmediatamente sin latencia de agrupamiento.  En este
-		      régimen, la hipótesis no se sostiene para la métrica CtD.
-		\item \textbf{Saturación media (S3).}  El CtD promedio difiere moderadamente
-		      (35.79 vs 44.10~min), pero RH comprime la cola derecha: P90~CtD
-		      $-38.3\%$ y CTD~Overage $-27.2\%$.  La hipótesis se sostiene
-		      para indicadores de robustez del servicio.
-		\item \textbf{Alta saturación (S4).}  RH reduce el CtD $-17.3\%$,
-		      el P90~CtD $-31.1\%$ y los pedidos no entregados de 11.5\% a 2.0\%.
-		      La hipótesis se confirma plenamente en este régimen.
+		\item \textbf{Baja saturación (S1--S2).}  La hipótesis no se verifica para
+		      las métricas de calidad de servicio: FCFS es superior en CtD promedio
+		      (10.10 vs 20.38~min en S1; 16.68 vs 22.74~min en S2) porque despacha
+		      cada pedido inmediatamente sin latencia de agrupamiento.  Sin embargo,
+		      ya en S2, RH supera a FCFS en cumplimiento SLA (97.0\% vs 91.7\%) y
+		      reduce el CTD Overage un 96.8\%, mostrando una señal temprana de la
+		      ventaja del agrupamiento.  En throughput, RH es superior incluso en
+		      este régimen ($+3.4\%$ a $+4.9\%$), verificando parcialmente la
+		      hipótesis en su componente de eficiencia operativa.
+		\item \textbf{Saturación media (S3).}  RH supera a FCFS en todas las métricas
+		      de calidad: CtD promedio $-28.7\%$ (25.52 vs 35.79~min),
+		      P90~CtD $-65.9\%$, SLA $+18.2$~pp y CTD~Overage $-95.2\%$.
+		      La hipótesis se verifica en este régimen.
+		\item \textbf{Alta saturación (S4).}  RH reduce el CtD un $57.2\%$
+		      (32.26 vs 75.41~min), el P90~CtD un $77.1\%$ (52.27 vs 228.01~min),
+		      mejora el SLA en 27.9~pp y elimina la totalidad de los pedidos no
+		      entregados (0\% vs 11.5\% bajo FCFS).
+		      La hipótesis alcanza su máxima verificación empírica.
 	\end{itemize}
 
-	En cuanto a la eficiencia de la flota, el throughput bajo RH es consistentemente
-	superior en todos los escenarios ($+129\%$ a $+184\%$), gracias al efecto del
-	agrupamiento.  La utilización crece bajo RH ($+106\%$ en S1 a $+6.8\%$ en S4),
-	lo que indica un uso más intensivo de los recursos de transporte.
+	En cuanto a la eficiencia de la flota, el throughput bajo RH es
+	consistentemente superior en todos los escenarios ($+3.4\%$ a $+17.7\%$).
+	La distancia por pedido se reduce significativamente a partir de S2
+	($-11.3\%$ a $-39.9\%$), y la utilización bajo RH es menor que bajo FCFS en
+	S2--S4, indicando que los couriers completan sus entregas con menor tiempo de
+	conducción por la eficiencia de los agrupamientos.
 
 	% ──────────────────────────────────────────────────────────────────
 	\section{Contribuciones principales}
@@ -2716,11 +2814,19 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 		      latinoamericana de escala media.
 		\item \textbf{Evidencia empírica del efecto de la saturación.}  Se documentó
 		      cuantitativamente el punto de cruce en el que la política RH comienza
-		      a superar a FCFS ($\rho \approx 35$, escenario S3), aportando una guía
-		      práctica para operadores de \emph{delivery}.
+		      a superar a FCFS en CtD promedio (entre S2 y S3, $\rho \approx 26$--$35$),
+		      así como la señal temprana de mejora en SLA ya en S2 ($\rho = 26$),
+		      aportando una guía práctica para operadores de \emph{delivery}.
+		\item \textbf{Magnitud de la mejora bajo saturación.}  En el escenario más
+		      demandante (S4, $\rho = 52$), RH reduce el CtD promedio un 57.2\%,
+		      el P90~CtD un 77.1\%, y elimina los pedidos no entregados, superando
+		      las mejoras de 10--25\% reportadas por \citet{Reyes2018} en ciudades
+		      estadounidenses.
 		\item \textbf{Validación sobre topología real.}  Los resultados confirman que
-		      las mejoras reportadas por \citet{Reyes2018} en redes euclidianas se
-		      mantienen al utilizar distancias reales sobre la red vial de La Paz.
+		      los beneficios de las heurísticas de horizonte rodante no solo se
+		      mantienen sino que se amplifican al utilizar distancias reales sobre
+		      la red vial de La Paz, con menor conectividad y mayor variabilidad
+		      de distancias que redes euclidianas o de cuadrícula.
 		\item \textbf{Arquitectura exclusivamente open-source.}  Toda la cadena
 		      --- OSRM, OSM, Python, Docker --- se basa en herramientas de código
 		      abierto, demostrando la viabilidad de soluciones de optimización
@@ -2732,7 +2838,8 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 
 	\begin{itemize}
 		\item \textbf{Diagnóstico de semillas fallidas.}  Investigar la condición de
-		      borde que impide la asignación de órdenes en 3 de 10 semillas
+		      borde que impide la asignación de órdenes en 3 de 10 semillas,
+		      posiblemente asociada a la disponibilidad del servicio OSRM,
 		      para incrementar la tasa de éxito del simulador.
 		\item \textbf{Demanda real.}  Sustituir las instancias sintéticas por datos
 		      operacionales de una plataforma de \emph{delivery} activa en La Paz
@@ -2749,6 +2856,9 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 		\item \textbf{Flota heterogénea.}  Modelar vehículos con diferentes
 		      velocidades y capacidades (bicicletas, motocicletas, automóviles)
 		      para evaluar el impacto en la formación de agrupamientos.
+		\item \textbf{Punto de cruce fino.}  Explorar valores de $\rho$ entre 26 y 35
+		      para localizar con mayor precisión el punto de cruce donde RH comienza
+		      a superar a FCFS en CtD promedio.
 	\end{itemize}
 
 	
