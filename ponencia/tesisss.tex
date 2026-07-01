@@ -1,0 +1,598 @@
+% !TeX encoding = UTF-8
+% Artículo para la memoria del Congreso Internacional de Humanidades,
+% Ingeniería y Tecnología (CIHITEC 2026). Versión condensada de la tesis
+% original (docs/tesisss.tex), adaptada a las Normas de publicación:
+% Times New Roman 12 pt, interlineado 1.5, márgenes 2.5 cm, APA 7, 8-15 págs.
+\documentclass[12pt,letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{mathptmx} % Times New Roman en texto y matemáticas
+\usepackage[spanish,mexico]{babel}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{placeins}   % \FloatBarrier
+\usepackage[margin=2.5cm]{geometry}
+\usepackage[hidelinks]{hyperref}
+\usepackage[natbibapa]{apacite} % Citas y referencias en estilo APA (autor-año)
+
+\renewcommand{\baselinestretch}{1.5} % Interlineado 1.5
+\setcounter{secnumdepth}{3}          % Numeración 1 / 1.1 / 1.1.1
+\graphicspath{{img/}{./}}
+
+\title{\textbf{Logística de última milla en redes viales reales: un enfoque
+reproducible para el MDRP en La Paz, B.C.S.}}
+\author{Alan José Marcos Sánchez Martínez\\
+	\small Instituto Tecnológico de La Paz, Tecnológico Nacional de México (TecNM)\\
+	\small alansama2906@gmail.com}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent La logística de última milla concentra entre el 30\,\% y el 60\,\% del
+costo de una operación de entrega y, en el segmento de comida preparada, se
+agrava por la urgencia y la demanda dinámica. La mayoría de los estudios sobre el
+\textit{Meal Delivery Routing Problem} (MDRP) evalúan sus políticas de despacho
+con distancias euclidianas, que subestiman los trayectos reales entre un 17\,\% y
+un 40\,\% y comprometen la validez de los tiempos de entrega prometidos. Este
+trabajo evalúa la eficiencia operativa de la política anticipatoria de horizonte
+rodante (\textit{Rolling Horizon}, RH) frente a una política reactiva
+\textit{First-Come, First-Served} (FCFS) para el MDRP sobre la red vial real de
+La Paz, Baja California Sur. Se desarrolló un entorno de simulación de eventos
+discretos reproducible, basado exclusivamente en software libre (OSRM,
+OpenStreetMap y Docker), que sustituye las distancias euclidianas por tiempos de
+viaje reales. La demanda se generó mediante un proceso de Poisson no homogéneo
+bimodal calibrado con el conjunto de datos LaDe (aproximadamente 1\,038 pedidos y
+25 restaurantes) y ambas políticas se compararon en cuatro escenarios de
+saturación de flota con siete réplicas válidas, contrastadas con la prueba de
+Mann-Whitney~$U$. Los resultados revelan dos regímenes: con flota holgada FCFS es
+más rápida, pero bajo saturación media y alta RH reduce el \textit{Click-to-Door}
+promedio hasta un 57.2\,\% y su percentil~90 hasta un 77.1\,\%, además de eliminar
+los pedidos no entregados. Se identifica un punto de cruce entre 26 y 35 pedidos
+por repartidor a partir del cual la anticipación supera a la asignación reactiva.
+
+\vspace{0.4cm}
+\noindent\textbf{Palabras clave:} MDRP; horizonte rodante; ruteo dinámico de
+vehículos; logística de última milla; OSRM; simulación de eventos discretos;
+software libre.
+\end{abstract}
+
+% ======================================================================
+\section{Introducción}
+% ======================================================================
+
+La entrega de última milla ---el segmento final desde el punto de origen hasta el
+domicilio del cliente--- es el componente más costoso y complejo de la logística
+urbana: puede representar entre el 30\,\% y el 60\,\% del costo total de un envío
+\citep{Jazemi2023}. En el caso de la comida preparada, este segmento se vuelve
+particularmente exigente por la urgencia (ventanas de 30 a 60 minutos), la
+perecibilidad del producto y una demanda dinámica e impredecible que obliga a
+reoptimizar continuamente las asignaciones.
+
+El problema de enrutamiento de vehículos (VRP), formulado originalmente por
+\citet{Dantzig1959} como generalización del problema del agente viajero, ha
+evolucionado durante cinco décadas para incorporar restricciones de capacidad,
+ventanas de tiempo y múltiples depósitos \citep{Laporte2009VRPSurvey}. Cuando la
+demanda se revela en tiempo real, el problema se torna dinámico
+\citep{Larsen2000DVRP,Pillac2013}. En esta familia, \citet{Reyes2018}
+introdujeron el \textit{Meal Delivery Routing Problem} (MDRP), que combina
+múltiples puntos de recolección, tiempos de preparación, alta urgencia y
+agrupamiento dinámico de pedidos (\textit{bundling}).
+
+Un problema transversal a esta literatura es la manera de estimar los tiempos de
+viaje. Las plataformas comerciales (Google Maps, Mapbox) ofrecen precisión pero
+imponen costos de licenciamiento y operan como caja negra, comprometiendo la
+reproducibilidad científica \citep{Pereira2021}. La alternativa académica
+tradicional ---la distancia euclidiana--- es gratuita y reproducible, pero
+\citet{Boyaci2021} demostraron, sobre 96 instancias en 12 ciudades, que las rutas
+reales son entre un 17\,\% y un 40\,\% más largas que la línea recta, lo que
+invalida las estimaciones de tiempo de arribo y puede producir rutas
+operativamente infactibles.
+
+Esta brecha se agudiza en ciudades medianas de topología irregular como La Paz,
+Baja California Sur, donde la ensenada obliga a rodeos extensos y la estructura
+vial depende de pocas arterias estructurantes. Además, \citet{Reyes2018}
+validaron sus políticas de horizonte rodante en instancias sintéticas de grandes
+urbes con alta conectividad y distancias euclidianas; se desconoce el grado de
+degradación de estas heurísticas al trasladarlas a un entorno de baja
+conectividad y alta penalización por error.
+
+De lo anterior surge la pregunta de investigación: \textit{¿en qué medida una
+política de despacho anticipatoria supera a una reactiva cuando el MDRP se evalúa
+sobre la red vial real de una ciudad mediana de topología hostil?} El
+\textbf{objetivo general} es evaluar la eficiencia operativa de la política
+\textit{Rolling Horizon} frente a la estrategia reactiva FCFS mediante un entorno
+de simulación reproducible que integre las restricciones topológicas reales de La
+Paz y patrones de demanda estocásticos. La \textbf{hipótesis} sostiene que la
+política anticipatoria, alimentada con tiempos de viaje reales, superará
+significativamente a la reactiva en eficiencia operativa y nivel de servicio,
+usando exclusivamente software de código abierto.
+
+El resto del documento se organiza como sigue. La Sección~2 presenta el marco
+teórico (formulación del MDRP, heurística de horizonte rodante, enrutamiento
+sobre grafos viales y generación estocástica de demanda). La Sección~3 describe la
+metodología y el diseño experimental. La Sección~4 presenta y discute los
+resultados. La Sección~5 concluye y plantea líneas de trabajo futuro.
+
+% ======================================================================
+\section{Marco teórico}
+% ======================================================================
+
+\subsection{Formulación del MDRP}
+
+El MDRP \citep{Reyes2018} se define sobre tres conjuntos: restaurantes
+$\mathcal{R}$ (con ubicación fija), órdenes $\mathcal{O}$ y repartidores
+(\textit{couriers}) $\mathcal{C}$. Cada orden $o$ se caracteriza por su
+restaurante de origen $r_o$, su instante de colocación $a_o$, su instante de
+disponibilidad o \textit{ready time} $e_o \ge a_o$ y su ubicación de entrega
+$\ell_o$; la información de la orden se revela al sistema únicamente en $a_o$
+(llegada dinámica). Toda la información de restaurantes y couriers se conoce a
+priori. El problema consiste en determinar rutas factibles que completen la
+recolección y entrega de las órdenes optimizando una o varias métricas de
+desempeño.
+
+Dos suposiciones estructurales son centrales. Primero, el \textbf{agrupamiento}
+(\textit{bundling}): órdenes de un mismo restaurante pueden combinarse en una ruta
+con múltiples entregas, cuyo \textit{ready time} es el máximo de sus órdenes
+constituyentes. Segundo, la \textbf{restricción de \textit{ready time}}: un
+courier no puede recoger una orden antes de que la comida esté lista. La
+remuneración sigue un esquema de compensación mínima garantizada:
+\begin{equation}
+	\text{Pago}(c) = \max\!\left(p_1\, n_c,\; p_2\,(l_c - e_c)\right),
+	\label{eq:comp}
+\end{equation}
+donde $n_c$ es el número de órdenes entregadas por el courier $c$, $l_c-e_c$ la
+duración de su turno, $p_1$ el pago por orden y $p_2$ el pago mínimo por hora.
+
+Las métricas primarias relevantes son el \textbf{\textit{Click-to-Door}} (CtD,
+tiempo entre colocación y entrega, $\text{CtD}_o = t_{delivery,o}-a_o$), el
+\textbf{\textit{Ready-to-Pickup}} (RtP, espera de la comida lista) y el
+\textbf{\textit{Ready-to-Door}} (RtD), además de la utilización del courier y el
+costo por orden. El MDRP pertenece a los problemas dinámicos de recolección y
+entrega \citep{Pillac2013} y se distingue por combinar múltiples puntos de
+recolección, alta urgencia ($\tau\approx 40$~min) y dinamismo total, lo que
+descarta los métodos exactos y favorece heurísticas basadas en horizontes
+rodantes.
+
+\subsection{Heurística de horizonte rodante}
+
+El algoritmo de \citet{Reyes2018} ejecuta, cada $f$~minutos, un ciclo de
+agrupamiento, asignación y compromiso sobre las órdenes cuyo \textit{ready time}
+cae dentro de un horizonte de asignación $\Delta_u$. Para equilibrar la
+utilización de la flota con la frescura de las entregas, el \textbf{tamaño
+objetivo de agrupamiento} al instante $t$ se define como la razón entre las
+órdenes próximas a estar listas y los couriers próximos a estar disponibles:
+\begin{equation}
+	Z_t = \frac{|\{o \in \mathcal{O}_t : e_o \le t + \Delta_1\}|}
+	           {|\{c \in \mathcal{D}_t : e^{avail}_c \le t + \Delta_2\}|},
+	\qquad \Delta_1,\Delta_2 > 0,
+	\label{eq:zt}
+\end{equation}
+donde $\mathcal{D}_t$ es el conjunto de couriers en turno. Cuando $Z_t<1$ hay más
+couriers que órdenes y el comportamiento converge a asignaciones individuales;
+cuando $Z_t\gg 1$ el sistema está saturado y se favorecen agrupamientos mayores.
+
+Determinado $Z_t$, se construyen agrupamientos por restaurante mediante inserción
+paralela con mejora local (\textit{remove-reinsert}), y se clasifican en tres
+grupos de prioridad según su urgencia respecto al objetivo CtD $\tau$. La
+asignación se resuelve secuencialmente por grupo como un \textbf{problema de
+asignación lineal}: para cada par agrupamiento-courier $(s,d)$ se define el peso
+\begin{equation}
+	w_{s,d} = \frac{N_s}{\max_{o \in s}\{\delta^s_{o,d}\} - e_d}
+	        - \theta\!\left(\pi_{s,d} - \max_{o \in s}\{e_o\}\right),
+	\label{eq:matching}
+\end{equation}
+donde $N_s$ es el número de órdenes del agrupamiento, $\delta^s_{o,d}$ el tiempo
+de entrega de la orden $o$, $e_d$ el momento en que el courier $d$ queda
+disponible, $\pi_{s,d}$ el tiempo de recolección y $\theta>0$ penaliza el retraso
+respecto al \textit{ready time}. El primer término premia la eficiencia (órdenes
+por unidad de tiempo) y el segundo la frescura. El problema se resuelve en
+$O(n^3)$ con el algoritmo húngaro \citep{Kuhn1955}.
+
+Finalmente, una estrategia de \textbf{compromiso aditivo en dos etapas}
+\citep{Reyes2018} distingue entre compromiso final (el courier recoge y entrega
+en la época actual) y compromiso parcial o \textit{inbound} (el courier se
+desplaza hacia el restaurante y su agrupamiento se confirma en la siguiente
+época). El compromiso parcial actúa como preposicionamiento y conserva
+flexibilidad ante nueva información.
+
+\subsection{Enrutamiento sobre grafos viales}
+
+Para eliminar el error de la aproximación euclidiana, este trabajo sustituye las
+distancias en línea recta por consultas sobre el grafo vial real mediante la
+cadena OpenStreetMap~$\rightarrow$~OSRM. OpenStreetMap (OSM) modela la
+infraestructura mediante nodos, vías y relaciones \citep{Haklay2010,Boeing2021},
+de las que se deriva un grafo $G=(V,E,c)$ con costos definidos por la distancia y
+la velocidad permitida de cada segmento.
+
+El cálculo de caminos mínimos se acelera con \textit{Contraction Hierarchies} (CH)
+\citep{Geisberger2008}, técnica de preprocesamiento que contrae los nodos por
+orden de importancia e inserta aristas de atajo, permitiendo resolver consultas
+mediante búsqueda bidireccional en milisegundos. \textbf{OSRM} (\textit{Open
+Source Routing Machine}) implementa CH sobre datos OSM en tres etapas
+(\texttt{osrm-extract}, \texttt{osrm-contract} y \texttt{osrm-routed}), con
+tiempos de respuesta típicos inferiores a 5~ms para grafos regionales. La
+sustitución de la distancia euclidiana por tiempos OSRM tiene tres consecuencias:
+los tiempos dejan de ser simétricos ($T(a,b)\neq T(b,a)$) por los sentidos de
+circulación, la desigualdad triangular se cumple de forma natural sobre la red y
+se elimina el factor de conversión euclidiano de \citet{Reyes2018}.
+
+\subsection{Generación estocástica de demanda}
+
+Las llegadas de pedidos se modelan mediante un \textbf{proceso de Poisson no
+homogéneo} \citep{Ross2014}, en el que el número de eventos en un intervalo sigue
+una distribución de Poisson cuyo parámetro es la integral de una función de
+intensidad $\lambda(t)$. Los servicios de comida exhiben dos picos diarios
+(almuerzo y cena) \citep{Wu2023LaDe}, por lo que la intensidad se representa como
+la superposición de una base constante y dos componentes gaussianas:
+\begin{equation}
+	\lambda(t) = \lambda_0
+	+ A_m \exp\!\left(-\frac{(t-\mu_m)^2}{2\sigma^2}\right)
+	+ A_e \exp\!\left(-\frac{(t-\mu_e)^2}{2\sigma^2}\right),
+	\label{eq:intensity}
+\end{equation}
+con base $\lambda_0$, centros $\mu_m,\mu_e$, amplitudes $A_m,A_e$ y dispersión
+$\sigma$. La propiedad de discretización de Poisson permite generar instancias
+mediante un simple muestreo minuto a minuto. Las métricas de desempeño se agregan
+con la media y los percentiles 50, 90 y 95; el percentil 90 es especialmente
+relevante porque captura la experiencia de los clientes en la cola de la
+distribución.
+
+% ======================================================================
+\section{Metodología}
+% ======================================================================
+
+\subsection{Arquitectura del sistema}
+
+El entorno de simulación se organiza en tres capas funcionales desacopladas:
+(1)~una capa de \textbf{enrutamiento} basada en OSRM~v5.27.1 desplegado en un
+contenedor Docker \citep{Merkel2014} que opera sobre \texttt{localhost} con el
+algoritmo CH sobre el extracto OSM de La Paz; (2)~una capa de \textbf{simulación}
+de eventos discretos implementada en Python, que consulta tiempos y rutas al
+servidor OSRM vía HTTP; y (3)~una capa de \textbf{análisis} que calcula los
+indicadores y genera las tablas y figuras. La contenerización garantiza que el
+entorno de cálculo sea idéntico en cualquier máquina anfitriona, y la operación
+\textit{offline} elimina el consumo de APIs comerciales y las barreras económicas
+para la replicación.
+
+\subsection{Generación de instancias sintéticas}
+
+Cada instancia contiene aproximadamente 1\,038 pedidos distribuidos en una ventana
+operativa diaria y asociados a 25 restaurantes. Los instantes de colocación se
+muestrean del proceso de Poisson no homogéneo bimodal de la
+Ecuación~\eqref{eq:intensity}, calibrado con los picos de demanda del conjunto de
+datos LaDe \citep{Wu2023LaDe}. Las ubicaciones de restaurantes y clientes se
+muestrean dentro del polígono urbano de La Paz, validando que cada punto obtenga
+respuesta del servicio de enrutamiento. Los tiempos de preparación se modelan como
+$T_{prep}\sim\max(5,\mathcal{N}(12,3^2))$~min. El tamaño de flota se dimensiona
+automáticamente según
+\begin{equation}
+	|\mathcal{C}| = \max\!\left(n_{\min},\; \lceil |\mathcal{O}|/r \rceil\right),
+	\label{eq:fleet}
+\end{equation}
+donde $r$ es el número objetivo de pedidos por repartidor y $n_{\min}=10$. El uso
+de semillas aleatorias garantiza la reproducibilidad exacta de las instancias.
+
+\subsection{Motor de simulación y políticas de despacho}
+
+La simulación avanza en \textbf{épocas de reoptimización} de $f=5$~min. En cada
+época, cada orden transita por una máquina de estados (colocada
+$\rightarrow$ lista $\rightarrow$ asignada $\rightarrow$ recogida
+$\rightarrow$ entregada) y los tiempos de viaje se obtienen de OSRM. Se comparan
+dos políticas:
+
+\begin{itemize}
+	\item \textbf{FCFS (línea base):} asignación reactiva e inmediata de cada
+	      pedido al courier disponible más cercano al restaurante, sin
+	      consolidación de órdenes.
+	\item \textbf{Rolling Horizon (RH):} implementación de la heurística de la
+	      Sección~2.2, con cálculo del tamaño objetivo de agrupamiento
+	      (Ecuación~\ref{eq:zt}), generación de agrupamientos por restaurante,
+	      clasificación por prioridad, asignación lineal
+	      (Ecuación~\ref{eq:matching}) resuelta con el algoritmo húngaro
+	      \citep{Kuhn1955} y compromiso en dos etapas.
+\end{itemize}
+
+Los parámetros del algoritmo se mantienen constantes: frecuencia de optimización
+$f=5$~min, horizonte $\Delta_u=20$~min, objetivo SLA $\tau=40$~min, tiempo de
+servicio $s=4$~min y tamaño máximo de agrupamiento $B_{max}=4$. La compensación
+usa $p_1=\$10$ por pedido y un piso de $p_2=\$15$ por hora.
+
+\subsection{Diseño experimental}
+
+La variable de tratamiento es la \textbf{razón de saturación} $r$ (pedidos por
+repartidor), que dimensiona la flota mediante la Ecuación~\eqref{eq:fleet}
+manteniendo fijo el volumen de pedidos. Se definen cuatro escenarios que cubren
+desde operación holgada hasta saturación alta (Tabla~\ref{tab:escenarios}).
+
+\begin{table}[htbp]
+\centering
+\caption{Escenarios experimentales de saturación de flota ($|\mathcal{O}|\approx
+1\,038$ pedidos). Fuente: elaboración propia.}
+\label{tab:escenarios}
+\begin{tabular}{@{}clccl@{}}
+\toprule
+Escenario & Nivel & $r$ & $|\mathcal{C}|$ & Descripción \\
+\midrule
+S1 & Baja     & 18 & 58 & Línea base; capacidad holgada \\
+S2 & Moderada & 26 & 40 & Reducción moderada de flota \\
+S3 & Media    & 35 & 30 & Punto medio de saturación \\
+S4 & Alta     & 52 & 20 & Carga elevada por repartidor \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Para cada combinación de escenario y semilla, ambas políticas se ejecutan sobre la
+\emph{misma} instancia de pedidos y flota (comparación \textbf{pareada}), lo que
+aísla el efecto de la política de asignación. Se emplearon diez semillas
+($s\in\{2025,\ldots,2034\}$), de las cuales siete produjeron resultados válidos;
+las tres restantes se descartaron porque la totalidad de sus órdenes permaneció en
+estado \emph{ready} sin asignación, atribuible a una interrupción del servicio
+OSRM. Los valores reportados corresponden al promedio de las siete réplicas
+válidas, generando $4\times 7\times 2 = 56$ corridas.
+
+El desempeño se cuantifica mediante 21 indicadores agrupados en cinco dimensiones:
+calidad de servicio (CtD, RtP, RtD, cumplimiento SLA y exceso sobre el objetivo o
+\textit{CTD Overage}), cobertura (\% de pedidos no entregados), eficiencia
+operativa (pedidos por repartidor por hora, utilización y distancia por pedido),
+eficiencia de agrupamiento (tamaño promedio de agrupamiento) y costo (costo por
+pedido, derivado de la Ecuación~\ref{eq:comp}). Para validar la significancia de
+las diferencias se aplica la prueba no paramétrica de Mann-Whitney~$U$
+\citep{MannWhitney1947} con corrección de Benjamini-Hochberg y correlación
+rank-biserial $r$ como tamaño del efecto \citep{Cohen1988}, complementada con la
+prueba ómnibus de Kruskal-Wallis. Se eligió Mann-Whitney~$U$ porque la prueba de
+Shapiro-Wilk rechazó la normalidad de los KPIs y por su robustez ante valores
+atípicos.
+
+% ======================================================================
+\section{Resultados y discusión}
+% ======================================================================
+
+\subsection{Calidad de servicio}
+
+La Tabla~\ref{tab:res_ctd} presenta los indicadores de calidad de servicio
+promediados sobre las siete réplicas válidas. El \textit{Click-to-Door} (CtD) es
+la métrica principal de calidad percibida por el cliente.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Indicadores de calidad de servicio: promedio de 7 réplicas. Fuente:
+elaboración propia.}
+\label{tab:res_ctd}
+\begin{tabular}{@{}l rr r rr r rr r@{}}
+\toprule
+& \multicolumn{3}{c}{Avg CtD (min)} & \multicolumn{3}{c}{P90 CtD (min)} & \multicolumn{3}{c}{SLA (\%)} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10}
+Esc. & FCFS & RH & $\Delta$\% & FCFS & RH & $\Delta$\% & FCFS & RH & $\Delta$\% \\
+\midrule
+S1 & 10.10 & 20.38 & $+101.8$ & 13.10  & 31.51 & $+140.5$ & 100.0 & 99.2 & $-0.8$  \\
+S2 & 16.68 & 22.74 & $+36.3$  & 32.73  & 35.46 & $+8.3$   & 91.7  & 97.0 & $+5.8$  \\
+S3 & 35.79 & 25.52 & $-28.7$  & 117.19 & 39.94 & $-65.9$  & 76.3  & 90.2 & $+18.2$ \\
+S4 & 75.41 & 32.26 & $-57.2$  & 228.01 & 52.27 & $-77.1$  & 61.2  & 78.3 & $+27.9$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+En el escenario de baja saturación (S1), con oferta holgada de repartidores, FCFS
+logra tiempos menores que RH (10.10 vs 20.38~min), porque despacha cada pedido de
+inmediato al courier más cercano mientras que RH introduce la latencia del ciclo
+de optimización y la espera para formar agrupamientos. No obstante, ambas
+políticas se mantienen muy por debajo del objetivo SLA de 40~min. En S2 la brecha
+se reduce ($+36.3\,\%$) y, notablemente, el cumplimiento SLA se invierte a favor de
+RH (97.0\,\% vs 91.7\,\%): antes incluso de superar a FCFS en promedio, la
+coordinación de agrupamientos ya reduce los pedidos que exceden el umbral.
+
+A partir de S3, RH supera decisivamente a FCFS: el CtD promedio baja un 28.7\,\%
+y el percentil~90 cae de 117.19 a 39.94~min ($-65.9\,\%$), comprimiendo la cola
+derecha de la distribución. En S4 la ventaja es máxima: el CtD promedio se reduce
+un 57.2\,\% y el P90 un 77.1\,\%; además, bajo FCFS un 11.5\,\% de los pedidos
+queda sin entregar al cierre, mientras que bajo RH se entrega la totalidad
+(0\,\%). La Figura~\ref{fig:ctd_boxplot} ilustra el colapso progresivo de FCFS en
+S3--S4 (cajas con alta dispersión y valores atípicos por encima de 300~min) frente
+a la distribución compacta de RH.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{img/fig_ctd_boxplot.png}
+\caption{Distribución del \textit{Click-to-Door} por escenario y política. La
+línea punteada indica el objetivo SLA de $\tau=40$~min. Fuente: elaboración
+propia.}
+\label{fig:ctd_boxplot}
+\end{figure}
+
+\FloatBarrier
+
+\subsection{Eficiencia operativa y agrupamiento}
+
+La Tabla~\ref{tab:res_eficiencia} resume la eficiencia operativa. El
+\textit{throughput} (pedidos por repartidor por hora) bajo RH es ligeramente
+superior en S1--S3 y se amplía a $+17.7\,\%$ en S4, gracias al agrupamiento: al
+asignar varios pedidos por viaje, cada turno produce más entregas. La utilización
+del courier, en cambio, es \emph{menor} bajo RH en S2--S4; esto no indica
+ociosidad sino mayor eficiencia kilométrica, pues los agrupamientos reducen la
+distancia por pedido hasta un 39.9\,\% en S4 (de 5.41 a 3.25~km), con el
+consiguiente ahorro de combustible y tiempo de conducción.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Indicadores de eficiencia operativa: promedio de 7 réplicas. Fuente:
+elaboración propia.}
+\label{tab:res_eficiencia}
+\begin{tabular}{@{}l rr r rr r rr r@{}}
+\toprule
+& \multicolumn{3}{c}{Ped./Rep./Hr} & \multicolumn{3}{c}{Utilización (\%)} & \multicolumn{3}{c}{Dist./Pedido (km)} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10}
+Esc. & FCFS & RH & $\Delta$\% & FCFS & RH & $\Delta$\% & FCFS & RH & $\Delta$\% \\
+\midrule
+S1 & 1.43 & 1.50 & $+4.9$  & 18.0 & 20.9 & $+16.1$ & 4.49 & 4.73 & $+5.3$  \\
+S2 & 2.07 & 2.14 & $+3.4$  & 27.3 & 26.9 & $-1.5$  & 4.77 & 4.23 & $-11.3$ \\
+S3 & 2.77 & 2.90 & $+4.7$  & 38.4 & 32.7 & $-14.8$ & 5.04 & 3.82 & $-24.2$ \\
+S4 & 3.62 & 4.26 & $+17.7$ & 53.0 & 40.7 & $-23.2$ & 5.41 & 3.25 & $-39.9$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Bajo FCFS cada courier recibe órdenes individuales (tamaño de agrupamiento igual a
+1.0). Bajo RH, el tamaño promedio de agrupamiento crece monotónicamente con la
+saturación, de 1.77 en S1 a 3.07 en S4 (Tabla~\ref{tab:res_bundles}), reflejando
+la adaptación dinámica del algoritmo. La Figura~\ref{fig:bundle_dist} muestra que
+en S1 más de la mitad de los pedidos se despachan individualmente, mientras que en
+S4 la mayoría se agrupa en \textit{bundles} de 3--4. El costo por pedido converge
+a $p_1=\$10$ a medida que aumenta la saturación, pues el pago variable domina
+sobre el mínimo garantizado.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Indicadores de agrupamiento y costo: promedio de 7 réplicas. Fuente:
+elaboración propia.}
+\label{tab:res_bundles}
+\begin{tabular}{@{}l rr r rr r@{}}
+\toprule
+& \multicolumn{3}{c}{Tamaño de agrup.} & \multicolumn{3}{c}{Costo/Pedido (\$)} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7}
+Esc. & FCFS & RH & $\Delta$\% & FCFS & RH & $\Delta$\% \\
+\midrule
+S1 & 1.00 & 1.77 & $+77.0$  & 11.40 & 11.06 & $-3.0$ \\
+S2 & 1.00 & 2.28 & $+128.0$ & 10.01 & 10.07 & $+0.6$ \\
+S3 & 1.00 & 2.67 & $+167.0$ & 10.00 & 10.00 & $+0.0$ \\
+S4 & 1.00 & 3.07 & $+207.0$ & 10.00 & 10.00 & $+0.0$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\textwidth]{img/fig_bundle_distribution.png}
+\caption{Distribución del tamaño de agrupamiento bajo RH por escenario. Fuente:
+elaboración propia.}
+\label{fig:bundle_dist}
+\end{figure}
+
+\FloatBarrier
+
+\subsection{Análisis estadístico}
+
+La Tabla~\ref{tab:mann_whitney} presenta la prueba de Mann-Whitney~$U$ para el CtD.
+Las 28 pruebas individuales (4~escenarios $\times$ 7~semillas) resultaron
+significativas tras la corrección de Benjamini-Hochberg. El tamaño del efecto
+disminuye de S1 a S4, lo que requiere interpretación cuidadosa: en S1--S2 el
+efecto grande favorece a FCFS en la comparación ordinal; en S4, el efecto pequeño
+($\bar{r}=0.144$) no refleja ausencia de diferencia, sino la alta variabilidad de
+FCFS (distribución bimodal con cola de horas), pese a que RH reduce el CtD
+promedio un 57.2\,\%. La prueba de Kruskal-Wallis confirma que el efecto de la
+política varía significativamente entre escenarios ($H=782.78$, $p<0.001$),
+justificando el análisis por regímenes de saturación.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Prueba de Mann-Whitney~$U$ para el \textit{Click-to-Door}: 7 semillas
+($\bar{r}\pm\sigma_r$). Fuente: elaboración propia.}
+\label{tab:mann_whitney}
+\begin{tabular}{@{}l rr c c l@{}}
+\toprule
+Esc. & $\bar{x}_{\text{FCFS}}$ & $\bar{x}_{\text{RH}}$ & $p$ & $\bar{r}\pm\sigma_r$ & Efecto \\
+\midrule
+S1 & 10.10 & 20.38 & $<0.001$ & $0.911 \pm 0.018$ & Grande  \\
+S2 & 16.68 & 22.74 & $<0.001$ & $0.687 \pm 0.045$ & Grande  \\
+S3 & 35.79 & 25.52 & $<0.001$ & $0.406 \pm 0.046$ & Mediano \\
+S4 & 75.41 & 32.26 & $<0.001$ & $0.144 \pm 0.030$ & Pequeño \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\FloatBarrier
+
+\subsection{Discusión}
+
+Los resultados revelan dos regímenes con una zona de transición identificable
+(Figura~\ref{fig:kpi_vs_ratio}). En el \textbf{régimen de baja saturación
+(S1--S2)}, la política reactiva FCFS logra menores tiempos promedio porque
+despacha cada pedido sin latencia de agrupamiento; sin embargo, ya en S2 aparece
+una señal temprana de la ventaja de RH (mayor cumplimiento SLA y reducción del
+\textit{CTD Overage} superior al 96\,\%). En el \textbf{régimen de saturación
+media--alta (S3--S4)}, RH supera a FCFS en todas las métricas de calidad, con
+reducciones del CtD del 28.7\,\% al 57.2\,\% y la eliminación total de pedidos no
+entregados en S4. Las curvas de CtD se cruzan entre $r=26$ y $r=35$, marcando el
+punto donde la anticipación comienza a dominar.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{img/fig_kpi_vs_ratio.png}
+\caption{Evolución de los KPIs principales en función de la saturación. El cruce
+de las curvas de CtD entre los ratios 26 y 35 marca la transición de régimen.
+Fuente: elaboración propia.}
+\label{fig:kpi_vs_ratio}
+\end{figure}
+
+La Figura~\ref{fig:util_cost} muestra el compromiso entre utilización y costo por
+pedido: RH logra menor utilización con \textit{throughput} equivalente o superior,
+lo que confirma su mayor eficiencia kilométrica. En conjunto, estos hallazgos
+superan el rango de mejora de 10--25\,\% que \citet{Reyes2018} reportan al pasar de
+asignación reactiva a horizonte rodante en ciudades estadounidenses, lo que
+sugiere que la topología vial de La Paz ---de menor conectividad y mayor
+variabilidad de distancias--- amplifica la ventaja del agrupamiento. Este
+resultado es coherente con la advertencia de \citet{Boyaci2021} y
+\citet{Figliozzi2007} sobre la distorsión de las aproximaciones lineales en redes
+reales.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{img/fig_utilization_cost.png}
+\caption{Compromiso entre utilización del repartidor y costo por pedido. Fuente:
+elaboración propia.}
+\label{fig:util_cost}
+\end{figure}
+
+Los resultados deben interpretarse considerando las limitaciones del modelo: la
+demanda es sintética (Poisson) y puede no capturar la variabilidad de una
+operación comercial; los tiempos de preparación y de servicio son homogéneos; la
+red vial se asume estática (sin congestión dinámica); y tres de las diez semillas
+no generaron resultados válidos por una interrupción del servicio OSRM.
+
+% ======================================================================
+\section{Conclusiones}
+% ======================================================================
+
+Se desarrolló y evaluó un entorno de simulación reproducible para el MDRP que
+integra tiempos de viaje reales sobre la red vial de La Paz, B.C.S., utilizando
+exclusivamente software de código abierto (OSRM, OpenStreetMap, Python y Docker).
+El objetivo general se cumplió: se ejecutaron 56 corridas válidas sobre la red
+real y se cuantificaron las diferencias entre las políticas FCFS y \textit{Rolling
+Horizon} con pruebas estadísticas formales.
+
+La hipótesis se verifica de forma \textbf{condicional al régimen de saturación}.
+Con flota holgada (S1--S2), la política reactiva es más rápida en promedio, aunque
+la anticipatoria ya mejora el cumplimiento SLA. A partir de la saturación media
+(S3), RH supera a FCFS en todas las métricas de calidad de servicio, y en alta
+saturación (S4) reduce el CtD promedio un 57.2\,\%, su percentil~90 un 77.1\,\% y
+elimina los pedidos no entregados. El \textit{throughput} bajo RH es
+consistentemente superior y la distancia por pedido se reduce hasta un 39.9\,\%.
+
+Las contribuciones principales son: (1)~un entorno de simulación reproducible y
+abierto aplicado por primera vez a una ciudad latinoamericana de escala media;
+(2)~la evidencia empírica de un punto de cruce ($r\approx 26$--$35$) a partir del
+cual la anticipación supera a la asignación reactiva, útil como guía práctica para
+operadores; y (3)~la constatación de que los beneficios del horizonte rodante no
+solo se mantienen sino que se amplifican sobre una topología vial real y hostil,
+superando las mejoras reportadas en la literatura para redes de cuadrícula. Al
+prescindir de APIs comerciales, el enfoque ofrece una alternativa de soberanía
+tecnológica que reduce las barreras de entrada para las PyMES locales
+\citep{MunozVillamizar2021}.
+
+Como líneas de trabajo futuro se plantea: diagnosticar la condición de borde que
+invalidó tres semillas; sustituir la demanda sintética por datos operacionales
+reales; incorporar perfiles de congestión dinámica en OSRM; y localizar con mayor
+precisión el punto de cruce explorando valores intermedios de $r$.
+
+% ======================================================================
+\bibliographystyle{apacite}
+\bibliography{ref/biblio}
+
+\end{document}
