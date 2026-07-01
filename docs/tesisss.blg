@@ -1,48 +1,46 @@
-This is BibTeX, Version 0.99e
+This is BibTeX, Version 0.99d (TeX Live 2023)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: tesisss.aux
-Reallocating 'name_of_file' (item size: 1) to 9 items.
 The style file: unsrtnat.bst
-Reallocating 'name_of_file' (item size: 1) to 11 items.
 Database file #1: ref/biblio.bib
-You've used 23 entries,
+You've used 34 entries,
             2481 wiz_defined-function locations,
-            751 strings with 9356 characters,
-and the built_in function-call counts, 9304 in all, are:
-= -- 842
-> -- 417
-< -- 17
-+ -- 168
-- -- 122
-* -- 737
-:= -- 1477
-add.period$ -- 92
-call.type$ -- 23
-change.case$ -- 46
-chr.to.int$ -- 23
-cite$ -- 23
-duplicate$ -- 473
-empty$ -- 841
-format.name$ -- 155
-if$ -- 1983
+            835 strings with 11680 characters,
+and the built_in function-call counts, 13836 in all, are:
+= -- 1277
+> -- 590
+< -- 25
++ -- 240
+- -- 172
+* -- 1077
+:= -- 2176
+add.period$ -- 139
+call.type$ -- 34
+change.case$ -- 68
+chr.to.int$ -- 34
+cite$ -- 34
+duplicate$ -- 701
+empty$ -- 1264
+format.name$ -- 218
+if$ -- 2966
 int.to.chr$ -- 1
-int.to.str$ -- 24
-missing$ -- 25
-newline$ -- 145
-num.names$ -- 69
-pop$ -- 159
+int.to.str$ -- 35
+missing$ -- 34
+newline$ -- 213
+num.names$ -- 102
+pop$ -- 234
 preamble$ -- 1
-purify$ -- 23
+purify$ -- 34
 quote$ -- 0
-skip$ -- 291
+skip$ -- 437
 stack$ -- 0
-substring$ -- 455
-swap$ -- 83
-text.length$ -- 3
+substring$ -- 721
+swap$ -- 126
+text.length$ -- 5
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 155
+type$ -- 235
 warning$ -- 0
-while$ -- 79
+while$ -- 121
 width$ -- 0
-write$ -- 352
+write$ -- 522

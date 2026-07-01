@@ -1,4 +1,4 @@
-\begin{thebibliography}{23}
+\begin{thebibliography}{34}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -118,6 +118,14 @@ Dirk Merkel.
 \newblock URL
   \url{http://www.linuxjournal.com/content/docker-lightweight-linux-containers-consistent-development-and-deployment}.
 
+\bibitem[Lin et~al.(2018)Lin, Zhao, Xu, and Zhou]{Lin2018GreedRL}
+Kaixiang Lin, Renyu Zhao, Zhaodong Xu, and Jiayu Zhou.
+\newblock Efficient large-scale fleet management via multi-agent deep
+  reinforcement learning.
+\newblock In \emph{Proceedings of the 24th ACM SIGKDD International Conference
+  on Knowledge Discovery \& Data Mining (KDD '18)}, pages 1774--1783, 2018.
+\newblock \doi{10.1145/3219819.3220003}.
+
 \bibitem[Wu et~al.(2023)Wu, Wen, Hu, Wang, Li, Wang, Ye, Zhang, and
   Xu]{Wu2023LaDe}
 Lin Wu, Haotian Wen, Hai Hu, Yong Wang, Yiran Li, Jian Wang, Jieping Ye, Haoyu
@@ -127,6 +135,45 @@ Lin Wu, Haotian Wen, Hai Hu, Yong Wang, Yiran Li, Jian Wang, Jieping Ye, Haoyu
 \newblock In \emph{Proceedings of the 32nd ACM International Conference on
   Information and Knowledge Management (CIKM '23)}, page 2619–2628, 2023.
 \newblock \doi{10.1145/3583780.3614820}.
+
+\bibitem[Muñoz-Villamizar et~al.(2021)Muñoz-Villamizar, Solano-Charris,
+  Reyes-Rubiano, and Faulin]{MunozVillamizar2021}
+Andrés Muñoz-Villamizar, Elyn~L. Solano-Charris, Lorena Reyes-Rubiano, and
+  Javier Faulin.
+\newblock Measuring disruptions in last-mile delivery operations.
+\newblock \emph{Logistics}, 5\penalty0 (1), 2021.
+\newblock \doi{10.3390/logistics5010017}.
+
+\bibitem[Y{\i}ld{\i}z and Savelsbergh(2019)]{Yildiz2019MealDelivery}
+Bar{\i}\c{s} Y{\i}ld{\i}z and Martin Savelsbergh.
+\newblock Provably high-quality solutions for the meal delivery routing
+  problem.
+\newblock \emph{Transportation Science}, 53\penalty0 (5):\penalty0 1372--1388,
+  2019.
+\newblock \doi{10.1287/trsc.2018.0887}.
+
+\bibitem[Ulmer et~al.(2021)Ulmer, Thomas, Campbell, and Woyak]{Ulmer2021RMDP}
+Marlin~W. Ulmer, Barrett~W. Thomas, Ann~M. Campbell, and Nicholas Woyak.
+\newblock The restaurant meal delivery problem: Dynamic pickup and delivery
+  with deadlines and random ready times.
+\newblock \emph{Transportation Science}, 55\penalty0 (1):\penalty0 75--100,
+  2021.
+\newblock \doi{10.1287/trsc.2020.1000}.
+
+\bibitem[Steever et~al.(2019)Steever, Karwan, and Murray]{Steever2019}
+Zachary Steever, Mark Karwan, and Chase Murray.
+\newblock Dynamic courier routing for a food delivery service.
+\newblock \emph{Computers \& Operations Research}, 107:\penalty0 173--188,
+  2019.
+\newblock \doi{10.1016/j.cor.2019.03.008}.
+
+\bibitem[Ulmer et~al.(2018)Ulmer, Soeffker, and Mattfeld]{Ulmer2018VFA}
+Marlin~W. Ulmer, Ninja Soeffker, and Dirk~C. Mattfeld.
+\newblock Value function approximation for dynamic multi-period vehicle
+  routing.
+\newblock \emph{European Journal of Operational Research}, 269\penalty0
+  (3):\penalty0 883--899, 2018.
+\newblock \doi{10.1016/j.ejor.2018.02.038}.
 
 \bibitem[Kuhn(1955)]{Kuhn1955}
 Harold~W. Kuhn.
@@ -143,6 +190,21 @@ Mordechai Haklay.
   (4):\penalty0 682--703, 2010.
 \newblock \doi{10.1068/b35097}.
 
+\bibitem[Boeing(2021)]{Boeing2021}
+Geoff Boeing.
+\newblock Street network models and indicators for every urban area in the
+  world.
+\newblock \emph{Geographical Analysis}, 53\penalty0 (3):\penalty0 482--508,
+  2021.
+\newblock \doi{10.1111/gean.12281}.
+\newblock Ver también su trabajo en OSMnx para validación topológica.
+
+\bibitem[Dijkstra(1959)]{Dijkstra1959}
+E.~W. Dijkstra.
+\newblock A note on two problems in connexion with graphs.
+\newblock \emph{Numerische Mathematik}, 1:\penalty0 269--271, 1959.
+\newblock \doi{10.1007/BF01386390}.
+
 \bibitem[Geisberger et~al.(2008)Geisberger, Sanders, Schultes, and
   Delling]{Geisberger2008}
 Robert Geisberger, Peter Sanders, Dominik Schultes, and Daniel Delling.
@@ -153,32 +215,53 @@ Robert Geisberger, Peter Sanders, Dominik Schultes, and Daniel Delling.
   Computer Science}, pages 319--333, Berlin, Heidelberg, 2008. Springer.
 \newblock \doi{10.1007/978-3-540-68552-4_24}.
 
+\bibitem[Luxen and Vetter(2011)]{LuxenVetter2011}
+Dennis Luxen and Christian Vetter.
+\newblock Real-time routing with {OpenStreetMap} data.
+\newblock In \emph{Proceedings of the 19th ACM SIGSPATIAL International
+  Conference on Advances in Geographic Information Systems}, GIS '11, pages
+  513--516, Chicago, IL, USA, 2011. ACM.
+\newblock \doi{10.1145/2093973.2094062}.
+
 \bibitem[Ross(2014)]{Ross2014}
 Sheldon~M. Ross.
 \newblock \emph{Introduction to Probability Models}.
 \newblock Academic Press, Amsterdam, 11th edition, 2014.
 \newblock ISBN 978-0-12-407948-9.
 
-\bibitem[Y{\i}ld{\i}z and Savelsbergh(2019)]{Yildiz2019MealDelivery}
-Bar{\i}\c{s} Y{\i}ld{\i}z and Martin Savelsbergh.
-\newblock Provably high-quality solutions for the meal delivery routing
-  problem.
-\newblock \emph{Transportation Science}, 53\penalty0 (5):\penalty0 1372--1388,
-  2019.
-\newblock \doi{10.1287/trsc.2018.0887}.
+\bibitem[Hildebrandt and Ulmer(2021)]{Hildebrandt2021}
+Florentin~D. Hildebrandt and Marlin~W. Ulmer.
+\newblock Supervised learning for arrival time estimations in restaurant meal
+  delivery.
+\newblock \emph{Transportation Science}, 2021.
+\newblock \doi{10.1287/trsc.2021.1095}.
+\newblock Versión working paper disponible desde agosto 2020.
 
-\bibitem[Mann and Whitney(1947)]{MannWhitney1947}
-Henry~B. Mann and Donald~R. Whitney.
-\newblock On a test of whether one of two random variables is stochastically
-  larger than the other.
-\newblock \emph{The Annals of Mathematical Statistics}, 18\penalty0
-  (1):\penalty0 50--60, 1947.
-\newblock \doi{10.1214/aoms/1177730491}.
+\bibitem[{Open Source Routing Machine}(2025)]{OSRMWiki2025}
+{Open Source Routing Machine}.
+\newblock {Open Source Routing Machine} -- documentación y manual de usuario.
+\newblock \url{https://github.com/Project-OSRM/osrm-backend/wiki}, 2025.
+\newblock Consultado en mayo de 2025.
 
-\bibitem[Cohen(1988)]{Cohen1988}
-Jacob Cohen.
-\newblock \emph{Statistical Power Analysis for the Behavioral Sciences}.
-\newblock Lawrence Erlbaum Associates, 2 edition, 1988.
-\newblock ISBN 978-0-8058-0283-2.
+\bibitem[Hurlbert(1984)]{Hurlbert1984}
+Stuart~H. Hurlbert.
+\newblock Pseudoreplication and the design of ecological field experiments.
+\newblock \emph{Ecological Monographs}, 54\penalty0 (2):\penalty0 187--211,
+  1984.
+\newblock \doi{10.2307/1942661}.
+
+\bibitem[Wilcoxon(1945)]{Wilcoxon1945}
+Frank Wilcoxon.
+\newblock Individual comparisons by ranking methods.
+\newblock \emph{Biometrics Bulletin}, 1\penalty0 (6):\penalty0 80--83, 1945.
+\newblock \doi{10.2307/3001968}.
+
+\bibitem[Friedman(1937)]{Friedman1937}
+Milton Friedman.
+\newblock The use of ranks to avoid the assumption of normality implicit in the
+  analysis of variance.
+\newblock \emph{Journal of the American Statistical Association}, 32\penalty0
+  (200):\penalty0 675--701, 1937.
+\newblock \doi{10.1080/01621459.1937.10503522}.
 
 \end{thebibliography}

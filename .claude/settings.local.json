@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\GpoFi\\\\OneDrive\\\\Documentos\\\\GitHub\\\\MDRP-BCS-code\" -Directory)",
-      "Bash(Select-Object Name)"
+      "Bash(Select-Object Name)",
+      "Bash(pdflatex -interaction=nonstopmode tesisss.tex)"
     ]
   }
 }

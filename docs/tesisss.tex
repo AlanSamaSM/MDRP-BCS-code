@@ -1,4 +1,4 @@
-% !TeX encoding = UTF-8
+﻿% !TeX encoding = UTF-8
 \documentclass[12pt,letterpaper,oneside]{book}
 \usepackage[utf8]{inputenc}
 \usepackage[spanish, mexico]{babel} %Para poner el texto generado por LaTeX en español
@@ -20,6 +20,7 @@
 \usepackage{tikz}
 \usetikzlibrary{positioning, arrows.meta, fit, backgrounds, calc}
 \usepackage{placeins} %Para \FloatBarrier: evita que tablas/figuras crucen límites de sección
+\usepackage{float} %Para fijar tablas que deben aparecer junto a su introducción
 % \usepackage{natbib} 
 
 
@@ -46,19 +47,19 @@
 		\sffamily
 		%\AddToShipoutPicture*{\BackgroundPic} esta versión no tiene fondo de agua
 		\noindent
-		\begin{minipage}{0.30\textwidth}
+		\begin{minipage}{0.40\textwidth}
 			\begin{flushleft}
-				\noindent\includegraphics[width=1.3\linewidth]{img/sep2021.png}
+				\noindent\includegraphics[width=\linewidth]{img/sep2026.jpeg}
 			\end{flushleft}
-		\end{minipage}
-		\begin{minipage}{.45\textwidth}
+		\end{minipage}%
+		\begin{minipage}{.35\textwidth}
 			\begin{center}
-				\noindent\includegraphics[width=.5\linewidth]{img/TecNM.png}
+				\noindent\includegraphics[width=.65\linewidth]{img/TecNM.png}
 			\end{center}
-		\end{minipage}
+		\end{minipage}%
 		\begin{minipage}{.25\textwidth}
 			\begin{flushright}
-				\noindent\includegraphics[width=.5\linewidth]{img/logotec.png}
+				\noindent\includegraphics[width=.5\linewidth]{img/logotec.jpeg}
 			\end{flushright}
 		\end{minipage}
 		
@@ -71,7 +72,7 @@
 			
 			\Large
 			\textbf{LOGÍSTICA DE ÚLTIMA MILLA EN REDES VIALES REALES: UN ENFOQUE REPRODUCIBLE PARA EL MDRP EN LA PAZ, B.C.S.}\\[1cm]	
-			\textbf{ANTEPROYECTO DE TESIS}\\[1cm]
+			\textbf{TESIS}\\[1cm]
 			\large
 			QUE PARA OBTENER EL GRADO DE\\[-0.3cm]
 			MAESTRO EN SISTEMAS COMPUTACIONALES\\[1cm]
@@ -81,12 +82,12 @@
 			\large ALAN JOSÉ MARCOS SÁNCHEZ MARTÍNEZ\\[1cm]
 			
 			\normalsize
-			DIRECTORES DE TESIS:\\[-0.3cm]
+			DIRECTOR DE TESIS:\\[-0.3cm]
 			\large DR. MARCO ANTONIO CASTRO LIERA\\[-0.3cm]
 		\end{center}
 		\begin{flushright}
 			\normalsize
-			LA PAZ, BAJA CALIFORNIA SUR, MÉXICO, DICIEMBRE 2023.
+			LA PAZ, BAJA CALIFORNIA SUR, MÉXICO, JUNIO 2026.
 		\end{flushright}
 	\end{titlepage}
 	\vspace*{\fill}
@@ -123,10 +124,9 @@ A pesar de su sencilla definición, el TSP es NP-duro, ya que el tiempo requerid
 para encontrar una solución óptima crece factorialmente con el número de ciudades, haciendo 
 que las instancias de gran tamaño sean computacionalmente intratables para métodos exactos \citep{Lenstra1981}.
 
-El TSP sirve como pilar para una clase más amplia y práctica de problemas de logística: 
-el Problema de Enrutamiento de Vehículos (VRP). La transición conceptual del TSP al VRP 
-ocurrió con el trabajo seminal de \citet{Dantzig1959}, quienes formularon "The Truck Dispatching 
-Problem". Este trabajo generalizó el TSP al considerar una flota de vehículos con capacidad 
+El TSP sirve como pilar para una clase más amplia y práctica de problemas de logística,
+que se conoce como el Problema de Enrutamiento de Vehículos (VRP). La transición conceptual del TSP al VRP
+ocurrió con el trabajo seminal de \citet{Dantzig1959}, quienes formularon \textit{The Truck Dispatching Problem}. Este trabajo generalizó el TSP al considerar una flota de vehículos con capacidad
 limitada, con el objetivo de servir a un conjunto de clientes desde un depósito central. 
 Esta generalización marcó el nacimiento del VRP, que busca minimizar el costo total de las 
 rutas (usualmente en términos de distancia o tiempo) para una flota de vehículos que atiende 
@@ -136,7 +136,7 @@ Al igual que el TSP, el VRP es NP-duro \citep{Lenstra1981}, pero su estructura e
 más rica y compleja. La complejidad no solo reside en encontrar las secuencias óptimas de visitas 
 (como en el TSP), sino también en asignar clientes a vehículos y rutas de manera eficiente \citep{Caceres-Cruz2014}. A lo 
 largo de cinco décadas, el VRP ha evolucionado para incorporar una gran variedad de restricciones 
-del mundo real, dando lugar a los llamados "Rich VRPs" \citep{Caceres-Cruz2014}. Estas extensiones 
+del mundo real, dando lugar a los llamados \textit{Rich VRPs} \citep{Caceres-Cruz2014}. Estas extensiones
 incluyen, entre otras:
 
 \subsection{VRP clásico y extensiones con restricciones } % Dantzig1959, Caceres-Cruz2014, Laporte2009VRPSurvey
@@ -179,10 +179,10 @@ reales, sitúa la motivación y relevancia del presente trabajo.
 
 La última milla de entrega---el segmento final desde un centro de distribución o 
 punto de recogida hasta el domicilio del cliente---representa el componente más 
-costoso, complejo y crítico en logística urbana. Jazemi \textit{et al}. (2023) documentan 
+costoso, complejo y crítico en logística urbana. \citet{Jazemi2023} documentan 
 que la última milla puede representar entre el 30\% y el 60\% del costo total de 
 una operación de envío, dependiendo de la densidad urbana, la dispersión geográfica 
-de clientes y la volatilidad de la demanda \cite{Jazemi2023}.
+de clientes y la volatilidad de la demanda.
 
 En el contexto de entrega de comida rápida, la última milla presenta desafíos 
 específicos adicionales: (1) alta urgencia---los clientes esperan entregas 
@@ -211,10 +211,10 @@ define una nueva clase de problemas de enrutamiento que requieren políticas de 
 
 \subsection{DVRP: Definición y características fundamentales}
 
-Larsen (2000) proporciona la taxonomía fundamental del Problema de Enrutamiento de Vehículos Dinámico (DVRP), 
+En~\cite{Larsen2000DVRP}, Larsen proporciona la taxonomía fundamental del Problema de Enrutamiento de Vehículos Dinámico (DVRP), 
 definiéndolo como una clase de problemas donde, en contraste con el VRP estático, ``nuevas solicitudes 
 de clientes arriban en tiempo real durante la operación, y el conjunto de clientes a atender no es conocido 
-completamente en el inicio'' \cite{Larsen2000DVRP}. Formalmente, el DVRP se caracteriza por:
+completamente en el inicio''. Formalmente, el DVRP se caracteriza por:
 
 \begin{itemize}
 	\item \textbf{Llegada estocástica de solicitudes}: Las órdenes no existe como conjunto fijo, sino que 
@@ -229,7 +229,7 @@ completamente en el inicio'' \cite{Larsen2000DVRP}. Formalmente, el DVRP se cara
 	
 	\item \textbf{Disyuntiva decisión-información}: Cada política de despacho enfrenta un dilema: decidir 
 	inmediatamente (riesgo de decisiones subóptimas) vs. esperar más información (riesgo de incumplir criterios de servicio). 
-	Pillac et al. (2013) profundizan en este aspecto, clasificando los problemas según su grado de dinamismo y la calidad de la información disponible \cite{Pillac2013}.
+	\citet{Pillac2013} profundizan en este aspecto, clasificando los problemas según su grado de dinamismo y la calidad de la información disponible.
 \end{itemize}
 
 Esta caracterización es central para entender la última milla de entrega: cada vez que un cliente 
@@ -240,15 +240,15 @@ completamente reactiva sin consideración del contexto futuro.
 
 \subsection{DARP: Del transporte de pasajeros a la entrega de bienes}
 
-Un problema históricamente relacionado pero conceptualmente distinto es el Dial-a-Ride Problem (DARP). 
-Las raíces del DARP se encuentran en Psaraftis (1980), quien formuló el primer modelo dinámico de 
-dial-a-ride: en sistemas de transporte compartido (típicamente para pasajeros), usuarios solicitan 
-recogida en una ubicación y entrega en otra ubicación diferente, y ambas solicitudes llegan en tiempo 
-real. Psaraftis (1980) abordó la pregunta central: ¿cómo asignar dinámicamente los pasajeros a vehículos 
-y secuenciar sus viajes de forma óptima bajo políticas de despacho inmediato? \cite{Psaraftis1980}
+Un problema históricamente relacionado pero conceptualmente distinto es el Dial-a-Ride Problem (DARP).
+En~\cite{Psaraftis1980}, Psaraftis formuló el primer modelo dinámico de
+\textit{dial-a-ride}: en sistemas de transporte compartido (típicamente para pasajeros), usuarios solicitan
+recogida en una ubicación y entrega en otra ubicación diferente, y ambas solicitudes llegan en tiempo
+real. El trabajo abordó la asignación dinámica de pasajeros a vehículos y la secuenciación óptima de sus
+viajes bajo políticas de despacho inmediato.
 
-Cordeau y Laporte (2007) extendieron significativamente este trabajo, formalizando matemáticamente el 
-Dial-a-Ride Problem y desarrollando heurísticas de solución prácticas \cite{Cordeau2007}. Su 
+Cordeau y Laporte~\cite{Cordeau2007} extendieron significativamente este trabajo, formalizando matemáticamente el
+\textit{Dial-a-Ride Problem} y desarrollando heurísticas de solución prácticas. Su
 contribución fue crítica para la investigación en enrutamiento dinámico. Definieron explícitamente las 
 restricciones estructurales del DARP:
 
@@ -285,26 +285,30 @@ orden en restaurante A y entregar en domicilio B''. Sin embargo, existen diferen
 
 \subsection{El valor de la información futura y el enfoque de Horizonte Rodante}
 
-A pesar de la diferencia entre DVRP y DARP, ambas clases de problemas comparten una pregunta fundamental: ¿Deben las decisiones ser reacitvas (FCFS) 
-o pueden ser anticipatorias?
+A pesar de sus diferencias, DVRP y DARP comparten la disyuntiva fundamental entre
+decisiones reactivas (FCFS) y decisiones anticipatorias.
 
-Ichoua et al. (2006) abordaron directamente esta pregunta en el contexto de \textit{dial-a-ride dinámico}. Compararon 
+\citet{Ichoua2006DDARP} abordaron directamente esta disyuntiva en el contexto de \textit{dial-a-ride} dinámico. Compararon
 políticas de despacho que desconocen solicitudes futuras (puramente reactivas) contra políticas que tienen 
 acceso a información sobre solicitudes que llegarán en los próximos 20-30 minutos. Su hallazgo fue 
 significativo: en escenarios críticos con elevada tasa de llegada de solicitudes, políticas anticipatorias 
 pueden lograr mejoras de hasta el 29\% en la reducción de clientes no servidos y entre 4-16\% en tiempo total 
 y retrasos, demostrando que la anticipación moderada proporciona ganancias sustanciales sin requerir 
-información perfecta sobre el futuro distante \cite{Ichoua2006DDARP}.
+información perfecta sobre el futuro distante.
 
 Esta idea fundamental conecta DVRP/DARP con el concepto de horizonte rodante (\textit{rolling horizon}): 
 en lugar de una asignación inmediata (FCFS), el sistema puede esperar un breve período (el horizonte $\Delta$, 
 típicamente 10-30 minutos), acumular un lote de solicitudes cuyo arribo es conocido con certeza relativa, 
-optimizar globalmente ese lote resolviendo un VRP estático (el ``matching'' óptimo), y luego ejecutar la 
+optimizar globalmente ese lote resolviendo un VRP estático (el \textit{matching} óptimo), y luego ejecutar la
 primera etapa de esa solución optimizada. En la siguiente época, repite el proceso.
 
 \subsection{MDRP y políticas de despacho} % Reyes2018
 
-El Problema de Enrutamiento de Entrega de Comida (MDRP) fue formalmente introducido por Reyes et al. (2018) 
+% Conserva la numeración bibliográfica de la versión revisada: Pereira [11],
+% Boyacı [12] y Reyes [13], aunque las primeras menciones de Reyes ahora sean citas.
+\nocite{Pereira2021,Boyaci2021}
+
+El Problema de Enrutamiento de Entrega de Comida (MDRP) fue formalmente introducido por \citet{Reyes2018}
 como una nueva clase de problema de enrutamiento dinámico que, aunque comparte características fundamentales con 
 DVRP y DARP, añade dimensiones específicas de la entrega de alimentos que lo distinguen conceptualmente y 
 requieren políticas de despacho especializadas.
@@ -318,14 +322,14 @@ restaurante (fuente) y entregada en un domicilio (destino), con restricciones de
 capacidad de vehículos. Estas características mencionadas crean el 
 contexto operacional básico.
 
-Sin embargo, Reyes \textit{et al}. (2018) evidenciaron que estas dos extensiones no capturan plenamente la realidad de 
+Sin embargo, \citet{Reyes2018} evidenciaron que estas dos extensiones no capturan plenamente la realidad de 
 la entrega de comida en ultima milla. El MDRP fue definido para llenar esta brecha, formulando un problema que 
 integra cinco características estructurales que no aparecen de forma acoplada en la literatura previa:
 
 \subsection{Definición y características del MDRP}
 
-Reyes \textit{et al}. (2018) definen el MDRP como una clase de problema de recolección y entrega dinámico (DPDP) caracterizado por una
-"urgencia extrema" y menores oportunidades de consolidación en comparación con la logística tradicional. Sus características
+\citet{Reyes2018} definen el MDRP como una clase de problema de recolección y entrega dinámico (DPDP) caracterizado por una
+\textit{urgencia extrema} y menores oportunidades de consolidación en comparación con la logística tradicional. Sus características
 distintivas son:
 
 \begin{enumerate}
@@ -334,15 +338,15 @@ distintivas son:
 	fija.
 	
 	\item \textbf{Tiempos de preparación:} Las órdenes no están listas inmediatamente al ser colocadas. 
-	Reyes et al. (2018) introducen el concepto de \textit{ready time} (tiempo de preparación) como una restricción dura: el courier no puede
+	\citet{Reyes2018} introducen el concepto de \textit{ready time} (tiempo de preparación) como una restricción dura: el courier no puede
 	recoger la orden antes de que la comida esté lista. Esto crea una holgura de tiempo natural pero reduce la flexibilidad del enrutamiento.
 	
 	\item \textbf{Alta urgencia y Dinamismo:} La mayoría de las solicitudes se revelan durante la operación (dinamismo)
-	y deben completarse en ventanas de tiempo muy cortas, típicamente menos de una hora (urgencia). Reyes \textit{et al}. (2018) 
+	y deben completarse en ventanas de tiempo muy cortas, típicamente menos de una hora (urgencia). \citet{Reyes2018}
 	señalan que esta combinación de dinamismo y urgencia es el desafío central del MDRP.
 	
 	\item \textbf{Agrupamiento dinámico (\textit{bundling}):} Para mejorar la eficiencia, el MDRP permite combinar múltiples órdenes de un 
-	mismo restaurante en una sola ruta, creando agrupamientos (referidos en la literatura inglesa como "\textit{bundles}"). Aunque el modelo teórico de Reyes \textit{et al}. (2018) asume capacidad 
+	mismo restaurante en una sola ruta, creando agrupamientos (referidos en la literatura inglesa como \textit{bundles}). Aunque el modelo teórico de \citet{Reyes2018} asume capacidad
 	ilimitada para estos agrupamientos, en la implementación práctica de esta tesis se considera la capacidad física limitada 
 	de los vehículos (motocicletas/bicicletas) como una restricción operativa real.
 \end{enumerate}
@@ -354,8 +358,8 @@ distintivas son:
 
 La validación efectiva de políticas de despacho dinámico depende críticamente de la calidad de los datos de 
 enrutamiento utilizados en la simulación. La literatura actual presenta una división instrumental: por un lado, las 
-plataformas comerciales (Google Maps, Mapbox) ofrecen máxima precisión en tiempos de viaje, pero su naturaleza 
-de "caja negra", sumada a estructuras de costos restrictivas, impide la auditoría de los algoritmos y 
+plataformas comerciales (Google Maps, Mapbox) ofrecen máxima precisión en tiempos de viaje, pero su naturaleza
+de \textit{caja negra}, sumada a estructuras de costos restrictivas, impide la auditoría de los algoritmos y
 compromete la reproducibilidad exacta de los experimentos científicos \citep{Pereira2021}. Por otro lado, 
 la investigación académica tradicional frecuentemente opta por simplificaciones euclidianas que, aunque 
 gratuitas y totalmente reproducibles, carecen de fidelidad operativa.
@@ -398,7 +402,7 @@ Un cálculo de ruta basado en distancia lineal en este entorno no solo es inexac
 en rutas infactibles, alterando drásticamente la viabilidad operativa en las entregas de comida de última milla.
 
 \subsection{La brecha en la eficiencia algorítmica}
-Si bien \citet{Reyes2018} demostraron que las políticas de despacho basadas en horizonte rodante (Rolling Horizon) 
+Si bien \citet{Reyes2018} demostraron que las políticas de despacho basadas en horizonte rodante (\textit{Rolling Horizon})
 pueden alcanzar eficiencias cercanas al 96\% respecto al óptimo teórico, su validación se restringió a instancias 
 sintéticas de grandes urbes con alta conectividad y, crucialmente, empleó distancias euclidianas.
 
@@ -461,12 +465,12 @@ horizonte rodante.
 
 \subsection{Aporte Tecnológico y Ciencia Abierta}
 Este proyecto contribuye con una arquitectura de software diseñada bajo principios de Ciencia Abierta. Se integra el 
-motor de enrutamiento OSRM desplegando su \textbf{imagen oficial en Docker}, lo que permite sustituir las distancias euclidianas por tiempos de viaje reales sobre la red vial, asegurando la consistencia del entorno de cálculo \citep{Merkel2014}. Esta integración desacopla la complejidad de la infraestructura de enrutamiento de la lógica de simulación, facilitando que la comunidad académica replique los experimentos sin enfrentar problemas de configuración.
+motor de enrutamiento OSRM desplegando su imagen oficial en Docker, lo que permite sustituir las distancias euclidianas por tiempos de viaje reales sobre la red vial, asegurando la consistencia del entorno de cálculo \citep{Merkel2014}. Esta integración desacopla la complejidad de la infraestructura de enrutamiento de la lógica de simulación, facilitando que la comunidad académica replique los experimentos sin enfrentar problemas de configuración.
 
 \subsection{Impacto Económico y Social}
 Para las PyMES y startups locales en Baja California Sur, la dependencia de APIs comerciales (como Google Maps) 
 representa una barrera de entrada económica. Al demostrar la viabilidad técnica de optimizar rutas utilizando
-exclusivamente herramientas \textit{Open Source} (OSRM), esta tesis ofrece una alternativa de "Soberanía Tecnológica"
+exclusivamente herramientas \textit{Open Source} (OSRM), esta tesis ofrece una alternativa de \textit{soberanía tecnológica}
 que reduce los costos operativos. Esto democratiza el acceso a logística de alto nivel, permitiendo que empresas
 locales compitan en eficiencia contra plataformas transnacionales, fomentando así la economía digital regional.
 
@@ -489,7 +493,7 @@ geográficas y técnicas del proyecto, así como las restricciones operativas as
 \subsection{Alcance Geográfico y de Datos}
 \subsubsection{Infraestructura Vial (La Paz, B.C.S.)}
 Geográficamente nos limitamos estrictamente a la zona urbana de La Paz, Baja California Sur. Se 
-implementa una instancia local del servidor de enrutamiento \textbf{OSRM v5.27.1} que opera sobre 
+implementa una instancia local del servidor de enrutamiento OSRM v5.27.1 que opera sobre
 \texttt{localhost}, eliminando la dependencia de conectividad externa a internet y garantizando 
 latencia mínima. Este servidor procesa el extracto en formato \texttt{.pbf} de 
 OpenStreetMap correspondiente a la ciudad de La Paz.
@@ -583,7 +587,7 @@ El modelo asume tiempos de servicio deterministas divididos en dos componentes:
 	\item \textbf{Heurística de Asignación Jerárquica:} Siguiendo la metodología de \citet{Reyes2018}, se adopta una estrategia 
 	secuencial que prioriza órdenes críticas (Grupos de prioridad).
 	
-	\item \textbf{Compromiso en Dos Etapas:} La lógica de ''Compromiso Parcial'' permite redirigir a un repartidor en ruta, lo cual es
+	\item \textbf{Compromiso en Dos Etapas:} La lógica de \textit{compromiso parcial} permite redirigir a un repartidor en ruta, lo cual es
 	una simplificación operativa que asume obediencia total y comunicación instantánea sin fricción.
 \end{itemize}
 
@@ -617,10 +621,17 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\section{Formulación matemática del MDRP}
 
 	El \textbf{Meal Delivery Routing Problem} (MDRP), introducido por
-	\citet{Reyes2018}, formaliza la clase de problemas de ruteo dinámico que
-	surgen en las operaciones de entrega de comida bajo demanda.  Esta sección
-	reproduce la notación y las suposiciones estructurales del modelo original,
-	que constituyen la base formal del simulador desarrollado en este trabajo.
+	\citet{Reyes2018} y formalizado de manera complementaria por
+	\citet{Yildiz2019MealDelivery} y \citet{Ulmer2021RMDP} bajo el rótulo
+	de \emph{Restaurant Meal Delivery Problem}, formaliza la clase de
+	problemas de enrutamiento dinámico que surgen en las operaciones de entrega
+	de comida bajo demanda.  Esta sección reproduce la notación y las
+	suposiciones estructurales del modelo de \citet{Reyes2018}, que
+	constituyen la base formal del simulador desarrollado en este trabajo,
+	e incorpora elementos de las formulaciones de
+	\citet{Yildiz2019MealDelivery} (cotas duales para evaluar la calidad
+	de soluciones) y \citet{Ulmer2021RMDP} (modelado explícito del
+	\textit{ready time} aleatorio).
 
 	\subsection{Conjuntos y entidades}
 
@@ -656,6 +667,35 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	completen la recolección y entrega de las órdenes, optimizando una o varias
 	métricas de desempeño.
 
+	\subsection{Función objetivo}
+
+	Sea $x$ una asignación factible de órdenes a couriers que cumple las
+	restricciones de capacidad, de secuenciamiento (recolección antes de
+	entrega) y de ventanas temporales del MDRP.  El problema minimiza una
+	combinación ponderada de tiempo total de servicio al cliente,
+	compensación de la flota y órdenes no atendidas:
+
+	\begin{equation}
+	    \min_{x} \;
+	    \alpha_1 \sum_{o \in \mathcal{O}} \text{CtD}_o(x)
+	    \;+\; \alpha_2 \sum_{c \in \mathcal{C}} \text{Pago}(c; x)
+	    \;+\; \alpha_3 \, |\mathcal{O}_{u}(x)|
+	    \label{eq:mdrp_obj}
+	\end{equation}
+
+	\noindent donde $\text{CtD}_o(x)$ es el tiempo \textit{Click-to-Door} inducido
+	por la asignación $x$, $\text{Pago}(c; x)$ es la compensación del
+	courier $c$ bajo el modelo dual descrito más adelante,
+	$\mathcal{O}_u(x)$ es el conjunto de órdenes no entregadas al cierre
+	del horizonte de simulación, y $\alpha_1, \alpha_2, \alpha_3 \geq 0$
+	son pesos que reflejan las prioridades de la plataforma
+	\citep{Reyes2018, Ulmer2021RMDP}.  En la heurística de horizonte
+	rodante (Sección~2.2) el objetivo~\eqref{eq:mdrp_obj} no se construye
+	explícitamente: se aproxima miópicamente en cada época mediante el peso
+	$w_{s,d}$ del modelo de asignación bipartita, y la evaluación
+	\emph{a posteriori} se realiza desagregando las tres componentes en los
+	indicadores descritos en la Sección~2.4 y el Capítulo~4.
+
 	\subsection{Suposiciones estructurales}
 
 	Las siguientes suposiciones, tomadas directamente de \citet{Reyes2018},
@@ -663,7 +703,7 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 
 	\begin{enumerate}
 		\item \textbf{Agrupamiento (\textit{bundling}):} Órdenes del mismo
-		      restaurante pueden combinarse en un \textit{agrupamiento} (bundle)
+		      restaurante pueden combinarse en un agrupamiento (\textit{bundle})
 		      con múltiples puntos de entrega.  El \textit{ready time} del
 		      agrupamiento es el máximo \textit{ready time} de sus órdenes
 		      constituyentes.
@@ -707,14 +747,14 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	plataforma).  Las más relevantes para este trabajo son:
 
 	\begin{enumerate}
-		\item \textbf{Click-to-Door} (CtD): tiempo entre la colocación y la
+		\item \textbf{\textit{Click-to-Door} (CtD):} tiempo entre la colocación y la
 		      entrega de la orden, $\text{CtD}_o = t_{delivery,o} - a_o$.  Se
 		      define un objetivo $\tau$ y un máximo absoluto $\tau_{max}$.
 
-		\item \textbf{Ready-to-Pickup} (RtP): tiempo de espera de la comida lista
+		\item \textbf{\textit{Ready-to-Pickup} (RtP):} tiempo de espera de la comida lista
 		      en el restaurante, $\text{RtP}_o = t_{pickup,o} - e_o$.
 
-		\item \textbf{Ready-to-Door} (RtD): tiempo desde la disponibilidad hasta
+		\item \textbf{\textit{Ready-to-Door} (RtD):} tiempo desde la disponibilidad hasta
 		      la entrega, $\text{RtD}_o = t_{delivery,o} - e_o$.
 
 		\item \textbf{Utilización del courier}: fracción del turno dedicada a
@@ -744,28 +784,47 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\end{itemize}
 
 	Ambas extensiones se implementan en el simulador mediante el mecanismo de
-	\textbf{compromiso en dos etapas} descrito en la Sección~3.5: el compromiso
-	parcial (inbound) funciona como preposicionamiento, y la reoptimización
+	compromiso en dos etapas descrito en la Sección~3.5: el compromiso
+	parcial (\textit{inbound}) funciona como preposicionamiento, y la reoptimización
 	entre épocas permite la actualización de agrupamientos.
 
 	\subsection{Clasificación del MDRP en la literatura}
 
-	El MDRP pertenece a la familia de los \textbf{problemas dinámicos de
-	recolección y entrega} (dPDP), una subclase de los problemas dinámicos de
-	ruteo de vehículos (dVRP) \citep{Pillac2013}.  Se distingue de otros dPDP
+	El MDRP pertenece a la familia de los problemas dinámicos de
+	recolección y entrega (dPDP), una subclase de los problemas dinámicos de
+	enrutamiento de vehículos (dVRP) \citep{Pillac2013}.  Se distingue de otros dPDP
 	por tres características simultáneas: (1)~múltiples puntos de recolección
 	(restaurantes), (2)~alta urgencia ($\tau \approx 40$~min) y
 	(3)~dinamismo total (todas las órdenes son dinámicas).  Estas propiedades
 	descartan los métodos exactos y favorecen heurísticas miopes basadas en
 	horizontes rodantes, como la desarrollada en la Sección~2.2.
+	Trabajos aplicados a operadores reales de entrega de comida, como el de
+	\citet{Steever2019} sobre la flexibilización de la asignación restaurante--courier
+	(\textit{virtual food court}), confirman empíricamente la relevancia de
+	estas tres propiedades para el diseño de políticas de despacho.
 
 	%% ================================================================
 	%% SECCIÓN 2.2: HEURÍSTICA DE HORIZONTE RODANTE
 	%% ================================================================
 	\section{Heurística de horizonte rodante}
 
+	La literatura identifica al menos tres familias de políticas
+	anticipatorias para problemas dinámicos de recolección y entrega: la
+	aproximación de la función de valor (\textit{value function
+	approximation}, VFA) mediante simulación offline
+	\citep{Ulmer2018VFA}, la asignación anticipatoria de clientes
+	(\textit{anticipatory customer assignment}, ACA) aplicada al RMDP
+	\citep{Ulmer2021RMDP}, y los esquemas de horizonte rodante
+	\citep{Reyes2018}.  Las dos primeras requieren entrenamiento offline
+	con datos históricos o simulaciones extensivas; la tercera opera con
+	únicamente la información disponible al instante de decisión.  Este
+	trabajo adopta el horizonte rodante por su tratabilidad computacional
+	y su independencia de datos históricos, condición necesaria en un
+	contexto de despliegue inicial (La~Paz, B.C.S.) sin trazas operativas
+	previas.
+
 	El algoritmo de \citet{Reyes2018} resuelve el MDRP mediante un esquema de
-	\textbf{horizonte rodante} (\textit{rolling horizon}) que, cada $f$~minutos,
+	horizonte rodante (\textit{rolling horizon}) que, cada $f$~minutos,
 	ejecuta un ciclo de agrupamiento, asignación y compromiso sobre el
 	subconjunto de órdenes cuyo \textit{ready time} cae dentro del horizonte de
 	asignación $\Delta_u$.  Formalmente, al instante de optimización $t$ el
@@ -783,7 +842,7 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 
 	Para equilibrar la utilización de los couriers con la frescura de las
 	entregas, el algoritmo ajusta dinámicamente el número de órdenes que se
-	agrupan en un mismo viaje.  El \textbf{tamaño objetivo de agrupamiento}
+	agrupan en un mismo viaje.  El tamaño objetivo de agrupamiento
 	(\textit{target bundle size}) al instante $t$ se define como la razón entre
 	las órdenes próximas a estar listas y los couriers disponibles:
 
@@ -797,21 +856,32 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\noindent donde $\mathcal{D}_t$ es el conjunto de couriers en turno al
 	instante $t$, $e^{avail}_c$ es el momento en que el courier $c$ queda
 	disponible para una nueva asignación, y $\Delta_1$, $\Delta_2$ son
-	horizontes de anticipación calibrados fuera de línea.  Para que el
+	horizontes de anticipación calibrados fuera de línea.  Conviene
+	distinguir explícitamente los tres horizontes empleados por el
+	algoritmo: $\Delta_u$ es el \emph{horizonte de asignación} que
+	delimita qué órdenes entran a la optimización en cada época;
+	$\Delta_1$ es el \emph{lookahead de demanda} usado en el numerador de
+	$Z_t$ para estimar cuántas órdenes estarán pronto listas; y $\Delta_2$
+	es el \emph{lookahead de oferta} usado en el denominador de $Z_t$ para
+	estimar cuántos couriers estarán pronto disponibles.  Para que el
 	algoritmo tenga carácter anticipatorio, \citet{Reyes2018} recomiendan
-	$f < \Delta_u \leq \Delta_1$ y $f < \Delta_u \leq \Delta_2$.  Cuando
-	$Z_t < 1$, hay más couriers que órdenes y el comportamiento converge
-	hacia asignaciones individuales; cuando $Z_t \gg 1$, el sistema está
-	saturado y se favorecen agrupamientos más grandes para maximizar la
-	capacidad de entrega.  Si no hay couriers disponibles antes de
-	$t + \Delta_2$, se asigna un valor por defecto.
+	$f < \Delta_u \leq \Delta_1$ y $f < \Delta_u \leq \Delta_2$.  En la
+	implementación de este trabajo (Sección~3.1,
+	Tabla~\ref{tab:config_params}) los tres horizontes se fijan en
+	20~minutos por calibración empírica, lo cual no implica equivalencia
+	conceptual entre ellos.  Cuando $Z_t < 1$, hay más couriers que
+	órdenes y el comportamiento converge hacia asignaciones individuales;
+	cuando $Z_t \gg 1$, el sistema está saturado y se favorecen
+	agrupamientos más grandes para maximizar la capacidad de entrega.  Si
+	no hay couriers disponibles antes de $t + \Delta_2$, se asigna un
+	valor por defecto.
 
 	\subsection{Generación de agrupamientos}
 
 	Una vez determinado $Z_t$, el algoritmo construye agrupamientos
 	(\textit{bundles}) por restaurante.  Para cada restaurante $r$, se
 	procesan las órdenes de $U_{t,r} = U_t \cap \{o : r_o = r\}$ mediante
-	un procedimiento de \textbf{inserción paralela} con mejora local
+	un procedimiento de inserción paralela con mejora local
 	\citep{Reyes2018}:
 
 	\begin{enumerate}
@@ -831,7 +901,11 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 		          \beta \sum_{i \in s} \text{ServiceDelay}(i),
 		      \end{equation}
 		      donde $T(i,j)$ es el tiempo de viaje entre ubicaciones consecutivas
-		      de la ruta y $\beta > 0$ pondera la pérdida de frescura.  Si un
+		      de la ruta y $\beta > 0$ pondera la pérdida de frescura.  El
+		      valor concreto $\beta = 0{.}1$ adoptado en la implementación
+		      (Sección~3.1) corresponde al rango recomendado por
+		      \citet{Reyes2018} y mantiene la prioridad del tiempo de viaje
+		      como término dominante.  Si un
 		      agrupamiento alcanza $Z_t$ órdenes, una inserción adicional solo se
 		      permite si mejora la eficiencia (reduce el tiempo promedio por
 		      orden).
@@ -848,27 +922,27 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\subsection{Esquema de prioridad}
 
 	Antes de resolver la asignación, los agrupamientos se clasifican en tres
-	\textbf{grupos de prioridad} según su urgencia \citep{Reyes2018}:
+	grupos de prioridad según su urgencia \citep{Reyes2018}:
 
 	\begin{itemize}
-		\item \textbf{Grupo~I} (urgente): el objetivo de Click-to-Door $\tau$ ya
+		\item Grupo~i (urgente): el objetivo de \textit{Click-to-Door} $\tau$ ya
 		      es inalcanzable para al menos una orden del agrupamiento.
-		\item \textbf{Grupo~II} (retrasado): el objetivo $\tau$ aún es alcanzable,
+		\item Grupo~ii (retrasado): el objetivo $\tau$ aún es alcanzable,
 		      pero la recolección no puede realizarse en el \textit{ready time}
 		      de las órdenes.
-		\item \textbf{Grupo~III} (normal): el agrupamiento puede recogerse y
+		\item Grupo~iii (normal): el agrupamiento puede recogerse y
 		      entregarse dentro de los objetivos de servicio.
 	\end{itemize}
 
-	La asignación se resuelve \textbf{secuencialmente} por grupo
-	(I~$\to$~II~$\to$~III), garantizando que los agrupamientos más urgentes
+	La asignación se resuelve secuencialmente por grupo
+	(i~$\to$~ii~$\to$~iii), garantizando que los agrupamientos más urgentes
 	obtengan los couriers más cercanos antes de que estos sean consumidos por
 	órdenes menos críticas.
 
 	\subsection{Modelo de asignación lineal}
 
 	En cada grupo de prioridad, la asignación de agrupamientos a couriers se
-	formula como un \textbf{problema de asignación lineal} (\textit{linear
+	formula como un problema de asignación lineal (\textit{linear
 	assignment problem}).  Sea $S$ el conjunto de agrupamientos del grupo
 	actual y $\mathcal{D}$ el subconjunto de couriers disponibles.  Para cada
 	par $(s, d) \in S \times \mathcal{D}$ se define el peso:
@@ -880,12 +954,15 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\end{equation}
 
 	\noindent donde $N_s$ es el número de órdenes en el agrupamiento $s$,
-	$\delta^s_{o,d}$ es el tiempo de entrega de la orden $o$ si $s$ es
-	asignado al courier $d$, $e_d$ es el momento en que $d$ queda disponible,
+	$\delta^s_{o,d}$ es el instante en que la orden $o \in s$ sería
+	entregada al cliente bajo la ruta inducida al asignar el agrupamiento
+	$s$ al courier $d$ (es decir, el tiempo de finalización de la entrega
+	dentro de la secuencia restaurante $\to$ entregas), $e_d$ es el
+	momento en que $d$ queda disponible,
 	$\pi_{s,d}$ es el tiempo de recolección del agrupamiento, y $\theta > 0$
 	penaliza el retraso en la recolección respecto al \textit{ready time}.
-	El primer término captura la \textit{eficiencia} (órdenes por unidad de
-	tiempo); el segundo, la \textit{frescura} (demora en el pickup).
+	El primer término captura la eficiencia (órdenes por unidad de
+	tiempo); el segundo, la frescura (demora en el pickup).
 
 	El problema se formula como:
 	\begin{align}
@@ -905,7 +982,7 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	cada agrupamiento sea asignado a exactamente un courier (posiblemente
 	artificial, $d=0$, para absorber exceso de demanda).  Al tratarse de un
 	problema de asignación lineal, puede resolverse en $O(n^3)$ mediante el
-	\textbf{Algoritmo Húngaro} \citep{Kuhn1955}, lo que garantiza tiempos de
+	\textit{Algoritmo Húngaro} \citep{Kuhn1955}, lo que garantiza tiempos de
 	ejecución despreciables incluso para instancias con cientos de couriers y
 	agrupamientos.
 
@@ -918,8 +995,8 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\subsection{Estrategia de compromiso en dos etapas}
 
 	Tras resolver la asignación, no todas las decisiones se comunican de
-	forma inmediata a los couriers.  La estrategia de \textbf{compromiso
-	aditivo en dos etapas} (\textit{two-stage additive commitment})
+	forma inmediata a los couriers.  La estrategia de compromiso
+	aditivo en dos etapas (\textit{two-stage additive commitment})
 	\citep{Reyes2018} descompone cada asignación tentativa $(s, d)$ en:
 
 	\begin{enumerate}
@@ -967,26 +1044,31 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	tiempos de viaje simétricos.  No obstante, \citet{Boyaci2021} demuestran
 	que la aproximación euclidiana introduce errores sistemáticos del 17--40\%
 	respecto a las distancias reales sobre la red vial, especialmente en
-	topologías irregulares.  Para eliminar esta fuente de error, el presente
-	trabajo sustituye el modelo euclidiano por consultas de enrutamiento sobre
-	el grafo vial real, empleando la cadena OpenStreetMap~$\to$~OSRM.
+	topologías irregulares.  En la misma línea, \citet{Pereira2021}
+	argumentan que el enrutamiento realista sobre redes multimodales
+	reproducibles es condición necesaria para la validación científica de
+	políticas de enrutamiento, y proporcionan una implementación pública
+	(\texttt{r5r}) consistente con esa exigencia metodológica.  Para
+	eliminar esta fuente de error, el presente trabajo sustituye el modelo
+	euclidiano por consultas de enrutamiento sobre el grafo vial real,
+	empleando la cadena OpenStreetMap~$\to$~OSRM.
 
 	\subsection{OpenStreetMap como modelo de datos geográficos}
 
-	\textbf{OpenStreetMap} (OSM) es un proyecto colaborativo de cartografía
+	OpenStreetMap (OSM) es un proyecto colaborativo de cartografía
 	abierta que modela la infraestructura vial mediante tres primitivas
 	\citep{Haklay2010, Boeing2021}:
 
 	\begin{itemize}
-		\item \textbf{Nodos} (\textit{nodes}): puntos georreferenciados
-		      $(lat, lon)$ que representan intersecciones, semáforos o puntos de
+		\item \textbf{Nodos} (\texttt{nodes}): puntos georreferenciados
+		      \texttt{(lat, lon)} que representan intersecciones, semáforos o puntos de
 		      interés.
-		\item \textbf{Vías} (\textit{ways}): secuencias ordenadas de nodos que
+		\item \textbf{Vías} (\texttt{ways}): secuencias ordenadas de nodos que
 		      representan segmentos de calle.  Cada vía porta atributos
-		      (\textit{tags}) como tipo de vía (\texttt{highway}), límite de
+		      (\texttt{tags}) como tipo de vía (\texttt{highway}), límite de
 		      velocidad (\texttt{maxspeed}), sentido de circulación
 		      (\texttt{oneway}) y superficie (\texttt{surface}).
-		\item \textbf{Relaciones} (\textit{relations}): agrupaciones de nodos y
+		\item \textbf{Relaciones} (\texttt{relations}): agrupaciones de nodos y
 		      vías que representan estructuras complejas (restricciones de giro,
 		      rutas de transporte público, etc.).
 	\end{itemize}
@@ -1001,24 +1083,25 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\subsection{\textit{Contraction Hierarchies}}
 
 	Dado un grafo vial $G = (V, E, c)$, el cálculo de caminos mínimos
-	mediante el algoritmo de Dijkstra tiene complejidad
+	mediante el algoritmo de \citet{Dijkstra1959}, en su variante con
+	colas de prioridad de Fibonacci, tiene complejidad
 	$O(|E| + |V| \log |V|)$, lo que resulta prohibitivo para consultas
 	frecuentes en grafos con millones de nodos.  \citet{Geisberger2008}
-	proponen \textbf{\textit{Contraction Hierarchies}} (CH), una técnica de
+	proponen \textit{Contraction Hierarchies} (CH), una técnica de
 	preprocesamiento que permite resolver consultas de camino mínimo en
 	milisegundos.
 
 	El algoritmo se divide en dos fases:
 
 	\paragraph{Preprocesamiento.}
-	Los nodos del grafo se ordenan por un criterio de \textit{importancia}
+	Los nodos del grafo se ordenan por un criterio de importancia
 	(e.g., diferencia de aristas creadas menos aristas eliminadas) y se
 	contraen secuencialmente.  Contraer un nodo $v$ consiste en:
 	\begin{enumerate}
 		\item Eliminar $v$ y todas sus aristas incidentes del grafo.
 		\item Para cada par de vecinos $(u, w)$ de $v$, si el camino mínimo
 		      $u \to v \to w$ es el único camino óptimo entre $u$ y $w$ en el
-		      grafo residual, insertar una \textbf{arista atajo}
+		      grafo residual, insertar una arista atajo
 		      (\textit{shortcut}) $(u, w)$ con peso $c(u,v) + c(v,w)$.
 	\end{enumerate}
 	El resultado es un grafo aumentado $G^+ = (V, E \cup E_{sc})$ donde
@@ -1027,7 +1110,7 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 
 	\paragraph{Consulta.}
 	Para encontrar el camino mínimo de $s$ a $t$, se ejecuta una
-	\textbf{búsqueda bidireccional} en $G^+$: desde $s$ hacia arriba en la
+	búsqueda bidireccional en $G^+$: desde $s$ hacia arriba en la
 	jerarquía (solo aristas hacia nodos de mayor nivel) y desde $t$ hacia
 	arriba.  El camino óptimo pasa por el nodo de encuentro que minimiza la
 	suma de distancias parciales.  La complejidad empírica de la consulta es
@@ -1036,9 +1119,11 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 
 	\subsection{OSRM: motor de enrutamiento}
 
-	\textbf{OSRM} (\textit{Open Source Routing Machine}) es un motor de
-	enrutamiento de código abierto que implementa CH sobre datos de
-	OpenStreetMap.  Su cadena de procesamiento consta de tres etapas:
+	OSRM (\textit{Open Source Routing Machine}) es un motor de
+	enrutamiento de código abierto introducido por
+	\citet{LuxenVetter2011}, que implementa CH sobre datos de
+	OpenStreetMap y expone una API HTTP para consultas en tiempo real.
+	Su cadena de procesamiento consta de tres etapas:
 
 	\begin{enumerate}
 		\item \texttt{osrm-extract}: parsea el archivo \texttt{.pbf} de OSM y
@@ -1048,8 +1133,8 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 		      extraído, generando archivos de índice que codifican los atajos y
 		      la ordenación jerárquica.
 		\item \texttt{osrm-routed}: servidor HTTP que responde consultas de ruta
-		      punto a punto (\texttt{/route/v1/driving/\{coords\}}) con tiempos
-		      de respuesta típicos $< 5$~ms para grafos regionales.
+		      punto a punto \\(\texttt{/route/v1/driving/\{coords\}})
+		      con tiempos de respuesta típicos $< 5$~ms para grafos regionales.
 	\end{enumerate}
 
 	El desacople entre preprocesamiento (offline, una sola vez) y consulta
@@ -1063,8 +1148,14 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\begin{itemize}
 		\item Los tiempos de viaje dejan de ser simétricos:
 		      $T(a,b) \neq T(b,a)$ por sentidos de circulación.
-		\item La desigualdad triangular se cumple de forma natural sobre la red
-		      vial, sin necesidad de correcciones \textit{ad hoc}.
+		\item La desigualdad triangular se preserva entre pares de nodos
+		      del grafo vial en ausencia de restricciones de giro, pero
+		      puede no cumplirse de forma estricta entre ubicaciones
+		      \emph{snapped} cuando intervienen sentidos de circulación
+		      opuestos o restricciones de giro complejas; OSRM gestiona
+		      estos casos devolviendo siempre la ruta mínima factible
+		      entre los nodos de inicio y fin, de modo que la heurística
+		      opera sobre una matriz de costos consistente.
 		\item El factor de conversión $\gamma$ de \citet{Reyes2018} se elimina:
 		      los tiempos provienen directamente de las velocidades y topología
 		      reales.
@@ -1087,7 +1178,7 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 
 	\subsection{Proceso de Poisson no homogéneo}
 
-	Un \textbf{proceso de Poisson no homogéneo} (PPNH) es un proceso de
+	Un proceso de Poisson no homogéneo (PPNH) es un proceso de
 	conteo $\{N(t), t \geq 0\}$ en el que el número de eventos en un
 	intervalo $(t_1, t_2]$ sigue una distribución de Poisson con parámetro
 	igual a la integral de una función de intensidad $\lambda(\cdot)$
@@ -1114,14 +1205,18 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 		\approx \text{Poisson}\!\bigl(\lambda(t)\bigr),
 	\]
 	aproximación válida si $\lambda$ varía lentamente dentro del intervalo.
-	Este resultado justifica el muestreo minuto a minuto empleado en la
+	El error relativo del reemplazo $\int_t^{t+1}\lambda(u)\,du \approx
+	\lambda(t)$ está acotado por $|\lambda'(t)|/(2\lambda(t))$ por
+	expansión de Taylor de primer orden, magnitud despreciable para los
+	parámetros adoptados ($\sigma = 45$~min, ver Sección~3.2).  Este
+	resultado justifica el muestreo minuto a minuto empleado en la
 	Sección~3.2.
 
 	\subsection{Función de intensidad bimodal}
 
 	Los patrones de demanda en servicios de entrega de comida exhiben dos
 	picos diarios correspondientes a los horarios de almuerzo y cena
-	\citep{Wu2023LaDe}.  Una representación parsimonosa de esta estructura
+	\citep{Wu2023LaDe}.  Una representación parsimoniosa de esta estructura
 	bimodal es la superposición de una intensidad base constante y dos
 	componentes gaussianas:
 
@@ -1154,14 +1249,28 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 		      (\textit{thinning}).
 	\end{enumerate}
 
+	Es preciso reconocer que la forma bimodal calibrada con LaDe
+	\citep{Wu2023LaDe} corresponde a hábitos de consumo del mercado
+	chino; su transferibilidad al contexto mexicano de La~Paz constituye
+	un supuesto operativo del modelo.  Los centros $\mu_m$ y $\mu_e$ del
+	perfil se ajustan a horarios locales en la Sección~3.2, pero el
+	supuesto subyacente de bimodalidad y la dispersión $\sigma$ no se
+	calibran con datos propios al no existir trazas operativas para La
+	Paz.  Esta limitación se discute en el Capítulo~5 como línea de
+	trabajo futuro.
+
 	\subsection{Métricas de desempeño: marco de evaluación}
 
 	La Sección~2.1 introdujo las métricas primarias del MDRP definidas por
 	\citet{Reyes2018}: Click-to-Door, Ready-to-Pickup, Ready-to-Door,
-	utilización del courier y costo por orden.  Para una evaluación
+	utilización del courier y costo por orden.  La importancia operativa
+	de la métrica Click-to-Door ha sido reforzada por trabajos como el de
+	\citet{Hildebrandt2021}, que demuestran que la estimación precisa del
+	tiempo de arribo (ETA) es un predictor más fuerte de la satisfacción
+	del cliente que el tiempo absoluto de servicio.  Para una evaluación
 	cuantitativa rigurosa, estas métricas individuales (por orden o por
 	courier) se agregan en estadísticos de resumen y se organizan en cinco
-	\textbf{familias} que cubren las perspectivas de los actores del sistema.
+	familias que cubren las perspectivas de los actores del sistema.
 
 	\paragraph{Estadísticos de agregación.}
 	Para cada métrica a nivel de orden (e.g., $\text{CtD}_o$), se calculan:
@@ -1213,16 +1322,16 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 
 	\chapter{Desarrollo}
 
-	Este capitulo describe la implementacion computacional del entorno de simulación para el MDRP en La Paz, B.CS. 
+	Este capítulo describe la implementación computacional del entorno de simulación para el MDRP en La Paz, B.C.S.
 	Se documenta la arquitectura del sistema, la generación de instancias sintéticas, el motor de simulación por 
-	épocas, las dos políticas de despacho implementadas (FCFS y Rolling Horizon), el diseño experimental y las 
+	épocas, las dos políticas de despacho implementadas (FCFS y \textit{Rolling Horizon}), el diseño experimental y las
 	métricas de evaluación.
 
 	\section{Arquitectura del sistema}
 
-	El sistema se organiza en tres capas funcionales desacopladas: (1)~una capa de \textbf{enrutamiento} basada en 
-	OSRM contenerizado, (2)~una capa de \textbf{simulación} implementada en Python, y (3)~una capa de 
-	\textbf{análisis} que recolecta y procesa los indicadores de desempeño. La Figura~\ref{fig:arquitectura} 
+	El sistema se organiza en tres capas funcionales desacopladas: (1)~una capa de enrutamiento basada en
+	OSRM contenerizado, (2)~una capa de simulación implementada en Python, y (3)~una capa de
+	análisis que recolecta y procesa los indicadores de desempeño. La Figura~\ref{fig:arquitectura} 
 	ilustra la interacción entre estos componentes.
 
 	\subsection{Capa de enrutamiento: OSRM contenerizado}
@@ -1364,27 +1473,26 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	El servicio de enrutamiento se despliega de forma declarativa mediante un archivo 
 	\texttt{docker-compose.yml} que encapsula toda la configuración necesaria:
 
-	\begin{lstlisting}[language=bash, basicstyle=\ttfamily\small, frame=single, 
+	\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single,
+	breaklines=true, breakatwhitespace=true, columns=fullflexible,
 	caption={Definición del servicio OSRM en \texttt{docker-compose.yml}.},
 	label=lst:dockercompose]
-	services:
-	osrm:
-		image: ghcr.io/project-osrm/osrm-backend:v5.27.1
-		container_name: mdrp-osrm
-		ports:
-		- "5000:5000"
-		volumes:
-		- ./osrm_data:/data:ro
-		command: osrm-routed --algorithm ch
-				/data/bcs-latest.osrm
-		restart: unless-stopped
-		healthcheck:
-		test: ["CMD", "curl", "-f",
-			"http://localhost:5000/route/v1/driving/
-			-110.31,24.14;-110.30,24.15"]
-		interval: 30s
-		timeout: 10s
-		retries: 3
+services:
+  osrm:
+    image: ghcr.io/project-osrm/osrm-backend:v5.27.1
+    container_name: mdrp-osrm
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./osrm_data:/data:ro
+    command: osrm-routed --algorithm ch /data/bcs-latest.osrm
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f",
+             "http://localhost:5000/route/v1/driving/-110.31,24.14;-110.30,24.15"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 	\end{lstlisting}
 
 	Esta configuración garantiza tres propiedades esenciales para la reproducibilidad:
@@ -1493,7 +1601,7 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\begin{itemize}
 		\item \texttt{run\_experiments.py}: Orquesta la ejecución del pipeline experimental 
 		completo: invoca al generador de instancias sintéticas (\texttt{make\_synth\_orders.py}) 
-		cuando se requieren múltiples semillas, ejecuta las simulaciones FCFS y Rolling Horizon, 
+		cuando se requieren múltiples semillas, ejecuta las simulaciones FCFS y \textit{Rolling Horizon},
 		calcula 21 KPIs comparativos y consolida los resultados. Define cuatro niveles de 
 		relación órdenes/courier (18:1, 26:1, 35:1 y 52:1), ejecuta ambas políticas en cada 
 		escenario, y genera tablas consolidadas (\texttt{experiment\_comparison.csv}, 
@@ -1501,11 +1609,12 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 		(\texttt{experiment\_metadata.json}). Adicionalmente, soporta la ejecución con múltiples 
 		semillas aleatorias (\texttt{-{}-seeds}) para análisis de robustez y la 
 		variación de parámetros algorítmicos (\texttt{-{}-bundle-sizes}).
-		\item \texttt{statistical\_analysis.py}: Aplica las pruebas estadísticas formales 
-		(Mann-Whitney $U$, corrección Benjamini-Hochberg, Kruskal-Wallis) sobre los KPIs 
-		generados por \texttt{run\_experiments.py}, produciendo los archivos 
-		\texttt{statistical\_summary.csv}, \texttt{cross\_seed\_aggregation.csv} y 
-		\texttt{normality\_tests.csv}.
+		\item \texttt{statistical\_analysis.py}: Aplica las pruebas inferenciales
+		definidas en la Sección~\ref{sec:plan_analisis} (Wilcoxon signed-rank
+		pareado a nivel semilla, prueba ómnibus de Friedman entre escenarios y
+		rank-biserial pareado como tamaño de efecto) sobre los KPIs generados
+		por \texttt{run\_experiments.py}, produciendo los archivos
+		\texttt{statistical\_summary.csv} y \texttt{cross\_seed\_aggregation.csv}.
 	\end{itemize}
 
 	La separación en tres capas independientes permite modificar cualquier componente sin afectar a los 
@@ -1571,13 +1680,13 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\end{equation}
 
 	\noindent donde $t_{created} = a_o$ es el instante de colocación de la orden 
-	(\texttt{placement\_time}). Este ready time constituye una \textbf{restricción dura} en el modelo de simulación: ningún courier puede 
+	(\texttt{placement\_time}). Este ready time constituye una restricción dura en el modelo de simulación: ningún courier puede
 	recoger la orden antes de $t_{ready}$, conforme a la definición del MDRP en 
 	\citet{Reyes2018}.
 
 	\subsection{Distribución geoespacial}
 
-	Las ubicaciones de restaurantes y clientes se generan mediante \textbf{muestreo uniforme} 
+	Las ubicaciones de restaurantes y clientes se generan mediante muestreo uniforme
 	dentro de un polígono que delimita la zona urbana de La Paz. Este polígono se define por 
 	cuatro vértices que encierran el área de mayor densidad poblacional y comercial:
 
@@ -1590,7 +1699,7 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 		\right)
 	\end{equation}
 
-	El muestreo utiliza un método de \textbf{rechazo} (\textit{rejection sampling}): se generan 
+	El muestreo utiliza un método de rechazo (\textit{rejection sampling}): se generan
 	puntos uniformemente en el rectángulo delimitador del polígono y se descartan aquellos que 
 	caen fuera de $\mathcal{P}$ (por ejemplo, sobre la bahía de La Paz). Esto garantiza que 
 	todas las ubicaciones generadas correspondan a puntos terrestres dentro de la mancha urbana.
@@ -1631,10 +1740,12 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 		\label{eq:fleet_sizing}
 	\end{equation}
 
-	\noindent donde $|\mathcal{O}|$ es el número total de órdenes, $r$ es el ratio objetivo de 
-	órdenes por courier (\texttt{orders\_per\_courier}, por defecto $r = 18$), y $n_{min}$ es un 
-	piso mínimo de flota (\texttt{min\_couriers}, por defecto $n_{min} = 15$). Este mecanismo 
-	permite variar el nivel de \textbf{saturación} de la flota: valores altos de $r$ producen 
+	\noindent donde $|\mathcal{O}|$ es el número total de órdenes, $r$ es el ratio objetivo de
+	órdenes por courier (\texttt{orders\_per\_courier}, por defecto $r = 18$), y $n_{min}$ es un
+	piso mínimo de flota (\texttt{min\_couriers}, $n_{min} = 10$ en los experimentos del
+	Capítulo~4; el valor por defecto del módulo \texttt{synth\_loader.py} es 15 y
+	se sobrescribe a 10 desde \texttt{run\_experiments.py}). Este mecanismo
+	permite variar el nivel de saturación de la flota: valores altos de $r$ producen
 	flotas más pequeñas y mayor carga por courier, mientras que valores bajos generan flotas 
 	holgadas con baja utilización.
 
@@ -1656,7 +1767,7 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 
 	\subsubsection{Reproducibilidad}
 
-	El generador acepta una \textbf{semilla aleatoria} (\texttt{-{}-seed}, por defecto 2025) que 
+	El generador acepta una semilla aleatoria (\texttt{-{}-seed}, por defecto 2025) que
 	inicializa el generador de números pseudoaleatorios de NumPy (\texttt{numpy.random.default\_rng}). 
 	Esto garantiza que, dada la misma semilla y el mismo objetivo de órdenes, se produzca una 
 	instancia idéntica en cualquier máquina. El script \texttt{run\_experiments.py} aprovecha esta 
@@ -1665,9 +1776,9 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 
 	\section{Motor de simulación}
 
-	El motor de simulación (\texttt{main.py}) implementa un ciclo discreto dirigido por épocas que 
-	avanza el reloj virtual en incrementos de $f = 5$~min. En cada época, el motor ejecuta cuatro 
-	fases secuenciales: \textbf{activación}, \textbf{revelación}, \textbf{asignación} y \textbf{actualización}.
+	El motor de simulación (\texttt{main.py}) implementa un ciclo discreto dirigido por épocas que
+	avanza el reloj virtual en incrementos de $f = 5$~min. En cada época, el motor ejecuta cuatro
+	fases secuenciales: activación, revelación, asignación y actualización.
 
 	\subsection{Ciclo de simulación por épocas}
 
@@ -1689,7 +1800,7 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 		su restaurante.
 
 		\item \textbf{Asignación:} Cuando $t$ es múltiplo de $f$, se activa la lógica de despacho 
-		(FCFS o Rolling Horizon, según la variable de entorno \texttt{FCFS\_POLICY}). La selección 
+		(FCFS o \textit{Rolling Horizon}, según la variable de entorno \texttt{FCFS\_POLICY}). La selección
 		de política se realiza en tiempo de ejecución, permitiendo ejecutar ambas sobre la misma 
 		instancia sin modificar código.
 
@@ -1743,9 +1854,9 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 		al sistema y está disponible para asignación. Se registra en la lista de órdenes 
 		pendientes de su restaurante.
 
-		\item \texttt{assigned}: La orden ha sido asignada a un courier y forma parte de su 
-		ruta activa. En la política FCFS, esta transición ocurre de forma explícita al 
-		seleccionar al courier más cercano. En la política Rolling Horizon, la orden se 
+		\item \texttt{assigned}: La orden ha sido asignada a un courier y forma parte de su
+		ruta activa. En la política FCFS, esta transición ocurre de forma explícita al
+		seleccionar al courier más cercano. En la política \textit{Rolling Horizon}, la orden se
 		incorpora al agrupamiento del courier sin cambio explícito de estado.
 
 		\item \texttt{delivered}: Un courier ha completado la entrega. Se registran 
@@ -1753,17 +1864,21 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 		para el cálculo posterior de KPIs.
 	\end{enumerate}
 
-	Las transiciones \texttt{pending} $\to$ \texttt{ready} ocurren en la fase de revelación 
-	de cada época. La transición \texttt{ready} $\to$ \texttt{assigned} ocurre en la fase de 
-	asignación, y la transición \texttt{assigned} $\to$ \texttt{delivered} ocurre en la fase de 
-	actualización, cuando el courier completa su ruta.
+	Las transiciones \texttt{pending} $\to$ \texttt{ready} ocurren en la fase de revelación
+	de cada época. La transición \texttt{ready} $\to$ \texttt{assigned} ocurre en la fase de
+	asignación, y la transición \texttt{assigned} $\to$ \texttt{delivered} ocurre en la fase de
+	actualización, cuando el courier completa su ruta.  Bajo la política \textit{Rolling Horizon}
+	con compromiso parcial (inbound, véase Sección~3.5.4), la orden permanece en
+	\texttt{ready} mientras el courier se desplaza al restaurante: solo transita a
+	\texttt{assigned} cuando el compromiso final se concreta en una época posterior,
+	preservando así la flexibilidad de reoptimizar el agrupamiento.
 
 	\subsection{Integración con OSRM}
 
-	El motor se comunica con el servicio de enrutamiento a través de \texttt{getrouteOSMR.py}, 
-	que actúa como capa de abstracción entre la simulación y la API REST. Cada vez que un 
-	módulo de asignación (FCFS o Rolling Horizon) necesita evaluar una ruta candidata, invoca 
-	\texttt{get\_route\_details(origin, waypoints)}, que:
+	El motor se comunica con el servicio de enrutamiento a través de \texttt{getrouteOSMR.py},
+	que actúa como capa de abstracción entre la simulación y la API REST. Cada vez que un
+	módulo de asignación (FCFS o \textit{Rolling Horizon}) necesita evaluar una ruta candidata,\\
+	invoca \texttt{get\_route\_details(origin, waypoints)}, que:
 
 	\begin{enumerate}
 		\item Verifica si la consulta existe en la caché en memoria (\texttt{\_osrm\_cache}), 
@@ -1780,10 +1895,10 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	individuales). Estos valores alimentan directamente el cálculo de tiempos de pickup, delivery 
 	y los KPIs de distancia recorrida.
 
-	\section{Política FCFS (baseline)}
+	\section{Política FCFS (\textit{baseline})}
 
-	La política \textbf{First-Come, First-Served} (FCFS) sirve como línea base contra la cual se 
-	evalúa el desempeño de la política Rolling Horizon. Implementa una lógica de despacho reactiva 
+	La política \textit{First-Come, First-Served} (FCFS) sirve como línea base contra la cual se
+	evalúa el desempeño de la política \textit{Rolling Horizon}. Implementa una lógica de despacho reactiva 
 	sin agrupamiento ni optimización global: cada orden se asigna individualmente al courier 
 	disponible más cercano en el momento de la decisión.
 
@@ -1801,13 +1916,16 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 		\end{equation}
 		donde $l_c$ es el fin del turno del courier (\texttt{off\_time}).
 
-		\item \textbf{Selección por proximidad:} Para cada courier disponible se calcula la distancia 
+		\item \textbf{Selección por proximidad:} Para cada courier disponible se calcula la distancia
 		euclidiana a la ubicación del restaurante de la orden:
 		\begin{equation}
 			d(c, o) = \sqrt{(\phi_c - \phi_r)^2 + (\psi_c - \psi_r)^2}
 		\end{equation}
-		donde $(\phi_c, \psi_c)$ es la ubicación actual del courier y $(\phi_r, \psi_r)$ la del 
+		donde $(\phi_c, \psi_c)$ es la ubicación actual del courier y $(\phi_r, \psi_r)$ la del
 		restaurante. Se selecciona $c^* = \arg\min_{c \in \mathcal{C}_{disp}} d(c, o)$.
+		Esta expresión opera en grados sobre la latitud y longitud y se usa
+		únicamente como ordenador para elegir al courier; el tiempo de viaje
+		efectivo se obtiene a continuación con OSRM.
 
 		\item \textbf{Consulta de ruta:} Se solicita a OSRM la ruta completa 
 		$c^*.\textit{location} \to r_o \to \ell_o$, donde $r_o$ es la ubicación del restaurante 
@@ -1826,8 +1944,8 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 
 	\subsection{Características y limitaciones}
 
-	La política FCFS presenta las siguientes propiedades que la distinguen de la política 
-	Rolling Horizon:
+	La política FCFS presenta las siguientes propiedades que la distinguen de la política
+	\textit{Rolling Horizon}:
 
 	\begin{itemize}
 		\item \textbf{Sin agrupamiento:} Cada orden genera una ruta individual 
@@ -1842,20 +1960,20 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 		(\textit{tentative assignment}). El courier se compromete de inmediato con la ruta 
 		completa pickup $\to$ delivery.
 
-		\item \textbf{Activación:} La política se activa estableciendo la variable de entorno 
-		\texttt{FCFS\_POLICY=1} antes de ejecutar la simulación. Sin esta variable, el motor 
-		utiliza Rolling Horizon por defecto.
+		\item \textbf{Activación:} La política se activa estableciendo la variable de entorno
+		\texttt{FCFS\_POLICY=1} antes de ejecutar la simulación. Sin esta variable, el motor
+		utiliza \textit{Rolling Horizon} por defecto.
 	\end{itemize}
 
-	Estas simplificaciones hacen de FCFS una cota inferior práctica: cualquier mejora 
-	que la política Rolling Horizon logre sobre FCFS puede atribuirse directamente a los 
+	Estas simplificaciones hacen de FCFS una cota inferior práctica: cualquier mejora
+	que la política \textit{Rolling Horizon} logre sobre FCFS puede atribuirse directamente a los
 	mecanismos de agrupamiento y optimización global que introduce.
 
-	\section{Política Rolling Horizon}
+	\section{Política \textit{Rolling Horizon}}
 
-	La política de \textbf{Rolling Horizon} (RH) constituye la heurística central de este 
-	trabajo, basada en el marco propuesto por \citet{Reyes2018}. A diferencia de FCFS, RH 
-	agrupa órdenes del mismo restaurante en \textit{agrupamientos} (bundles), resuelve un 
+	La política de \textit{Rolling Horizon} (RH) constituye la heurística central de este
+	trabajo, basada en el marco propuesto por \citet{Reyes2018}. A diferencia de FCFS, RH
+	agrupa órdenes del mismo restaurante en agrupamientos (\textit{bundles}), resuelve un
 	problema de asignación bipartita courier-agrupamiento mediante el Algoritmo Húngaro, y 
 	emplea un esquema de compromiso en dos etapas que permite reoptimizar asignaciones entre 
 	épocas. Esta sección describe los cuatro componentes secuenciales que se ejecutan en cada 
@@ -1890,8 +2008,8 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 
 	\subsection{Generación de agrupamientos por restaurante}
 
-	Para cada restaurante con órdenes pendientes, el módulo \texttt{bundling.py} construye 
-	agrupamientos mediante un procedimiento de \textbf{inserción paralela con mejora local} 
+	Para cada restaurante con órdenes pendientes, el módulo \texttt{bundling.py} construye
+	agrupamientos mediante un procedimiento de inserción paralela con mejora local
 	(\textit{parallel insertion with remove-reinsert improvement}):
 
 	\begin{enumerate}
@@ -1937,29 +2055,31 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	grupos de prioridad según \citet{Reyes2018}:
 
 	\begin{itemize}
-		\item \textbf{Grupo~I} (urgente): El tiempo de entrega más temprano posible excede 
-		$a_o + \tau$ para la orden más antigua del agrupamiento, donde $a_o$ es el 
-		\textit{placement time} y $\tau = 40$~min es el objetivo de Click-to-Door. Ningún 
+		\item Grupo~i (urgente): El tiempo de entrega más temprano posible excede
+		$a_o + \tau$ para la orden más antigua del agrupamiento, donde $a_o$ es el
+		\textit{placement time} y $\tau = 40$~min es el objetivo de \textit{Click-to-Door}. Ningún
 		courier puede cumplir la meta de servicio.
 
-		\item \textbf{Grupo~II} (retrasado): El agrupamiento no pertenece al Grupo~I, pero 
-		ningún courier puede llegar al restaurante antes del \textit{ready time} del 
-		agrupamiento. Existe retraso en la recolección pero la meta de entrega aún es 
+		\item Grupo~ii (retrasado): El agrupamiento no pertenece al Grupo~i, pero
+		ningún courier puede llegar al restaurante antes del \textit{ready time} del
+		agrupamiento. Existe retraso en la recolección pero la meta de entrega aún es
 		alcanzable.
 
-		\item \textbf{Grupo~III} (normal): El agrupamiento puede ser recogido y entregado 
+		\item Grupo~iii (normal): El agrupamiento puede ser recogido y entregado
 		dentro de los objetivos de servicio.
 	\end{itemize}
 
-	La asignación se resuelve en \textbf{tres rondas secuenciales} (I $\to$ II $\to$ III), 
+	La asignación se resuelve en tres rondas secuenciales (i $\to$ ii $\to$ iii),
 	priorizando los agrupamientos más urgentes. En cada ronda, se construye una matriz de 
 	costos $\mathbf{W} \in \mathbb{R}^{|\mathcal{C}_{disp}| \times |B_g|}$ donde cada 
 	entrada es el peso de matching:
 
 	\begin{equation}
-		w_{cj} = \frac{|B_j|}{T_{delivery}(c, B_j)} - \theta \cdot (t_{pickup}(c, B_j) - 
-		t_{ready}(B_j)) - P_g
-		\label{eq:matching_weight}
+	\begin{aligned}
+		w_{cj} ={} & \frac{|B_j|}{T_{delivery}(c, B_j)} \\
+		           & - \theta \cdot \bigl(t_{pickup}(c, B_j) - t_{ready}(B_j)\bigr) - P_g
+	\end{aligned}
+	\label{eq:matching_weight}
 	\end{equation}
 
 	\noindent donde $|B_j|$ es el número de órdenes en el agrupamiento $j$, 
@@ -1972,15 +2092,15 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	courier-agrupamiento es infactible (sin ruta OSRM), se asigna un costo prohibitivo 
 	($10^9$).
 
-	La matriz se convierte a costos ($c_{ij} = -w_{cj}$) y se resuelve mediante 
-	\texttt{scipy.optimize.linear\_sum\_assignment}, que implementa el \textbf{Algoritmo 
+	La matriz se convierte a costos ($c_{ij} = -w_{cj}$) y se resuelve mediante
+	\texttt{scipy.optimize.linear\_sum\_assignment}, que implementa el \textit{Algoritmo
 	Húngaro} con complejidad $O(n^3)$. Los couriers asignados a celdas con costo 
 	prohibitivo se descartan.
 
 	\subsection{Compromiso en dos etapas}
 
-	Para cada par $(c, B)$ seleccionado por el Algoritmo Húngaro, se aplica el 
-	\textbf{compromiso aditivo en dos etapas} (\textit{two-stage additive commitment}) 
+	Para cada par $(c, B)$ seleccionado por el Algoritmo Húngaro, se aplica el
+	compromiso aditivo en dos etapas (\textit{two-stage additive commitment})
 	descrito en \citet{Reyes2018}:
 
 	\begin{enumerate}
@@ -1996,8 +2116,8 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 		courier $\to$ restaurante $\to$ entrega$_1$ $\to \cdots \to$ entrega$_n$. El courier 
 		queda comprometido hasta $t_{completion}$.
 
-		\item \textbf{Compromiso parcial:} Si no se cumplen las condiciones anteriores, se 
-		asigna únicamente la ruta \textbf{inbound} (courier $\to$ restaurante). El courier 
+		\item \textbf{Compromiso parcial:} Si no se cumplen las condiciones anteriores, se
+		asigna únicamente la ruta \textit{inbound} (courier $\to$ restaurante). El courier 
 		comienza a desplazarse hacia el restaurante, pero en la siguiente época el sistema 
 		puede reoptimizar la asignación: actualizar el agrupamiento, cambiar de courier, o 
 		añadir/quitar órdenes.
@@ -2016,7 +2136,7 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 
 	\subsection{Resumen del flujo RH por época}
 
-	La Figura~\ref{fig:rh_flow} resume el flujo completo de la política Rolling Horizon en 
+	La Figura~\ref{fig:rh_flow} resume el flujo completo de la política \textit{Rolling Horizon} en
 	cada época de asignación.
 
 	\begin{figure}[htbp]
@@ -2029,7 +2149,7 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	]
 		\node[block] (zt) {Calcular $Z_t$ (Ec.~\ref{eq:target_bundle})};
 		\node[block, below=of zt] (bundle) {Generar agrupamientos por restaurante\\(inserción paralela + remove-reinsert)};
-		\node[block, below=of bundle] (classify) {Clasificar agrupamientos:\\Grupo I $\to$ II $\to$ III};
+		\node[block, below=of bundle] (classify) {Clasificar agrupamientos:\\Grupo i $\to$ ii $\to$ iii};
 		\node[block, below=of classify] (hungarian) {Resolver asignación bipartita\\(Algoritmo Húngaro, Ec.~\ref{eq:matching_weight})};
 		\node[block, below=of hungarian] (commit) {Compromiso en dos etapas:\\final / parcial / ignorar};
 		
@@ -2038,13 +2158,13 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 		\draw[arrow] (classify) -- (hungarian);
 		\draw[arrow] (hungarian) -- (commit);
 	\end{tikzpicture}
-	\caption{Flujo de la política Rolling Horizon en cada época de asignación.}
+	\caption{Flujo de la política \textit{Rolling Horizon} en cada época de asignación.}
 	\label{fig:rh_flow}
 	\end{figure}
 
 	\section{Diseño experimental}
 
-	La evaluación comparativa de las políticas FCFS y Rolling Horizon se estructura
+	La evaluación comparativa de las políticas FCFS y \textit{Rolling Horizon} se estructura
 	como un experimento pareado sobre instancias sintéticas generadas según el proceso
 	descrito en la Sección~3.2.  El script \texttt{run\_experiments.py} orquesta la
 	ejecución completa.
@@ -2091,9 +2211,31 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	simulación se invoca en proceso (\emph{in-process}): la función
 	\texttt{\_run\_policy} ajusta el parámetro $r$ del escenario y activa la política
 	correspondiente mediante la variable de entorno \texttt{FCFS\_POLICY} (presente
-	$\rightarrow$ FCFS; ausente $\rightarrow$ Rolling Horizon).  Este diseño pareado
+	$\rightarrow$ FCFS; ausente $\rightarrow$ \textit{Rolling Horizon}).  Este diseño pareado
 	elimina la variabilidad inter-instancia y aísla el efecto de la política de
 	asignación.
+
+	\subsection{Plan de análisis estadístico}
+	\label{sec:plan_analisis}
+
+	El diseño pareado de la subsección anterior condiciona la elección de las
+	pruebas inferenciales que se aplicarán en el Capítulo~4.  Cada semilla
+	genera un par observacional (FCFS, RH) sobre la misma instancia, por lo
+	que la unidad natural de análisis es la diferencia intra-semilla.  Para
+	evitar la pseudo-replicación \citep{Hurlbert1984} que resultaría de tratar
+	cada orden como observación independiente ---cuando todas las órdenes de
+	una corrida comparten la misma realización aleatoria--- cada métrica se
+	agrega al nivel de semilla antes de la inferencia.
+
+	Como prueba primaria se adopta el test de Wilcoxon signed-rank pareado
+	\citep{Wilcoxon1945}, no paramétrico, libre de supuestos de normalidad y
+	apropiado para tamaños muestrales pequeños ($n \leq 10$ semillas).  Se
+	reporta la diferencia de medias entre semillas con intervalo de confianza
+	$t$-Student al 95\,\% y el rank-biserial pareado como tamaño de efecto.
+	Para evaluar si la magnitud del efecto varía entre regímenes de saturación
+	se aplica la prueba ómnibus de Friedman \citep{Friedman1937} sobre la
+	matriz semillas\,$\times$\,escenarios de $\Delta\text{CtD}$.  Los
+	resultados detallados se reportan en el Capítulo~4, Sección~4.5.
 
 	\subsection{Replicación y análisis de sensibilidad}
 
@@ -2143,7 +2285,7 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 
 	\subsection{Calidad de servicio}
 
-	El indicador principal es el \textbf{Click-to-Door} (CtD), definido como el
+	El indicador principal es el \textit{Click-to-Door} (CtD), definido como el
 	tiempo transcurrido desde la colocación de la orden hasta su entrega al cliente:
 	\[
 		\text{CtD}_o = t_{delivery,o} - a_o
@@ -2151,11 +2293,11 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	Se reportan la media y los percentiles 50, 90 y 95.  Adicionalmente se calculan:
 
 	\begin{itemize}
-		\item \textbf{Ready-to-Pickup} (RtP): tiempo desde que la orden está lista en
+		\item \textit{Ready-to-Pickup} (RtP): tiempo desde que la orden está lista en
 		      el restaurante hasta que el repartidor la recoge
 		      ($\text{RtP}_o = t_{pickup,o} - t_{ready,o}$).
 		      Se reportan la media y el percentil 90.
-		\item \textbf{Ready-to-Door} (RtD): tiempo desde la disponibilidad del pedido
+		\item \textit{Ready-to-Door} (RtD): tiempo desde la disponibilidad del pedido
 		      hasta su entrega ($\text{RtD}_o = t_{delivery,o} - t_{ready,o}$).
 		      Se reportan la media y el percentil 90.
 		\item \textbf{Cumplimiento SLA}: porcentaje de órdenes entregadas con
@@ -2224,9 +2366,10 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	La Tabla~\ref{tab:kpis} presenta los 21 indicadores con su definición abreviada
 	y la dimensión a la que pertenecen.
 
-	\begin{table}[htbp]
+	\begin{table}[H]
 		\centering
-		\small
+		\footnotesize
+		\renewcommand{\arraystretch}{0.86}
 		\caption{Indicadores clave de desempeño (KPIs) evaluados.}
 		\label{tab:kpis}
 		\begin{tabular}{@{}rllp{5.8cm}@{}}
@@ -2335,7 +2478,7 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\end{tabular}
 	\end{table}
 
-	\subsection{Análisis del Click-to-Door}
+	\subsection{Análisis del \textit{Click-to-Door}}
 
 	En el escenario de baja saturación (S1), donde la oferta de repartidores es
 	holgada, FCFS logra tiempos de entrega menores que RH
@@ -2374,12 +2517,12 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\begin{figure}[htbp]
 	\centering
 	\includegraphics[width=0.95\textwidth]{img/fig_ctd_boxplot.png}
-	\caption{Distribución del Click-to-Door por escenario y política.  La línea
+	\caption{Distribución del \textit{Click-to-Door} por escenario y política.  La línea
 	roja punteada indica el objetivo SLA de $\tau = 40$~min.}
 	\label{fig:ctd_boxplot}
 	\end{figure}
 
-	\subsection{Ready-to-Pickup y tiempo de espera}
+	\subsection{\textit{Ready-to-Pickup} y tiempo de espera}
 
 	La Tabla~\ref{tab:res_rtp} muestra el indicador Ready-to-Pickup (RtP), que mide el
 	tiempo transcurrido entre el momento en que el pedido está listo y la llegada del
@@ -2389,11 +2532,11 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\begin{table}[htbp]
 	\centering
 	\small
-	\caption{Ready-to-Pickup y CTD Overage: promedio de 7 réplicas.}
+	\caption{\textit{Ready-to-Pickup} y \textit{CTD Overage}: promedio de 7 réplicas.}
 	\label{tab:res_rtp}
 	\begin{tabular}{@{}l rr r rr r@{}}
 	\toprule
-	& \multicolumn{3}{c}{Avg RtP (min)} & \multicolumn{3}{c}{CTD Overage (min)} \\
+	& \multicolumn{3}{c}{\textit{Avg RtP} [min]} & \multicolumn{3}{c}{\textit{CTD Overage} [min]} \\
 	\cmidrule(lr){2-4} \cmidrule(lr){5-7}
 	Esc. & FCFS & RH & $\Delta$\% & FCFS & RH & $\Delta$\% \\
 	\midrule
@@ -2445,10 +2588,11 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\end{tabular}
 	\end{table}
 
-	\subsection{Throughput y utilización}
+	\subsection{Productividad y utilización}
 
-	El indicador Orders/Courier/Hr mide la productividad individual.  El throughput
-	bajo RH es ligeramente superior en S1--S3 ($+3.4\%$ a $+4.9\%$) y se amplía
+	El indicador Orders/Courier/Hr mide la productividad individual ---cuántos
+	pedidos entrega en promedio cada repartidor por hora de turno---.  La
+	productividad bajo RH es ligeramente superior en S1--S3 ($+3.4\%$ a $+4.9\%$) y se amplía
 	a $+17.7\%$ en S4.  Esta ganancia moderada pero consistente se explica por
 	el efecto del agrupamiento: al asignar múltiples pedidos a un mismo courier por
 	viaje, cada turno produce más entregas.  Nótese que, a diferencia de lo que se
@@ -2539,133 +2683,89 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	% ──────────────────────────────────────────────────────────────────
 	\section{Análisis estadístico}
 
-	Para validar que las diferencias observadas entre FCFS y RH son
-	estadísticamente significativas y no producto del azar, se aplica la prueba de
-	Mann-Whitney $U$~\citep{MannWhitney1947} a seis métricas a nivel de orden:
-	Click-to-Door, Ready-to-Pickup, Ready-to-Door, tamaño de agrupamiento,
-	cumplimiento SLA y CTD Overage.
-	Se utiliza un nivel de significancia $\alpha = 0{.}05$ con corrección de
-	Benjamini-Hochberg para comparaciones múltiples, y se reporta la correlación
-	rank-biserial $r = 1 - 2U/(n_1 n_2)$ como medida del tamaño del efecto,
-	clasificado según \citet{Cohen1988}: negligible ($|r| < 0{.}1$),
-	pequeño ($0{.}1 \leq |r| < 0{.}3$), mediano ($0{.}3 \leq |r| < 0{.}5$) y
-	grande ($|r| \geq 0{.}5$).
+	\subsection{Diseño inferencial}
 
-	Se elige Mann-Whitney $U$ por tres razones: (i) no requiere que las distribuciones
-	de los KPIs sean normales --- la prueba de Shapiro-Wilk rechazó la normalidad
-	en las 160 distribuciones evaluadas (4~escenarios $\times$ 7~semillas $\times$
-	2~políticas $\times$ múltiples métricas), confirmando esta condición;
-	(ii) es robusto ante la presencia de valores atípicos; y (iii) compara las
-	distribuciones ordinales, lo que es apropiado cuando el interés es determinar si
-	una política produce valores \emph{estocásticamente} menores que la otra.
-	Adicionalmente, se aplica la prueba de Kruskal-Wallis como test ómnibus para
-	evaluar si el efecto de la política varía significativamente entre escenarios.
+	El experimento posee un diseño de medidas repetidas: cada orden se
+	evalúa bajo ambas políticas con la misma semilla y el mismo mapa.
+	Conforme a este diseño, la prueba primaria es el test de Wilcoxon
+	signed-rank pareado \citep{Wilcoxon1945} aplicado a las medias por
+	semilla, de modo que cada semilla aporta una observación independiente
+	al test y se evita la pseudo-replicación que inflaría artificialmente
+	los grados de libertad \citep{Hurlbert1984}.  Se reporta la diferencia
+	de medias entre semillas con intervalo de confianza $t$-Student al
+	95\,\% y el rank-biserial pareado como tamaño de efecto.  Para evaluar
+	si la magnitud del efecto varía entre regímenes se utiliza la prueba
+	ómnibus de Friedman \citep{Friedman1937} sobre la matriz
+	semillas\,$\times$\,escenarios de
+	$\Delta\text{CtD} = \text{CtD}_{\text{FCFS}} - \text{CtD}_{\text{RH}}$.
+	Los cálculos detallados, incluyendo análisis suplementarios a nivel
+	orden, residen en
+	\texttt{results/experiments/20260413\_182745/}.
 
-	\subsection{Resultados de la prueba Mann-Whitney $U$}
+	\subsection{Resultados}
 
-	La Tabla~\ref{tab:mann_whitney} presenta los resultados de la prueba para el
-	Click-to-Door en cada escenario, agregados sobre las siete semillas válidas.
-	Para la métrica Click-to-Door, las 28 pruebas individuales (4 escenarios $\times$ 7 semillas)
-	resultaron significativas tras la corrección de Benjamini-Hochberg.
-	Para Ready-to-Pickup en S4, el efecto no alcanzó significancia en todas las semillas
-	($\bar{r} = 0.033$), lo cual es consistente con la menor sensibilidad de esta métrica
-	al mecanismo de agrupamiento bajo saturación extrema.
+	La Tabla~\ref{tab:wilcoxon_seed} consolida la inferencia primaria
+	para las dos métricas clave: Click-to-Door y SLA Compliance.  La
+	convención de signos es $\bar{\Delta} = \bar{x}_{\text{FCFS}} -
+	\bar{x}_{\text{RH}}$, por lo que en CtD un $\bar{\Delta} > 0$ favorece
+	a RH (menor tiempo de entrega) y en SLA un $\bar{\Delta} < 0$ favorece
+	a RH (mayor cumplimiento).
 
 	\begin{table}[htbp]
 	\centering
 	\small
-	\caption{Prueba de Mann-Whitney $U$ para Click-to-Door: 7 semillas ($\bar{r} \pm \sigma$).}
-	\label{tab:mann_whitney}
-	\begin{tabular}{@{}l rr c c l@{}}
+	\caption{Wilcoxon \textit{signed-rank} pareado a nivel semilla ($n=7$): \textit{Click-to-Door} y SLA \textit{Compliance}.}
+	\label{tab:wilcoxon_seed}
+	\begin{tabular}{@{}ll rr l c r@{}}
 	\toprule
-	Esc. & $\bar{x}_{\text{FCFS}}$ & $\bar{x}_{\text{RH}}$ & $p$ & $\bar{r} \pm \sigma_r$ & Efecto \\
+	Esc. & Métrica & $\bar{x}_{\text{FCFS}}$ & $\bar{x}_{\text{RH}}$ & $\bar{\Delta}$ [CI 95\%] & $p$ Wilcoxon & $r$ pareado \\
 	\midrule
-	S1 & 10.10 & 20.38 & $<0.001$ & $0.911 \pm 0.018$ & Grande  \\
-	S2 & 16.68 & 22.74 & $<0.001$ & $0.687 \pm 0.045$ & Grande  \\
-	S3 & 35.79 & 25.52 & $<0.001$ & $0.406 \pm 0.046$ & Mediano \\
-	S4 & 75.41 & 32.26 & $<0.001$ & $0.144 \pm 0.030$ & Peq.    \\
+	S1 & CtD (min) & 10.10 & 20.38 & $-10.28\ [-10.64,\ -9.93]$    & 0.0156 & $-1.00$ \\
+	S1 & SLA (\%)  & 100.0 & 99.2  & $\phantom{-}+0.8\ [+0.4,\ +1.2]$ & 0.0156 & $+1.00$ \\
+	S2 & CtD (min) & 16.68 & 22.74 & $\phantom{-}-6.06\ [-7.79,\ -4.32]$ & 0.0156 & $-1.00$ \\
+	S2 & SLA (\%)  & 91.7  & 97.1  & $-5.4\ [-7.6,\ -3.2]$         & 0.0156 & $-1.00$ \\
+	S3 & CtD (min) & 35.79 & 25.52 & $+10.27\ [+7.19,\ +13.35]$    & 0.0156 & $+1.00$ \\
+	S3 & SLA (\%)  & 76.3  & 90.2  & $-14.0\ [-15.5,\ -12.5]$      & 0.0156 & $-1.00$ \\
+	S4 & CtD (min) & 75.41 & 32.26 & $+43.15\ [+38.91,\ +47.39]$   & 0.0156 & $+1.00$ \\
+	S4 & SLA (\%)  & 61.2  & 78.3  & $-17.1\ [-20.1,\ -14.1]$      & 0.0156 & $-1.00$ \\
 	\bottomrule
 	\end{tabular}
 	\end{table}
 
-	El tamaño del efecto disminuye progresivamente de S1 a S4, lo cual requiere
-	interpretación cuidadosa.  En S1--S2, el efecto grande ($r > 0.5$) indica que
-	FCFS produce valores de CtD \emph{estocásticamente menores} que RH (a favor de
-	FCFS).  En S3, el efecto mediano ($r = 0.406$) ya refleja una inversión parcial:
-	aunque el estadístico aún favorece ligeramente a FCFS en la comparación ordinal,
-	la \emph{media} del CtD bajo RH es inferior (25.52 vs 35.79~min), lo cual
-	indica que RH reduce la tendencia central a pesar de que FCFS mantiene una
-	fracción mayor de entregas rápidas (P10--P50 más bajos).  En S4, el efecto
-	pequeño ($r = 0.144$) refleja la alta variabilidad de la distribución bajo
-	FCFS (con cola hasta 420~min), no la ausencia de una diferencia
-	operativamente relevante: RH reduce el CtD promedio un 57.2\%.
+	El valor $p = 0{.}0156$ es el mínimo alcanzable por Wilcoxon con
+	$n=7$ y todas las diferencias del mismo signo, condición que se
+	cumple en las ocho pruebas.  Los intervalos de confianza no incluyen
+	al cero en ninguna fila, confirmando que los efectos observados son
+	estadísticamente robustos.  La prueba ómnibus de Friedman sobre la
+	matriz $7 \times 4$ de $\Delta\text{CtD}$ confirma además que la
+	magnitud del efecto varía significativamente entre regímenes de
+	saturación ($\chi^2_F = 21{.}0$, $p < 0{.}001$), lo que justifica el
+	análisis estratificado por escenario.
 
-	La Tabla~\ref{tab:mann_whitney_overage} complementa el análisis con los resultados
-	para el CTD Overage.
+	\subsection{Discusión por regímenes}
 
-	\begin{table}[htbp]
-	\centering
-	\small
-	\caption{Mann-Whitney $U$ para CTD Overage: 7 semillas ($\bar{r} \pm \sigma$).}
-	\label{tab:mann_whitney_overage}
-	\begin{tabular}{@{}l rr c c l@{}}
-	\toprule
-	Esc. & $\bar{x}_{\text{FCFS}}$ & $\bar{x}_{\text{RH}}$ & $p$ & $\bar{r} \pm \sigma_r$ & Efecto \\
-	\midrule
-	S1 & 0.00  & 0.02 & $<0.05$ & $\phantom{-}0.008 \pm 0.004$ & Neg.    \\
-	S2 & 2.85  & 0.09 & $<0.001$ & $-0.056 \pm 0.025$ & Neg.    \\
-	S3 & 17.24 & 0.83 & $<0.001$ & $-0.160 \pm 0.019$ & Peq.    \\
-	S4 & 52.06 & 4.72 & $<0.001$ & $-0.240 \pm 0.026$ & Peq.    \\
-	\bottomrule
-	\end{tabular}
-	\end{table}
+	Los resultados revelan dos regímenes de comportamiento.  En
+	\textbf{baja saturación (S1--S2)}, FCFS logra menores tiempos de
+	Click-to-Door que RH (\,$\bar{\Delta}_{\text{CtD}} = -10{.}28$~min en
+	S1; $-6{.}06$~min en S2\,), porque con exceso de repartidores el
+	despacho greedy asigna cada pedido inmediatamente al courier más
+	cercano, mientras que RH introduce la latencia del ciclo de
+	optimización sin disponer de masa suficiente para amortizar el costo
+	del agrupamiento.  Sin embargo, ya en S2 RH alcanza un cumplimiento
+	SLA superior (97.1\% vs 91.7\%, $\bar{\Delta} = -5.4$\,pp),
+	señal temprana de que la coordinación de agrupamientos evita los
+	rezagos que la política greedy genera.
 
-	Los valores negativos de $\bar{r}$ para el CTD Overage indican que RH produce
-	valores \emph{estocásticamente menores} que FCFS: los pedidos bajo RH exceden
-	el umbral SLA en menor magnitud.  El efecto crece monotónicamente con la
-	saturación, confirmando que la ventaja de RH se amplifica bajo presión
-	operativa.
-
-	La prueba de Kruskal-Wallis sobre las diferencias por orden
-	$\text{CtD}_{\text{FCFS}} - \text{CtD}_{\text{RH}}$ confirma que el efecto de la
-	política varía significativamente entre escenarios ($H = 782.78$, $p < 0.001$),
-	lo que justifica el análisis por regímenes de saturación.
-
-	\subsection{Discusión de resultados}
-
-	Los resultados revelan dos regímenes de comportamiento en función de la saturación,
-	con una zona de transición claramente identificable.
-
-	\paragraph{Régimen de baja saturación (S1--S2).}
-	Con una flota holgada, FCFS logra tiempos CtD menores que RH
-	(10.10 vs 20.38~min en S1; 16.68 vs 22.74~min en S2).
-	La prueba de Mann-Whitney confirma diferencias significativas con tamaño de efecto
-	grande ($\bar{r} = 0.911$ y $\bar{r} = 0.687$, respectivamente), \emph{a favor
-	de FCFS} en la métrica CtD.  Esto se explica porque, con exceso de repartidores,
-	FCFS despacha cada pedido inmediatamente al courier más cercano, mientras que
-	RH introduce la latencia del ciclo de optimización.
-
-	Sin embargo, ya en S2 se observa una señal temprana: el cumplimiento SLA bajo
-	RH es superior (97.0\% vs 91.7\%) y el CTD Overage se reduce en más de un
-	96\% (0.09 vs 2.85~min).  Esto indica que, aunque la política greedy es más
-	rápida en promedio, genera una cola de pedidos rezagados que RH logra evitar
-	mediante la coordinación de agrupamientos.
-
-	\paragraph{Régimen de saturación media--alta (S3--S4).}
-	A partir de S3 ($\rho = 35$), RH supera decisivamente a FCFS en
-	todas las métricas de calidad de servicio.  En S3, el CtD promedio se reduce
-	un 28.7\% y la cola derecha se comprime drásticamente (P90: 39.94 vs
-	117.19~min, $-65.9\%$).  En S4, la mejora alcanza un 57.2\% en CtD promedio
-	y un 77.1\% en P90~CtD, con la eliminación total de pedidos no entregados.
-
-	La prueba de Mann-Whitney detecta un efecto mediano en S3 ($\bar{r} = 0.406$)
-	y pequeño en S4 ($\bar{r} = 0.144$); el decrecimiento del efecto ordinal
-	contrasta con el aumento de la mejora en media, lo cual se explica por la
-	distribución bimodal de FCFS en alta saturación: una masa de pedidos entregados
-	rápidamente (los primeros de la cola) junto con una cola larga de pedidos
-	que esperan horas, promediando un CtD alto pero con mediana relativamente
-	baja.  RH, en cambio, produce una distribución
-	unimodal y compacta.
+	En \textbf{saturación media--alta (S3--S4)} la situación se invierte:
+	RH supera decisivamente a FCFS en ambas métricas.  En S3 el CtD
+	promedio se reduce un 28.7\,\% ($\bar{\Delta} = +10{.}27$~min) y el
+	SLA mejora en 14.0\,pp.  En S4 la mejora alcanza el 57.2\,\% en CtD
+	($\bar{\Delta} = +43{.}15$~min) y 17.1\,pp en SLA, además de eliminar
+	por completo las órdenes no entregadas que FCFS deja al cierre del
+	turno.  El rank-biserial pareado pasa de $r = -1{.}00$ en S1--S2 (en
+	favor de FCFS) a $r = +1{.}00$ en S3--S4 (en favor de RH), reflejando
+	el cruce de regímenes detectado también gráficamente en la
+	Figura~\ref{fig:kpi_vs_ratio}.
 
 	\subsection{Comparación con la literatura}
 
@@ -2707,17 +2807,6 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\label{fig:kpi_vs_ratio}
 	\end{figure}
 
-	La Figura~\ref{fig:util_cost} presenta el trade-off entre utilización del courier
-	y costo por pedido, mostrando que RH logra menor utilización con throughput
-	equivalente o superior, lo cual indica mayor eficiencia kilométrica.
-
-	\begin{figure}[htbp]
-	\centering
-	\includegraphics[width=0.85\textwidth]{img/fig_utilization_cost.png}
-	\caption{Trade-off entre utilización del courier y costo por pedido.}
-	\label{fig:util_cost}
-	\end{figure}
-
 	\chapter{Conclusiones}
 
 	Este capítulo sintetiza los hallazgos principales del trabajo, verifica el
@@ -2738,9 +2827,9 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\subsection{Objetivos específicos}
 
 	\paragraph{OE\,1: Generación de instancias sintéticas.}
-	Se implementó un generador estocástico (\texttt{make\_synth\_orders.py}) que
-	proyecta patrones temporales de la literatura (LaDe) sobre la estructura
-	demográfica real de La Paz.  Las diez semillas ($s \in \{2025, \ldots, 2034\}$)
+	Se implementó un generador estocástico que proyecta patrones temporales de la
+	literatura (LaDe) sobre la estructura demográfica real de La Paz
+	(\texttt{make\_synth\_orders.py}). Las diez semillas ($s \in \{2025, \ldots, 2034\}$)
 	producen instancias reproducibles de $\sim$1\,038~órdenes distribuidas en
 	25~restaurantes; siete de ellas generaron resultados válidos.
 
@@ -2760,14 +2849,18 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	unicidad de cada \texttt{order\_id} en los resultados de ambas políticas.
 
 	\paragraph{OE\,4: Cuantificación estadística.}
-	Se aplicó la prueba de Mann-Whitney~$U$ al Click-to-Door y cinco métricas
-	adicionales en los cuatro escenarios, obteniendo $p < 0.001$ en todas las
-	comparaciones tras corrección de Benjamini-Hochberg.  La correlación
-	rank-biserial promedio varía de $\bar{r} = 0.911$ (Grande) en S1 a
-	$\bar{r} = 0.144$ (Pequeño) en S4, confirmando diferencias estadísticamente
-	significativas cuya dirección e intensidad dependen del nivel de saturación.
-	La prueba ómnibus de Kruskal-Wallis ($H = 782.78$, $p < 0.001$) confirma que
-	el efecto varía significativamente entre escenarios.
+	Se aplicó la prueba de Wilcoxon \textit{signed-rank} pareado a nivel semilla
+	($n = 7$) sobre \textit{Click-to-Door} y SLA \textit{Compliance} en los cuatro escenarios,
+	obteniendo $p = 0{.}0156$ ---el valor mínimo alcanzable con $n = 7$ cuando
+	todas las diferencias comparten signo--- en las ocho pruebas.  Los
+	intervalos de confianza $t$-Student al 95\,\% de la diferencia de medias
+	por semilla no incluyen al cero en ninguna fila.  El tamaño de efecto
+	\textit{rank-biserial} pareado es $r = \pm 1{.}00$ en todos los escenarios,
+	reflejando consistencia perfecta del signo entre réplicas (negativo en
+	S1--S2, en favor de FCFS; positivo en S3--S4, en favor de RH).  La prueba
+	ómnibus de Friedman sobre la matriz $7 \times 4$ de $\Delta\text{CtD}$
+	($\chi^2_F = 21{.}0$, $p < 0{.}001$) confirma que la magnitud del efecto
+	varía significativamente entre regímenes de saturación.
 
 	% ──────────────────────────────────────────────────────────────────
 	\section{Verificación de la hipótesis}
@@ -2782,13 +2875,13 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 		      (10.10 vs 20.38~min en S1; 16.68 vs 22.74~min en S2) porque despacha
 		      cada pedido inmediatamente sin latencia de agrupamiento.  Sin embargo,
 		      ya en S2, RH supera a FCFS en cumplimiento SLA (97.0\% vs 91.7\%) y
-		      reduce el CTD Overage un 96.8\%, mostrando una señal temprana de la
-		      ventaja del agrupamiento.  En throughput, RH es superior incluso en
+		      reduce el \textit{CTD Overage} un 96.8\%, mostrando una señal temprana de la
+		      ventaja del agrupamiento.  En \textit{throughput}, RH es superior incluso en
 		      este régimen ($+3.4\%$ a $+4.9\%$), verificando parcialmente la
 		      hipótesis en su componente de eficiencia operativa.
 		\item \textbf{Saturación media (S3).}  RH supera a FCFS en todas las métricas
 		      de calidad: CtD promedio $-28.7\%$ (25.52 vs 35.79~min),
-		      P90~CtD $-65.9\%$, SLA $+18.2$~pp y CTD~Overage $-95.2\%$.
+		      P90~CtD $-65.9\%$, SLA $+18.2$~pp y \textit{CTD Overage} $-95.2\%$.
 		      La hipótesis se verifica en este régimen.
 		\item \textbf{Alta saturación (S4).}  RH reduce el CtD un $57.2\%$
 		      (32.26 vs 75.41~min), el P90~CtD un $77.1\%$ (52.27 vs 228.01~min),
@@ -2797,7 +2890,7 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 		      La hipótesis alcanza su máxima verificación empírica.
 	\end{itemize}
 
-	En cuanto a la eficiencia de la flota, el throughput bajo RH es
+	En cuanto a la eficiencia de la flota, el \textit{throughput} bajo RH es
 	consistentemente superior en todos los escenarios ($+3.4\%$ a $+17.7\%$).
 	La distancia por pedido se reduce significativamente a partir de S2
 	($-11.3\%$ a $-39.9\%$), y la utilización bajo RH es menor que bajo FCFS en
@@ -2837,15 +2930,17 @@ se asume que los patrones de comportamiento de consumo son universales y transfe
 	\section{Trabajo futuro}
 
 	\begin{itemize}
-		\item \textbf{Diagnóstico de semillas fallidas.}  Investigar la condición de
-		      borde que impide la asignación de órdenes en 3 de 10 semillas,
-		      posiblemente asociada a la disponibilidad del servicio OSRM,
-		      para incrementar la tasa de éxito del simulador.
+		\item \textbf{Robustez de la integración con OSRM.}  Confirmar el modo
+		      de fallo observado en 3 de 10 semillas ---atribuido a interrupciones
+		      del servicio OSRM durante esas corridas--- e introducir mecanismos
+		      de reintento y monitoreo de salud del servicio para garantizar
+		      la tasa de éxito completa del simulador en futuras campañas
+		      experimentales.
 		\item \textbf{Demanda real.}  Sustituir las instancias sintéticas por datos
 		      operacionales de una plataforma de \emph{delivery} activa en La Paz
 		      para validar la transferibilidad de los resultados.
 		\item \textbf{Congestión dinámica.}  Incorporar perfiles de velocidad
-		      variables por hora del día en OSRM (traffic profiles) para capturar
+		      variables por hora del día en OSRM (\textit{traffic profiles}) para capturar
 		      el efecto de la congestión sobre los tiempos de viaje.
 		\item \textbf{Calibración de pesos.}  Explorar métodos de ajuste automático
 		      de los pesos de la función de costo ($w_1, w_2, w_3, w_4$) mediante
