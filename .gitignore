@@ -7,3 +7,19 @@
 # Generated map HTML files (regenerable via scripts)
 /results/maps/
 
+# LaTeX build artifacts (el .pdf y el .bbl si se versionan)
+*.aux
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lot
+*.out
+*.toc
+*.idx
+*.ind
+*.ilg
+*.synctex.gz
+*.synctex(busy)
+

@@ -1,0 +1,561 @@
+\begin{thebibliography}{}
+
+\bibitem [\protect \citeauthoryear {%
+Boeing%
+}{%
+Boeing%
+}{%
+{\protect \APACyear {2021}}%
+}]{%
+Boeing2021}
+\APACinsertmetastar {%
+Boeing2021}%
+\begin{APACrefauthors}%
+Boeing, G.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2021}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Street Network Models and Indicators for Every Urban
+  Area in the World} {Street network models and indicators for every urban area
+  in the world}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Geographical Analysis}{53}{3}{482--508}.
+\newblock
+\APACrefnote{Ver también su trabajo en OSMnx para validación topológica}
+\newblock
+\begin{APACrefDOI} \doi{10.1111/gean.12281} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Boyac{\i}%
+, Dang%
+\BCBL {}\ \BBA {} Letchford%
+}{%
+Boyac{\i}%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2021}}%
+}]{%
+Boyaci2021}
+\APACinsertmetastar {%
+Boyaci2021}%
+\begin{APACrefauthors}%
+Boyac{\i}, B.%
+, Dang, T\BPBI H.%
+\BCBL {}\ \BBA {} Letchford, A\BPBI N.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2021}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Vehicle routing on road networks: How good is Euclidean
+  approximation?} {Vehicle routing on road networks: How good is euclidean
+  approximation?}{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Computers \& Operations Research}{129}{}{105197}.
+\newblock
+\begin{APACrefDOI} \doi{10.1016/j.cor.2020.105197} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Cohen%
+}{%
+Cohen%
+}{%
+{\protect \APACyear {1988}}%
+}]{%
+Cohen1988}
+\APACinsertmetastar {%
+Cohen1988}%
+\begin{APACrefauthors}%
+Cohen, J.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYear{1988}.
+\newblock
+\APACrefbtitle {Statistical Power Analysis for the Behavioral Sciences}
+  {Statistical power analysis for the behavioral sciences}\ (\PrintOrdinal{2}\
+  \BEd).
+\newblock
+\APACaddressPublisher{}{Lawrence Erlbaum Associates}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Dantzig%
+\ \BBA {} Ramser%
+}{%
+Dantzig%
+\ \BBA {} Ramser%
+}{%
+{\protect \APACyear {1959}}%
+}]{%
+Dantzig1959}
+\APACinsertmetastar {%
+Dantzig1959}%
+\begin{APACrefauthors}%
+Dantzig, G\BPBI B.%
+\BCBT {}\ \BBA {} Ramser, J\BPBI H.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{1959}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {The Truck Dispatching Problem} {The truck dispatching
+  problem}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Management Science}{6}{1}{80-91}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Figliozzi%
+}{%
+Figliozzi%
+}{%
+{\protect \APACyear {2007}}%
+}]{%
+Figliozzi2007}
+\APACinsertmetastar {%
+Figliozzi2007}%
+\begin{APACrefauthors}%
+Figliozzi, M\BPBI A.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2007}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Analysis of the efficiency of urban commercial vehicle
+  tours: Data collection, methodology, and policy implications} {Analysis of
+  the efficiency of urban commercial vehicle tours: Data collection,
+  methodology, and policy implications}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Transportation Research Part B:
+  Methodological}{41}{9}{1014--1032}.
+\newblock
+\begin{APACrefDOI} \doi{10.1016/j.trb.2007.04.006} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Geisberger%
+, Sanders%
+, Schultes%
+\BCBL {}\ \BBA {} Delling%
+}{%
+Geisberger%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2008}}%
+}]{%
+Geisberger2008}
+\APACinsertmetastar {%
+Geisberger2008}%
+\begin{APACrefauthors}%
+Geisberger, R.%
+, Sanders, P.%
+, Schultes, D.%
+\BCBL {}\ \BBA {} Delling, D.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2008}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Contraction Hierarchies: Faster and Simpler Hierarchical
+  Routing in Road Networks} {Contraction hierarchies: Faster and simpler
+  hierarchical routing in road networks}.{\BBCQ}
+\newblock
+\BIn{} \APACrefbtitle {Proceedings of the 7th International Workshop on
+  Experimental Algorithms (WEA 2008)} {Proceedings of the 7th international
+  workshop on experimental algorithms (wea 2008)}\ (\BVOL\ 5038, \BPGS\
+  319--333).
+\newblock
+\APACaddressPublisher{Berlin, Heidelberg}{Springer}.
+\newblock
+\begin{APACrefDOI} \doi{10.1007/978-3-540-68552-4_24} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Haklay%
+}{%
+Haklay%
+}{%
+{\protect \APACyear {2010}}%
+}]{%
+Haklay2010}
+\APACinsertmetastar {%
+Haklay2010}%
+\begin{APACrefauthors}%
+Haklay, M.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2010}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {How Good is Volunteered Geographical Information? A
+  Comparative Study of OpenStreetMap and Ordnance Survey Datasets} {How good is
+  volunteered geographical information? a comparative study of openstreetmap
+  and ordnance survey datasets}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Environment and Planning B: Planning and
+  Design}{37}{4}{682--703}.
+\newblock
+\begin{APACrefDOI} \doi{10.1068/b35097} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Jazemi%
+, Alidadiani%
+, Ahn%
+\BCBL {}\ \BBA {} Jang%
+}{%
+Jazemi%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2023}}%
+}]{%
+Jazemi2023}
+\APACinsertmetastar {%
+Jazemi2023}%
+\begin{APACrefauthors}%
+Jazemi, R.%
+, Alidadiani, E.%
+, Ahn, K.%
+\BCBL {}\ \BBA {} Jang, J.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2023}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {A Review of Literature on Vehicle Routing Problems of
+  Last-Mile Delivery in Urban Areas} {A review of literature on vehicle routing
+  problems of last-mile delivery in urban areas}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Applied Sciences}{13}{2413015}{}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Kuhn%
+}{%
+Kuhn%
+}{%
+{\protect \APACyear {1955}}%
+}]{%
+Kuhn1955}
+\APACinsertmetastar {%
+Kuhn1955}%
+\begin{APACrefauthors}%
+Kuhn, H\BPBI W.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{1955}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {The {H}ungarian Method for the Assignment Problem} {The
+  {H}ungarian method for the assignment problem}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Naval Research Logistics Quarterly}{2}{1--2}{83--97}.
+\newblock
+\begin{APACrefDOI} \doi{10.1002/nav.3800020109} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Laporte%
+}{%
+Laporte%
+}{%
+{\protect \APACyear {2009}}%
+}]{%
+Laporte2009VRPSurvey}
+\APACinsertmetastar {%
+Laporte2009VRPSurvey}%
+\begin{APACrefauthors}%
+Laporte, G.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2009}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Fifty Years of Vehicle Routing} {Fifty years of vehicle
+  routing}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Transportation Science}{43}{4}{408--416}.
+\newblock
+\begin{APACrefDOI} \doi{10.1287/trsc.1090.0301} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Larsen%
+}{%
+Larsen%
+}{%
+{\protect \APACyear {2000}}%
+}]{%
+Larsen2000DVRP}
+\APACinsertmetastar {%
+Larsen2000DVRP}%
+\begin{APACrefauthors}%
+Larsen, J.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2000}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {The Dynamic Vehicle Routing Problem: Survey of
+  Classifications} {The dynamic vehicle routing problem: Survey of
+  classifications}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Computers \& Operations Research}{27}{10}{103--122}.
+\newblock
+\begin{APACrefDOI} \doi{10.1016/S0305-0548(99)00100-X} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Mann%
+\ \BBA {} Whitney%
+}{%
+Mann%
+\ \BBA {} Whitney%
+}{%
+{\protect \APACyear {1947}}%
+}]{%
+MannWhitney1947}
+\APACinsertmetastar {%
+MannWhitney1947}%
+\begin{APACrefauthors}%
+Mann, H\BPBI B.%
+\BCBT {}\ \BBA {} Whitney, D\BPBI R.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{1947}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {On a Test of Whether One of Two Random Variables Is
+  Stochastically Larger than the Other} {On a test of whether one of two random
+  variables is stochastically larger than the other}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{The Annals of Mathematical Statistics}{18}{1}{50--60}.
+\newblock
+\begin{APACrefDOI} \doi{10.1214/aoms/1177730491} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Merkel%
+}{%
+Merkel%
+}{%
+{\protect \APACyear {2014}}%
+}]{%
+Merkel2014}
+\APACinsertmetastar {%
+Merkel2014}%
+\begin{APACrefauthors}%
+Merkel, D.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2014}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Docker: Lightweight Linux Containers for Consistent
+  Development and Deployment} {Docker: Lightweight linux containers for
+  consistent development and deployment}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Linux Journal}{2014}{239}{2}.
+\newblock
+\begin{APACrefURL}
+  \url{http://www.linuxjournal.com/content/docker-lightweight-linux-containers-consistent-development-and-deployment}
+  \end{APACrefURL}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Muñoz-Villamizar%
+, Solano-Charris%
+, Reyes-Rubiano%
+\BCBL {}\ \BBA {} Faulin%
+}{%
+Muñoz-Villamizar%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2021}}%
+}]{%
+MunozVillamizar2021}
+\APACinsertmetastar {%
+MunozVillamizar2021}%
+\begin{APACrefauthors}%
+Muñoz-Villamizar, A.%
+, Solano-Charris, E\BPBI L.%
+, Reyes-Rubiano, L.%
+\BCBL {}\ \BBA {} Faulin, J.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2021}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Measuring Disruptions in Last-Mile Delivery Operations}
+  {Measuring disruptions in last-mile delivery operations}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Logistics}{5}{1}{}.
+\newblock
+\begin{APACrefDOI} \doi{10.3390/logistics5010017} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Pereira%
+, Saraiva%
+, Herszenhut%
+, Braga%
+\BCBL {}\ \BBA {} Conway%
+}{%
+Pereira%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2021}}%
+}]{%
+Pereira2021}
+\APACinsertmetastar {%
+Pereira2021}%
+\begin{APACrefauthors}%
+Pereira, R\BPBI H\BPBI M.%
+, Saraiva, M.%
+, Herszenhut, D.%
+, Braga, C\BPBI K.%
+\BCBL {}\ \BBA {} Conway, M\BPBI W.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2021}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {r5r: Rapid Realistic Routing on Multimodal Transport
+  Networks with {R5} in {R}} {r5r: Rapid realistic routing on multimodal
+  transport networks with {R5} in {R}}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Findings}{}{}{}.
+\newblock
+\begin{APACrefURL}
+  \url{https://findingspress.org/article/21262-r5r-rapid-realistic-routing-on-multimodal-transport-networks-with-r5-in-r}
+  \end{APACrefURL}
+\newblock
+\begin{APACrefDOI} \doi{10.32866/001c.21262} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Pillac%
+, Gendreau%
+, Guéret%
+\BCBL {}\ \BBA {} Medaglia%
+}{%
+Pillac%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2013}}%
+}]{%
+Pillac2013}
+\APACinsertmetastar {%
+Pillac2013}%
+\begin{APACrefauthors}%
+Pillac, V.%
+, Gendreau, M.%
+, Guéret, C.%
+\BCBL {}\ \BBA {} Medaglia, A\BPBI L.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2013}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {A Review of Dynamic Vehicle Routing Problems} {A review
+  of dynamic vehicle routing problems}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{European Journal of Operational
+  Research}{225}{1}{1--11}.
+\newblock
+\begin{APACrefDOI} \doi{10.1016/j.ejor.2012.08.015} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Reyes%
+, Erera%
+, Savelsbergh%
+, Sahasrabudhe%
+\BCBL {}\ \BBA {} O'Neil%
+}{%
+Reyes%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2018}}%
+}]{%
+Reyes2018}
+\APACinsertmetastar {%
+Reyes2018}%
+\begin{APACrefauthors}%
+Reyes, D.%
+, Erera, A.%
+, Savelsbergh, M.%
+, Sahasrabudhe, S.%
+\BCBL {}\ \BBA {} O'Neil, R.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2018}{March}{}.
+\newblock
+{\BBOQ}\APACrefatitle {The Meal Delivery Routing Problem} {The meal delivery
+  routing problem}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Optimization Online}{}{}{}.
+\newblock
+\begin{APACrefURL}
+  \url{http://www.optimization-online.org/DB_FILE/2018/03/6512.pdf}
+  \end{APACrefURL}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Ross%
+}{%
+Ross%
+}{%
+{\protect \APACyear {2014}}%
+}]{%
+Ross2014}
+\APACinsertmetastar {%
+Ross2014}%
+\begin{APACrefauthors}%
+Ross, S\BPBI M.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYear{2014}.
+\newblock
+\APACrefbtitle {Introduction to Probability Models} {Introduction to
+  probability models}\ (\PrintOrdinal{11th}\ \BEd).
+\newblock
+\APACaddressPublisher{Amsterdam}{Academic Press}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Wu%
+\ \protect \BOthers {.}}{%
+Wu%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2023}}%
+}]{%
+Wu2023LaDe}
+\APACinsertmetastar {%
+Wu2023LaDe}%
+\begin{APACrefauthors}%
+Wu, L.%
+, Wen, H.%
+, Hu, H.%
+, Wang, Y.%
+, Li, Y.%
+, Wang, J.%
+\BDBL {}Xu, M.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2023}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {LaDe: The First Comprehensive Last-mile Delivery Dataset
+  from Industry} {Lade: The first comprehensive last-mile delivery dataset from
+  industry}.{\BBCQ}
+\newblock
+\BIn{} \APACrefbtitle {Proceedings of the 32nd ACM International Conference on
+  Information and Knowledge Management (CIKM '23)} {Proceedings of the 32nd acm
+  international conference on information and knowledge management (cikm '23)}\
+  (\BPG~2619–2628).
+\newblock
+\begin{APACrefDOI} \doi{10.1145/3583780.3614820} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\end{thebibliography}

@@ -1,0 +1,82 @@
+{
+  // --- LaTeX Workshop (James-Yu.latex-workshop) ---
+  // Ambos documentos (docs/tesisss.tex y ponencia/tesisss.tex) usan BibTeX,
+  // no Biber: natbib+unsrtnat en la tesis, apacite en la ponencia.
+  "latex-workshop.latex.tools": [
+    {
+      "name": "pdflatex",
+      "command": "pdflatex",
+      "args": [
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "%DOC%"
+      ],
+      "env": {}
+    },
+    {
+      "name": "bibtex",
+      "command": "bibtex",
+      "args": ["%DOCFILE%"],
+      "env": {}
+    },
+    {
+      "name": "latexmk",
+      "command": "latexmk",
+      "args": [
+        "-pdf",
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "%DOC%"
+      ],
+      "env": {}
+    }
+  ],
+  "latex-workshop.latex.recipes": [
+    {
+      // Receta por defecto: funciona con BasicTeX tal como esta instalado.
+      "name": "pdflatex -> bibtex -> pdflatex x2",
+      "tools": ["pdflatex", "bibtex", "pdflatex", "pdflatex"]
+    },
+    {
+      // Requiere: sudo tlmgr install latexmk
+      "name": "latexmk (pdflatex)",
+      "tools": ["latexmk"]
+    }
+  ],
+  "latex-workshop.latex.outDir": "%DIR%",
+  // Compilar manualmente (boton play en la barra TeX o Cmd+Alt+B).
+  // La tesis son ~3000 lineas con TikZ y Gantt: compilar en cada guardado estorba.
+  "latex-workshop.latex.autoBuild.run": "never",
+  "latex-workshop.latex.autoClean.run": "onBuilt",
+  "latex-workshop.latex.clean.fileTypes": [
+    "*.aux",
+    "*.blg",
+    "*.fdb_latexmk",
+    "*.fls",
+    "*.lof",
+    "*.log",
+    "*.lot",
+    "*.out",
+    "*.toc",
+    "*.idx",
+    "*.ind",
+    "*.ilg",
+    "*.nav",
+    "*.snm",
+    "*.vrb",
+    "*.synctex(busy)"
+  ],
+  "latex-workshop.latex.search.rootFiles.include": [
+    "docs/tesisss.tex",
+    "ponencia/tesisss.tex"
+  ],
+  "latex-workshop.view.pdf.viewer": "tab",
+  "latex-workshop.synctex.afterBuild.enabled": true,
+  "latex-workshop.message.badbox.show": false,
+  "[latex]": {
+    "editor.wordWrap": "on",
+    "editor.formatOnSave": false
+  }
+}
