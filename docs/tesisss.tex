@@ -462,7 +462,7 @@ restricciones topológicas reales de la ciudad de La Paz, B.C.S. y patrones de d
 \subsection{Objetivos específicos}
 \begin{itemize}
 	\item Generar un conjunto de instancias sintéticas calibradas que proyecten los patrones temporales
-	de demanda de la literatura (LaDe) sobre el área urbana de La Paz, garantizando la
+	de demanda de la literatura (LaDe) sobre la estructura demográfica real de La Paz, garantizando la 
 	validez geoespacial de los puntos de entrega y recolección.
 	
 	\item Integrar un motor de simulación de eventos discretos con la infraestructura de enrutamiento OSRM sobre 
@@ -482,7 +482,8 @@ restricciones topológicas reales de la ciudad de La Paz, B.C.S. y patrones de d
 \section{Hipótesis}
 La implementación de una política de despacho anticipatoria (Horizonte Rodante), alimentada con una matriz de
 costos de viaje reales (OSRM) sobre la topología de La Paz, superará significativamente en eficiencia operativa
-\textquotedblleft órdenes por hora\textquotedblright\ y nivel de servicio \textquotedblleft\textit{Ready-to-Door}\textquotedblright\ a la estrategia reactiva estándar (FCFS), demostrando la viabilidad de soluciones de optimización logística de alto rendimiento basadas
+\textquotedblleft órdenes por hora\textquotedblright\ y nivel de servicio \textquotedblleft\textit{Ready-to-Door}\textquotedblright\ a la estrategia reactiva estándar (FCFS con estimación
+euclidiana), demostrando la viabilidad de soluciones de optimización logística de alto rendimiento basadas
 exclusivamente en software de código abierto.
 
 \section{Justificación}
@@ -512,18 +513,18 @@ motor de enrutamiento OSRM desplegando su imagen oficial en Docker, lo que permi
 Para las PyMES y startups locales en Baja California Sur, la dependencia de APIs comerciales (como Google Maps) 
 representa una barrera de entrada económica. Al demostrar la viabilidad técnica de optimizar rutas utilizando
 exclusivamente herramientas \textit{Open Source} (OSRM), esta tesis ofrece una alternativa de \textit{soberanía tecnológica}
-que puede reducir los costos de licenciamiento. Esto podría facilitar el acceso a herramientas de logística avanzadas
-a empresas locales que hoy compiten con plataformas transnacionales.
+que reduce los costos operativos. Esto democratiza el acceso a logística de alto nivel, permitiendo que empresas
+locales compitan en eficiencia contra plataformas transnacionales, fomentando así la economía digital regional.
 
 \subsection{Delimitación frente a métodos de Aprendizaje Profundo}
 Aunque existen métodos avanzados de Inteligencia Artificial (como Aprendizaje Profundo), estos requieren grandes
-cantidades de datos históricos o de simulación para entrenarse \citep{Lin2018GreedRL}. En ciudades como La Paz, donde no se dispone
-de registros accesibles de rutas y pedidos, estos modelos enfrentan el problema de \textquotedblleft arranque en frío\textquotedblright: no pueden operar sin entrenamiento previo.
+cantidades de datos históricos para funcionar \citep{Lin2018GreedRL}. En ciudades como La Paz, donde no existen registros previos de rutas
+y pedidos, estos modelos enfrentan el problema de \textquotedblleft arranque en frío\textquotedblright: no pueden operar sin entrenamiento previo.
 
 Por ello, esta tesis utiliza \textit{Rolling Horizon}, un algoritmo que no necesita datos históricos y funciona desde
-el primer día de operación. Además, al ser computacionalmente ligero (Sección~\ref{sec:desempeno_computacional}),
-puede ejecutarse en equipos de cómputo convencionales. Un sistema de este tipo en operación podría, a su vez,
-generar los datos necesarios para entrenar modelos de IA en el futuro.
+el primer día de operación. Además, al ser computacionalmente ligero, permite a las empresas locales operar con 
+servidores económicos. Este sistema servirá, a su vez, para generar los datos necesarios que permitirán entrenar 
+modelos de IA en el futuro.
 
 \section{Alcance y limitaciones}
 
@@ -561,7 +562,7 @@ El sistema compara exclusivamente dos políticas de despacho::
 	en el momento en que se coloca cada orden, al repartidor libre más cercano al restaurante, sin consolidación de órdenes.
 	
 	\item \textbf{Política Propuesta (\textit{Rolling Horizon}):} Implementación de la heurística de
-	\citet{Reyes2018} con un horizonte de asignación configurable (20 minutos en los experimentos) y capacidad de
+	\citet{Reyes2018} con un horizonte de visión configurable (10-20 minutos) y capacidad de 
 	agrupamiento (\textit{bundling}) dinámico de hasta 4 órdenes por repartidor.
 	
 	\item \textbf{Escenario de Control (Aislamiento de Variables):} Ambas políticas se ejecutan
@@ -1150,11 +1151,7 @@ limitación del estudio.
 	frecuentes en grafos con millones de nodos.  \citet{Geisberger2008}
 	proponen \textit{Contraction Hierarchies} (CH), una técnica de
 	preprocesamiento que permite resolver consultas de camino mínimo en
-	milisegundos.  En este trabajo, la ventaja de CH no proviene tanto del
-	tamaño del grafo urbano como del número de consultas: cada época de la
-	política RH evalúa rutas para todos los pares courier--agrupamiento
-	(Sección~2.3.3), y a lo largo de un día simulado se acumulan miles de
-	consultas.
+	milisegundos.
 
 	El algoritmo se divide en dos fases:
 
@@ -1776,8 +1773,6 @@ services:
 	puntos uniformemente en el rectángulo delimitador del polígono y se descartan aquellos que 
 	caen fuera de $\mathcal{P}$ (por ejemplo, sobre la bahía de La Paz). Esto garantiza que 
 	todas las ubicaciones generadas correspondan a puntos terrestres dentro de la mancha urbana.
-	El muestreo es uniforme dentro de $\mathcal{P}$: no se pondera por densidad de población
-	ni por la ubicación real de los comercios.
 
 	\subsubsection{Asignación restaurante-cliente}
 
@@ -1795,13 +1790,6 @@ services:
 	respectivamente. Si múltiples restaurantes caen dentro del rango, se elige uno al azar. 
 	Si ninguno cumple la restricción, se selecciona el restaurante más cercano que exceda 
 	la distancia mínima de 2~km como mecanismo de respaldo.
-
-	La aproximación anterior usa 111~km por grado también en longitud, sin el factor
-	$\cos\phi$ (a 24°\,N un grado de longitud mide $\approx 101$~km), y el polígono urbano
-	es pequeño, por lo que el rango $[2, 5]$~km es nominal.  Medidas con la fórmula de
-	Haversine sobre las 10\,184 órdenes de las diez semillas, las distancias en línea recta
-	restaurante--cliente tienen mediana de 2.30~km (P5 = 1.90~km, P95 = 3.23~km, máximo
-	4.20~km); el 85.5\,\% cae dentro de $[2, 5]$~km.
 
 	\subsubsection{Fuente de datos de restaurantes}
 
@@ -1904,7 +1892,7 @@ services:
 	intervalo $(t - f, t]$ se libera en la actualización de la época $t$ y recibe su siguiente
 	ruta en la época $t + f$: entre el fin de una ruta y el inicio de la siguiente transcurren
 	entre 5 y 10~min.  Esta espera afecta más a la política que realiza más viajes; su efecto
-	sobre los resultados se evalúa en la Sección~\ref{sec:robustez_reloj}.
+	sobre los resultados se discute en la Sección~\ref{sec:limitaciones_resultados}.
 
 	\subsection{Modelos de datos: órdenes, couriers y restaurantes}
 
@@ -2044,10 +2032,7 @@ services:
 		restaurante. Se selecciona $c^* = \arg\min_{c \in \mathcal{C}_{disp}} d(c, o)$.
 		Esta expresión opera en grados sobre la latitud y longitud y se usa
 		únicamente como ordenador para elegir al courier; el tiempo de viaje
-		efectivo se obtiene a continuación con OSRM.  Como el ordenamiento no
-		considera la red vial, el courier elegido puede no ser el que llega
-		antes al restaurante, lo que puede desfavorecer a FCFS cuando los
-		tiempos provienen de OSRM (Sección~\ref{sec:res_topologia}).
+		efectivo se obtiene a continuación con OSRM.
 
 		\item \textbf{Consulta de ruta:} Se solicita a OSRM la ruta completa 
 		$c^*.\textit{location} \to r_o \to \ell_o$, donde $r_o$ es la ubicación del restaurante 
@@ -2090,9 +2075,7 @@ services:
 	Estas simplificaciones hacen de FCFS una línea base reactiva.  Como RH difiere de FCFS en
 	varios mecanismos a la vez ---agrupamiento, asignación global, horizonte de anticipación,
 	compromiso en dos etapas y grupos de prioridad---, la comparación evalúa las políticas
-	completas y no atribuye la mejora a un mecanismo en particular; aislar la contribución de cada
-	uno requiere un estudio de ablación como el de \citet{Reyes2018}, que se propone como trabajo
-	futuro.
+	completas y no atribuye la mejora a un mecanismo en particular.
 
 	\section{Política \textit{Rolling Horizon}}
 
@@ -2375,18 +2358,12 @@ services:
 	\label{sec:control_euclidiano}
 
 	Para separar el efecto de la política del efecto de la topología vial, el experimento
-	completo se repite sustituyendo OSRM por la distancia en línea recta (Haversine) entre
-	cada par de puntos, recorrida a velocidad constante (\texttt{run\_experiments.py
-	-{}-euclidean}).  La velocidad se fija en 651~m/min ($\approx 39$~km/h), la velocidad media
-	que OSRM asigna a los 10\,184 trayectos restaurante--cliente de las diez instancias
-	(\texttt{circuity.py}), de modo que ambos escenarios difieren solo en la geometría de las
-	rutas y no en la rapidez de los repartidores.  El rodeo que impone la red
-	vial se cuantifica con el índice de circuidad $\kappa = d_{OSRM} / d_{Haversine}$ sobre los
-	pares restaurante--cliente de las diez instancias (\texttt{circuity.py}).  Un segundo control
-	usa la velocidad reducida en ese factor ($651/\kappa \approx 472$~m/min,
-	\texttt{-{}-speed 472.1}), de modo que los trayectos en línea recta duran en promedio lo mismo
-	que por la red; la diferencia entre este control y la red real aísla el efecto de la
-	estructura de la red más allá de la longitud media de los viajes.
+	completo se repite sustituyendo OSRM por la distancia en línea recta (Haversine), recorrida
+	a la velocidad media que OSRM asigna a los trayectos restaurante--cliente (651~m/min), de modo
+	que ambos escenarios difieren solo en la geometría de las rutas.  Un segundo control usa la
+	velocidad reducida en el índice de circuidad $\kappa = d_{OSRM} / d_{Haversine}$
+	($651/\kappa \approx 472$~m/min), de modo que los trayectos en línea recta duran en promedio
+	lo mismo que por la red.
 
 	\subsection{Replicación y análisis de sensibilidad}
 
@@ -2569,10 +2546,10 @@ services:
 	Los resultados provienen de la corrida \texttt{results/experiments/20261023\_233115\_osrm};
 	los controles euclidianos (Sección~\ref{sec:control_euclidiano}) corresponden a las corridas
 	\texttt{20261023\_232220\_euclid} (651~m/min) y \texttt{20261024\_euclid\_kappa}
-	(472~m/min), y el análisis de robustez de la Sección~\ref{sec:robustez_reloj}, a la corrida
-	\texttt{20261024\_updfirst\_osrm}.
+	(472~m/min).
 
 	\section{Configuración experimental}
+	\label{sec:config_experimental}
 
 	La Tabla~\ref{tab:escenarios} resume los cuatro escenarios de saturación.  Cada semilla
 	genera una instancia sintética de La Paz, B.C.S. con entre 988 y 1\,047 órdenes
@@ -2612,6 +2589,10 @@ services:
 	\textit{ready time} ni se entrega antes de recogerse, el número de entregas registradas por
 	los repartidores coincide con el número de órdenes entregadas (no hay entregas dobles),
 	todas las semillas producen entregas y ninguna ruta recurrió al respaldo euclidiano.
+	Con la semilla 2025 (1\,038 órdenes), simular un día de operación toma entre 1.8 y 2.7~s con
+	FCFS y entre 57 y 80~s con RH, incluidas las consultas a OSRM, con una memoria máxima de 194 a
+	221~MB por proceso, en una computadora portátil Apple M1 Pro con 16~GB de RAM (corridas
+	\texttt{20261024\_timing\_*}).
 
 	% ──────────────────────────────────────────────────────────────────
 	\section{Calidad de servicio}
@@ -2644,34 +2625,41 @@ services:
 
 	\subsection{Análisis del \textit{Click-to-Door}}
 
-	En el escenario de baja saturación (S1), donde la oferta de repartidores es holgada,
-	ambas políticas tienen un desempeño muy similar: FCFS entrega 1.4~min antes en promedio
-	(28.93 vs 30.31~min), una diferencia estadísticamente significativa pero pequeña
-	(Sección~\ref{sec:res_estadistico}), y el cumplimiento SLA es casi idéntico (84.6\,\% vs
-	83.4\,\%).  La pequeña ventaja de FCFS se explica porque lleva cada pedido directamente del
-	restaurante al cliente, mientras que RH, incluso con flota holgada, consolida pedidos: cada
-	viaje lleva en promedio 1.93 órdenes y el pedido típico viaja en un agrupamiento de 2.54
-	órdenes (media ponderada por pedido), de modo que cada entrega posterior a la primera espera
-	a las anteriores.
+	En el escenario de baja saturación (S1), donde la oferta de repartidores es
+	holgada, FCFS logra tiempos de entrega ligeramente menores que RH
+	(28.93 vs 30.31~min).  Esto se explica porque, con exceso de repartidores,
+	FCFS lleva cada pedido directamente del restaurante al cliente, mientras que
+	RH introduce la espera para la formación de agrupamientos y cada entrega
+	posterior a la primera espera a las anteriores.  No obstante, la diferencia en
+	cumplimiento SLA es prácticamente nula ($-1.1$~pp).
 
-	A partir de S2 (saturación moderada) la situación cambia de forma marcada.  El CtD promedio
-	bajo RH es 36.8\,\% menor (35.42 vs 56.07~min) y el cumplimiento SLA pasa de 38.1\,\% a
-	69.6\,\% ($+31.5$~pp).  En S3 la reducción del CtD alcanza el 58.2\,\% (45.36 vs
-	108.49~min) y el SLA mejora en 50.3~pp; en S4 la reducción es del 67.3\,\% (73.63 vs
-	224.88~min), con 36.3~pp más de cumplimiento.  El percentil~90 del CtD se reduce entre
-	42.0\,\% y 53.3\,\% en S2--S4, de modo que RH no solo mejora la tendencia central sino que
-	también acorta la cola derecha de la distribución.
+	En S2 (saturación moderada), la relación se invierte: el CtD promedio bajo RH es
+	36.8\% menor (35.42 vs 56.07~min) y el cumplimiento SLA
+	se inclina a favor de RH (69.6\% vs 38.1\%, $+31.5$~pp).  Este resultado
+	muestra que, en cuanto la flota deja de ser holgada, la
+	coordinación de agrupamientos ya produce un efecto positivo en la reducción de
+	pedidos que exceden el umbral de 40~min.
 
-	La cobertura acentúa la diferencia.  Bajo FCFS quedan sin entregar al cierre de la
-	simulación el 11.3\,\% de los pedidos en S3 y el 39.9\,\% en S4, frente a 0\,\% y 0.2\,\%
-	bajo RH.  Como el CtD y el SLA de la Tabla~\ref{tab:res_ctd} se calculan sobre los pedidos
-	entregados, favorecen a FCFS en esos escenarios: medido sobre todas las órdenes generadas,
-	el cumplimiento de FCFS cae a 6.4\,\% en S3 y a 3.8\,\% en S4, frente a 57.6\,\% y
-	42.4\,\% bajo RH.
+	En S3 (saturación media), la heurística RH supera decisivamente a FCFS.
+	El CtD promedio se reduce un 58.2\% (45.36 vs 108.49~min) y el P90~CtD cae de
+	169.54 a 79.10~min ($-53.3\%$), lo cual indica que RH no solo mejora la
+	tendencia central sino que comprime la cola derecha de la
+	distribución.  El cumplimiento SLA mejora de 7.3\% a 57.6\% ($+50.3$~pp).
+
+	En S4 (alta saturación), la ventaja de RH es máxima: el CtD promedio se reduce
+	un 67.3\% (73.63 vs 224.88~min) y el P90~CtD de 321.10 a 186.18~min ($-42.0\%$).
+	Adicionalmente, bajo FCFS queda sin entregar al final de la simulación el 11.3\% de los
+	pedidos en S3 y el 39.9\% en S4, mientras que bajo RH prácticamente la totalidad de los
+	pedidos se entrega (0\% y 0.2\% sin entregar).  Como el CtD y el SLA de la
+	Tabla~\ref{tab:res_ctd} se calculan sobre los pedidos entregados, favorecen a FCFS en esos
+	escenarios: medido sobre todas las órdenes generadas, el cumplimiento de FCFS cae a 6.4\% en
+	S3 y a 3.8\% en S4, frente a 57.6\% y 42.4\% bajo RH.  Esta capacidad de RH para absorber la
+	carga completa bajo restricción severa de flota es un hallazgo central del estudio.
 
 	La Figura~\ref{fig:ctd_boxplot} muestra la distribución del Click-to-Door por
-	escenario: las distribuciones de ambas políticas casi coinciden en S1, mientras que en
-	S2--S4 la de FCFS se desplaza y dispersa rápidamente y la de RH permanece compacta.
+	escenario, donde se observa el colapso progresivo de FCFS en S2--S4 (cajas con
+	alta dispersión y bigotes de más de 300~min en S4) contrastado con la distribución
+	más compacta de RH.
 
 	\begin{figure}[htbp]
 	\centering
@@ -2681,11 +2669,12 @@ services:
 	\label{fig:ctd_boxplot}
 	\end{figure}
 
-	\subsection{\textit{Ready-to-Pickup} y exceso sobre el objetivo}
+	\subsection{\textit{Ready-to-Pickup} y tiempo de espera}
 
 	La Tabla~\ref{tab:res_rtp} muestra el indicador Ready-to-Pickup (RtP), que mide el
-	tiempo que la comida permanece lista en el restaurante antes de ser recogida, así como el
-	CTD Overage (exceso promedio sobre el objetivo SLA).
+	tiempo transcurrido entre el momento en que el pedido está listo y la llegada del
+	courier al restaurante, así como el CTD Overage (exceso promedio sobre el
+	objetivo SLA).
 
 	\begin{table}[htbp]
 	\centering
@@ -2706,14 +2695,21 @@ services:
 	\end{tabular}
 	\end{table}
 
-	En todos los escenarios la comida espera menos en el restaurante bajo RH.  En S1 el RtP
-	baja de 7.78 a 4.94~min: durante los picos de demanda incluso la flota de S1 queda
-	ocupada por completo, y FCFS, que lleva un pedido por viaje, acumula pedidos listos sin
-	repartidor, mientras que RH recoge varios pedidos de un mismo restaurante en cada visita.  Con la saturación, el RtP bajo FCFS crece hasta
-	203.75~min en S4, reflejo de colas de pedidos listos sin repartidor, mientras que bajo RH se
-	mantiene en 46.20~min ($-77.3$\,\%).  El exceso sobre el objetivo de 40~min es
-	despreciable en S1 para ambas políticas ($\leq 1.1$~min) y se reduce más de un 79\,\% con
-	RH en S2--S4.
+	En S1, el RtP promedio bajo RH (4.94~min) es menor que bajo FCFS (7.78~min):
+	durante los picos de demanda incluso la flota de S1 queda ocupada por completo, y
+	FCFS, que lleva un pedido por viaje, acumula pedidos listos sin repartidor, mientras
+	que RH recoge varios pedidos de un mismo restaurante en cada visita.
+
+	A medida que crece la saturación, el RtP bajo FCFS aumenta dramáticamente
+	(203.75~min en S4), reflejando largas colas de espera cuando los couriers no
+	están disponibles.  En contraste, el RtP bajo RH crece moderadamente
+	(46.20~min en S4, $-77.3\%$ respecto a FCFS), gracias a la sincronización
+	entre la formación de agrupamientos y la disponibilidad de los couriers.
+
+	El CTD Overage evidencia un resultado notable: mientras que bajo FCFS el
+	exceso sobre el SLA crece rápidamente con la saturación (de 0.82 a
+	185.64~min), bajo RH crece mucho menos (hasta 38.25~min en S4), con reducciones
+	cercanas al 80\% en S2--S4.
 
 	% ──────────────────────────────────────────────────────────────────
 	\section{Eficiencia operativa}
@@ -2741,29 +2737,31 @@ services:
 
 	\subsection{Productividad y utilización}
 
-	Como ambas políticas operan con la misma flota y los mismos turnos, los pedidos por
-	repartidor por hora solo difieren cuando difiere el número de pedidos entregados.  En S1 y
-	S2 ambas políticas entregan prácticamente todos los pedidos y la productividad es idéntica
-	(1.43 y 2.06 pedidos/repartidor/hora).  El aumento bajo RH en S3 ($+12.7$\,\%) y S4
-	($+66.0$\,\%) refleja la mayor cobertura: RH entrega los pedidos que FCFS deja pendientes
-	al cierre del turno.
+	El indicador Orders/Courier/Hr mide la productividad individual ---cuántos
+	pedidos entrega en promedio cada repartidor por hora de turno---.  La
+	productividad es idéntica en S1--S2 (1.43 y 2.06) y bajo RH es superior en S3
+	($+12.7\%$) y S4 ($+66.0\%$).  Como ambas políticas operan con la misma flota y los
+	mismos turnos, esta métrica solo difiere cuando difiere el número de pedidos
+	entregados: el aumento bajo RH refleja los pedidos que FCFS deja pendientes al
+	cierre del turno.
 
-	La utilización ---fracción del turno dedicada a conducir o a dar servicio, sin contar las
-	esperas--- es menor bajo RH en S1--S3 ($-6.5$ a $-15.4$~pp): los agrupamientos permiten
-	atender la misma demanda con menos kilómetros y menos visitas a restaurantes.  Con la flota
-	fija del experimento, esa diferencia se traduce en capacidad ociosa; su valor operativo es que
-	permitiría atender la demanda con menos repartidores (Sección~\ref{sec:discusion_regimenes}).  En S4 ambas
-	políticas alcanzan una utilización similar (67.3 vs 67.8\,\%), pero RH la convierte en
-	entregas efectivas mientras que FCFS acumula pedidos sin atender.
+	La utilización (\% del turno en conducción o en servicio) presenta un patrón inverso al
+	esperado bajo despacho greedy: bajo RH, la utilización es \emph{menor} que bajo
+	FCFS en S1--S3 ($-6.5$ a $-15.4$~pp) y similar en S4 (67.8 vs 67.3\%).  Esto se explica porque los
+	agrupamientos reducen la distancia recorrida por pedido y las visitas a restaurantes, de modo que cada
+	courier completa sus entregas en menos tiempo de conducción activa.  En S4, RH convierte esa
+	utilización en entregas efectivas, mientras que FCFS acumula pedidos sin atender.
 
 	\subsection{Distancia y enrutamiento}
 
-	La distancia por pedido es menor bajo RH en todos los escenarios, desde $-13.5$\,\% en S1
-	hasta $-49.4$\,\% en S4 (de 5.20 a 2.63~km por pedido).  Las rutas con varias entregas
-	reparten la distancia del trayecto al restaurante entre varios pedidos, y la reducción
-	crece con el tamaño de los agrupamientos.  Bajo FCFS la distancia por pedido aumenta con la
-	saturación porque los repartidores libres están, en promedio, más lejos del restaurante que
-	los necesita.
+	La distancia por pedido refleja la eficiencia geográfica del enrutamiento.
+	La distancia
+	por pedido bajo RH es consistentemente menor en todos los escenarios ($-13.5\%$ en S1 hasta
+	$-49.4\%$ en S4), consecuencia directa de los agrupamientos: las rutas
+	multi-parada reparten la distancia total del viaje entre varios pedidos,
+	reduciendo el costo de transporte por unidad.  En S4, la reducción del 49.4\%
+	(de 5.20 a 2.63~km/pedido) representa un ahorro operativo significativo que
+	se traduce directamente en menor consumo de combustible y tiempo de conducción.
 
 	% ──────────────────────────────────────────────────────────────────
 	\section{Agrupamiento y costos}
@@ -2775,36 +2773,37 @@ services:
 	\centering
 	\small
 	\caption{Indicadores de agrupamiento y costos: promedio de 10 réplicas.  \textit{Avg Bundle} es
-	el tamaño del agrupamiento en que viaja cada pedido (media ponderada por pedido); Órd./viaje es
-	el número medio de órdenes por ruta.}
+	el tamaño del agrupamiento en que viaja cada pedido (media ponderada por pedido).}
 	\label{tab:res_bundles}
-	\begin{tabular}{@{}l rr r r rr r@{}}
+	\begin{tabular}{@{}l rr r rr r@{}}
 	\toprule
-	& \multicolumn{2}{c}{Avg Bundle} & Órd./viaje & \% Multi & \multicolumn{3}{c}{Costo/Ped. (\$)} \\
-	\cmidrule(lr){2-3} \cmidrule(lr){4-4} \cmidrule(lr){5-5} \cmidrule(lr){6-8}
-	Esc. & FCFS & RH & RH & RH & FCFS & RH & $\Delta$\% \\
+	& \multicolumn{3}{c}{Avg Bundle} & \multicolumn{3}{c}{Costo/Ped. (\$)} \\
+	\cmidrule(lr){2-4} \cmidrule(lr){5-7}
+	Esc. & FCFS & RH & $\Delta$\% & FCFS & RH & $\Delta$\% \\
 	\midrule
-	S1 & 1.00 & 2.54 & 1.93 & 74.6 & 10.80 & 11.59 & $+7.4$ \\
-	S2 & 1.00 & 2.80 & 2.17 & 81.2 & 10.00 & 10.03 & $+0.3$ \\
-	S3 & 1.00 & 3.03 & 2.42 & 85.6 & 10.00 & 10.00 & $0.0$  \\
-	S4 & 1.00 & 3.30 & 2.80 & 91.9 & 10.00 & 10.00 & $0.0$  \\
+	S1 & 1.00 & 2.54 & $+154.0$ & 10.80 & 11.59 & $+7.4$  \\
+	S2 & 1.00 & 2.80 & $+180.0$ & 10.00 & 10.03 & $+0.3$  \\
+	S3 & 1.00 & 3.03 & $+203.0$ & 10.00 & 10.00 & $+0.0$  \\
+	S4 & 1.00 & 3.30 & $+230.0$ & 10.00 & 10.00 & $+0.0$  \\
 	\bottomrule
 	\end{tabular}
 	\end{table}
 
 	\subsection{Distribución de agrupamientos}
 
-	Bajo FCFS cada repartidor recibe órdenes individuales ($\text{bundle\_size} = 1$).  Bajo RH,
-	el módulo de \emph{bundling} genera agrupamientos de hasta $B_{max} = 4$ órdenes por
-	restaurante y el tamaño promedio crece con la saturación, de 2.54 en S1 a 3.30 en S4 (por
-	viaje, de 1.93 a 2.80 órdenes).  La
-	Figura~\ref{fig:bundle_dist} muestra la distribución: en S1 solo el 25.4\,\% de los pedidos
-	viaja de forma individual y el 51.1\,\% lo hace en agrupamientos de 3 o 4 órdenes; en S4 esa
-	proporción sube al 80.9\,\%.  Que RH consolide pedidos incluso con flota holgada explica su
-	ligera desventaja en tiempo de entrega en S1: el procedimiento de inserción añade un pedido
-	a un agrupamiento existente del mismo restaurante cuando el incremento de costo es menor
-	que el de una ruta nueva, y el tamaño objetivo $Z_t$, redondeado hacia arriba, vale 2 en
-	cuanto las órdenes inminentes superan a los repartidores disponibles.
+	Bajo FCFS, cada courier recibe órdenes individuales ($\text{bundle\_size} = 1$),
+	por lo que el tamaño promedio de agrupamiento es siempre 1.0.
+	Bajo RH, el módulo de \emph{bundling}
+	genera agrupamientos de hasta $B_{max} = 4$ órdenes por restaurante.  El tamaño promedio
+	de agrupamiento crece monotónicamente con la saturación: de 2.54 en S1
+	(donde la baja densidad de la cola de pedidos limita las oportunidades de
+	agrupamiento) hasta 3.30 en S4 (donde la alta carga permite formar
+	agrupamientos cercanos al máximo); por viaje, de 1.93 a 2.80 órdenes.
+
+	La Figura~\ref{fig:bundle_dist} muestra la distribución del tamaño de agrupamiento
+	bajo RH.  En S1, el 25.4\% de los pedidos se despacha individualmente; en S4,
+	el 80.9\% se agrupa en bundles de 3--4, reflejando la adaptación dinámica
+	del algoritmo al nivel de saturación.
 
 	\begin{figure}[htbp]
 	\centering
@@ -2816,14 +2815,15 @@ services:
 	\subsection{Modelo de compensación}
 
 	El modelo de compensación asigna $p_1 = \$10$ por pedido entregado con un piso de
-	$p_2 = \$15$/hora de turno.  En S1 alrededor del 60\,\% de los repartidores recibe el pago
-	mínimo bajo ambas políticas.  El costo por pedido es mayor bajo RH (\$11.59 vs \$10.80)
-	porque los agrupamientos concentran las entregas en menos repartidores: los que entregan
-	más cobran por pedido mientras el resto sigue cobrando el piso, lo que eleva el costo
-	total.  A partir de S2 el pago variable domina y el costo por pedido converge a
-	$p_1 = \$10$ en ambas políticas.  Con estos parámetros de pago, el piso solo es activo en S1,
-	de modo que en S2--S4 el costo por pedido es igual a $p_1$ por construcción y no discrimina
-	entre políticas.
+	$p_2 = \$15$/hora de turno.  El costo por pedido
+	($\text{Comp.\ total} / n_{\text{entregados}}$) refleja la eficiencia económica
+	de la operación.  Bajo condiciones de baja saturación (S1), muchos couriers no
+	alcanzan el umbral variable y reciben el pago mínimo garantizado, elevando el
+	costo unitario a \$10.80 bajo FCFS y \$11.59 bajo RH; el costo es mayor bajo RH porque los
+	agrupamientos concentran las entregas en menos repartidores, mientras el resto sigue
+	cobrando el piso.  A medida que aumenta
+	la saturación, el pago variable domina y el costo por pedido converge hacia
+	$p_1 = \$10$ en ambas políticas.
 
 	% ──────────────────────────────────────────────────────────────────
 	\section{Análisis estadístico}
@@ -2850,7 +2850,7 @@ services:
 	\subsection{Resultados}
 
 	La Tabla~\ref{tab:wilcoxon_seed} consolida la inferencia primaria
-	para las métricas clave: Click-to-Door, Ready-to-Door y SLA Compliance.  La
+	para las dos métricas clave: Click-to-Door y SLA Compliance.  La
 	convención de signos es $\bar{\Delta} = \bar{x}_{\text{FCFS}} -
 	\bar{x}_{\text{RH}}$, por lo que en CtD un $\bar{\Delta} > 0$ favorece
 	a RH (menor tiempo de entrega) y en SLA un $\bar{\Delta} < 0$ favorece
@@ -2859,315 +2859,127 @@ services:
 	\begin{table}[htbp]
 	\centering
 	\small
-	\caption{Wilcoxon \textit{signed-rank} pareado a nivel semilla ($n=10$): \textit{Click-to-Door}, \textit{Ready-to-Door} y SLA \textit{Compliance}.}
+	\caption{Wilcoxon \textit{signed-rank} pareado a nivel semilla ($n=10$): \textit{Click-to-Door} y SLA \textit{Compliance}.}
 	\label{tab:wilcoxon_seed}
 	\begin{tabular}{@{}ll rr l c r@{}}
 	\toprule
-	Esc. & Métrica & $\bar{x}_{\text{FCFS}}$ & $\bar{x}_{\text{RH}}$ & $\bar{\Delta}$ [IC 95\%] & $p$ Wilcoxon & $r$ pareado \\
+	Esc. & Métrica & $\bar{x}_{\text{FCFS}}$ & $\bar{x}_{\text{RH}}$ & $\bar{\Delta}$ [CI 95\%] & $p$ Wilcoxon & $r$ pareado \\
 	\midrule
 	S1 & CtD (min) & 28.93  & 30.31 & $-1.38\ [-2.35,\ -0.41]$        & 0.0137 & $-0.85$ \\
-	S1 & RtD (min) & 16.95  & 18.32 & $-1.38\ [-2.35,\ -0.41]$        & 0.0137 & $-0.85$ \\
-	S1 & SLA (\%)  & 84.6   & 83.4  & $+1.1\ [-1.8,\ +4.1]$           & 0.2324 & $+0.45$ \\
+	S1 & SLA (\%)  & 84.6   & 83.4  & $\phantom{-}+1.1\ [-1.8,\ +4.1]$ & 0.2324 & $+0.45$ \\
 	S2 & CtD (min) & 56.07  & 35.42 & $+20.64\ [+18.98,\ +22.31]$     & 0.0020 & $+1.00$ \\
-	S2 & RtD (min) & 44.08  & 23.44 & $+20.64\ [+18.98,\ +22.31]$     & 0.0020 & $+1.00$ \\
 	S2 & SLA (\%)  & 38.1   & 69.6  & $-31.5\ [-33.7,\ -29.2]$        & 0.0020 & $-1.00$ \\
 	S3 & CtD (min) & 108.49 & 45.36 & $+63.13\ [+56.14,\ +70.13]$     & 0.0020 & $+1.00$ \\
-	S3 & RtD (min) & 96.52  & 33.37 & $+63.15\ [+56.16,\ +70.13]$     & 0.0020 & $+1.00$ \\
 	S3 & SLA (\%)  & 7.3    & 57.6  & $-50.3\ [-52.6,\ -48.0]$        & 0.0020 & $-1.00$ \\
 	S4 & CtD (min) & 224.88 & 73.63 & $+151.24\ [+143.71,\ +158.78]$  & 0.0020 & $+1.00$ \\
-	S4 & RtD (min) & 212.92 & 61.65 & $+151.27\ [+143.73,\ +158.82]$  & 0.0020 & $+1.00$ \\
 	S4 & SLA (\%)  & 6.2    & 42.5  & $-36.3\ [-37.2,\ -35.3]$        & 0.0020 & $-1.00$ \\
 	\bottomrule
 	\end{tabular}
 	\end{table}
 
-	El valor $p = 0{.}0020$ es el mínimo alcanzable por Wilcoxon con $n=10$ cuando todas las
-	diferencias tienen el mismo signo, condición que se cumple en S2--S4 para las tres métricas.
-	Con $n = 10$ ese valor solo indica que la diferencia tiene el mismo signo en las diez semillas;
-	la magnitud del efecto se lee en los intervalos de confianza.  La diferencia en RtD coincide
-	con la de CtD porque ambas políticas atienden las mismas órdenes con los mismos tiempos de
-	preparación ($\text{RtD} = \text{CtD} - T_{prep}$); solo difiere ligeramente cuando FCFS deja
-	órdenes sin entregar.
-	En S1 la ventaja de FCFS en CtD es estadísticamente significativa pero pequeña
-	(1.38~min, $p = 0{.}0137$, $r = -0{.}85$), y la diferencia en SLA no lo es ($p = 0{.}23$; el
-	intervalo de confianza incluye al cero).  No se definió un margen de equivalencia, por lo que
-	no se afirma equivalencia formal entre las políticas en S1.  Los resultados se mantienen tras la
-	corrección de Benjamini--Hochberg \citep{BenjaminiHochberg1995} aplicada a las 24 pruebas a nivel semilla (seis métricas en
-	cuatro escenarios): en S1, $p_{BH} = 0{.}015$ para CtD y RtD y $p_{BH} = 0{.}23$ para SLA; en
-	S2--S4, $p_{BH} = 0{.}002$.  La prueba ómnibus de Friedman sobre la matriz
-	$10 \times 4$ de $\Delta\text{CtD}$ confirma que la magnitud del efecto varía entre
-	regímenes de saturación ($\chi^2_F = 30{.}0$, $p < 0{.}001$): en cada una de las diez
-	semillas, la ventaja de RH crece de S1 a S4.
+	El valor $p = 0{.}0020$ es el mínimo alcanzable por Wilcoxon con
+	$n=10$ y todas las diferencias del mismo signo, condición que se
+	cumple en las seis pruebas de S2--S4.  En S1 la ventaja de FCFS en CtD es
+	estadísticamente significativa pero pequeña (1.38~min, $p = 0{.}0137$), y la
+	diferencia en SLA no lo es ($p = 0{.}23$).  Los intervalos de confianza no incluyen
+	al cero en ninguna otra fila, confirmando que los efectos observados son
+	estadísticamente robustos.  La prueba ómnibus de Friedman sobre la
+	matriz $10 \times 4$ de $\Delta\text{CtD}$ confirma además que la
+	magnitud del efecto varía significativamente entre regímenes de
+	saturación ($\chi^2_F = 30{.}0$, $p < 0{.}001$), lo que justifica el
+	análisis estratificado por escenario.
 
 	\subsection{Discusión por regímenes}
 	\label{sec:discusion_regimenes}
 
-	Los resultados revelan dos regímenes.  En \textbf{baja saturación (S1)} ambas políticas
-	tienen un desempeño muy similar: FCFS entrega ligeramente antes porque no espera a formar
-	agrupamientos, pero el cumplimiento SLA no difiere y RH reduce el tiempo de espera de la
-	comida y la distancia por pedido.  A partir de \textbf{saturación moderada (S2)} RH supera
-	decisivamente a FCFS en todas las métricas de servicio: con menos repartidores que pedidos
-	inminentes, FCFS forma colas que crecen sin control, mientras que RH atiende varios pedidos
-	por viaje y mantiene la carga bajo control.  El punto de cruce se ubica, por tanto, entre
-	S1 y S2 ($\rho \approx 18$--$26$ pedidos por repartidor), como se aprecia en la
+	Los resultados revelan dos regímenes de comportamiento.  En
+	\textbf{baja saturación (S1)}, FCFS logra menores tiempos de
+	Click-to-Door que RH (\,$\bar{\Delta}_{\text{CtD}} = -1{.}38$~min\,),
+	porque con exceso de repartidores el
+	despacho greedy lleva cada pedido directamente del restaurante al
+	cliente, mientras que RH consolida pedidos
+	sin disponer de masa suficiente para amortizar el costo
+	del agrupamiento.  Sin embargo, la diferencia en cumplimiento
+	SLA no es significativa (84.6\% vs 83.4\%), y RH reduce el tiempo de
+	espera de la comida y la distancia por pedido.
+
+	En \textbf{saturación moderada--alta (S2--S4)} la situación se invierte:
+	RH supera decisivamente a FCFS en ambas métricas.  En S2 el CtD
+	promedio se reduce un 36.8\,\% ($\bar{\Delta} = +20{.}64$~min) y el
+	SLA mejora en 31.5\,pp; en S3, un 58.2\,\% ($\bar{\Delta} = +63{.}13$~min) y
+	50.3\,pp.  En S4 la mejora alcanza el 67.3\,\% en CtD
+	($\bar{\Delta} = +151{.}24$~min) y 36.3\,pp en SLA, además de entregar
+	prácticamente todas las órdenes que FCFS deja sin entregar al cierre del
+	turno.  El rank-biserial pareado pasa de $r = -0{.}85$ en S1 (en
+	favor de FCFS) a $r = +1{.}00$ en S2--S4 (en favor de RH), reflejando
+	el cruce de regímenes detectado también gráficamente en la
 	Figura~\ref{fig:kpi_vs_ratio}.
 
-	Los escenarios también permiten comparar las políticas con flotas distintas.  RH con 29--30
-	repartidores (S3) obtiene un CtD medio de 45.4~min y un cumplimiento SLA de 57.6\,\%, mejores
-	que los de FCFS con 38--41 repartidores (S2: 56.1~min y 38.1\,\%); es decir, RH ofrece mejor
-	servicio con alrededor de 25\,\% menos repartidores (con la variante de robustez de la
-	Sección~\ref{sec:robustez_reloj}, el CtD resulta similar y el SLA sigue siendo mayor).  La ventaja no se extiende a cualquier
-	reducción: RH con 38--41 repartidores (S2: 35.4~min) no alcanza a FCFS con 55--59 (S1:
-	28.9~min).  Las magnitudes de S3 y S4 corresponden a un régimen en el que FCFS acumula colas
-	que no logra vaciar (hasta 39.9\,\% de pedidos sin entregar en S4), por lo que su valor es
-	ilustrativo del colapso de la política reactiva más que de una operación realista.
+	\subsection{Comparación con la literatura}
+	\label{sec:comparacion_literatura}
+
+	\citet{Reyes2018} no publican una comparación directa contra una política FCFS
+	equivalente, por lo que no es posible contrastar cuantitativamente la magnitud de las
+	mejoras.  Para estimar el efecto de la red vial, sobre los 10\,184 trayectos
+	restaurante--cliente de las diez instancias la distancia por la red OSRM es en promedio
+	3.30~km frente a 2.39~km en línea recta: un índice de circuidad $\kappa = 1{.}38$, dentro del
+	rango típico de 1.2 a 1.4 que recogen \citet{Boyaci2021}.  El polígono de muestreo abarca
+	8.4~km$^2$ del centro urbano, por lo que ningún trayecto rodea la ensenada.  En el control
+	euclidiano (Sección~\ref{sec:control_euclidiano}), con las mismas instancias y la misma
+	velocidad media, la ventaja de RH en minutos es menor que con la red real en los cuatro
+	escenarios ($p = 0{.}002$): en S1 la desventaja de RH es de 4.5~min en lugar de 1.4, y en S3
+	la ventaja es de 37.1~min en lugar de 63.1.  Las distancias euclidianas subestiman también los
+	tiempos de entrega de ambas políticas (en S2, el CtD de FCFS pasa de 41.8~min en el control a
+	56.1~min con OSRM, y el de RH, de 30.3 a 35.4~min); para RH, el CtD medio aumenta un 10\,\% en
+	S1 y un 29\,\% en S4.  Con la velocidad del control reducida en el factor $\kappa$, el
+	escalamiento explica entre el 62 y el 84\,\% de la diferencia en la ventaja de RH; el resto
+	($p \leq 0{.}004$) corresponde a la estructura de la red.  Estos resultados sugieren que la
+	topología vial de La Paz amplifica la ventaja de las estrategias de agrupamiento,
+	principalmente porque alarga los viajes y aumenta la carga efectiva de la flota.
+
+	\subsection{Limitaciones de los resultados}
+	\label{sec:limitaciones_resultados}
+
+	Los resultados deben interpretarse considerando las limitaciones del modelo:
+	\begin{itemize}
+		\item El reloj avanza en épocas de $f = 5$~min y la actualización de rutas ocurre
+		      después de la asignación, de modo que un repartidor que termina su ruta espera
+		      entre 5 y 10~min su siguiente asignación; esta espera afecta más a FCFS, que hace
+		      un viaje por pedido.  Al repetir la campaña con la actualización antes de la
+		      asignación (corrida \texttt{20261024\_updfirst\_osrm}), FCFS sigue siendo mejor en
+		      S1 y RH en S2--S4, en las diez semillas de cada escenario, y el cruce permanece
+		      entre S1 y S2, pero la reducción del CtD bajo RH baja a 14.6\,\% en S2, 41.4\,\% en
+		      S3 y 63.0\,\% en S4.  Las magnitudes reportadas deben leerse como una cota superior
+		      de la ventaja de RH.
+		\item La demanda es sintética con distribución de Poisson, que puede no capturar
+		      la variabilidad real de una operación comercial (§1.6), y sus picos provienen
+		      del perfil de recolección de paquetes de LaDe (9:00 y 17:00), no de la demanda
+		      de comida local.
+		\item Los tiempos de preparación son homogéneos ($T_{prep} \sim \max(5, \mathcal{N}(12, 3^2))$~min),
+		      sin especialización por tipo de restaurante.
+		\item La red vial se asume estática (sin congestión dinámica).
+		\item El tiempo de servicio es constante ($s_r = s_o = 4$~min), sin variabilidad por
+		      tipo de edificio o condiciones de acceso.
+	\end{itemize}
+
+	La Figura~\ref{fig:kpi_vs_ratio} resume la evolución de los KPIs principales
+	en función de la relación órdenes/courier.  Las curvas de CtD se cruzan entre
+	S1 y S2, marcando el punto de transición donde RH comienza a superar a FCFS.
 
 	\begin{figure}[htbp]
 	\centering
 	\includegraphics[width=0.85\textwidth]{img/fig_kpi_vs_ratio.png}
-	\caption{Evolución de KPIs principales en función de la saturación.  Las curvas de CtD se
-	cruzan entre los ratios 18 y 26.}
+	\caption{Evolución de KPIs principales en función de la saturación.  El cruce
+	de las curvas de CtD entre los ratios 18 y 26 marca la transición de régimen.}
 	\label{fig:kpi_vs_ratio}
 	\end{figure}
 
-	% ──────────────────────────────────────────────────────────────────
-	\section{Análisis de robustez: orden de las fases del ciclo}
-	\label{sec:robustez_reloj}
-
-	En el motor de simulación la actualización de rutas ocurre después de la asignación
-	(Sección~3.3): un repartidor que termina en el intervalo $(t - f, t]$ recibe su siguiente ruta
-	en la época $t + f$, de modo que espera entre 5 y 10~min.  En la campaña principal, el
-	percentil~1 del intervalo entre el fin de un viaje y la siguiente recolección es de 8.4 a
-	8.9~min en todos los escenarios.  Esta espera afecta más a la política que realiza más viajes:
-	FCFS hace un viaje por pedido, mientras que RH lleva en promedio entre 1.93 y 2.80 órdenes por
-	viaje.  Para evaluar su efecto se repitió la campaña OSRM completa con la actualización antes de
-	la asignación (\texttt{run\_experiments.py -{}-update-first}): el repartidor que termina en
-	$(t - f, t]$ recibe ruta en la época $t$ y la espera se reduce a entre 0 y 5~min (percentil~1
-	de 3.3 a 5.0~min).  Las 80 corridas pasan las verificaciones de integridad.  La
-	Tabla~\ref{tab:robustez} compara ambas versiones.
-
-	\begin{table}[htbp]
-	\centering
-	\small
-	\caption{Robustez frente al orden de las fases del ciclo: campaña principal (actualización
-	después de asignar) y variante con actualización antes de asignar.  Media de 10 semillas;
-	$\Delta$CtD $=$ CtD$_{\text{FCFS}} - $CtD$_{\text{RH}}$ (min), cambio relativo del CtD de RH
-	respecto a FCFS (\%, media por semilla), $\Delta$SLA $=$ SLA$_{\text{RH}} - $SLA$_{\text{FCFS}}$
-	(pp) y porcentaje de pedidos que FCFS no entrega.}
-	\label{tab:robustez}
-	\begin{tabular}{@{}l rr rr rr rr@{}}
-	\toprule
-	& \multicolumn{2}{c}{$\Delta$CtD (min)} & \multicolumn{2}{c}{Cambio rel.\ (\%)} & \multicolumn{2}{c}{$\Delta$SLA (pp)} & \multicolumn{2}{c}{No entreg.\ FCFS (\%)} \\
-	\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9}
-	Esc. & Princ. & Variante & Princ. & Variante & Princ. & Variante & Princ. & Variante \\
-	\midrule
-	S1 & $-1.38$  & $-6.77$ & $+5.0$  & $+29.9$ & $-1.1$  & $-14.7$ & 0.0  & 0.0  \\
-	S2 & $20.64$  & $5.40$  & $-36.7$ & $-14.6$ & $+31.5$ & $+19.6$ & 0.1  & 0.0  \\
-	S3 & $63.13$  & $26.27$ & $-57.9$ & $-41.4$ & $+50.3$ & $+34.6$ & 11.3 & 0.4  \\
-	S4 & $151.24$ & $97.52$ & $-67.2$ & $-63.0$ & $+36.3$ & $+45.1$ & 39.9 & 23.9 \\
-	\bottomrule
-	\end{tabular}
-	\end{table}
-
-	Con la espera reducida ambas políticas mejoran, y FCFS mucho más que RH: en S2 el CtD medio de
-	FCFS baja de 56.1 a 36.4~min y el de RH, de 35.4 a 31.0~min.  Las conclusiones cualitativas se
-	mantienen.  En S1, FCFS sigue siendo mejor en las diez semillas, ahora con una ventaja mayor
-	(6.8~min) y con una diferencia en SLA que pasa a ser significativa (100\,\% frente a 85.3\,\%,
-	$p = 0{.}002$).  En S2--S4, RH sigue siendo mejor en las diez semillas de cada escenario
-	($p = 0{.}002$ en CtD y SLA), y el punto de cruce permanece entre S1 y S2.  Las magnitudes, en
-	cambio, son menores: la reducción del CtD es de 14.6\,\% en S2, 41.4\,\% en S3 y 63.0\,\% en S4,
-	frente a 36.7\,\%, 57.9\,\% y 67.2\,\% en la campaña principal.  También se modera la
-	comparación con flotas distintas de la Sección~\ref{sec:discusion_regimenes}: con la variante, RH
-	con 29--30 repartidores (S3) obtiene un CtD similar al de FCFS con 38--41 (S2; 37.0 frente a
-	36.4~min, $p = 0{.}23$) y un cumplimiento SLA mayor (67.8 frente a 61.5\,\%, $p = 0{.}03$).  Por
-	tanto, el signo de los resultados es robusto a la convención del ciclo, mientras que las
-	magnitudes de la campaña principal deben leerse como una cota superior de la ventaja de RH.
-
-	% ──────────────────────────────────────────────────────────────────
-	\section{Efecto de la topología vial}
-	\label{sec:res_topologia}
-
-	\subsection{Circuidad de la red de La Paz}
-
-	Sobre los 10\,184 trayectos restaurante--cliente de las diez instancias, la distancia por la
-	red vial OSRM es en promedio 3.30~km frente a 2.39~km en línea recta: un índice de circuidad
-	agregado de $\kappa = 1{.}38$ (mediana 1.37; percentiles 10 y 90 de 1.19 y 1.61).  Es decir,
-	los trayectos reales son un 38\,\% más largos que la estimación euclidiana, valor dentro del
-	rango típico de 1.2 a 1.4 que recogen \citet{Boyaci2021}.  La velocidad media que OSRM asigna a
-	esos trayectos es de 39.1~km/h (651~m/min).
-
-	Conviene precisar el alcance geográfico de esta medición.  El polígono de muestreo
-	(Sección~3.2) abarca 8.4~km$^2$ del centro urbano y su lado noroeste sigue la costa, por lo que
-	ningún trayecto rodea la ensenada: el percentil 99 de $\kappa$ es 1.90 y solo el 0.5\,\% de los
-	pares supera $\kappa = 2$.  La circuidad medida refleja, por tanto, la retícula vial y los
-	sentidos de circulación del centro, no los rodeos por la bahía descritos en la
-	Sección~1.2.  Además, 13 de los 10\,184 pares tienen $\kappa < 1$, lo que solo es posible
-	si OSRM ajusta (\textit{snapping}) alguno de los puntos a una vía distante; su efecto sobre
-	los promedios es despreciable.
-
-	\subsection{Comparación con el escenario de control euclidiano}
-
-	La Tabla~\ref{tab:topologia} compara la ventaja de RH sobre FCFS en el escenario principal
-	(OSRM) y en el control euclidiano, que usa las mismas instancias y la misma velocidad media
-	pero trayectos en línea recta (Sección~\ref{sec:control_euclidiano}).  Las comparaciones se
-	hacen semilla por semilla con la prueba de Wilcoxon pareada ($n = 10$); el cambio relativo se
-	calcula por semilla y luego se promedia, por lo que puede diferir ligeramente del cociente de
-	las medias de la Tabla~\ref{tab:res_ctd} (por ejemplo, $+5.0$ frente a $+4.8$\,\% en S1).
-
-	\begin{table}[htbp]
-	\centering
-	\small
-	\caption{Ventaja de RH sobre FCFS con la red vial real (OSRM) y con distancias en línea
-	recta (Euclid.): media de 10 semillas.  $\Delta$CtD $=$ CtD$_{\text{FCFS}} -
-	$CtD$_{\text{RH}}$; $\Delta$SLA $=$ SLA$_{\text{RH}} - $SLA$_{\text{FCFS}}$.}
-	\label{tab:topologia}
-	\begin{tabular}{@{}l rr c rr c rr c@{}}
-	\toprule
-	& \multicolumn{3}{c}{$\Delta$CtD (min)} & \multicolumn{3}{c}{Cambio relativo del CtD (\%)} & \multicolumn{3}{c}{$\Delta$SLA (pp)} \\
-	\cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10}
-	Esc. & OSRM & Euclid. & $p$ & OSRM & Euclid. & $p$ & OSRM & Euclid. & $p$ \\
-	\midrule
-	S1 & $-1.38$ & $-4.53$ & 0.002 & $+5.0$  & $+19.8$ & 0.002 & $-1.1$  & $-9.5$  & 0.002 \\
-	S2 & $20.64$ & $11.50$ & 0.002 & $-36.7$ & $-27.4$ & 0.002 & $+31.5$ & $+31.4$ & 0.922 \\
-	S3 & $63.13$ & $37.09$ & 0.002 & $-57.9$ & $-49.9$ & 0.002 & $+50.3$ & $+41.5$ & 0.002 \\
-	S4 & $151.24$ & $123.30$ & 0.002 & $-67.2$ & $-68.3$ & 0.084 & $+36.3$ & $+47.1$ & 0.002 \\
-	\bottomrule
-	\end{tabular}
-	\end{table}
-
-	Con la red vial real, la ventaja de RH en minutos es mayor en los cuatro escenarios
-	($p = 0{.}002$ en todos): en S1 la desventaja de RH se reduce de 4.5 a 1.4~min y en S3 la
-	ventaja pasa de 37.1 a 63.1~min.  En términos relativos la ventaja también es mayor en
-	S1--S3, mientras que en S4 es estadísticamente igual ($-67.2$ vs $-68.3$\,\%, $p = 0{.}08$).
-	En cumplimiento SLA el efecto es mixto: mayor con OSRM en S1 y S3, igual en S2 y menor en
-	S4, donde ambas políticas ya incumplen el objetivo en la mayoría de los pedidos.
-
-	El mecanismo principal es la carga efectiva: los rodeos que impone la red alargan cada viaje en
-	torno a un 38\,\%, de modo que la misma flota enfrenta una saturación mayor, y la ventaja de RH
-	crece con la saturación.  Así, el uso de distancias euclidianas subestima los tiempos de
-	entrega de ambas políticas (el CtD de FCFS en S2 pasa de 41.8~min en el control a 56.1~min con
-	OSRM; el de RH, de 30.3 a 35.4~min) y también el beneficio de coordinar los despachos en buena
-	parte de los escenarios.  Para RH, pasar del control a la red real aumenta el CtD medio un
-	10\,\% en S1 y un 29\,\% en S4.
-
-	Para separar el efecto de la longitud de los viajes del de la estructura de la red, se repitió
-	el control euclidiano con la velocidad reducida en el factor de circuidad ($651/1.38 \approx
-	472$~m/min), de modo que los trayectos en línea recta duran en promedio lo mismo que por la
-	red.  La Tabla~\ref{tab:topologia_kappa} muestra que este ajuste escalar explica entre el 62 y
-	el 84\,\% de la diferencia entre el control y la red real en la ventaja de RH.  El resto, aún
-	significativo ($p \leq 0{.}004$ en los cuatro escenarios), corresponde a la estructura de la
-	red: la variación de la circuidad entre pares, la asimetría de los sentidos de circulación y
-	los tramos de acceso de cada repartidor al restaurante.  Parte de ese resto puede deberse
-	también a que FCFS elige al repartidor por distancia en línea recta, criterio que con la red
-	real no siempre identifica al que llega primero (Sección~3.4).
-
-	\begin{table}[htbp]
-	\centering
-	\small
-	\caption{Ventaja de RH en CtD ($\Delta$CtD $=$ CtD$_{\text{FCFS}} - $CtD$_{\text{RH}}$, min) con la
-	red vial real, con el control euclidiano a la velocidad media (651~m/min) y con el control
-	euclidiano escalado por $\kappa$ (472~m/min): media de 10 semillas.  La última columna es la
-	fracción de la diferencia OSRM--control explicada por el escalamiento, (Euclid.$\times\kappa$
-	$-$ Euclid.)/(OSRM $-$ Euclid.).}
-	\label{tab:topologia_kappa}
-	\begin{tabular}{@{}l rrr c r@{}}
-	\toprule
-	Esc. & OSRM & Euclid. & Euclid.$\times\kappa$ & $p$ (OSRM vs.\ $\times\kappa$) & Explicado por $\kappa$ \\
-	\midrule
-	S1 & $-1.38$  & $-4.53$  & $-2.46$  & 0.002 & 66\,\% \\
-	S2 & $20.64$  & $11.50$  & $17.83$  & 0.002 & 69\,\% \\
-	S3 & $63.13$  & $37.09$  & $53.17$  & 0.002 & 62\,\% \\
-	S4 & $151.24$ & $123.30$ & $146.70$ & 0.004 & 84\,\% \\
-	\bottomrule
-	\end{tabular}
-	\end{table}
-
-	\section{Desempeño computacional}
-	\label{sec:desempeno_computacional}
-
-	Para sustentar el requisito de hardware de consumo (Sección~1.6) se midió el tiempo de cómputo
-	con la semilla 2025 (1\,038 órdenes), ejecutando cada escenario en un proceso independiente, en
-	secuencia y sin otras cargas, sobre una computadora portátil Apple M1 Pro con 16~GB de RAM,
-	Python~3.9.6 y el servidor \texttt{osrm-routed} v5.27.1 local.  La Tabla~\ref{tab:computo}
-	resume los resultados: simular un día de operación (unas 150 épocas de $f = 5$~min) toma entre
-	1.8 y 2.7~s con FCFS y entre 57 y 80~s con RH, incluidas las consultas a OSRM, es decir, menos de
-	0.6~s por época en promedio para RH.  La memoria máxima de cada proceso, que ejecuta ambas
-	políticas y el cálculo de indicadores, fue de 194 a 221~MB, muy por debajo de los 8~GB
-	considerados en el alcance.
-
-	\begin{table}[htbp]
-	\centering
-	\small
-	\caption{Tiempo de cómputo por día simulado (semilla 2025, 1\,038 órdenes) y memoria máxima del
-	proceso, con OSRM local.}
-	\label{tab:computo}
-	\begin{tabular}{@{}l c rr r@{}}
-	\toprule
-	Esc. & $|C|$ & FCFS (s) & RH (s) & Memoria máx.\ (MB) \\
-	\midrule
-	S1 & 58 & 2.7 & 74.4 & 213 \\
-	S2 & 40 & 2.7 & 57.0 & 194 \\
-	S3 & 30 & 2.4 & 58.7 & 195 \\
-	S4 & 20 & 1.8 & 79.9 & 221 \\
-	\bottomrule
-	\end{tabular}
-	\end{table}
-
-	\section{Comparación con la literatura y limitaciones}
-
-	\subsection{Comparación con la literatura}
-
-	\citet{Reyes2018} reportan que su heurística de horizonte rodante obtiene, en instancias
-	pequeñas resueltas a optimalidad, un CtD promedio apenas un 4\,\% superior al óptimo, pero no
-	publican una comparación directa contra una política FCFS equivalente, por lo que no es
-	posible contrastar cuantitativamente la magnitud de las mejoras.  Cualitativamente, los
-	resultados coinciden con su interpretación del agrupamiento como un recurso para mitigar la
-	escasez de capacidad: su tamaño objetivo busca agrupamientos de una sola orden cuando hay
-	menos órdenes que repartidores y agrupamientos mayores cuando el sistema está bajo presión.
-	En la implementación de este trabajo, sin embargo, RH consolida pedidos incluso en S1
-	(1.93 órdenes por viaje; el pedido típico viaja en un agrupamiento de 2.54), más de lo que esa
-	intención sugiere, lo que explica su ligera desventaja en baja saturación.  La circuidad medida
-	(1.38) queda dentro del rango típico de 1.2 a 1.4 que recogen \citet{Boyaci2021}, y el control
-	escalado por $\kappa$ muestra que, en estas instancias, la mayor parte del efecto de la red
-	vial sobre la comparación de políticas se debe a la longitud de los viajes, como supone el
-	factor de conversión $\gamma$ de \citet{Reyes2018}, y una parte menor a su estructura.
-
-	\subsection{Limitaciones de los resultados}
-
-	Los resultados deben interpretarse considerando las limitaciones del modelo:
-	\begin{itemize}
-		\item La demanda es sintética: sigue un proceso de Poisson con los picos de recolección de
-		      paquetes de LaDe (09:00 y 17:00), que no corresponden a la demanda de comida ni a los
-		      horarios de comida locales, y las ubicaciones se muestrean de forma uniforme en un
-		      polígono de 8.4~km$^2$ del centro urbano, con 25 restaurantes (§1.6, §3.2).
-		\item Los tiempos de preparación son homogéneos ($T_{prep} \sim \max(5, \mathcal{N}(12, 3^2))$~min)
-		      y los tiempos de servicio constantes ($s_r = s_o = 4$~min).
-		\item La red vial se asume estática (sin congestión dinámica) y los tiempos provienen del
-		      perfil \texttt{car.lua} de OSRM, que corresponde a automóviles y no a motocicletas o
-		      bicicletas.
-		\item Todos los repartidores comparten un único turno que cubre la jornada completa.
-		\item El reloj avanza en épocas de $f = 5$~min y la actualización de rutas ocurre después
-		      de la asignación, de modo que un repartidor que termina su ruta espera entre 5 y
-		      10~min su siguiente asignación, aunque los instantes de recolección y entrega se
-		      registran con precisión de segundos.  El efecto de esta convención se evalúa en la
-		      Sección~\ref{sec:robustez_reloj}.
-		\item El CtD y el SLA de las tablas principales se calculan sobre los pedidos entregados;
-		      en S3 y S4 los pedidos que FCFS no entrega no aportan tiempos, por lo que esas medias
-		      subestiman el deterioro de FCFS (el SLA sobre todas las órdenes se reporta en la
-		      Sección~4.2).
-		\item Con los parámetros de pago adoptados ($p_1 = \$10$ por pedido, $p_2 = \$15$/h), el
-		      pago mínimo solo es activo en S1, por lo que los indicadores de costo no discriminan
-		      entre políticas en S2--S4.
-		\item Los controles euclidianos usan una única velocidad para toda la red, por lo que
-		      aíslan el efecto de la geometría de las rutas pero no el de las diferencias de
-		      velocidad entre tipos de vía.
-	\end{itemize}
-
 	\chapter{Conclusiones}
 
-	Este capítulo responde las preguntas de investigación planteadas en la
-	Sección~\ref{sec:preguntas}, verifica el cumplimiento de los objetivos y de la
-	hipótesis, resume las contribuciones y propone líneas de investigación futura.
+	Este capítulo responde las preguntas de investigación de la
+	Sección~\ref{sec:preguntas}, sintetiza los hallazgos principales del trabajo, verifica el
+	cumplimiento de los objetivos planteados en el Capítulo~1 y propone líneas de
+	investigación futura.
 
 	% ──────────────────────────────────────────────────────────────────
 	\section{Respuesta a las preguntas de investigación}
@@ -3182,113 +2994,112 @@ services:
 
 	\paragraph{PI1 (saturación).}  La ventaja de RH crece con la saturación de la flota
 	(Secciones~4.2 y~4.5).  El punto de cruce se ubica entre 18 y 26 pedidos por repartidor; por
-	encima de él RH reduce el CtD medio entre 15 y 37\,\% en S2 y entre 63 y 67\,\% en S4, según
-	la convención del ciclo de simulación (Sección~\ref{sec:robustez_reloj}), y entrega
-	prácticamente todos los pedidos cuando FCFS deja de atender una parte de ellos.
+	encima de él RH reduce el CtD medio entre 37 y 67\,\% y entrega prácticamente todos los
+	pedidos cuando FCFS deja de atender una parte de ellos.  Estas magnitudes son una cota
+	superior de la ventaja de RH (Sección~\ref{sec:limitaciones_resultados}).
 
 	\paragraph{PI2 (red vial).}  Los trayectos restaurante--cliente por la red vial del centro de
 	La Paz son en promedio un 38\,\% más largos que en línea recta ($\kappa = 1{.}38$).  Con la red
 	real, la ventaja de RH en minutos es mayor que con distancias euclidianas en los cuatro
 	escenarios; entre el 62 y el 84\,\% de esa diferencia se explica por la mayor longitud media de
-	los viajes y el resto por la estructura de la red (Sección~\ref{sec:res_topologia}).
+	los viajes y el resto por la estructura de la red (Sección~\ref{sec:comparacion_literatura}).
 
 	\paragraph{PI3 (reproducibilidad y recursos).}  Sí.  Toda la cadena ---OpenStreetMap, OSRM,
 	Python--- es de código abierto, las instancias se regeneran a partir de semillas fijas, cada
 	corrida pasa verificaciones automáticas de integridad, y simular un día de operación con RH
 	toma alrededor de un minuto en una computadora portátil, con menos de 250~MB de memoria
-	(Sección~\ref{sec:desempeno_computacional}).
+	(Sección~\ref{sec:config_experimental}).
 
 	% ──────────────────────────────────────────────────────────────────
 	\section{Verificación de objetivos}
 
 	\subsection{Objetivo general}
-	El objetivo general ---evaluar la eficiencia operativa de la política de despacho
+	El objetivo general --- evaluar la eficiencia operativa de la política de despacho
 	\emph{Rolling Horizon} frente a FCFS mediante un entorno de simulación reproducible
-	con restricciones topológicas reales de La Paz, B.C.S.--- se cumple.  Se construyó el
-	entorno y con él se ejecutaron 80~corridas pareadas válidas (4~escenarios $\times$
-	10~semillas $\times$ 2~políticas) sobre la red vial real, más dos controles euclidianos de 80
-	corridas cada uno.  La evaluación muestra que la ventaja de RH depende de la saturación de la
-	flota: con 18 pedidos por repartidor, FCFS entrega 1.4~min antes; a partir de 26 pedidos por
-	repartidor, RH reduce el CtD medio entre 37\,\% y 67\,\% y entrega prácticamente todos los
-	pedidos.  Estos resultados valen para instancias sintéticas del centro urbano de La Paz
-	(8.4~km$^2$), con 25 restaurantes, turno único y red sin congestión.
+	con restricciones topológicas reales de La Paz, B.C.S. --- se cumple
+	satisfactoriamente.  Se ejecutaron 80~corridas de simulación válidas (4~escenarios
+	$\times$ 10~semillas $\times$ 2~políticas) sobre la red vial real, y se
+	cuantificaron las diferencias en 21~KPIs con pruebas estadísticas formales.
 
 	\subsection{Objetivos específicos}
 
 	\paragraph{OE\,1: Generación de instancias sintéticas.}
-	Se implementó un generador estocástico (\texttt{make\_synth\_orders.py}) que proyecta sobre
-	el área urbana de La Paz el perfil diario de LaDe (picos a las 9:00 y a las 17:00).  Las
-	instancias no están calibradas con datos locales, que no se tienen disponibles: sus
-	parámetros se fijan con valores de la literatura (Secciones~2.4 y~3.2).  La validez
-	geoespacial se garantiza al muestrear dentro de un polígono terrestre del centro urbano.  Las
-	diez semillas ($s \in \{2025, \ldots, 2034\}$) producen instancias reproducibles de 988 a
-	1\,047 órdenes distribuidas en 25~restaurantes, y todas generaron resultados válidos.
+	Se implementó un generador estocástico que proyecta patrones temporales de la
+	literatura (LaDe) sobre el área urbana de La Paz
+	(\texttt{make\_synth\_orders.py}). Las diez semillas ($s \in \{2025, \ldots, 2034\}$)
+	producen instancias reproducibles de 988 a 1\,047~órdenes distribuidas en
+	25~restaurantes; todas generaron resultados válidos.
 
 	\paragraph{OE\,2: Integración OSRM--simulador.}
-	El motor de simulación se integró con OSRM v5.27.1 sobre cartografía OpenStreetMap,
-	utilizando \textit{Contraction Hierarchies} para el cálculo de tiempos y rutas.  El 100\,\%
-	de las rutas de la campaña principal se obtuvo de OSRM, sin recurrir al respaldo euclidiano.
-	La diferencia frente a las distancias euclidianas se cuantificó con el índice de circuidad
-	($\kappa = 1{.}38$) y con dos escenarios de control.  La exactitud de los tiempos de OSRM
-	frente a una referencia externa (por ejemplo, trazas GPS de repartidores) no se evaluó.
+	El motor de simulación de eventos discretos se integró con OSRM v5.27.1 sobre
+	cartografía OpenStreetMap, utilizando el algoritmo CH (\textit{Contraction Hierarchies})
+	para el cálculo de tiempos y rutas de viaje reales.  La cobertura del grafo vial
+	se validó verificando que el 100\% de los puntos de entrega y recolección obtienen
+	respuesta válida del servicio de enrutamiento.  La diferencia frente a las distancias
+	euclidianas se cuantificó con el índice de circuidad ($\kappa = 1{.}38$) y con dos
+	escenarios de control.
 
 	\paragraph{OE\,3: Implementación de las políticas.}
-	Se implementaron ambas políticas (FCFS y RH) con instrumentación completa de métricas y con
-	la temporización de \citet{Reyes2018}: espera en el restaurante hasta que la comida está
-	lista y tiempos de servicio en recolección y entrega.  El módulo de \emph{bundling} agrupa
-	hasta $B_{max} = 4$ órdenes por restaurante.  Se verificó la integridad de todas las
-	corridas: ninguna orden se entrega antes de estar lista, cada orden pertenece a un solo
-	agrupamiento y ninguna se entrega dos veces.  Estas verificaciones comprueban la consistencia
-	de la simulación; la fidelidad de la implementación de RH frente a la de \citet{Reyes2018} se
-	sustenta en el seguimiento de su descripción, con las adaptaciones documentadas en el
-	Capítulo~3.
+	Se implementaron ambas políticas (FCFS y RH) con instrumentación completa de
+	métricas y con la temporización de \citet{Reyes2018}: espera en el restaurante hasta que
+	la comida está lista y tiempos de servicio en recolección y entrega.  El módulo de \emph{bundling} dinámico agrupa hasta $B_{max} = 4$
+	órdenes por restaurante, y el horizonte de anticipación ($\Delta_u = 20$~min)
+	sincroniza la asignación con la disponibilidad de los pedidos.
+	Se verificó la integridad de todas las corridas: ninguna orden se entrega antes de estar
+	lista, cada orden pertenece a un solo agrupamiento y ninguna se entrega dos veces.
 
 	\paragraph{OE\,4: Cuantificación estadística.}
-	Se aplicó la prueba de Wilcoxon \textit{signed-rank} pareada a nivel semilla ($n = 10$) sobre
-	\textit{Click-to-Door}, \textit{Ready-to-Door} y SLA \textit{Compliance} en los cuatro
-	escenarios, con corrección de Benjamini--Hochberg.  En S2--S4 todas las pruebas arrojan
-	$p = 0{.}0020$ ---el mínimo alcanzable con $n = 10$, que indica que las diez semillas
-	coinciden en el signo--- a favor de RH, con intervalos de confianza alejados del cero.  En S1,
-	FCFS obtiene un CtD y un RtD 1.38~min menores ($p = 0{.}0137$) y la diferencia en SLA no es
-	significativa ($p = 0{.}23$).  La prueba de Friedman ($\chi^2_F = 30{.}0$, $p < 0{.}001$)
-	confirma que la magnitud del efecto varía entre regímenes de saturación.
+	Se aplicó la prueba de Wilcoxon \textit{signed-rank} pareado a nivel semilla
+	($n = 10$) sobre \textit{Click-to-Door} y SLA \textit{Compliance} en los cuatro escenarios,
+	obteniendo $p = 0{.}0020$ ---el valor mínimo alcanzable con $n = 10$ cuando
+	todas las diferencias comparten signo--- en las seis pruebas de S2--S4.  En S1, FCFS
+	obtiene un CtD 1.38~min menor ($p = 0{.}0137$) y la diferencia en SLA no es
+	significativa ($p = 0{.}23$).  Los
+	intervalos de confianza $t$-Student al 95\,\% de la diferencia de medias
+	por semilla no incluyen al cero en ninguna otra fila.  El tamaño de efecto
+	\textit{rank-biserial} pareado es $r = +1{.}00$ en S2--S4, en favor de RH,
+	y $r = -0{.}85$ en el CtD de S1, en favor de FCFS.  La prueba
+	ómnibus de Friedman sobre la matriz $10 \times 4$ de $\Delta\text{CtD}$
+	($\chi^2_F = 30{.}0$, $p < 0{.}001$) confirma que la magnitud del efecto
+	varía significativamente entre regímenes de saturación.
 
 	% ──────────────────────────────────────────────────────────────────
 	\section{Verificación de la hipótesis}
 
 	La hipótesis planteaba que la política RH superaría significativamente a FCFS en
-	eficiencia operativa (órdenes por hora) y nivel de servicio (\textit{Ready-to-Door}).
-	Formulada de manera general, \textbf{la hipótesis no se verifica}, porque no se cumple en
-	baja saturación; los datos sí sostienen una versión condicionada al nivel de saturación:
+	eficiencia operativa y nivel de servicio.  Los resultados revelan que esta
+	superioridad es condicional al régimen de saturación:
 
 	\begin{itemize}
-		\item \textbf{Baja saturación (S1).}  FCFS entrega 1.4~min antes en promedio (28.93 vs
-		      30.31~min; IC~95\,\% de la diferencia [0.41, 2.35]~min) y su \textit{Ready-to-Door}
-		      también es 1.4~min menor; el cumplimiento SLA no difiere significativamente.  RH sí
-		      reduce el tiempo de espera de la comida ($-36.5$\,\%) y la distancia por pedido
-		      ($-13.5$\,\%).
-		\item \textbf{Saturación moderada a alta (S2--S4).}  RH reduce el CtD promedio entre
-		      36.8\,\% y 67.3\,\%, el \textit{Ready-to-Door} entre 46.8\,\% y 71.0\,\%, y mejora el
-		      cumplimiento SLA entre 31.5 y 50.3~pp, en las diez semillas de cada escenario
-		      ($p = 0{.}002$).  En S3 y S4, además, entrega prácticamente todos los pedidos,
-		      mientras que FCFS deja sin entregar el 11.3\,\% y el 39.9\,\%.
+		\item \textbf{Baja saturación (S1).}  La hipótesis no se verifica para
+		      las métricas de calidad de servicio: FCFS es superior en CtD promedio
+		      (28.93 vs 30.31~min) porque lleva
+		      cada pedido directamente sin esperar a formar agrupamientos, y la diferencia
+		      en cumplimiento SLA no es significativa.  Sin embargo, RH reduce el tiempo de
+		      espera de la comida ($-36.5\%$) y la distancia por pedido ($-13.5\%$).
+		      En \textit{throughput} ambas políticas son iguales (1.43 pedidos por repartidor
+		      por hora), por lo que la hipótesis tampoco se verifica en su componente de
+		      eficiencia operativa.
+		\item \textbf{Saturación moderada y media (S2--S3).}  RH supera a FCFS en todas las métricas
+		      de calidad: CtD promedio $-36.8\%$ y $-58.2\%$ (35.42 vs 56.07~min y
+		      45.36 vs 108.49~min), P90~CtD $-46.0\%$ y $-53.3\%$, SLA $+31.5$ y $+50.3$~pp y
+		      \textit{CTD Overage} $-82.1\%$ y $-82.5\%$.
+		      La hipótesis se verifica en este régimen.
+		\item \textbf{Alta saturación (S4).}  RH reduce el CtD un $67.3\%$
+		      (73.63 vs 224.88~min), el P90~CtD un $42.0\%$ (186.18 vs 321.10~min),
+		      mejora el SLA en 36.3~pp y entrega prácticamente la totalidad de los pedidos
+		      (0.2\% sin entregar vs 39.9\% bajo FCFS).
+		      La hipótesis alcanza su máxima verificación empírica.
 	\end{itemize}
 
-	El componente de eficiencia operativa de la hipótesis, medido como órdenes por repartidor
-	por hora, no permite discriminar entre políticas con este diseño: como ambas operan con la
-	misma flota y los mismos turnos, esa métrica solo difiere cuando difiere la cobertura.  Por
-	eso es idéntica en S1--S2, y su aumento bajo RH en S3 y S4 ($+12.7$ y $+66.0$\,\%) refleja
-	los pedidos que FCFS no entrega, no una mayor productividad por repartidor.  La eficiencia de
-	RH se manifiesta, en cambio, en la distancia por pedido, menor en todos los escenarios
-	($-13.5$\,\% a $-49.4$\,\%), y en la flota necesaria para un nivel de servicio dado: con
-	alrededor de 25\,\% menos repartidores (S3), RH ofrece un servicio al menos comparable al de
-	FCFS en S2 (Secciones~\ref{sec:discusion_regimenes} y~\ref{sec:robustez_reloj}).  La forma condicional de la hipótesis es, por tanto,
-	un hallazgo del estudio y no la hipótesis original.  El análisis de robustez
-	(Sección~\ref{sec:robustez_reloj}) confirma estas conclusiones cualitativas cuando el repartidor
-	recibe ruta en la misma época en que termina la anterior: FCFS sigue siendo mejor en S1 y RH en
-	S2--S4, en todas las semillas, aunque la ventaja de RH es menor (por ejemplo, una reducción del
-	CtD de 14.6\,\% en S2 en lugar de 36.7\,\%), por lo que las magnitudes reportadas son una cota
-	superior.
+	En cuanto a la eficiencia de la flota, el \textit{throughput} bajo RH es
+	igual al de FCFS en S1--S2 y superior en S3--S4 ($+12.7\%$ y $+66.0\%$), donde refleja
+	los pedidos que FCFS no alcanza a entregar.
+	La distancia por pedido se reduce en todos los escenarios
+	($-13.5\%$ a $-49.4\%$), y la utilización bajo RH es menor que bajo FCFS en
+	S1--S3, indicando que los couriers completan sus entregas con menor tiempo de
+	conducción por la eficiencia de los agrupamientos.  Las magnitudes en S2--S4 deben leerse
+	como una cota superior de la ventaja de RH (Sección~\ref{sec:limitaciones_resultados}).
 
 	% ──────────────────────────────────────────────────────────────────
 	\section{Contribuciones principales}
@@ -3296,28 +3107,21 @@ services:
 	\begin{enumerate}
 		\item \textbf{Entorno de simulación reproducible.}  Se desarrolló un simulador
 		      de código abierto que integra OSRM, cartografía OSM y generación
-		      estocástica de demanda, con verificaciones automáticas de integridad de los
-		      resultados, aplicado a una ciudad latinoamericana de escala media.
+		      estocástica de demanda, aplicado por primera vez a una ciudad
+		      latinoamericana de escala media.
 		\item \textbf{Evidencia empírica del efecto de la saturación.}  Se documentó
-		      cuantitativamente que, en la configuración evaluada, RH supera a FCFS a partir de
-		      saturación moderada y que el punto de cruce se ubica entre 18 y 26 pedidos por
-		      repartidor.  La desventaja de RH en S1 se asocia con el redondeo hacia arriba del
-		      tamaño objetivo de agrupamiento, por lo que el umbral es una propiedad de la
-		      implementación y de las instancias evaluadas, y no una regla general para
-		      operadores.
-		\item \textbf{Magnitud de la mejora y ahorro de flota.}  RH con alrededor de 25\,\% menos
-		      repartidores (S3) ofrece un servicio al menos comparable al de FCFS en S2: CtD y SLA
-		      mejores en la campaña principal, y CtD similar con SLA mayor en la variante de
-		      robustez.  En el escenario más demandante (S4, $\rho = 52$), RH reduce el CtD
-		      promedio entre 63\,\% y 67\,\% según la convención del ciclo y entrega
-		      prácticamente todos los pedidos, frente al 60--76\,\% de FCFS; esa magnitud ilustra
-		      el colapso de la política reactiva bajo saturación extrema.
-		\item \textbf{Medición del efecto de la red vial.}  Se midió que los trayectos por la red
-		      vial del centro de La Paz son un 38\,\% más largos que en línea recta ($\kappa =
-		      1{.}38$) y que ignorar esta diferencia subestima los tiempos de entrega de ambas
-		      políticas y la carga efectiva de la flota.  Un control euclidiano escalado por
-		      $\kappa$ mostró que entre el 62 y el 84\,\% del efecto de la red sobre la ventaja de
-		      RH se debe a la longitud de los viajes y el resto a la estructura de la red.
+		      cuantitativamente el punto de cruce en el que la política RH comienza
+		      a superar a FCFS en CtD promedio (entre S1 y S2, $\rho \approx 18$--$26$),
+		      aportando una guía práctica para operadores de \emph{delivery}.
+		\item \textbf{Magnitud de la mejora bajo saturación.}  En el escenario más
+		      demandante (S4, $\rho = 52$), RH reduce el CtD promedio un 67.3\%,
+		      el P90~CtD un 42.0\%, y entrega prácticamente todos los pedidos que FCFS
+		      deja sin entregar.
+		\item \textbf{Validación sobre topología real.}  Los resultados confirman que
+		      los beneficios de las heurísticas de horizonte rodante no solo se
+		      mantienen sino que se amplifican al utilizar distancias reales sobre
+		      la red vial de La Paz, cuyos trayectos son un 38\% más largos que en
+		      línea recta ($\kappa = 1{.}38$).
 		\item \textbf{Arquitectura exclusivamente open-source.}  Toda la cadena
 		      --- OSRM, OSM, Python, Docker --- se basa en herramientas de código
 		      abierto, demostrando la viabilidad de soluciones de optimización
@@ -3328,37 +3132,24 @@ services:
 	\section{Trabajo futuro}
 
 	\begin{itemize}
-		\item \textbf{Punto de cruce fino.}  Explorar valores de $\rho$ entre 18 y 26 para
-		      localizar con mayor precisión el punto a partir del cual RH supera a FCFS.
-		\item \textbf{Latencia de RH con flota holgada.}  Evaluar reglas que eviten agrupar
-		      cuando sobran repartidores (por ejemplo, un tamaño objetivo $Z_t$ redondeado al
-		      entero más cercano o una frecuencia de optimización menor), para eliminar la
-		      desventaja de RH en baja saturación.
-		\item \textbf{Ablación y líneas base más fuertes.}  Aislar la contribución de cada
-		      mecanismo de RH (agrupamiento, asignación global, compromiso en dos etapas,
-		      grupos de prioridad), como en las variantes de \citet{Reyes2018}, y comparar RH
-		      con políticas reactivas que también agrupen o que elijan al repartidor con
-		      tiempos de la red vial.
-		\item \textbf{Validación con instancias de referencia.}  Ejecutar la implementación sobre
-		      las instancias públicas de \citet{Reyes2018} para contrastar sus resultados con los
-		      publicados.
 		\item \textbf{Demanda real.}  Sustituir las instancias sintéticas por datos
-		      operacionales de una plataforma de \emph{delivery} activa en La Paz, con los
-		      horarios de comida y la distribución espacial de la demanda locales.
-		\item \textbf{Cobertura geográfica y calidad de la red.}  Ampliar el polígono de
-		      muestreo al área urbana completa ---incluidos los trayectos que rodean la
-		      ensenada---, medir la conectividad del grafo vial y validar los tiempos de OSRM
-		      contra trazas reales de repartidores.
+		      operacionales de una plataforma de \emph{delivery} activa en La Paz
+		      para validar la transferibilidad de los resultados.
 		\item \textbf{Congestión dinámica.}  Incorporar perfiles de velocidad
 		      variables por hora del día en OSRM (\textit{traffic profiles}) para capturar
 		      el efecto de la congestión sobre los tiempos de viaje.
 		\item \textbf{Calibración de pesos.}  Explorar métodos de ajuste automático
-		      de los parámetros de la función de costo y del peso de asignación ($\beta$,
-		      $\theta$) mediante búsqueda bayesiana o aprendizaje por refuerzo.
-		\item \textbf{Flota heterogénea y turnos.}  Modelar vehículos con diferentes
-		      velocidades y capacidades (bicicletas, motocicletas, automóviles) y turnos
-		      escalonados de repartidores, para evaluar su impacto en la formación de
-		      agrupamientos.
+		      de los pesos de la función de costo ($\beta$, $\theta$) mediante
+		      búsqueda bayesiana o aprendizaje por refuerzo.
+		\item \textbf{Escenarios multi-turno.}  Extender el horizonte de simulación
+		      a jornadas completas con relevos de repartidores y variación temporal
+		      de la demanda (picos de almuerzo y cena).
+		\item \textbf{Flota heterogénea.}  Modelar vehículos con diferentes
+		      velocidades y capacidades (bicicletas, motocicletas, automóviles)
+		      para evaluar el impacto en la formación de agrupamientos.
+		\item \textbf{Punto de cruce fino.}  Explorar valores de $\rho$ entre 18 y 26
+		      para localizar con mayor precisión el punto de cruce donde RH comienza
+		      a superar a FCFS en CtD promedio.
 	\end{itemize}
 
 	

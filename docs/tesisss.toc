@@ -31,7 +31,7 @@
 \contentsline {subsection}{\numberline {1. 6.1}Alcance Geográfico y de Datos}{14}{subsection.1.6.1}%
 \contentsline {subsubsection}{Infraestructura Vial (La Paz, B.C.S.)}{14}{section*.4}%
 \contentsline {subsubsection}{Instancias de Demanda y Patrones Temporales}{14}{section*.5}%
-\contentsline {subsection}{\numberline {1. 6.2}Alcance Funcional y Algorítmico}{14}{subsection.1.6.2}%
+\contentsline {subsection}{\numberline {1. 6.2}Alcance Funcional y Algorítmico}{15}{subsection.1.6.2}%
 \contentsline {subsection}{\numberline {1. 6.3}Alcance Técnico: Reproducibilidad e Infraestructura}{15}{subsection.1.6.3}%
 \contentsline {subsection}{\numberline {1. 6.4}Supuestos y Limitaciones}{16}{subsection.1.6.4}%
 \contentsline {subsubsection}{Modelo de Tráfico Estático}{16}{section*.6}%
@@ -63,7 +63,7 @@
 \contentsline {subsection}{\numberline {2. 3.3}OSRM: motor de enrutamiento}{30}{subsection.2.3.3}%
 \contentsline {section}{\numberline {2. 4}Generación estocástica de demanda y métricas}{31}{section.2.4}%
 \contentsline {subsection}{\numberline {2. 4.1}Proceso de Poisson no homogéneo}{31}{subsection.2.4.1}%
-\contentsline {paragraph}{Propiedad de discretización.}{32}{section*.14}%
+\contentsline {paragraph}{Propiedad de discretización.}{31}{section*.14}%
 \contentsline {subsection}{\numberline {2. 4.2}Función de intensidad bimodal}{32}{subsection.2.4.2}%
 \contentsline {subsection}{\numberline {2. 4.3}Métricas de desempeño: marco de evaluación}{33}{subsection.2.4.3}%
 \contentsline {paragraph}{Estadísticos de agregación.}{33}{section*.15}%
@@ -89,24 +89,24 @@
 \contentsline {subsection}{\numberline {3. 3.1}Ciclo de simulación por épocas}{45}{subsection.3.3.1}%
 \contentsline {subsection}{\numberline {3. 3.2}Modelos de datos: órdenes, couriers y restaurantes}{46}{subsection.3.3.2}%
 \contentsline {subsection}{\numberline {3. 3.3}Máquina de estados de una orden}{47}{subsection.3.3.3}%
-\contentsline {subsection}{\numberline {3. 3.4}Temporización de rutas}{48}{subsection.3.3.4}%
+\contentsline {subsection}{\numberline {3. 3.4}Temporización de rutas}{47}{subsection.3.3.4}%
 \contentsline {subsection}{\numberline {3. 3.5}Integración con OSRM}{48}{subsection.3.3.5}%
 \contentsline {section}{\numberline {3. 4}Política FCFS (\textit {baseline})}{49}{section.3.4}%
 \contentsline {subsection}{\numberline {3. 4.1}Lógica de asignación}{49}{subsection.3.4.1}%
 \contentsline {subsection}{\numberline {3. 4.2}Características y limitaciones}{50}{subsection.3.4.2}%
 \contentsline {section}{\numberline {3. 5}Política \textit {Rolling Horizon}}{51}{section.3.5}%
 \contentsline {subsection}{\numberline {3. 5.1}Cálculo del tamaño objetivo de agrupamiento}{51}{subsection.3.5.1}%
-\contentsline {subsection}{\numberline {3. 5.2}Generación de agrupamientos por restaurante}{52}{subsection.3.5.2}%
-\contentsline {subsection}{\numberline {3. 5.3}Clasificación por prioridad y asignación bipartita}{53}{subsection.3.5.3}%
-\contentsline {subsection}{\numberline {3. 5.4}Compromiso en dos etapas}{54}{subsection.3.5.4}%
-\contentsline {subsection}{\numberline {3. 5.5}Resumen del flujo RH por época}{55}{subsection.3.5.5}%
-\contentsline {section}{\numberline {3. 6}Diseño experimental}{55}{section.3.6}%
+\contentsline {subsection}{\numberline {3. 5.2}Generación de agrupamientos por restaurante}{51}{subsection.3.5.2}%
+\contentsline {subsection}{\numberline {3. 5.3}Clasificación por prioridad y asignación bipartita}{52}{subsection.3.5.3}%
+\contentsline {subsection}{\numberline {3. 5.4}Compromiso en dos etapas}{53}{subsection.3.5.4}%
+\contentsline {subsection}{\numberline {3. 5.5}Resumen del flujo RH por época}{54}{subsection.3.5.5}%
+\contentsline {section}{\numberline {3. 6}Diseño experimental}{54}{section.3.6}%
 \contentsline {subsection}{\numberline {3. 6.1}Variable de tratamiento: saturación de flota}{56}{subsection.3.6.1}%
 \contentsline {subsection}{\numberline {3. 6.2}Escenarios}{56}{subsection.3.6.2}%
 \contentsline {subsection}{\numberline {3. 6.3}Comparación pareada}{56}{subsection.3.6.3}%
 \contentsline {subsection}{\numberline {3. 6.4}Plan de análisis estadístico}{57}{subsection.3.6.4}%
 \contentsline {subsection}{\numberline {3. 6.5}Escenario de control euclidiano}{57}{subsection.3.6.5}%
-\contentsline {subsection}{\numberline {3. 6.6}Replicación y análisis de sensibilidad}{58}{subsection.3.6.6}%
+\contentsline {subsection}{\numberline {3. 6.6}Replicación y análisis de sensibilidad}{57}{subsection.3.6.6}%
 \contentsline {subsection}{\numberline {3. 6.7}Almacenamiento de resultados}{58}{subsection.3.6.7}%
 \contentsline {section}{\numberline {3. 7}Métricas de evaluación}{58}{section.3.7}%
 \contentsline {subsection}{\numberline {3. 7.1}Calidad de servicio}{59}{subsection.3.7.1}%
@@ -119,39 +119,33 @@
 \contentsline {section}{\numberline {4. 1}Configuración experimental}{62}{section.4.1}%
 \contentsline {section}{\numberline {4. 2}Calidad de servicio}{63}{section.4.2}%
 \contentsline {subsection}{\numberline {4. 2.1}Análisis del \textit {Click-to-Door}}{63}{subsection.4.2.1}%
-\contentsline {subsection}{\numberline {4. 2.2}\textit {Ready-to-Pickup} y exceso sobre el objetivo}{65}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4. 2.2}\textit {Ready-to-Pickup} y tiempo de espera}{65}{subsection.4.2.2}%
 \contentsline {section}{\numberline {4. 3}Eficiencia operativa}{66}{section.4.3}%
 \contentsline {subsection}{\numberline {4. 3.1}Productividad y utilización}{66}{subsection.4.3.1}%
 \contentsline {subsection}{\numberline {4. 3.2}Distancia y enrutamiento}{67}{subsection.4.3.2}%
 \contentsline {section}{\numberline {4. 4}Agrupamiento y costos}{67}{section.4.4}%
-\contentsline {subsection}{\numberline {4. 4.1}Distribución de agrupamientos}{67}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4. 4.1}Distribución de agrupamientos}{68}{subsection.4.4.1}%
 \contentsline {subsection}{\numberline {4. 4.2}Modelo de compensación}{68}{subsection.4.4.2}%
-\contentsline {section}{\numberline {4. 5}Análisis estadístico}{68}{section.4.5}%
-\contentsline {subsection}{\numberline {4. 5.1}Diseño inferencial}{68}{subsection.4.5.1}%
+\contentsline {section}{\numberline {4. 5}Análisis estadístico}{69}{section.4.5}%
+\contentsline {subsection}{\numberline {4. 5.1}Diseño inferencial}{69}{subsection.4.5.1}%
 \contentsline {subsection}{\numberline {4. 5.2}Resultados}{69}{subsection.4.5.2}%
 \contentsline {subsection}{\numberline {4. 5.3}Discusión por regímenes}{70}{subsection.4.5.3}%
-\contentsline {section}{\numberline {4. 6}Análisis de robustez: orden de las fases del ciclo}{71}{section.4.6}%
-\contentsline {section}{\numberline {4. 7}Efecto de la topología vial}{73}{section.4.7}%
-\contentsline {subsection}{\numberline {4. 7.1}Circuidad de la red de La Paz}{73}{subsection.4.7.1}%
-\contentsline {subsection}{\numberline {4. 7.2}Comparación con el escenario de control euclidiano}{73}{subsection.4.7.2}%
-\contentsline {section}{\numberline {4. 8}Desempeño computacional}{74}{section.4.8}%
-\contentsline {section}{\numberline {4. 9}Comparación con la literatura y limitaciones}{75}{section.4.9}%
-\contentsline {subsection}{\numberline {4. 9.1}Comparación con la literatura}{75}{subsection.4.9.1}%
-\contentsline {subsection}{\numberline {4. 9.2}Limitaciones de los resultados}{76}{subsection.4.9.2}%
-\contentsline {chapter}{\numberline {5}Conclusiones}{78}{chapter.5}%
-\contentsline {section}{\numberline {5. 1}Respuesta a las preguntas de investigación}{78}{section.5.1}%
-\contentsline {paragraph}{Pregunta central.}{78}{section*.24}%
-\contentsline {paragraph}{PI1 (saturación).}{78}{section*.25}%
-\contentsline {paragraph}{PI2 (red vial).}{78}{section*.26}%
-\contentsline {paragraph}{PI3 (reproducibilidad y recursos).}{79}{section*.27}%
-\contentsline {section}{\numberline {5. 2}Verificación de objetivos}{79}{section.5.2}%
-\contentsline {subsection}{\numberline {5. 2.1}Objetivo general}{79}{subsection.5.2.1}%
-\contentsline {subsection}{\numberline {5. 2.2}Objetivos específicos}{79}{subsection.5.2.2}%
-\contentsline {paragraph}{OE\,1: Generación de instancias sintéticas.}{79}{section*.28}%
-\contentsline {paragraph}{OE\,2: Integración OSRM--simulador.}{80}{section*.29}%
-\contentsline {paragraph}{OE\,3: Implementación de las políticas.}{80}{section*.30}%
-\contentsline {paragraph}{OE\,4: Cuantificación estadística.}{80}{section*.31}%
-\contentsline {section}{\numberline {5. 3}Verificación de la hipótesis}{80}{section.5.3}%
-\contentsline {section}{\numberline {5. 4}Contribuciones principales}{81}{section.5.4}%
-\contentsline {section}{\numberline {5. 5}Trabajo futuro}{82}{section.5.5}%
-\contentsline {chapter}{Bibliografía}{83}{section.5.5}%
+\contentsline {subsection}{\numberline {4. 5.4}Comparación con la literatura}{70}{subsection.4.5.4}%
+\contentsline {subsection}{\numberline {4. 5.5}Limitaciones de los resultados}{71}{subsection.4.5.5}%
+\contentsline {chapter}{\numberline {5}Conclusiones}{73}{chapter.5}%
+\contentsline {section}{\numberline {5. 1}Respuesta a las preguntas de investigación}{73}{section.5.1}%
+\contentsline {paragraph}{Pregunta central.}{73}{section*.24}%
+\contentsline {paragraph}{PI1 (saturación).}{73}{section*.25}%
+\contentsline {paragraph}{PI2 (red vial).}{73}{section*.26}%
+\contentsline {paragraph}{PI3 (reproducibilidad y recursos).}{74}{section*.27}%
+\contentsline {section}{\numberline {5. 2}Verificación de objetivos}{74}{section.5.2}%
+\contentsline {subsection}{\numberline {5. 2.1}Objetivo general}{74}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5. 2.2}Objetivos específicos}{74}{subsection.5.2.2}%
+\contentsline {paragraph}{OE\,1: Generación de instancias sintéticas.}{74}{section*.28}%
+\contentsline {paragraph}{OE\,2: Integración OSRM--simulador.}{74}{section*.29}%
+\contentsline {paragraph}{OE\,3: Implementación de las políticas.}{75}{section*.30}%
+\contentsline {paragraph}{OE\,4: Cuantificación estadística.}{75}{section*.31}%
+\contentsline {section}{\numberline {5. 3}Verificación de la hipótesis}{75}{section.5.3}%
+\contentsline {section}{\numberline {5. 4}Contribuciones principales}{76}{section.5.4}%
+\contentsline {section}{\numberline {5. 5}Trabajo futuro}{77}{section.5.5}%
+\contentsline {chapter}{Bibliografía}{77}{section.5.5}%

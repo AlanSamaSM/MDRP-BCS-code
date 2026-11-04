@@ -1,4 +1,4 @@
-\begin{thebibliography}{35}
+\begin{thebibliography}{34}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -265,13 +265,5 @@ Milton Friedman.
 \newblock \emph{Journal of the American Statistical Association}, 32\penalty0
   (200):\penalty0 675--701, 1937.
 \newblock \doi{10.1080/01621459.1937.10503522}.
-
-\bibitem[Benjamini and Hochberg(1995)]{BenjaminiHochberg1995}
-Yoav Benjamini and Yosef Hochberg.
-\newblock Controlling the false discovery rate: A practical and powerful
-  approach to multiple testing.
-\newblock \emph{Journal of the Royal Statistical Society: Series B
-  (Methodological)}, 57\penalty0 (1):\penalty0 289--300, 1995.
-\newblock \doi{10.1111/j.2517-6161.1995.tb02031.x}.
 
 \end{thebibliography}

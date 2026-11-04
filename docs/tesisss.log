@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.3.1)  26 OCT 2026 23:38
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.3.1)  4 NOV 2026 03:29
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -882,7 +882,7 @@ LaTeX Info: Redefining \% on input line 40.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-<img/sep2026.jpeg, id=516, 368.37625pt x 99.37125pt>
+<img/sep2026.jpeg, id=492, 368.37625pt x 99.37125pt>
 File: img/sep2026.jpeg Graphic file (type jpg)
 <use img/sep2026.jpeg>
 Package pdftex.def Info: img/sep2026.jpeg  used on input line 50.
@@ -898,12 +898,12 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 52.
 (/usr/local/texlive/2026basic/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-<img/TecNM.png, id=517, 490.83376pt x 246.1697pt>
+<img/TecNM.png, id=493, 490.83376pt x 246.1697pt>
 File: img/TecNM.png Graphic file (type png)
 <use img/TecNM.png>
 Package pdftex.def Info: img/TecNM.png  used on input line 55.
 (pdftex.def)             Requested size: 110.62448pt x 55.47969pt.
-<img/logotec.jpeg, id=518, 1351.29843pt x 1000.48781pt>
+<img/logotec.jpeg, id=494, 1351.29843pt x 1000.48781pt>
 File: img/logotec.jpeg Graphic file (type jpg)
 <use img/logotec.jpeg>
 Package pdftex.def Info: img/logotec.jpeg  used on input line 60.
@@ -947,26 +947,26 @@ LaTeX Info: Redefining \. on input line 1.
 LaTeX Info: Redefining \% on input line 1.
 LaTeX Info: Redefining \. on input line 2.
 LaTeX Info: Redefining \% on input line 2.
- [8
-
-])
+)
 \tf@lot=\write7
 \openout7 = `tesisss.lot'.
 
- [9]
+ [8
+
+]
 Cap\'{\i }tulo 1.
 [1
 
 
 ] [2] [3] [4] [5] [6] [7] [8] [9] [10] [11] [12] [13] [14]
-Overfull \hbox (2.76828pt too wide) in paragraph at lines 585--588
+Overfull \hbox (2.76828pt too wide) in paragraph at lines 586--589
 \OT1/cmr/m/n/12 se des-plie-ga me-dian-te \OT1/cmr/bx/n/12 Doc-ker \OT1/cmr/m/n
 /12 (ima-gen \OT1/cmtt/m/n/12 ghcr.io/project-osrm/osrm-backend:v5.27.1\OT1/cmr
 /m/n/12 ),
  []
 
 
-Overfull \hbox (2.8106pt too wide) in paragraph at lines 589--591
+Overfull \hbox (2.8106pt too wide) in paragraph at lines 590--592
 []\OT1/cmr/bx/n/12 Independencia de APIs: \OT1/cmr/m/n/12 El sis-te-ma ope-ra d
 e for-ma aut^^Sono-ma (\OT1/cmr/m/it/12 of-fli-ne\OT1/cmr/m/n/12 ) so-bre \OT1/
 cmtt/m/n/12 localhost\OT1/cmr/m/n/12 ,
@@ -977,7 +977,7 @@ Cap\'{\i }tulo 2.
 [19
 
 ] [20] [21]
-Overfull \hbox (11.82101pt too wide) in paragraph at lines 812--814
+Overfull \hbox (11.82101pt too wide) in paragraph at lines 813--815
 []\OT1/cmr/bx/it/12 Ready-to-Door \OT1/cmr/bx/n/12 (RtD): \OT1/cmr/m/n/12 tiem-
 po des-de la dis-po-ni-bi-li-dad has-ta la en-tre-ga, $[][] = \OML/cmm/m/it/12 
 t[] \OMS/cmsy/m/n/12 ^^@
@@ -985,30 +985,30 @@ t[] \OMS/cmsy/m/n/12 ^^@
 
 [22] [23] [24] [25] [26] [27] [28] [29]
 LaTeX Font Info:    Trying to load font information for OMS+cmtt on input line 
-1201.
-LaTeX Font Info:    No file OMScmtt.fd. on input line 1201.
+1198.
+LaTeX Font Info:    No file OMScmtt.fd. on input line 1198.
 
 
 LaTeX Font Warning: Font shape `OMS/cmtt/m/n' undefined
 (Font)              using `OMS/cmsy/m/n' instead
-(Font)              for symbol `textbraceleft' on input line 1201.
+(Font)              for symbol `textbraceleft' on input line 1198.
 
 [30] [31] [32] [33] [34]
 Cap\'{\i }tulo 3.
 [35
 
 ]
-Overfull \hbox (12.42766pt too wide) in paragraph at lines 1452--1452
+Overfull \hbox (12.42766pt too wide) in paragraph at lines 1449--1449
  [][]\OT1/cmtt/m/n/10.95 bcs-latest.osm.pbf 
  []
 
 
-Overfull \hbox (29.73195pt too wide) in paragraph at lines 1479--1479
+Overfull \hbox (29.73195pt too wide) in paragraph at lines 1476--1476
  [][]\OT1/cmtt/m/n/10.95 asignaciontentativa.py 
  []
 
 
-Overfull \hbox (2.57278pt too wide) in paragraph at lines 1511--1511
+Overfull \hbox (2.57278pt too wide) in paragraph at lines 1508--1508
  [][]\OT1/cmtt/m/n/10.95 statistical[]analysis.py 
  []
 
@@ -1017,17 +1017,17 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.3.1})
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.1529 
+l.1526 
        ]
-Overfull \hbox (53.46716pt too wide) in paragraph at lines 1544--1546
+Overfull \hbox (53.46716pt too wide) in paragraph at lines 1541--1543
 []\OT1/cmr/m/n/12 El ser-vi-cio de en-ru-ta-mien-to se des-plie-ga de for-ma de
 -cla-ra-ti-va me-dian-te un ar-chi-vo \OT1/cmtt/m/n/12 docker-compose.yml
  []
 
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
-nput line 1550.
+nput line 1547.
 [37]
-Overfull \hbox (34.3243pt too wide) in paragraph at lines 1572--1575
+Overfull \hbox (34.3243pt too wide) in paragraph at lines 1569--1572
 []\OT1/cmr/bx/n/12 Aislamiento del en-torno: \OT1/cmr/m/n/12 La ima-gen Doc-ker
  \OT1/cmtt/m/n/12 ghcr.io/project-osrm/osrm-backend:v5.27.1
  []
@@ -1037,60 +1037,60 @@ pdfTeX warning (ext4): destination with the same identifier (name{table.3.1}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.1666 \FloatBarrier
+l.1663 \FloatBarrier
                     ] [40
 pdfTeX warning (ext4): destination with the same identifier (name{table.3.2}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.1666 \FloatBarrier
-                    ] [41] [42] [43]
-Overfull \hbox (9.58789pt too wide) in paragraph at lines 1808--1815
+l.1663 \FloatBarrier
+                    ] [41] [42]
+Overfull \hbox (9.58789pt too wide) in paragraph at lines 1796--1803
 []\OT1/cmr/m/n/12 Las ubi-ca-cio-nes ba-se de los res-tau-ran-tes se ob-tie-nen
  del ar-chi-vo \OT1/cmtt/m/n/12 la[]paz[]restaurants.geojson\OT1/cmr/m/n/12 ,
  []
 
-
-Overfull \hbox (47.93697pt too wide) in paragraph at lines 1827--1835
+[43]
+Overfull \hbox (47.93697pt too wide) in paragraph at lines 1815--1823
 \OT1/cmr/m/n/12 donde $\OMS/cmtt/m/n/12 jOj$ \OT1/cmr/m/n/12 es el n^^Sume-ro t
 o-tal de ^^Sorde-nes, $\OML/cmm/m/it/12 r$ \OT1/cmr/m/n/12 es el ra-tio ob-je-t
 i-vo de ^^Sorde-nes por courier (\OT1/cmtt/m/n/12 orders[]per[]courier\OT1/cmr/
 m/n/12 ,
  []
 
-[44] [45] [46] [47] [48] [49] [50] [51] [52] [53]
-Overfull \hbox (84.70303pt too wide) in paragraph at lines 2224--2229
+[44] [45] [46] [47] [48] [49] [50] [51] [52]
+Overfull \hbox (84.70303pt too wide) in paragraph at lines 2207--2212
 []\OT1/cmr/m/n/12 La ma-triz se con-vier-te a cos-tos ($\OML/cmm/m/it/12 c[] \O
 T1/cmr/m/n/12 = \OMS/cmtt/m/n/12 ^^@\OML/cmm/m/it/12 w[]$\OT1/cmr/m/n/12 ) y se
  re-suel-ve me-dian-te \OT1/cmtt/m/n/12 scipy.optimize.linear[]sum[]assignment
  []
 
-[54] [55
+[53] [54] [55
 pdfTeX warning (ext4): destination with the same identifier (name{figure.3.2}) 
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.2311 
-       ] [56
+l.2287 	\subsection
+                   {Variable de tratamiento: saturación de flota}] [56
 pdfTeX warning (ext4): destination with the same identifier (name{table.3.3}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.2352 	\subsection
-                   {Plan de análisis estadístico}] [57]
-Overfull \hbox (8.66914pt too wide) in paragraph at lines 2413--2417
+l.2334 
+       ] [57]
+Overfull \hbox (8.66914pt too wide) in paragraph at lines 2390--2394
 []\OT1/cmr/m/n/12 Cada co-rri-da del mar-co ge-ne-ra un di-rec-to-rio con mar-c
 a tem-po-ral ba-jo \OT1/cmtt/m/n/12 results/experiments/\OT1/cmr/m/n/12 .
  []
 
 [58] [59]
-Overfull \hbox (9.84683pt too wide) in paragraph at lines 2500--2503
+Overfull \hbox (9.84683pt too wide) in paragraph at lines 2477--2480
 []$ $\OT1/cmr/bx/n/12 % Pe-di-dos en multi-agrupamiento\OT1/cmr/m/n/12 : pro-po
 r-ci^^Son de ^^Sorde-nes en-tre-ga-das cu-yo \OT1/cmtt/m/n/12 bundle[]size
  []
 
 
-Underfull \hbox (badness 1635) in paragraph at lines 2557--2558
+Underfull \hbox (badness 1635) in paragraph at lines 2534--2535
 []|\OT1/cmr/m/n/10 Fracci^^Son de re-par-ti-do-res con pa-go
  []
 
@@ -1099,7 +1099,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{table.3.4}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.2562 	\chapter
+l.2539 	\chapter
                 {Resultados}]
 Cap\'{\i }tulo 4.
 [62
@@ -1109,122 +1109,94 @@ pdfTeX warning (ext4): destination with the same identifier (name{table.4.1}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.2656 
-       ]
-<img/fig_ctd_boxplot.png, id=1366, 809.6649pt x 371.4678pt>
-File: img/fig_ctd_boxplot.png Graphic file (type png)
-<use img/fig_ctd_boxplot.png>
-Package pdftex.def Info: img/fig_ctd_boxplot.png  used on input line 2678.
-(pdftex.def)             Requested size: 461.94324pt x 211.93723pt.
- [64
+l.2635 
+       ] [64
 pdfTeX warning (ext4): destination with the same identifier (name{table.4.2}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.2689 
-       ] [65
+l.2659 	L
+         a Figura~\ref{fig:ctd_boxplot} muestra la distribución del Click-t...
+]
+<img/fig_ctd_boxplot.png, id=1306, 809.6649pt x 371.4678pt>
+File: img/fig_ctd_boxplot.png Graphic file (type png)
+<use img/fig_ctd_boxplot.png>
+Package pdftex.def Info: img/fig_ctd_boxplot.png  used on input line 2666.
+(pdftex.def)             Requested size: 461.94324pt x 211.93723pt.
+ [65
 pdfTeX warning (ext4): destination with the same identifier (name{figure.4.1}) 
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.2717 
+l.2702 
        
 pdfTeX warning (ext4): destination with the same identifier (name{table.4.3}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.2717 
+l.2702 
         <./img/fig_ctd_boxplot.png>] [66
 pdfTeX warning (ext4): destination with the same identifier (name{table.4.4}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.2767 
-       ] [67
+l.2748 	L
+         a utilización (\% del turno en conducción o en servicio) presenta...
+] [67
 pdfTeX warning (ext4): destination with the same identifier (name{table.4.5}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.2808 
+l.2802 
        ]
-<img/fig_bundle_distribution.png, id=1392, 712.8231pt x 352.4367pt>
+<img/fig_bundle_distribution.png, id=1328, 712.8231pt x 352.4367pt>
 File: img/fig_bundle_distribution.png Graphic file (type png)
 <use img/fig_bundle_distribution.png>
 Package pdftex.def Info: img/fig_bundle_distribution.png  used on input line 28
-11.
+10.
 (pdftex.def)             Requested size: 413.32193pt x 204.35428pt.
  [68
 pdfTeX warning (ext4): destination with the same identifier (name{figure.4.2}) 
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.2849 
-        <./img/fig_bundle_distribution.png>] [69
+l.2827 
+        <./img/fig_bundle_distribution.png>] [69] [70
 pdfTeX warning (ext4): destination with the same identifier (name{table.4.6}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.2901 
-       ]
-<img/fig_kpi_vs_ratio.png, id=1410, 783.6477pt x 586.3506pt>
+l.2939 
+       ] [71]
+<img/fig_kpi_vs_ratio.png, id=1356, 783.6477pt x 586.3506pt>
 File: img/fig_kpi_vs_ratio.png Graphic file (type png)
 <use img/fig_kpi_vs_ratio.png>
-Package pdftex.def Info: img/fig_kpi_vs_ratio.png  used on input line 2927.
+Package pdftex.def Info: img/fig_kpi_vs_ratio.png  used on input line 2971.
 (pdftex.def)             Requested size: 413.32193pt x 309.26125pt.
- [70] [71
+ [72
 pdfTeX warning (ext4): destination with the same identifier (name{figure.4.3}) 
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.2970 	\end{table}
-                    <./img/fig_kpi_vs_ratio.png>] [72
-pdfTeX warning (ext4): destination with the same identifier (name{table.4.7}) h
-as been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.2998 
-       ] [73] [74
-pdfTeX warning (ext4): destination with the same identifier (name{table.4.8}) h
-as been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.3097 
-       ] [75
-pdfTeX warning (ext4): destination with the same identifier (name{table.4.9}) h
-as been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.3134 
-       
-pdfTeX warning (ext4): destination with the same identifier (name{table.4.10}) 
-has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.3134 
-       ] [76] [77]
+l.2977 	\chapter
+                {Conclusiones} <./img/fig_kpi_vs_ratio.png>]
 Cap\'{\i }tulo 5.
-[78
+[73
 
 ]
-Overfull \hbox (5.45546pt too wide) in paragraph at lines 3195--3200
+Overfull \hbox (5.45546pt too wide) in paragraph at lines 3007--3012
  []\OT1/cmr/bx/n/12 PI3 (re-pro-du-ci-bi-li-dad y re-cur-sos).[] \OT1/cmr/m/n/1
 2 S^^S^^P. To-da la ca-de-na ---OpenStreetMap, OSRM, Python---
  []
 
 
-Overfull \hbox (97.50931pt too wide) in paragraph at lines 3219--3226
- []\OT1/cmr/bx/n/12 OE1: Ge-ne-ra-ci^^Son de ins-tan-cias sint^^Seti-cas.[] \OT
-1/cmr/m/n/12 Se im-ple-ment^^So un ge-ne-ra-dor es-toc^^Sasti-co (\OT1/cmtt/m/n
-/12 make[]synth[]orders.py\OT1/cmr/m/n/12 )
+Overfull \hbox (68.06468pt too wide) in paragraph at lines 3027--3032
+\OT1/cmr/m/n/12 pro-yec-ta pa-tro-nes tem-po-ra-les de la li-te-ra-tu-ra (La-De
+) so-bre el ^^Sarea ur-ba-na de La Paz (\OT1/cmtt/m/n/12 make[]synth[]orders.py
+\OT1/cmr/m/n/12 ).
  []
 
-
-Overfull \hbox (1.0377pt too wide) in paragraph at lines 3228--3234
- []\OT1/cmr/bx/n/12 OE2: In-te-gra-ci^^Son OSRM--simulador.[] \OT1/cmr/m/n/12 E
-l mo-tor de si-mu-la-ci^^Son se in-tegr^^So con OSRM v5.27.1
- []
-
-[79] [80] [81] [82] (./tesisss.bbl [83] [84
+[74] [75] [76] (./tesisss.bbl [77] [78
 
 ]
 Underfull \hbox (badness 10000) in paragraph at lines 82--90
@@ -1256,7 +1228,7 @@ Overfull \hbox (34.98401pt too wide) in paragraph at lines 82--90
 transport-[]networks-[]with-[]r5-[]in-[]r$[]\OT1/cmr/m/n/12 . 
  []
 
-[85] [86]) [87] (./tesisss.aux
+[79] [80]) [81] (./tesisss.aux
 LaTeX Info: Redefining \. on input line 8.
 LaTeX Info: Redefining \% on input line 8.
 LaTeX Info: Redefining \. on input line 9.
@@ -1271,16 +1243,16 @@ L3 programming layer <2026-01-19>
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 Package rerunfilecheck Info: File `tesisss.out' has not changed.
-(rerunfilecheck)             Checksum: 493B2876FDC9CC6BF4B8B5FE2241242A;26903.
+(rerunfilecheck)             Checksum: 64AAE4C902076FC3A64AAA04045A8EE2;25290.
  ) 
 Here is how much of TeX's memory you used:
- 26624 strings out of 469006
- 479942 string characters out of 5454814
- 914816 words of memory out of 5000000
- 54456 multiletter control sequences out of 15000+600000
+ 26593 strings out of 469006
+ 479531 string characters out of 5454814
+ 910662 words of memory out of 5000000
+ 54443 multiletter control sequences out of 15000+600000
  646646 words of font info for 108 fonts, out of 8000000 for 9000
  319 hyphenation exceptions out of 8191
- 84i,15n,94p,573b,1150s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,15n,94p,488b,1150s stack positions out of 10000i,1000n,20000p,200000b,200000s
  </Users/owner/Library/texlive/2026basic/texmf-var/fonts/pk/ljfour/jknappen/e
 c/tcrm1095.600pk> </Users/owner/Library/texlive/2026basic/texmf-var/fonts/pk/lj
 four/jknappen/ec/tcrm1000.600pk> </Users/owner/Library/texlive/2026basic/texmf-
@@ -1313,10 +1285,10 @@ ive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb></usr/local/
 texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/loc
 al/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
 
-Output written on tesisss.pdf (97 pages, 1856896 bytes).
+Output written on tesisss.pdf (90 pages, 1835018 bytes).
 PDF statistics:
- 1749 PDF objects out of 2073 (max. 8388607)
- 1568 compressed objects within 16 object streams
- 426 named destinations out of 1000 (max. 500000)
- 1059 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1638 PDF objects out of 1728 (max. 8388607)
+ 1466 compressed objects within 15 object streams
+ 408 named destinations out of 1000 (max. 500000)
+ 1011 words of extra memory for PDF output out of 10000 (max. 10000000)
 
