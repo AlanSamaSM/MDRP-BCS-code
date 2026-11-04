@@ -10,10 +10,12 @@ from src.config import (
 )
 from src.getrouteOSMR import get_route_details
 from src.bundling import calculate_bundle_score
+from src.schedule import plan_route, final_route
 
 def assign_order_to_nearest_courier(order, couriers, current_time):
     """
     Assigns a single order to the nearest available courier (FCFS logic).
+    The courier waits at the restaurant if the order is not ready yet.
     """
     best_courier = None
     min_dist = float('inf')
@@ -21,25 +23,16 @@ def assign_order_to_nearest_courier(order, couriers, current_time):
     for courier in couriers:
         if courier.current_route is None:
             # Simplified distance calculation (Euclidean)
-            dist = np.sqrt((courier.location[0] - order.restaurant.location[0])**2 + 
+            dist = np.sqrt((courier.location[0] - order.restaurant.location[0])**2 +
                          (courier.location[1] - order.restaurant.location[1])**2)
             if dist < min_dist:
                 min_dist = dist
                 best_courier = courier
 
     if best_courier:
-        route_data = get_route_details(
-            best_courier.location,
-            [order.restaurant.location, order.dropoff_loc]
-        )
-        if route_data:
-            best_courier.current_route = {
-                'orders': [order],
-                'route': route_data,
-                'start_time': current_time,
-                'completion_time': current_time + timedelta(seconds=route_data['duration']),
-                'commitment_type': 'final'
-            }
+        plan = plan_route(best_courier.location, current_time, [order])
+        if plan:
+            best_courier.current_route = final_route(plan, [order], current_time)
             order.status = 'assigned'
 
 
@@ -101,14 +94,6 @@ def classify_bundle(bundle, couriers, current_time):
 # Compromiso en dos etapas (2-stage additive commitment)
 # ======================
 
-def tentative_assignment(route_data, current_time):
-   #Determina si el courier puede llegar al restaurante antes de current_time + OPTIMIZATION_FREQUENCY (Horizonte).
-    if not route_data:
-        return False
-    duracion_min = (route_data['duration'] / 60.0) * 0.5  # mitad del tiempo de viaje por simplificación, se podría mejorar con un modelo de tráfico y ubicando el tiempo exacto desde su ubicación actual al restaurante
-    arrival_time = current_time + timedelta(minutes=duracion_min) 
-    return arrival_time <= current_time + OPTIMIZATION_FREQUENCY #Bool donde si el tiempo de llegada es menor al horizonte se considera true en el return
-
 def two_stage_commitment(courier, bundle, current_time):
     """
     Two-stage additive commitment as per Reyes (2018), Section 3.3:
@@ -129,49 +114,31 @@ def two_stage_commitment(courier, bundle, current_time):
         (current_time - o.ready_time).total_seconds() / 60.0 > max_wait_minutes for o in bundle
     )
     
-    # obtener la ruta del buldle
-    route_data = get_route_details(
-        courier.location,
-        [o.restaurant.location for o in bundle] + [o.dropoff_loc for o in bundle]
-    )
-    if not route_data:
+    # ruta y tiempos del bundle (courier -> restaurante -> entregas)
+    plan = plan_route(courier.location, current_time, bundle)
+    if not plan:
         return False  # no se puede asignar si no hay ruta
 
     # Built in function all() que revisa si todas las ordenes en el bundle están listas
     all_ready = all(o.ready_time <= current_time + OPTIMIZATION_FREQUENCY for o in bundle)
-    
-    # Excepción: si alguna orden lleva lista más de 15 minutos, se fuerza un compromiso final
-    if ready_too_long:
-        courier.current_route = {
-            'orders': bundle,
-            'route': route_data,
-            'start_time': current_time,
-            'completion_time': current_time + timedelta(seconds=route_data['duration']),
-            'commitment_type': 'final'
-        }
-        for o in bundle:
-            o.status = 'assigned'
-        return True
+    # el courier llega al restaurante dentro de la época actual
+    reaches_restaurant = plan['arrival_restaurant'] <= current_time + OPTIMIZATION_FREQUENCY
 
-    # Caso 1: Compromiso final si las ordenes están listas y el repartidor puede llegar al restaurante antes de current_time + OPTIMIZATION_FREQUENCY
-    if tentative_assignment(route_data, current_time) and all_ready:
-        courier.current_route = {
-            'orders': bundle,
-            'route': route_data,
-            'start_time': current_time,
-            'completion_time': current_time + timedelta(seconds=route_data['duration']),
-            'commitment_type': 'final'
-        }
+    # Excepción (orden lista hace más de x minutos) o Caso 1: compromiso final
+    if ready_too_long or (reaches_restaurant and all_ready):
+        courier.current_route = final_route(plan, bundle, current_time)
         for o in bundle:
             o.status = 'assigned'
         return True
     else:
         # Caso 2: Compromiso parcial si el repartidor termina su última asignación antes de current_time + OPTIMIZATION_FREQUENCY
-        inbound_only = get_route_details(courier.location, [bundle[0].restaurant.location])
+        restaurant_loc = bundle[0].restaurant.location
+        inbound_only = get_route_details(courier.location, [restaurant_loc])
         if inbound_only:
             courier.current_route = {
                 'orders': bundle,
                 'route': inbound_only,
+                'waypoints': [restaurant_loc],
                 'start_time': current_time,
                 'completion_time': current_time + timedelta(seconds=inbound_only['duration']),
                 'commitment_type': 'partial'
@@ -193,44 +160,13 @@ def earliest_possible_dropoff(bundle, courier, current_time):
     Returns the earliest drop-off time if 'courier' starts delivering 'bundle' NOW
     (i.e., from courier.location at current_time).
 
-    Simplistic approach:
-      1) Compute inbound route to restaurant (time_inbound).
-      2) Earliest pickup time = max{ bundle_ready_time, current_time + time_inbound + SERVICE_TIME}.
-      3) After picking up, compute time from restaurant to all drop-offs in bundle.
-      4) The final drop-off time is that earliest pickup + travel_to_customers + SERVICE_TIME * #orders).
+    Uses the same timing rules as the executed route (src/schedule.py):
+    the last drop-off of courier -> restaurant -> drop-offs.
     """
-    if not bundle:
-        return None
-
-    # Step 1: inbound route from courier.location -> bundle[0].restaurant
-    r_loc = bundle[0].restaurant.location
-    inbound = get_route_details(courier.location, [r_loc])
-    if not inbound:
+    plan = plan_route(courier.location, current_time, bundle)
+    if not plan:
         return None  # no route => no feasible assignment
-
-    time_inbound_min = inbound["duration"] / 60.0
-
-    # Step 2: earliest pickup
-    bundle_ready_time = max(o.ready_time for o in bundle)
-    service_min = SERVICE_TIME.total_seconds() / 60.0
-    earliest_pickup = max(
-        bundle_ready_time,
-        current_time + timedelta(minutes=time_inbound_min + service_min)
-    )
-
-    # Step 3: route from restaurant to each drop-off (in the order they appear).
-    #   We'll do a naive approach: restaurant -> dropoff1 -> dropoff2 -> ... -> dropoffN
-    dropoff_points = [o.dropoff_loc for o in bundle] 
-    route_outbound = get_route_details(r_loc, dropoff_points)
-    if not route_outbound:
-        return None
-    time_outbound_min = route_outbound["duration"] / 60.0
-
-    # Step 4: final drop-off time
-    #   After picking up, we add time_outbound_min + half-service per order
-    total_drop_service_min = service_min * len(bundle)
-    final_dropoff = earliest_pickup + timedelta(minutes=time_outbound_min + total_drop_service_min)
-    return final_dropoff
+    return max(plan['dropoff_times'])
 
 
 

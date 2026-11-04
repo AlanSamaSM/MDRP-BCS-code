@@ -47,6 +47,13 @@ Extracted from `producto_academico/Template_artículo_RIIM.docx` (`word/styles.x
 ## 4. Phases
 
 ### Phase 0 — Fix the data (BLOCKING)
+**Status 2026-10-24: DONE.**
+- Code fixed (C1–C4, C14–C21).
+- Corrected OSRM campaign and Euclidean control both pass 80/80.
+- Thesis Chapters 4–5 rewritten.
+- Numbers for the article: `DATACHECKS.md` §6.
+- **The headline changed:** RH wins from moderate saturation (crossover at ρ ≈ 18–26); at low saturation the two policies are at parity.
+
 The current results are invalid; see **`DATACHECKS.md`**. Before any number is written:
 1. Fix in `src/` the following:
    - C1: wait for food plus service time in the route timing;
@@ -82,15 +89,33 @@ Technical choices:
 ### Phase 2 — Content (fresh Spanish prose, ~4,000–4,500 words)
 Write new text rather than pasting from the thesis, so the plagiarism check stays clean. Avoid self-identifying wording ("esta tesis", institute name, repo URL).
 
-1. **Resumen / Abstract** (≤150 words each).
-2. **Introducción:**
-   - last-mile cost [Jazemi2023];
-   - the MDRP [Reyes2018, Yildiz2019, Ulmer2021RMDP];
-   - the Euclidean approximation underestimates by 17–40% [Boyaci2021] and is a reproducibility problem [Pereira2021];
-   - La Paz's topology;
-   - cost barrier for SMEs [MunozVillamizar2021];
-   - data-hungry ML alternatives [Hildebrandt2021];
-   - objective, hypothesis, contributions.
+**Framing (decided 2026-10-26; same as thesis §1.2 and §5.1).** The paper is an *experimental evaluation study*, not an algorithm paper. Every section serves one question:
+
+> En una ciudad media, ¿en qué condiciones de saturación de la flota conviene coordinar los despachos (RH) en vez de asignar cada pedido al llegar (FCFS), y cuánto cambia esa evaluación al usar la red vial real en lugar de distancias euclidianas?
+
+- Factor: policy (FCFS vs RH). Condition: fleet saturation (S1–S4). Context: real network (OSRM) vs Euclidean controls. Response: CtD, SLA, coverage, distance per order. Tool: open, reproducible simulator.
+- Sub-questions (as in thesis §1.2.4):
+  - PI1: saturation and crossover;
+  - PI2: circuity, and how much the network changes the comparison;
+  - PI3: reproducibility and computing cost.
+- Headline answers:
+  - coordination does not pay off with a slack fleet (FCFS 1.4 min faster at 18 orders/courier);
+  - it does from ≈26 orders/courier, in every seed: CtD −15 to −37 % in S2 depending on the epoch convention (report both, thesis §4.6), and RH delivers almost everything when FCFS cannot;
+  - κ = 1.38; Euclidean distances underestimate delivery times and the benefit of coordinating, and 62–84 % of that effect is trip length (κ-scaled control);
+  - RH runs in about 1 min per simulated day on a laptop.
+- Do **not** claim:
+  - "hostile topology" (the bay is not in the 8.4 km² domain);
+  - near-optimality;
+  - a new algorithm;
+  - superiority over state-of-the-art policies.
+
+1. **Resumen / Abstract** (≤150 words each): problem → question → method → the headline answers above.
+2. **Introducción**, in this order:
+   - (a) the dispatch decision: coordinate vs react, and why the answer depends on fleet saturation [Reyes2018, Yildiz2019, Ulmer2021RMDP];
+   - (b) the gap: evidence comes from metropolitan, Euclidean instances with no comparison against a reactive policy across saturation levels; Euclidean distances underestimate trips by a factor of 1.2–1.4 and can make time-windowed routes infeasible [Boyaci2021, as corrected in the thesis]; commercial routing APIs are costly black boxes [Pereira2021];
+   - (c) the La Paz case (mid-size city, no public data);
+   - (d) the research question and sub-questions;
+   - (e) contributions, mapped one-to-one to PI1–PI3.
 3. **Metodología:**
    - *Formulación del MDRP y métricas:* sets; CtD / RtP / RtD; compensation equation.
    - *Heurística de horizonte rodante:* the Z_t equation, insertion cost, priority groups, the w_{s,d} equation, the Hungarian algorithm [Kuhn1955], two-stage commitment.

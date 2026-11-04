@@ -1,0 +1,12 @@
+{
+  "pairs": 10184,
+  "circuity_aggregate": 1.3793,
+  "circuity_mean": 1.3877,
+  "circuity_p10": 1.1892,
+  "circuity_median": 1.3707,
+  "circuity_p90": 1.6057,
+  "haversine_km_mean": 2.39,
+  "osrm_km_mean": 3.296,
+  "osrm_speed_m_per_min": 651.1,
+  "osrm_speed_km_h": 39.1
+}

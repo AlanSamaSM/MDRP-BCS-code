@@ -1,0 +1,18 @@
+{
+  "run_id": "20261024_timing_S2_moderada",
+  "csv": "data/synthetic_lapaz_orders_limited.csv",
+  "seeds": [
+    2025
+  ],
+  "bundle_sizes": [
+    null
+  ],
+  "scenarios": [
+    "S2_moderada"
+  ],
+  "n_experiments": 1,
+  "routing": "osrm",
+  "euclidean_meters_per_minute": null,
+  "update_before_assign": false,
+  "timestamp": "2026-10-24T23:29:10.250641"
+}

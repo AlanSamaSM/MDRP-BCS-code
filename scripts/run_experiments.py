@@ -130,10 +130,12 @@ def calculate_kpis(df, courier_df, total_orders):
     total_del = courier_df["orders_delivered"].sum()
     total_bundles = courier_df["bundles_picked_up"].sum()
     driving_hrs = courier_df["driving_time_minutes"].sum() / 60.0
+    # Utilización (Reyes et al., 2018): conducción + servicio en restaurante y cliente
+    service_hrs = courier_df["service_time_minutes"].sum() / 60.0 if "service_time_minutes" in courier_df else 0.0
 
     opc_hr = total_del / total_hours if total_hours > 0 else 0
     bph = total_bundles / total_hours if total_hours > 0 else 0
-    utilization = (driving_hrs / total_hours) * 100 if total_hours > 0 else 0
+    utilization = ((driving_hrs + service_hrs) / total_hours) * 100 if total_hours > 0 else 0
     dist_per_order = total_dist / total_del if total_del > 0 else 0
 
     avg_bundle = delivered["bundle_size"].mean()
@@ -158,6 +160,7 @@ def calculate_kpis(df, courier_df, total_orders):
 
     # SLA compliance (% orders within 40 min CTD)
     sla_pct = (len(delivered[delivered["click_to_door"] <= TARGET_CTD]) / n_delivered) * 100
+    sla_all_pct = (len(delivered[delivered["click_to_door"] <= TARGET_CTD]) / total_orders) * 100
 
     return {
         "Avg CTD (min)": round(avg_ctd, 2),
@@ -170,6 +173,7 @@ def calculate_kpis(df, courier_df, total_orders):
         "P90 RTD (min)": round(p90_rtd, 2),
         "% Undelivered": round(pct_undelivered, 2),
         "SLA Compliance (%)": round(sla_pct, 2),
+        "SLA All Orders (%)": round(sla_all_pct, 2),
         "Avg Bundle Size": round(avg_bundle, 2),
         "% Multi-Bundle": round(pct_multi, 2),
         "Total Distance (km)": round(total_dist, 2),
@@ -188,7 +192,7 @@ def _kpi_keys():
     return [
         "Avg CTD (min)", "P50 CTD (min)", "P90 CTD (min)", "P95 CTD (min)",
         "Avg RTP (min)", "P90 RTP (min)", "Avg RTD (min)", "P90 RTD (min)",
-        "% Undelivered", "SLA Compliance (%)", "Avg Bundle Size", "% Multi-Bundle",
+        "% Undelivered", "SLA Compliance (%)", "SLA All Orders (%)", "Avg Bundle Size", "% Multi-Bundle",
         "Total Distance (km)", "Dist/Order (km)", "Orders/Courier/Hr", "Bundles/Hr",
         "Utilization (%)", "Total Compensation ($)", "Cost/Order ($)",
         "Frac. Min Comp", "CTD Overage (min)",
@@ -254,6 +258,11 @@ def run_scenario(scenario, csv_path, results_base, seed_suffix=""):
     }
 
 
+# Modo de ruteo de la corrida: OSRM (por defecto) o control euclidiano
+# (distancia Haversine a velocidad constante). Se fija desde main().
+ROUTING = {"euclidean": False, "meters_per_minute": 651.1, "update_first": False}
+
+
 def _run_policy(csv_path, opc, mc, results_path, courier_results_path, policy):
     """Invoca la simulación en-proceso (sin subprocess) para mayor eficiencia."""
     # Imports dinámicos para evitar contaminación de env antes de tiempo
@@ -269,7 +278,11 @@ def _run_policy(csv_path, opc, mc, results_path, courier_results_path, policy):
         min_couriers=mc,
     )
 
-    os.environ["USE_EUCLIDEAN"] = "0"
+    os.environ["USE_EUCLIDEAN"] = "1" if ROUTING["euclidean"] else "0"
+    if ROUTING["euclidean"]:
+        os.environ["METERS_PER_MINUTE"] = str(ROUTING["meters_per_minute"])
+    # Robustez C22: actualizar rutas antes de asignar (ver src/main.py)
+    os.environ["UPDATE_BEFORE_ASSIGN"] = "1" if ROUTING["update_first"] else "0"
 
     if policy == "fcfs":
         os.environ["FCFS_POLICY"] = "1"
@@ -334,6 +347,10 @@ def analyze_all(results_base, scenarios_run):
         # Mejoras
         for k, v in improvements.items():
             row[f"Δ% {k}"] = v
+        # Diferencias en puntos porcentuales para métricas expresadas en %
+        for k in fcfs_kpis:
+            if k.endswith("(%)") or k.startswith("%"):
+                row[f"Δpp {k}"] = round(rh_kpis[k] - fcfs_kpis[k], 2)
 
         # Tiempos de ejecución
         row["FCFS Time (s)"] = round(sr.get("t_fcfs", 0), 1)
@@ -355,7 +372,9 @@ def analyze_all(results_base, scenarios_run):
         "FCFS Cost/Order ($)", "RH Cost/Order ($)", "Δ% Cost/Order ($)",
         "FCFS Orders/Courier/Hr", "RH Orders/Courier/Hr", "Δ% Orders/Courier/Hr",
         "FCFS Utilization (%)", "RH Utilization (%)", "Δ% Utilization (%)",
-        "FCFS SLA Compliance (%)", "RH SLA Compliance (%)", "Δ% SLA Compliance (%)",
+        "FCFS SLA Compliance (%)", "RH SLA Compliance (%)", "Δpp SLA Compliance (%)",
+        "FCFS SLA All Orders (%)", "RH SLA All Orders (%)", "Δpp SLA All Orders (%)",
+        "FCFS % Undelivered", "RH % Undelivered",
         "FCFS Dist/Order (km)", "RH Dist/Order (km)", "Δ% Dist/Order (km)",
     ]
     existing_cols = [c for c in summary_cols if c in df.columns]
@@ -448,6 +467,35 @@ Ejemplos:
         help="Número objetivo de órdenes por instancia (default: 1000)",
     )
     parser.add_argument(
+        "--run-id",
+        default=None,
+        help="Nombre del directorio de la corrida (default: marca de tiempo). Permite que varios "
+             "procesos en paralelo escriban en la misma corrida; con --analyze-only, corrida a analizar",
+    )
+    parser.add_argument(
+        "--no-analysis",
+        action="store_true",
+        help="No ejecutar el análisis consolidado al terminar (útil para procesos en paralelo)",
+    )
+    parser.add_argument(
+        "--euclidean",
+        action="store_true",
+        help="Escenario de control: distancia Haversine a velocidad constante en lugar de OSRM",
+    )
+    parser.add_argument(
+        "--speed",
+        type=float,
+        default=651.1,
+        help="Velocidad (m/min) del control euclidiano; default: velocidad media OSRM de los pares "
+             "restaurante-cliente medida con scripts/circuity.py (%(default)s)",
+    )
+    parser.add_argument(
+        "--update-first",
+        action="store_true",
+        help="Robustez C22: ejecutar la fase de actualización de rutas antes de la asignación "
+             "(el repartidor que termina en (t-f, t] recibe ruta en la época t)",
+    )
+    parser.add_argument(
         "--bundle-sizes",
         default=None,
         help="Valores de MAX_BUNDLE_SIZE a probar, separados por coma (ej: 2,3,4)",
@@ -455,7 +503,17 @@ Ejemplos:
     args = parser.parse_args()
 
     # Timestamp para identificar esta corrida
-    run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+    ROUTING["euclidean"] = args.euclidean
+    ROUTING["meters_per_minute"] = args.speed
+    ROUTING["update_first"] = args.update_first
+    if args.run_id:
+        run_id = args.run_id
+    else:
+        run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+        if args.euclidean:
+            run_id += "_euclid"
+        if args.update_first:
+            run_id += "_updfirst"
     results_base = os.path.join(BASE_PATH, "results", "experiments", run_id)
     os.makedirs(results_base, exist_ok=True)
 
@@ -497,8 +555,8 @@ Ejemplos:
         if not runs:
             print("No se encontraron resultados de experimentos anteriores.")
             sys.exit(1)
-        latest = os.path.join(exp_root, runs[-1])
-        print(f"  Analizando corrida más reciente: {latest}")
+        latest = os.path.join(exp_root, args.run_id or runs[-1])
+        print(f"  Analizando corrida: {latest}")
 
         # Reconstruir scenarios_run a partir de los directorios existentes
         scenarios_run = _discover_scenarios(latest)
@@ -506,6 +564,21 @@ Ejemplos:
             print("  No se encontraron resultados de escenarios.")
             sys.exit(1)
         analyze_all(latest, scenarios_run)
+        if args.run_id:
+            seeds_found = sorted({int(sr["name"].split("_seed")[1]) for sr in scenarios_run
+                                  if "_seed" in sr["name"]})
+            meta = {
+                "run_id": args.run_id,
+                "seeds": seeds_found,
+                "scenarios": sorted({sr["name"].split("_seed")[0] for sr in scenarios_run}),
+                "n_experiments": len(scenarios_run),
+                "routing": "euclidean" if args.euclidean else "osrm",
+                "euclidean_meters_per_minute": args.speed if args.euclidean else None,
+                "update_before_assign": args.update_first,
+                "analyzed": datetime.now().isoformat(),
+            }
+            with open(os.path.join(latest, "experiment_metadata.json"), "w") as f:
+                json.dump(meta, f, indent=2)
         return
 
     # ── Ejecutar experimentos ──
@@ -525,9 +598,10 @@ Ejemplos:
         for bs in bundle_sizes:
             if bs is not None:
                 # Override dinámico de config
-                from src import config
+                from src import config, bundling
                 original_bs = config.MAX_BUNDLE_SIZE
                 config.MAX_BUNDLE_SIZE = bs
+                bundling.MAX_BUNDLE_SIZE = bs  # bundling importa la constante al cargarse
                 bs_suffix = f"_bs{bs}"
                 print(f"\n  >> MAX_BUNDLE_SIZE override: {original_bs} → {bs}")
             else:
@@ -546,6 +620,11 @@ Ejemplos:
             # Restaurar config si fue modificado
             if bs is not None:
                 config.MAX_BUNDLE_SIZE = original_bs
+                bundling.MAX_BUNDLE_SIZE = original_bs
+
+    if args.no_analysis:
+        print(f"\n  Simulaciones terminadas en {results_base} (análisis omitido por --no-analysis)")
+        return
 
     # ── Guardar metadata ──
     meta = {
@@ -555,6 +634,9 @@ Ejemplos:
         "bundle_sizes": bundle_sizes,
         "scenarios": [s["name"] for s in scenarios_to_run],
         "n_experiments": total,
+        "routing": "euclidean" if args.euclidean else "osrm",
+        "euclidean_meters_per_minute": args.speed if args.euclidean else None,
+        "update_before_assign": args.update_first,
         "timestamp": datetime.now().isoformat(),
     }
     meta_path = os.path.join(results_base, "experiment_metadata.json")
@@ -589,11 +671,12 @@ def _discover_scenarios(results_dir):
         rh_orders = [f for f in files if f.endswith("_rh_results.csv")]
 
         if fcfs_orders and rh_orders:
+            spec = next((sc for sc in SCENARIOS if entry.startswith(sc["name"])), None)
             scenarios_run.append({
                 "name": entry,
-                "label": entry,
-                "opc": 0,
-                "min_couriers": 0,
+                "label": spec["label"] if spec else entry,
+                "opc": spec["orders_per_courier"] if spec else 0,
+                "min_couriers": spec["min_couriers"] if spec else 0,
                 "fcfs_orders": os.path.join(entry_path, fcfs_orders[0]),
                 "fcfs_couriers": os.path.join(
                     entry_path,

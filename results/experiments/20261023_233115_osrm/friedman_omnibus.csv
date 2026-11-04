@@ -1,0 +1,5 @@
+Scenario,n_seeds,Mean_Delta_CtD,Median_Delta_CtD,Std_Delta_CtD,Friedman_statistic,p_value,Significant (α=0.05)
+S1_baja,10,-1.379,-1.644,1.358,30.0,1e-06,Yes
+S2_moderada,10,20.643,20.548,2.329,30.0,1e-06,Yes
+S3_media,10,63.133,60.335,9.781,30.0,1e-06,Yes
+S4_alta,10,151.242,148.019,10.53,30.0,1e-06,Yes

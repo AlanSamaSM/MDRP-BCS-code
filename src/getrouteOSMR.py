@@ -71,9 +71,6 @@ def clear_osrm_cache():
     _osrm_cache = {}
 
 def get_route_details(start_coords, waypoints):
-    cache_key = (start_coords,) + tuple(waypoints)
-    if cache_key in _osrm_cache:
-        return _osrm_cache[cache_key]
     """Return routing information for start_coords -> waypoints.
 
     If the environment variable ``USE_EUCLIDEAN`` is set to ``1`` the route is
@@ -83,6 +80,12 @@ def get_route_details(start_coords, waypoints):
     """
 
     use_euclidean = os.environ.get('USE_EUCLIDEAN') == '1'
+
+    # El modo de ruteo forma parte de la llave para no mezclar resultados
+    # euclidianos y OSRM dentro del mismo proceso.
+    cache_key = (use_euclidean, start_coords) + tuple(waypoints)
+    if cache_key in _osrm_cache:
+        return _osrm_cache[cache_key]
 
     # If explicitly requested, use Euclidean fallback only and skip HTTP calls.
     if use_euclidean:

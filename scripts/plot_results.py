@@ -228,7 +228,8 @@ def plot_bundle_distribution(scenarios, out_dir):
     fig, ax = plt.subplots(figsize=(10, 5))
 
     bundle_sizes_range = [1, 2, 3, 4]
-    x = np.arange(len(SCENARIO_ORDER))
+    scenario_order = [sn for sn in SCENARIO_ORDER if sn in scenarios]  # solo escenarios ejecutados
+    x = np.arange(len(scenario_order))
     width = 0.18
     offsets = np.arange(len(bundle_sizes_range)) - (len(bundle_sizes_range) - 1) / 2
 
@@ -236,10 +237,7 @@ def plot_bundle_distribution(scenarios, out_dir):
 
     for i, bs in enumerate(bundle_sizes_range):
         pcts = []
-        for sn in SCENARIO_ORDER:
-            if sn not in scenarios:
-                pcts.append(0)
-                continue
+        for sn in scenario_order:
             rh_all = []
             for seed, sd in scenarios[sn]:
                 _, rh = load_order_data(sd)
@@ -260,7 +258,7 @@ def plot_bundle_distribution(scenarios, out_dir):
     ax.set_ylabel("% de órdenes")
     ax.set_title("Distribución de tamaños de agrupamiento (Rolling Horizon)")
     ax.set_xticks(x)
-    ax.set_xticklabels([SCENARIO_SHORT[s] for s in SCENARIO_ORDER])
+    ax.set_xticklabels([SCENARIO_SHORT[s] for s in scenario_order])
     ax.legend(title="Tamaño de bundle")
     ax.grid(True, alpha=0.3, axis="y")
 

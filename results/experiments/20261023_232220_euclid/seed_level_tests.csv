@@ -1,0 +1,25 @@
+Base_Scenario,Metric,n_seeds_valid,n_seeds_total,Mean_FCFS,Mean_RH,Mean_Diff_FCFS_minus_RH,CI_low_95,CI_high_95,W_statistic_seed,p_value_seed,Rank_Biserial_r_seed,Effect_Size_seed,Significant_seed (α=0.05),p_seed_BH,Significant_seed_BH (α=0.05)
+S1_baja,Bundle Size,10,10,1.0,2.5483,-1.5483,-1.6126,-1.484,0.0,0.001953,-1.0,large,Yes,0.002038,Yes
+S1_baja,Click-to-Door (min),10,10,23.0175,27.5492,-4.5317,-4.8997,-4.1636,0.0,0.001953,-1.0,large,Yes,0.002038,Yes
+S1_baja,CTD Overage (min),10,10,0.0008,0.5117,-0.5109,-0.5515,-0.4703,0.0,0.001953,-1.0,large,Yes,0.002038,Yes
+S1_baja,Ready-to-Door (min),10,10,11.0319,15.5635,-4.5317,-4.8997,-4.1636,0.0,0.001953,-1.0,large,Yes,0.002038,Yes
+S1_baja,Ready-to-Pickup (min),10,10,3.3603,4.3047,-0.9445,-1.3606,-0.5284,1.0,0.003906,-0.9636,large,Yes,0.003906,Yes
+S1_baja,SLA Compliance (≤40 min),10,10,0.9987,0.9037,0.095,0.0907,0.0994,0.0,0.001953,1.0,large,Yes,0.002038,Yes
+S2_moderada,Bundle Size,10,10,1.0,2.724,-1.724,-1.7873,-1.6608,0.0,0.001953,-1.0,large,Yes,0.002038,Yes
+S2_moderada,Click-to-Door (min),10,10,41.7665,30.2687,11.4978,10.1915,12.804,0.0,0.001953,1.0,large,Yes,0.002038,Yes
+S2_moderada,CTD Overage (min),10,10,9.6199,1.2639,8.356,7.1193,9.5927,0.0,0.001953,1.0,large,Yes,0.002038,Yes
+S2_moderada,Ready-to-Door (min),10,10,29.7809,18.2831,11.4978,10.1915,12.804,0.0,0.001953,1.0,large,Yes,0.002038,Yes
+S2_moderada,Ready-to-Pickup (min),10,10,22.1093,6.6038,15.5055,14.1263,16.8847,0.0,0.001953,1.0,large,Yes,0.002038,Yes
+S2_moderada,SLA Compliance (≤40 min),10,10,0.513,0.8271,-0.3141,-0.3365,-0.2917,0.0,0.001953,-1.0,large,Yes,0.002038,Yes
+S3_media,Bundle Size,10,10,1.0,2.9677,-1.9677,-2.0247,-1.9107,0.0,0.001953,-1.0,large,Yes,0.002038,Yes
+S3_media,Click-to-Door (min),10,10,74.2232,37.1328,37.0904,35.3101,38.8707,0.0,0.001953,1.0,large,Yes,0.002038,Yes
+S3_media,CTD Overage (min),10,10,38.108,6.0579,32.0501,30.4359,33.6642,0.0,0.001953,1.0,large,Yes,0.002038,Yes
+S3_media,Ready-to-Door (min),10,10,62.237,25.1471,37.0899,35.3127,38.8671,0.0,0.001953,1.0,large,Yes,0.002038,Yes
+S3_media,Ready-to-Pickup (min),10,10,54.5652,12.9088,41.6564,39.8563,43.4565,0.0,0.001953,1.0,large,Yes,0.002038,Yes
+S3_media,SLA Compliance (≤40 min),10,10,0.274,0.6888,-0.4148,-0.4363,-0.3934,0.0,0.001953,-1.0,large,Yes,0.002038,Yes
+S4_alta,Bundle Size,10,10,1.0,3.2359,-2.2359,-2.2701,-2.2018,0.0,0.001953,-1.0,large,Yes,0.002038,Yes
+S4_alta,Click-to-Door (min),10,10,180.256,56.9609,123.2951,116.0896,130.5005,0.0,0.001953,1.0,large,Yes,0.002038,Yes
+S4_alta,CTD Overage (min),10,10,141.0993,23.5656,117.5337,110.3534,124.714,0.0,0.001953,1.0,large,Yes,0.002038,Yes
+S4_alta,Ready-to-Door (min),10,10,168.2979,44.9753,123.3227,116.1288,130.5166,0.0,0.001953,1.0,large,Yes,0.002038,Yes
+S4_alta,Ready-to-Pickup (min),10,10,160.6322,32.1298,128.5023,121.2828,135.7218,0.0,0.001953,1.0,large,Yes,0.002038,Yes
+S4_alta,SLA Compliance (≤40 min),10,10,0.0607,0.5316,-0.4708,-0.4846,-0.4571,0.0,0.001953,-1.0,large,Yes,0.002038,Yes

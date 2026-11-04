@@ -1,8 +1,30 @@
 # DATACHECKS — data consistency checks before writing the RIIM article
 
-> **Status: BLOCKED.** The results in `results/experiments/20260413_182745/`, which are the source of every number in thesis Chapter 4, are **not valid for publication**. Do not copy any number from the thesis into the article until checks **DC1–DC5** pass on a fresh run.
+> **Status: RESOLVED (2026-10-24).**
+> - The corrected OSRM campaign `results/experiments/20261023_233115_osrm/` passes every check (80/80, 10/10 seeds).
+> - So does the Euclidean control `20261023_232220_euclid/`.
+> - Thesis Chapters 4–5 were rewritten from these runs.
+> - `results/experiments/20260413_182745/` is **invalid** and kept only for history. Never quote it.
+> - **Findings of 2026-10-24:** C22 (epoch-ordering dead time) was handled as a robustness analysis. The default model is unchanged, so the main tables stand. Signs and the crossover hold, and the S2–S4 magnitudes are an upper bound (thesis §4.6, `20261024_updfirst_osrm`). C23 (runtime not recorded) is covered by the E6 timing runs; see §1c.
 
 Audit date: 2026-10-23. Sources audited: `docs/tesisss.tex` (the `.tex`, which is newer than `docs/tesisss.pdf`), `src/`, `scripts/run_experiments.py`, and the raw per-seed CSVs.
+
+## 0. Fix status (2026-10-23, branch `pre-revista`)
+
+| ID | Fix | Where | Status |
+|---|---|---|---|
+| C1 | Route timing per Reyes et al.: wait for food, s_r/2 and s_o/2 around pickup/drop-off, per-order delivery times | new `src/schedule.py`; used by FCFS, RH commitment, matching score, priority groups | done; DC1/DC5 = 0 |
+| C2 | Dispatch on every epoch, regardless of the start minute | `src/main.py` | done; seeds 2027/2033/2034 now valid |
+| C3 | Root cause: remove-reinsert rebuilt each bundle from a stale snapshot, so a moved order stayed in its old bundle too. Rewritten; assertion that each order is in exactly one bundle; `RuntimeError` on a second delivery | `src/bundling.py`, `src/main.py` | done; DC3 = 0 |
+| C4 | FCFS dispatches every revealed order at placement, in placement order (user decision), with waiting at the restaurant | `src/main.py` | done; thesis §1.7 and §3.4 updated |
+| C5 | Euclidean control mode (`--euclidean --speed`), circuity script, new thesis §4.6 | `scripts/run_experiments.py`, new `scripts/circuity.py` | done (§6) |
+| C6 | Reyes "≈96%" rephrased; the "10–25%" comparison removed | thesis §1.2, §4.7, Ch. 5 | done |
+| C7 | `Δpp` columns and "SLA All Orders (%)" in the runner; thesis tables use pp | runner, thesis Ch. 4 | done |
+| C8 | Utilization = driving + service time; throughput caveat | runner, `statistical_analysis.py`, thesis §3.7 | done |
+| C9, C10, C11, C12 | Wording fixed; real distance distribution and real fleet ranges reported | thesis §1.6, §2.4.2, §3.2, §3.6 | done |
+| C14–C21 | Additional bugs found while fixing (below) | see §1b | done |
+
+Chapters 4 and 5 were rewritten from the corrected runs, and `docs/tesisss.pdf` was rebuilt (88 pages, no LaTeX errors), which also resolves C13.
 
 ---
 
@@ -201,6 +223,26 @@ Tables `tab:scenarios` and `tab:escenarios` give |C| = 58/40/30/20. The real per
 
 `tesisss.tex` was modified 2026-08-05 03:36, but the PDF was built at 01:50. Recompile the thesis before quoting it.
 
+## 1b. Additional bugs found while fixing C1–C4 (all fixed)
+
+| ID | Bug | Effect | Fix |
+|---|---|---|---|
+| C14 | Parallel insertion and remove-reinsert compared the *absolute* cost of each candidate bundle instead of the cost *increase* | Orders were spread evenly across bundles rather than inserted where they cost least, unlike Reyes et al. and the thesis text (§3.5.2) | `_best_insertion` in `src/bundling.py` minimizes cost(B ⊕ o) − cost(B) |
+| C15 | After a partial (inbound) commitment, the courier's location was set to the *last customer's* address, because OSRM is called without `steps` | Couriers "teleported" to a customer instead of standing at the restaurant | Location = last waypoint of the route (`src/main.py`) |
+| C16 | The Z_t denominator received only *free* couriers, so `get_available_time` never saw a busy one | Z_t was overestimated, which inflated bundle sizes; contradicts the thesis definition (§3.5.1) | Denominator = couriers on duty that will be free within Δ2 |
+| C17 | The matching score added the *full* route duration (including the inbound leg) after departing the restaurant | Inbound time counted twice in w_{s,d} and in the Group I/II penalties | Score uses `plan_route` timings |
+| C18 | The final-commitment test estimated arrival at the restaurant as *half of the whole route* duration | Wrong final/partial decisions | Uses the real inbound leg (`arrival_restaurant`) |
+| C19 | FCFS iterated orders grouped by restaurant, not by placement time | Not first-come-first-served; the thesis acknowledged an "iteration bias" | Sorted by `placement_time` |
+| C20 | The route cache key ignored the routing mode | Euclidean and OSRM results could mix within one process | Mode added to the cache key |
+| C21 | `--bundle-sizes` patched `config.MAX_BUNDLE_SIZE`, but `bundling.py` had already imported the constant | The sensitivity option the thesis describes (§3.6) did nothing | The runner patches `bundling.MAX_BUNDLE_SIZE` too |
+
+## 1c. Open findings (thesis review, 2026-10-24; details in `ponencia/revisiontesis.md`)
+
+| ID | Bug | Evidence | Effect | Proposed fix |
+|---|---|---|---|---|
+| C22 | **ROBUSTNESS EVALUATED (2026-10-24).** In `src/main.py` the assignment phase (l.124–166) runs *before* the route-update phase (l.170–211). A courier who finishes at c ∈ (t−5, t] is freed in the update of epoch t and assigned only at t+5. | The gap from the end of a trip (last drop-off + s_o/2) to the next pickup has P1 = 8.35–8.90 min in every scenario and policy of `20261023_233115_osrm`. That is ≥ 5 min dead time + s_r/2 + inbound travel. | 5–10 min idle per trip (≈7.5 on average). FCFS makes one trip per order, RH 1.93–2.80 orders per trip, so the dead time costs FCFS roughly 31% of the shift in S4 against about 18% for RH (estimate). This inflates RH's advantage in S2–S4 and shifts the crossover. The thesis limitation (§4.7) says couriers are free "en la época siguiente", which understates it. | Kept as the documented model, now stated explicitly in thesis §3.3. Opt-in flag `--update-first` (env `UPDATE_BEFORE_ASSIGN=1`). Without the flag the simulator reproduces `20261023_233115_osrm` byte for byte (S1 seed 2025, all four CSVs). With the flag (run `20261024_updfirst_osrm`, 80/80 pass DC1–DC5, P1 gap 3.3–5.0 min): FCFS still wins S1 in 10/10 seeds (ΔCtD −6.77 min; the SLA gap becomes significant, 100 vs 85.3 %). RH still wins S2–S4 in 10/10 seeds, but ΔCtD drops to 5.40 / 26.27 / 97.52 min (−14.6 / −41.4 / −63.0 %, against −36.7 / −57.9 / −67.2 %). The crossover stays between S1 and S2. Reported in thesis §4.6 (Tabla 4.7). |
+| C23 | **MEASURED (2026-10-24).** `FCFS Time (s)` and `RH Time (s)` are 0.00 for every scenario of the parallel OSRM run (the Euclidean run records 0.8–16.7 s). | `experiment_comparison.csv` of `20261023_233115_osrm` | The thesis cannot support "computacionalmente ligero" with data from the main campaign | Not fixed in code: the timing is only recorded when analysis runs in the same process. Measured instead with E6 (one process per scenario, sequential, seed 2025, runs `20261024_timing_S*`, Apple M1 Pro, 16 GB). Per simulated day FCFS takes 1.8–2.7 s and RH 57–80 s; peak RSS is 194–221 MB. Reported in thesis §4.8 (Tabla 4.10). |
+
 ---
 
 ## 2. Blocking checks (must pass on the new run before any number goes into the article)
@@ -277,13 +319,52 @@ Expected output on the **current** (invalid) run:
     - `Reyes2018`: Optimization Online preprint. Cite it as such (there is no journal version with this exact title).
 - [ ] RIIM rule: most references ≤5 years old (2021+). Plan: 8 of 14.
 
-## 5. Re-run checklist (Phase 0 in `PLAN.md`)
+## 5. How the corrected campaign was run (reproducible on macOS, Linux or Windows)
 
-1. Fix C1: sequential route timing with waiting and service time; per-order delivery times inside bundles.
-2. Fix C2: dispatch on elapsed time (or align `start` to 5 min).
-3. Fix C3: find the remaining duplication path (the 2026-04-04 fix was not enough); add an assertion that an order is delivered at most once.
-4. Decide on C4 (purely reactive FCFS vs documented lookahead) and make code and text agree.
-5. Optional, needed to keep claim C5: Euclidean control run plus a circuity measurement.
-6. Run `python scripts/run_experiments.py --seeds 2025,2026,2027,2028,2029,2030,2031,2032,2033,2034`, then `python scripts/statistical_analysis.py --run-dir results/experiments/<new_run_id>`.
-7. Run the script in §2 on the new run. All of DC1–DC5 must pass.
-8. Update the thesis (erratum or corrected version) so that thesis and article agree.
+**OSRM server.** Either option serves identical routes: same version (v5.27.1), same `osrm_data/` and the CH algorithm.
+- **Docker (any OS):** `docker-compose up -d`.
+- **Native, no Docker (used on 2026-10-23 on macOS arm64):**
+  1. Download `node_osrm-v5.27.1-node-v108-darwin-arm64-Release.tar.gz` from the v5.27.1 release of Project-OSRM/osrm-backend on GitHub. It ships `binding/osrm-routed`.
+  2. Run `binding/osrm-routed --algorithm ch --ip 127.0.0.1 --port 5000 osrm_data/bcs-latest.osrm`.
+
+**Commands** (repo root):
+1. Circuity and network speed: `python scripts/circuity.py` → `results/circuity/circuity_summary.json`.
+2. OSRM campaign. The 5 parallel workers share one run directory:
+   ```bash
+   RID=$(date +%Y%m%d_%H%M%S)_osrm; export USE_EUCLIDEAN_ON_FAILURE=0
+   for p in 2025,2026 2027,2028 2029,2030 2031,2032 2033,2034; do
+     python scripts/run_experiments.py --run-id $RID --no-analysis --seeds $p &
+   done; wait
+   python scripts/run_experiments.py --analyze-only --run-id $RID
+   ```
+   A single process (`--seeds 2025,...,2034`) also works, but takes about 3.5 h instead of about 50 min.
+3. Euclidean control: `python scripts/run_experiments.py --euclidean --seeds 2025,...,2034`. The default `--speed 651.1` m/min comes from `circuity.py`.
+4. For each run: `python scripts/statistical_analysis.py --run-dir <run>`, `python scripts/plot_results.py --run-dir <run>`, then `python scripts/check_results.py <run>` (must print 80/80).
+
+## 6. Corrected results (seed means, n = 10)
+
+**Circuity** (10,184 restaurant→customer pairs):
+- κ = OSRM km / straight-line km = **1.38** (median 1.37, P10 1.19, P90 1.61).
+- Mean 2.39 km straight line vs 3.30 km by road.
+- OSRM speed 651 m/min (39.1 km/h).
+
+**OSRM campaign `20261023_233115_osrm`** (FCFS → RH):
+
+| Esc. | CtD (min) | P90 CtD | SLA (%) | Δ SLA | Undelivered FCFS / RH | Dist/order (km) | Bundle RH |
+|---|---|---|---|---|---|---|---|
+| S1 | 28.93 → 30.31 (+4.8%) | 43.3 → 43.8 | 84.6 → 83.4 | −1.1 pp (n.s., p = 0.23) | 0 / 0 % | 4.71 → 4.08 | 2.54 |
+| S2 | 56.07 → 35.42 (−36.8%) | 97.9 → 52.9 | 38.1 → 69.6 | +31.5 pp | 0.1 / 0 % | 4.88 → 3.60 | 2.80 |
+| S3 | 108.49 → 45.36 (−58.2%) | 169.5 → 79.1 | 7.3 → 57.6 | +50.3 pp | 11.3 / 0 % | 5.07 → 3.17 | 3.03 |
+| S4 | 224.88 → 73.63 (−67.3%) | 321.1 → 186.2 | 6.2 → 42.5 | +36.3 pp | 39.9 / 0.2 % | 5.20 → 2.63 | 3.30 |
+
+- Wilcoxon (n = 10): p = 0.0020 and r = ±1.00 in S2–S4 for both CtD and SLA. In S1, CtD favors FCFS by 1.38 min (p = 0.0137, r = −0.85).
+- Friedman on ΔCtD: χ²_F = 30.0, p < 0.001.
+- **Crossover between S1 and S2 (ρ ≈ 18–26).** The old thesis said 26–35.
+
+**Topology effect** (OSRM vs Euclidean control at the same mean speed, paired by seed):
+- RH's advantage in minutes is larger with the real network in all scenarios (p = 0.002).
+- Its relative advantage is larger in S1–S3 and the same in S4.
+- The SLA effect is mixed.
+- Full table: thesis Table 4.7.
+
+**Moving numbers into the article:** use the thesis tables (Ch. 4) or these CSVs. Every number has a source in `20261023_233115_osrm/` (`experiment_comparison.csv`, `seed_level_tests.csv`, `friedman_omnibus.csv`), `20261023_232220_euclid/` or `results/circuity/`.

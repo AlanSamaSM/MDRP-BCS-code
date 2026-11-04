@@ -56,6 +56,7 @@ class Courier:
         self.shift_started = False  # Para controlar el cálculo del tiempo de turno
         self.bundles_picked_up = 0  # Número de bundles recogidos
         self.driving_time = 0.0  # Tiempo total conduciendo en minutos
+        self.service_time = 0.0  # Tiempo total de servicio (recolección + entregas) en minutos
 
     def shift_duration_hours(self):
         #aqui se calcula la duracion del turno del repartidor en HORAS
@@ -100,6 +101,57 @@ def run_simulation(orders, couriers, restaurants, simulation_end, start_time=Non
     
     print(f"=== STARTING SIMULATION LOOP ===")
     
+    # Fase de actualización de rutas. Por defecto se ejecuta después de la asignación
+    # (modelo descrito en la tesis, §3.3); con UPDATE_BEFORE_ASSIGN=1 se ejecuta antes,
+    # de modo que un repartidor que terminó en (t − f, t] recibe ruta en la época t
+    # (análisis de robustez C22, ponencia/DATACHECKS.md §1c).
+    update_first = os.environ.get('UPDATE_BEFORE_ASSIGN') == '1'
+
+    def update_routes():
+        nonlocal visualized_deliveries_count
+        for c in active_couriers:
+            if c.current_route and current_time >= c.current_route['completion_time']:
+                if c.current_route['commitment_type'] == 'final':
+                    # Tiempos calculados en src/schedule.py según Reyes (2018):
+                    # pickup = max(ready del bundle, llegada + s_r/2); cada orden
+                    # se entrega al llegar a su cliente + s_o/2.
+                    route_data = c.current_route['route']
+                    _routing_src = route_data.get('routing_source', 'osrm')
+                    orders_in_route = c.current_route['orders']
+                    for o, dropoff_time in zip(orders_in_route, c.current_route['dropoff_times']):
+                        if o.status == 'delivered':
+                            raise RuntimeError(f"Order {o.id} delivered twice (courier {c.id})")
+                        o.status = 'delivered'
+                        o.pickup_time = c.current_route['pickup_time']
+                        o.delivery_time = dropoff_time
+                        o.courier_id = c.id
+                        o.bundle_size = len(orders_in_route)
+                        o.routing_source = _routing_src
+                        c.orders_delivered += 1
+                        delivered_orders.append(o)
+                        print(f"Order {o.id} delivered via {_routing_src}.")
+                    # Incrementar bundles recogidos (una ruta = un bundle)
+                    c.bundles_picked_up += 1
+                    # Servicio: s_r una vez por restaurante + s_o por cada entrega
+                    c.service_time += (SERVICE_TIME * (1 + len(orders_in_route))).total_seconds() / 60.0
+                # actualizar ubicación al último punto de la ruta
+                # (restaurante en un compromiso parcial; último cliente en uno final)
+                route_data = c.current_route['route']
+                c.location = c.current_route['waypoints'][-1]
+                c.total_distance += route_data['distance'] / 1000 # convert to km
+                # Sumar tiempo de conducción (duration en segundos -> minutos)
+                c.driving_time += route_data['duration'] / 60.0
+                # almacenar la ruta completada antes de limpiarla y guardar mapa
+                c.route_history.append(c.current_route)
+                if visualized_deliveries_count < 10 and c.current_route['commitment_type'] == 'final':
+                    visualized_deliveries_count += 1
+                    save_route_map(
+                        c.current_route,
+                        policy_label,
+                        visualized_deliveries_count,
+                    )
+                c.current_route = None
+
     iteration_count = 0
 
     while current_time < simulation_end:
@@ -117,102 +169,59 @@ def run_simulation(orders, couriers, restaurants, simulation_end, start_time=Non
             new_order.status = 'ready' #se cambia el estado de la orden a lista
             new_order.restaurant.orders.append(new_order) #se agrega la orden a la lista de ordenes del restaurante
          
-        if (current_time.minute % 5) == 0: #cada que el tiempo actual sea multiplo de 5 minutos
-            print(f"[{current_time}] Running assignment logic...")
-            available_couriers = [c for c in active_couriers if not c.current_route and c.off_time > current_time] # se filtra la lista de repartidores activos para obtener los que no tienen rutas asignadas y que su tiempo de salida sea mayor al tiempo actual
-            
+        # El reloj avanza en pasos de OPTIMIZATION_FREQUENCY (f): cada iteración es
+        # una época de optimización, sin importar en qué minuto inicie la simulación.
+        if update_first:
+            update_routes()
+
+        print(f"[{current_time}] Running assignment logic...")
+        available_couriers = [c for c in active_couriers if not c.current_route and c.off_time > current_time] # se filtra la lista de repartidores activos para obtener los que no tienen rutas asignadas y que su tiempo de salida sea mayor al tiempo actual
+
+        if use_fcfs:
+            # Lógica FCFS: cada orden revelada y sin asignar se despacha, en orden de
+            # colocación, al repartidor libre más cercano (que espera en el restaurante
+            # si la comida aún no está lista).
+            pending_orders = sorted(
+                (o for rest in restaurants for o in rest.orders if o.status == 'ready'),
+                key=lambda o: o.placement_time,
+            )
+            for order in pending_orders:
+                assign_order_to_nearest_courier(order, available_couriers, current_time)
+        else:
+            # Lógica de Rolling Horizon
             orders_ready = [o for rest in restaurants for o in rest.orders if o.status == "ready" and o.ready_time <= current_time + ASSIGNMENT_HORIZON] #se filtran las ordenes que esten listas segun el horizonte de asignación
+            couriers_available_hor = [c for c in available_couriers if c.off_time >= current_time + ASSIGNMENT_HORIZON] #se filtran los repartidores disponibles segun el horizonte de asignación
+            # Para Z_t cuentan también los repartidores ocupados que quedarán libres dentro de Δ2
+            couriers_on_duty_hor = [c for c in active_couriers if c.off_time >= current_time + ASSIGNMENT_HORIZON]
 
-            if use_fcfs:
-                # Lógica FCFS: Asignar órdenes una por una al repartidor más cercano
-                for order in orders_ready:
-                    if order.status == 'ready':
-                        assign_order_to_nearest_courier(order, available_couriers, current_time)
-            else:
-                # Lógica de Rolling Horizon (la que ya existía)
-                couriers_available_hor = [c for c in available_couriers if c.off_time >= current_time + ASSIGNMENT_HORIZON] #se filtran los repartidores disponibles segun el horizonte de asignación
-                
-                print(f"  RH: {len(orders_ready)} orders ready, {len(couriers_available_hor)} couriers in horizon")
-                
-                target_bundle_size = compute_target_bundle_size(
+            print(f"  RH: {len(orders_ready)} orders ready, {len(couriers_available_hor)} couriers in horizon")
+
+            target_bundle_size = compute_target_bundle_size(
+                current_time,
+                orders_ready,
+                couriers_on_duty_hor,
+            )
+            print(f"  RH: target_bundle_size = {target_bundle_size}")
+
+            all_bundles = []
+            for rest in restaurants:
+                rst_bundles = generate_bundles_for_restaurant(
+                    rest,
                     current_time,
-                    orders_ready,
-                    couriers_available_hor,
+                    target_bundle_size,
+                    len(couriers_available_hor),
                 )
-                print(f"  RH: target_bundle_size = {target_bundle_size}")
+                if rst_bundles:
+                    all_bundles.extend(rst_bundles)
+            
+            print(f"  RH: Generated {len(all_bundles)} bundles from {len(restaurants)} restaurants")
 
-                all_bundles = []
-                for rest in restaurants:
-                    rst_bundles = generate_bundles_for_restaurant(
-                        rest,
-                        current_time,
-                        target_bundle_size,
-                        len(couriers_available_hor),
-                    )
-                    if rst_bundles:
-                        all_bundles.extend(rst_bundles)
-                
-                print(f"  RH: Generated {len(all_bundles)} bundles from {len(restaurants)} restaurants")
+            assign_bundles_to_couriers(available_couriers, all_bundles, current_time)
+            print(f"  RH: Bundle assignment complete")
+        print(f"[{current_time}] Assignment logic finished.")
 
-                assign_bundles_to_couriers(available_couriers, all_bundles, current_time)
-                print(f"  RH: Bundle assignment complete")
-            print(f"[{current_time}] Assignment logic finished.")
-
-        # actualizar progreso de rutas
-        for c in active_couriers:
-            if c.current_route and current_time >= c.current_route['completion_time']:
-                if c.current_route['commitment_type'] == 'final':
-                    # Compute actual pickup time per Reyes (2018):
-                    # pickup = max(bundle_ready_time, courier_arrival + service_half)
-                    route_data = c.current_route['route']
-                    _start = c.current_route['start_time']
-                    _inbound_sec = route_data['legs'][0]['duration'] if route_data.get('legs') else 0
-                    _service_half_sec = SERVICE_TIME.total_seconds() / 2
-                    _courier_arrival = _start + timedelta(seconds=_inbound_sec)
-                    _bundle_ready = max(o.ready_time for o in c.current_route['orders'])
-                    _actual_pickup = max(
-                        _bundle_ready,
-                        _courier_arrival + timedelta(seconds=_service_half_sec)
-                    )
-                    _routing_src = route_data.get('routing_source', 'osrm')
-                    for o in c.current_route['orders']:
-                        o.status = 'delivered'
-                        o.pickup_time = _actual_pickup
-                        o.delivery_time = c.current_route['completion_time']
-                        o.courier_id = c.id
-                        o.bundle_size = len(c.current_route['orders'])
-                        o.routing_source = _routing_src
-                        c.orders_delivered += 1
-                        delivered_orders.append(o)
-                        print(f"Order {o.id} delivered via {_routing_src}.")
-                    # Incrementar bundles recogidos (una ruta = un bundle)
-                    c.bundles_picked_up += 1
-                # actualizar ubicación al último punto de la ruta
-                route_data = c.current_route['route']
-                if route_data.get('legs'):
-                    last_leg = route_data['legs'][-1]
-                    steps = last_leg.get('steps', [])
-                    if steps:
-                        from src.getrouteOSMR import as_latlon
-                        last = steps[-1]['maneuver']['location']
-                        c.location = as_latlon(last)
-                    else:
-                        # OSRM was called without steps=true; use the last
-                        # order's drop-off location as the courier's position.
-                        c.location = c.current_route['orders'][-1].dropoff_loc
-                    c.total_distance += route_data['distance'] / 1000 # convert to km
-                    # Sumar tiempo de conducción (duration en segundos -> minutos)
-                    c.driving_time += route_data['duration'] / 60.0
-                # almacenar la ruta completada antes de limpiarla y guardar mapa
-                c.route_history.append(c.current_route)
-                if visualized_deliveries_count < 10 and c.current_route['commitment_type'] == 'final':
-                    visualized_deliveries_count += 1
-                    save_route_map(
-                        c.current_route,
-                        policy_label,
-                        visualized_deliveries_count,
-                    )
-                c.current_route = None
+        if not update_first:
+            update_routes()
 
         current_time += OPTIMIZATION_FREQUENCY
 
@@ -229,6 +238,7 @@ def run_simulation(orders, couriers, restaurants, simulation_end, start_time=Non
             'shift_duration_hours': c.shift_duration_hours(),
             'bundles_picked_up': c.bundles_picked_up,
             'driving_time_minutes': c.driving_time,
+            'service_time_minutes': c.service_time,
         } for c in couriers
     ])
     if courier_results_path:

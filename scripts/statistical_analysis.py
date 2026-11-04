@@ -311,7 +311,9 @@ def prepare_courier_data(df):
     """Prepara DataFrame de couriers con métricas derivadas."""
     c = df.copy()
     c["orders_per_hour"] = c["orders_delivered"] / c["shift_duration_hours"]
-    c["utilization_pct"] = (c["driving_time_minutes"] / 60.0) / c["shift_duration_hours"] * 100
+    # Utilización (Reyes et al., 2018): conducción + servicio en restaurante y cliente
+    busy_min = c["driving_time_minutes"] + (c["service_time_minutes"] if "service_time_minutes" in c else 0.0)
+    c["utilization_pct"] = (busy_min / 60.0) / c["shift_duration_hours"] * 100
     c["dist_per_order"] = c["total_distance_km"] / c["orders_delivered"].replace(0, np.nan)
     return c
 
