@@ -309,8 +309,9 @@ agrupamiento y la posición de la ruta que menos incrementan el costo
   \label{eq:costo}
 \end{equation}
 donde $B \oplus_p o$ es el agrupamiento con la orden $o$ insertada en la posición $p$, $T_{ruta}$ es
-la duración de la ruta según OSRM y $T_{servicio}$ el tiempo de servicio acumulado; con $\beta = 0.1$,
-la duración de la ruta domina el costo. Después, dos iteraciones de extracción y reinserción mueven
+la duración de la ruta según OSRM y $T_{servicio}$ el tiempo de servicio acumulado. El peso $\beta$, que en
+\cite{Reyes2018} representa la pérdida de frescura y se calibra en $[0, 1]$, se fija en 0.1 para que la
+duración de la ruta domine el costo. Después, dos iteraciones de extracción y reinserción mueven
 cada orden al agrupamiento donde su costo es menor.
 
 Cuarto, asigna agrupamientos a repartidores. Los agrupamientos se clasifican en tres grupos de
