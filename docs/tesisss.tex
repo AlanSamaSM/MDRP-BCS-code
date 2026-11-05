@@ -13,6 +13,7 @@
 \pagestyle{plain}
 %\usepackage{fancyhdr} %Para modificar los encabezados de las páginas
 \usepackage{booktabs} %Para incluir líneas horizontales en las tablas especiales para libros (con los comandos \toprule, \midrule y \bottomrule)
+\usepackage{longtable} %Para la tabla de notación, que ocupa más de una página
 \usepackage{amsmath} %Para soportar el entorno matrix
 \usepackage{amssymb} %Para símbolos matemáticos como \mathbb
 \usepackage{tikz}
@@ -176,19 +177,19 @@ reales, sitúa la motivación y relevancia del presente trabajo.
 
 \subsection{Última milla y contexto urbano} % Jazemi2023
 
-La última milla de entrega---el segmento final desde un centro de distribución o 
-punto de recogida hasta el domicilio del cliente---es uno de los segmentos más
+La última milla de entrega (el segmento final desde un centro de distribución o 
+punto de recogida hasta el domicilio del cliente) es uno de los segmentos más
 exigentes de la logística urbana. \citet{Jazemi2023} documentan
 que la entrega a zonas residenciales urbanas se complica por el volumen de entregas,
 los horarios de entrega estrechos y las condiciones de entrega en cambio continuo, y
 revisan las estrategias de ruteo propuestas para enfrentarlo.
 
 En el contexto de entrega de comida rápida, la última milla presenta desafíos 
-específicos adicionales: (1) alta urgencia---los clientes esperan entregas 
+específicos adicionales: (1) alta urgencia, ya que los clientes esperan entregas 
 en ventanas de 30-60 minutos desde la orden, significativamente más restrictivas 
-que en logística general; (2) perecedibilidad---la comida debe mantener 
+que en logística general; (2) perecedibilidad, ya que la comida debe mantener 
 temperatura, frescura y presentación, implicando rutas directas sin desviaciones 
-innecesarias; (3) demanda dinámica e impredecible---los flujos de órdenes no son 
+innecesarias; (3) demanda dinámica e impredecible, ya que los flujos de órdenes no son 
 uniformes sino que presentan picos pronunciados (horas de almuerzo, cena), 
 requiriendo reoptimización continua de asignaciones.
 
@@ -336,7 +337,7 @@ distintivas son:
 	fija.
 	
 	\item \textbf{Tiempos de preparación:} Las órdenes no están listas inmediatamente al ser colocadas. 
-	\citet{Reyes2018} introducen el concepto de \textit{ready time} (tiempo de preparación) como una restricción dura: el courier no puede
+	\citet{Reyes2018} introducen el concepto de \textit{ready time} (tiempo de preparación) como una restricción dura: el repartidor (\textit{courier}) no puede
 	recoger la orden antes de que la comida esté lista. Esto crea una holgura de tiempo natural pero reduce la flexibilidad del enrutamiento.
 	
 	\item \textbf{Alta urgencia y Dinamismo:} La mayoría de las solicitudes se revelan durante la operación (dinamismo)
@@ -387,9 +388,9 @@ despacha manualmente.  La segunda es \textbf{coordinada}: el sistema espera unos
 agrupamiento, como en la heurística de horizonte rodante (\textit{Rolling Horizon}, RH) de
 \citet{Reyes2018}.
 
-Ninguna de las dos es mejor en todas las condiciones.  Coordinar tiene un costo ---algunas órdenes
-esperan a que se forme el agrupamiento o a que se entregue otra orden antes que la suya--- y un
-beneficio ---cada viaje atiende más pedidos---.  El balance entre ambos depende, sobre todo, de
+Ninguna de las dos es mejor en todas las condiciones.  Coordinar tiene un costo (algunas órdenes
+esperan a que se forme el agrupamiento o a que se entregue otra orden antes que la suya) y un
+beneficio (cada viaje atiende más pedidos).  El balance entre ambos depende, sobre todo, de
 cuántos repartidores hay disponibles frente a la demanda: con una flota holgada, la espera puede
 no compensar; con una flota escasa, el ahorro de viajes puede ser decisivo.  Para un operador, la
 pregunta práctica es, por tanto, \emph{en qué condiciones conviene coordinar los despachos}.
@@ -462,7 +463,7 @@ restricciones topológicas reales de la ciudad de La Paz, B.C.S. y patrones de d
 \subsection{Objetivos específicos}
 \begin{itemize}
 	\item Generar un conjunto de instancias sintéticas calibradas que proyecten los patrones temporales
-	de demanda de la literatura (LaDe) sobre la estructura demográfica real de La Paz, garantizando la 
+	de demanda del conjunto de datos público de entregas de última milla LaDe \citep{Wu2023LaDe} sobre la estructura demográfica real de La Paz, garantizando la 
 	validez geoespacial de los puntos de entrega y recolección.
 	
 	\item Integrar un motor de simulación de eventos discretos con la infraestructura de enrutamiento OSRM sobre 
@@ -480,10 +481,10 @@ restricciones topológicas reales de la ciudad de La Paz, B.C.S. y patrones de d
 \end{itemize}
 
 \section{Hipótesis}
-La implementación de una política de despacho anticipatoria (Horizonte Rodante), alimentada con una matriz de
-costos de viaje reales (OSRM) sobre la topología de La Paz, superará significativamente en eficiencia operativa
-\textquotedblleft órdenes por hora\textquotedblright\ y nivel de servicio \textquotedblleft\textit{Ready-to-Door}\textquotedblright\ a la estrategia reactiva estándar (FCFS con estimación
-euclidiana), demostrando la viabilidad de soluciones de optimización logística de alto rendimiento basadas
+La implementación de una política de despacho anticipatoria (Horizonte Rodante), que estima los tiempos de viaje
+sobre la red vial real de La Paz mediante el motor de ruteo OSRM, superará significativamente en eficiencia operativa
+\textquotedblleft órdenes por hora\textquotedblright\ y nivel de servicio \textquotedblleft\textit{Ready-to-Door}\textquotedblright\ a la estrategia reactiva estándar (FCFS, que asigna al
+repartidor más cercano en línea recta), demostrando la viabilidad de soluciones de optimización logística de alto rendimiento basadas
 exclusivamente en software de código abierto.
 
 \section{Justificación}
@@ -559,7 +560,7 @@ El sistema compara exclusivamente dos políticas de despacho::
 
 \begin{enumerate}
 	\item \textbf{Política Base \textit{First-Come-First-Served} (FCFS):} Asignación reactiva inmediata,
-	en el momento en que se coloca cada orden, al repartidor libre más cercano al restaurante, sin consolidación de órdenes.
+	en la primera época de asignación posterior a su colocación (cada $f = 5$~min), al repartidor libre más cercano al restaurante, sin consolidación de órdenes.
 	
 	\item \textbf{Política Propuesta (\textit{Rolling Horizon}):} Implementación de la heurística de
 	\citet{Reyes2018} con un horizonte de visión configurable (10-20 minutos) y capacidad de 
@@ -610,10 +611,10 @@ El modelo asume tiempos de servicio deterministas divididos en dos componentes, 
 convención de \citet{Reyes2018} (la mitad del tiempo antes y la mitad después del instante de
 recolección o de entrega):
 \begin{itemize}
-	\item \textbf{Tiempo de Recolección (\textit{Pickup}):} Se aplica una penalización fija de $T_{pickup} = 4$ min por visita a cada restaurante asignado por visitar.
+	\item \textbf{Tiempo de Recolección (\textit{Pickup}):} Se aplica una penalización fija de $s_r = 4$ min por visita a cada restaurante asignado por visitar.
 	Si la comida aún no está lista, el repartidor espera en el restaurante.
 
-	\item \textbf{Tiempo de Entrega (\textit{Drop-off}):} Se añade un tiempo de servicio de $T_{drop} = 4$ min por cada orden
+	\item \textbf{Tiempo de Entrega (\textit{Drop-off}):} Se añade un tiempo de servicio de $s_o = 4$ min por cada orden
 	entregada al cliente.
 	
 	\item \textbf{Ausencia de Variabilidad Estocástica:} No se modelan retrasos aleatorios por búsqueda de estacionamiento, acceso a edificios 
@@ -703,24 +704,25 @@ limitación del estudio.
 		      La información de una orden $o$ se revela al sistema únicamente en
 		      el instante $a_o$ (llegada dinámica).
 
-		\item $\mathcal{C}$: conjunto de \textbf{repartidores} (couriers).  Cada
-		      courier $c \in \mathcal{C}$ posee:
+		\item $\mathcal{C}$: conjunto de \textbf{repartidores} (\textit{couriers} en la
+	      terminología de \citet{Reyes2018}).  Cada
+		      repartidor $c \in \mathcal{C}$ posee:
 		      \begin{itemize}
 		          \item instante de inicio de turno (\textit{on-time}) $e_c$,
 		          \item ubicación inicial $\ell_c$ en el instante $e_c$,
 		          \item instante de fin de turno (\textit{off-time}) $l_c > e_c$.
 		      \end{itemize}
 		      A diferencia de las órdenes, toda la información sobre restaurantes
-		      y couriers se conoce \textit{a priori}.
+		      y repartidores se conoce \textit{a priori}.
 	\end{itemize}
 
-	El MDRP consiste en determinar rutas factibles para los couriers que
+	El MDRP consiste en determinar rutas factibles para los repartidores que
 	completen la recolección y entrega de las órdenes, optimizando una o varias
 	métricas de desempeño.
 
 	\subsection{Función objetivo}
 
-	Sea $x$ una asignación factible de órdenes a couriers que cumple las
+	Sea $x$ una asignación factible de órdenes a repartidores que cumple las
 	restricciones de capacidad, de secuenciamiento (recolección antes de
 	entrega) y de ventanas temporales del MDRP.  \citet{Reyes2018} no fijan
 	una función objetivo única: plantean el problema con varias métricas de
@@ -741,14 +743,14 @@ limitación del estudio.
 
 	\noindent donde $\text{CtD}_o(x)$ es el tiempo \textit{Click-to-Door} inducido
 	por la asignación $x$, $\text{Pago}(c; x)$ es la compensación del
-	courier $c$ bajo el modelo dual descrito más adelante,
+	repartidor $c$ bajo el modelo dual descrito más adelante,
 	$\mathcal{O}_u(x)$ es el conjunto de órdenes no entregadas al cierre
 	del horizonte de simulación, y $\alpha_1, \alpha_2, \alpha_3 \geq 0$
 	son pesos que reflejan las prioridades de la plataforma
 	\citep{Reyes2018, Ulmer2021RMDP}.  En la heurística de horizonte
 	rodante (Sección~2.2) el objetivo~\eqref{eq:mdrp_obj} no se construye
 	explícitamente: se aproxima miópicamente en cada época mediante el peso
-	$w_{s,d}$ del modelo de asignación bipartita, y la evaluación
+	$w_{c,B}$ del modelo de asignación bipartita, y la evaluación
 	\emph{a posteriori} se realiza desagregando las tres componentes en los
 	indicadores descritos en la Sección~2.4 y el Capítulo~4.
 
@@ -768,31 +770,31 @@ limitación del estudio.
 		      de ubicaciones se asume invariante en el tiempo.
 
 		\item \textbf{Tiempos de servicio:} Se definen dos tiempos de servicio
-		      constantes: $s^r$ para la recolección en un restaurante (independiente
-		      del número de órdenes) y $s^o$ para la entrega al cliente.
+		      constantes: $s_r$ para la recolección en un restaurante (independiente
+		      del número de órdenes) y $s_o$ para la entrega al cliente.
 
-		\item \textbf{Restricción de turno:} Un courier no puede iniciar nuevas
+		\item \textbf{Restricción de turno:} Un repartidor no puede iniciar nuevas
 		      recolecciones después de su \textit{off-time} $l_c$, pero puede
 		      completar entregas pendientes.
 
 		\item \textbf{Obediencia determinista:} En el marco determinista del
-		      modelo, los couriers aceptan todas las instrucciones y esperan nuevas
+		      modelo, los repartidores aceptan todas las instrucciones y esperan nuevas
 		      asignaciones en su última ubicación conocida.
 	\end{enumerate}
 
 	\subsection{Modelo de compensación}
 
-	La remuneración de los couriers sigue un esquema de \textbf{compensación
-	mínima garantizada} \citep{Reyes2018}: cada courier percibe el máximo entre
+	La remuneración de los repartidores sigue un esquema de \textbf{compensación
+	mínima garantizada} \citep{Reyes2018}: cada repartidor percibe el máximo entre
 	su ganancia por entregas y un pago mínimo por hora:
 
 	\begin{equation}
-		\text{Pago}(c) = \max\!\left(p_1 \cdot n_c, \;\; p_2 \cdot (l_c - e_c)\right)
+		\text{Pago}(c) = \max\!\left(p_1 \cdot n_c, \;\; p_2 \cdot h_c\right)
 	\end{equation}
 
 	\noindent donde $n_c$ es el número total de órdenes entregadas por el
-	courier $c$, $p_1$ es el pago por orden y $p_2$ el pago mínimo por hora.
-	Este modelo alinea los incentivos del courier con los objetivos de la
+	repartidor $c$, $h_c = l_c - e_c$ es la duración de su turno en horas, $p_1$ es el pago por orden y $p_2$ el pago mínimo por hora.
+	Este modelo alinea los incentivos del repartidor con los objetivos de la
 	plataforma: cuando la demanda es suficiente, la ganancia variable domina;
 	cuando la demanda es baja, la compensación mínima garantiza un ingreso base.
 
@@ -813,7 +815,7 @@ limitación del estudio.
 		\item \textbf{\textit{Ready-to-Door} (RtD):} tiempo desde la disponibilidad hasta
 		      la entrega, $\text{RtD}_o = t_{delivery,o} - e_o$.
 
-		\item \textbf{Utilización del courier}: fracción del turno dedicada a
+		\item \textbf{Utilización del repartidor}: fracción del turno dedicada a
 		      conducción y servicio (vs.\ tiempo de espera).
 
 		\item \textbf{Costo por orden}: compensación total dividida entre el
@@ -832,10 +834,10 @@ limitación del estudio.
 
 	\begin{itemize}
 		\item \textbf{Preposicionamiento:} Además de asignar rutas de
-		      recolección-entrega, el despachador puede enviar a un courier hacia
+		      recolección-entrega, el despachador puede enviar a un repartidor hacia
 		      un restaurante anticipadamente (\textit{prepositioning move}).
 
-		\item \textbf{Actualización de asignaciones:} Cuando un courier llega a
+		\item \textbf{Actualización de asignaciones:} Cuando un repartidor llega a
 		      un restaurante, el agrupamiento asignado puede modificarse
 		      (añadir o quitar órdenes) antes de la recolección efectiva.
 	\end{itemize}
@@ -860,6 +862,115 @@ limitación del estudio.
 	puede incluir platillos de varios restaurantes (\textit{virtual food court});
 	en simulación, su heurística que anticipa estados futuros supera a una
 	heurística miope en métricas de servicio al cliente.
+
+	\subsection{Resumen de notación}
+	\label{sec:notacion}
+
+	La Tabla~\ref{tab:notacion} reúne los símbolos empleados en esta tesis,
+	incluidos los que se introducen en las secciones y capítulos posteriores.
+
+	{\small
+	\begin{longtable}{@{}p{3.6cm}p{11.6cm}@{}}
+	\caption{Notación empleada en la tesis.}
+	\label{tab:notacion} \\
+	\toprule
+	\textbf{Símbolo} & \textbf{Descripción} \\
+	\midrule
+	\endfirsthead
+	\multicolumn{2}{@{}l}{\textit{Tabla~\ref{tab:notacion} (continuación)}} \\
+	\toprule
+	\textbf{Símbolo} & \textbf{Descripción} \\
+	\midrule
+	\endhead
+	\midrule
+	\multicolumn{2}{r@{}}{\textit{Continúa en la siguiente página}} \\
+	\endfoot
+	\bottomrule
+	\endlastfoot
+	\multicolumn{2}{@{}l}{\textit{Conjuntos e índices}} \\
+	$\mathcal{R}$, $r$ & Conjunto de restaurantes; restaurante \\
+	$\mathcal{O}$, $o$ & Conjunto de órdenes de la instancia; orden \\
+	$\mathcal{C}$, $c$ & Conjunto de repartidores (flota); repartidor.  $|\mathcal{C}|$ es el tamaño de la flota y $c = 0$ denota el repartidor artificial del modelo de asignación \\
+	$B$ & Agrupamiento (\textit{bundle}): conjunto de órdenes de un mismo restaurante asignadas a una ruta \\
+	$t$ & Instante de simulación; época de optimización \\
+	$\mathcal{O}_t$ & Órdenes reveladas hasta $t$ que aún no han sido finalizadas \\
+	$U_t$, $U_{t,r}$ & Órdenes de $\mathcal{O}_t$ con $e_o \leq t + \Delta_u$; subconjunto del restaurante $r$ \\
+	$\mathcal{O}_{del}$, $\mathcal{O}_u$ & Órdenes entregadas; órdenes no entregadas al cierre de la simulación \\
+	$\mathcal{C}_{act}(t)$ & Repartidores activos en $t$ ($e_c \leq t$) \\
+	$\mathcal{C}_{turno}(t)$ & Repartidores en turno en $t$, libres u ocupados \\
+	$\mathcal{C}_{disp}(t)$ & Repartidores disponibles en $t$: sin ruta activa y con turno vigente \\
+	$\mathcal{B}_t$, $\mathcal{B}_g$ & Agrupamientos generados en la época $t$; agrupamientos del grupo de prioridad $g$ \\
+	\midrule
+	\multicolumn{2}{@{}l}{\textit{Atributos de restaurantes, órdenes y repartidores}} \\
+	$\ell_r$, $\ell_o$, $\ell_c$ & Ubicación del restaurante $r$; punto de entrega de la orden $o$; ubicación inicial del repartidor $c$ \\
+	$(\phi, \psi)$ & Latitud y longitud de una ubicación \\
+	$r_o$, $r_B$ & Restaurante de origen de la orden $o$; restaurante del agrupamiento $B$ \\
+	$a_o$ & Instante de colocación de la orden (\textit{placement time}) \\
+	$e_o$ & Instante en que la comida está lista (\textit{ready time}), $e_o = a_o + T_{prep}$ \\
+	$e_B$ & \textit{Ready time} del agrupamiento, $e_B = \max_{o \in B} e_o$ \\
+	$T_{prep}$ & Tiempo de preparación de la orden (min) \\
+	$t_{pickup,o}$, $t_{delivery,o}$ & Instantes de recolección y de entrega de la orden $o$ \\
+	$e_c$, $l_c$ & Inicio (\textit{on-time}) y fin (\textit{off-time}) del turno del repartidor $c$ \\
+	$h_c$ & Duración del turno del repartidor, $h_c = l_c - e_c$ (h) \\
+	$e^{avail}_c$ & Instante en que el repartidor $c$ queda libre para una nueva asignación \\
+	$n_c$, $b_c$ & Órdenes entregadas y agrupamientos recogidos por el repartidor $c$ \\
+	$t_{drive,c}$, $t_{serv,c}$ & Tiempo de conducción y tiempo de servicio acumulados por el repartidor $c$ (min) \\
+	$\text{Pago}(c)$ & Compensación del repartidor, $\max(p_1 n_c,\, p_2 h_c)$ \\
+	\midrule
+	\multicolumn{2}{@{}l}{\textit{Parámetros del modelo y de la política (valores en la Tabla~\ref{tab:config_params})}} \\
+	$f$ & Frecuencia de optimización: intervalo entre épocas (min) \\
+	$\Delta_u$ & Horizonte de asignación: qué órdenes entran a la optimización (min) \\
+	$\Delta_1$, $\Delta_2$ & Horizontes de anticipación de demanda y de oferta en el cálculo de $Z_t$ (min) \\
+	$\Delta_x$ & Espera máxima de una orden lista antes de forzar un compromiso final (min) \\
+	$\tau$, $\tau_{max}$ & Objetivo y máximo absoluto de \textit{Click-to-Door} (min) \\
+	$s_r$, $s_o$ & Tiempo de servicio por recolección en restaurante y por entrega al cliente (min) \\
+	$B_{max}$ & Tamaño máximo de un agrupamiento (órdenes) \\
+	$\beta$ & Peso de la pérdida de frescura en el costo de inserción \\
+	$\theta$ & Peso del retraso en la recolección en el peso de asignación \\
+	$p_1$, $p_2$ & Pago por orden entregada; pago mínimo por hora \\
+	$\gamma$ & Factor de conversión de distancia euclidiana a tiempo de viaje en \citet{Reyes2018} \\
+	\midrule
+	\multicolumn{2}{@{}l}{\textit{Agrupamiento y asignación}} \\
+	$x$ & Asignación factible de órdenes a repartidores (Ec.~\ref{eq:mdrp_obj}) \\
+	$\alpha_1$, $\alpha_2$, $\alpha_3$ & Pesos de la función objetivo (Ec.~\ref{eq:mdrp_obj}) \\
+	$Z_t$ & Tamaño objetivo de agrupamiento en la época $t$ \\
+	$m_r$, $k^r_t$ & Número inicial de agrupamientos del restaurante $r$; repartidores disponibles en $r$ \\
+	$T(i,j)$ & Tiempo de viaje entre las ubicaciones $i$ y $j$ \\
+	$B \oplus_p o$ & Agrupamiento $B$ con la orden $o$ insertada en la posición $p$ \\
+	$\text{costo}(B, o, p)$ & Costo de inserción de $o$ en la posición $p$ de $B$ \\
+	$T_{ruta}$, $T_{servicio}$ & Duración OSRM de la ruta y tiempo de servicio acumulado de un agrupamiento \\
+	$t_{arr,r}$ & Instante de llegada del repartidor al restaurante \\
+	$t_{pickup}(c,B)$ & Instante de recolección de $B$ si se asigna al repartidor $c$ \\
+	$t_{delivery,o}(c,B)$ & Instante de entrega de $o \in B$ si $B$ se asigna al repartidor $c$ \\
+	$T_{delivery}(c,B)$ & Tiempo total de entrega, $\max_{o \in B} t_{delivery,o}(c,B) - e^{avail}_c$ \\
+	$w_{c,B}$, $\mathbf{W}$ & Peso de asignar $B$ al repartidor $c$; matriz de pesos de una ronda \\
+	$x_{c,B}$ & Variable binaria: 1 si $B$ se asigna al repartidor $c$ \\
+	$P_g$ & Penalización por grupo de prioridad en el peso de asignación \\
+	$G = (V, E, \omega)$ & Grafo vial: vértices, aristas y función de costo de las aristas \\
+	\midrule
+	\multicolumn{2}{@{}l}{\textit{Métricas de desempeño}} \\
+	$\text{CtD}_o$ & \textit{Click-to-Door}: $t_{delivery,o} - a_o$ \\
+	$\text{RtP}_o$ & \textit{Ready-to-Pickup}: $t_{pickup,o} - e_o$ \\
+	$\text{RtD}_o$ & \textit{Ready-to-Door}: $t_{delivery,o} - e_o$ \\
+	SLA & Cumplimiento del \textit{Service Level Agreement}: porcentaje de órdenes entregadas con $\text{CtD}_o \leq \tau$ (Ec.~\ref{eq:sla}) \\
+	$\bar{E}$ & Exceso promedio sobre el objetivo (\textit{CTD Overage}): media de $\max(0, \text{CtD}_o - \tau)$ \\
+	$\bar{m}$; $P_{50}$, $P_{90}$, $P_{95}$ & Media y percentiles de una métrica sobre $\mathcal{O}_{del}$ \\
+	\midrule
+	\multicolumn{2}{@{}l}{\textit{Generación de instancias y diseño experimental}} \\
+	$\lambda(t)$ & Intensidad de llegada de órdenes (órdenes/min) \\
+	$\lambda_0$; $A_m$, $A_e$; $\mu_m$, $\mu_e$; $\sigma$ & Intensidad base; amplitudes, centros y dispersión de los picos matutino y vespertino \\
+	$N_t$ & Número de órdenes generadas en el minuto $t$ \\
+	$H$ & Duración de la ventana operativa (min) \\
+	$\mu_{prep}$, $\sigma_{prep}$ & Media y desviación estándar del tiempo de preparación (min) \\
+	$\mathcal{P}$ & Polígono urbano de La~Paz donde se generan las ubicaciones \\
+	$\rho$ & Razón de saturación: órdenes objetivo por repartidor \\
+	$n_{\min}$ & Tamaño mínimo de la flota \\
+	$\kappa$ & Índice de circuidad, $d_{OSRM} / d_{Haversine}$ \\
+	$\Delta\text{CtD}$ & Diferencia de \textit{Click-to-Door} entre políticas, $\text{CtD}_{\text{FCFS}} - \text{CtD}_{\text{RH}}$ \\
+	$\bar{x}$, $\bar{\Delta}$ & Media de una métrica por política; diferencia media pareada FCFS $-$ RH \\
+	$r_{rb}$ & Correlación \textit{rank-biserial} pareada (tamaño de efecto) \\
+	\end{longtable}
+	}
 
 	%% ================================================================
 	%% SECCIÓN 2.2: HEURÍSTICA DE HORIZONTE RODANTE
@@ -898,21 +1009,20 @@ limitación del estudio.
 
 	\subsection{Tamaño objetivo de agrupamiento}
 
-	Para equilibrar la utilización de los couriers con la frescura de las
+	Para equilibrar la utilización de los repartidores con la frescura de las
 	entregas, el algoritmo ajusta dinámicamente el número de órdenes que se
 	agrupan en un mismo viaje.  El tamaño objetivo de agrupamiento
 	(\textit{target bundle size}) al instante $t$ se define como la razón entre
-	las órdenes próximas a estar listas y los couriers disponibles:
+	las órdenes próximas a estar listas y los repartidores disponibles:
 
 	\begin{equation}
 		Z_t = \frac{|\{o \in \mathcal{O}_t : e_o \leq t + \Delta_1\}|}
-		           {|\{c \in \mathcal{D}_t : e^{avail}_c \leq t + \Delta_2\}|},
+		           {|\{c \in \mathcal{C}_{turno}(t) : e^{avail}_c \leq t + \Delta_2\}|},
 		\quad \Delta_1 > 0,\; \Delta_2 > 0,
 		\label{eq:zt_theory}
 	\end{equation}
 
-	\noindent donde $\mathcal{D}_t$ es el conjunto de couriers en turno al
-	instante $t$, $e^{avail}_c$ es el momento en que el courier $c$ queda
+	\noindent donde $\mathcal{C}_{turno}(t)$ es el conjunto de repartidores en turno al instante $t$, $e^{avail}_c$ es el momento en que el repartidor $c$ queda
 	disponible para una nueva asignación, y $\Delta_1$, $\Delta_2$ son
 	horizontes de anticipación calibrados fuera de línea.  Conviene
 	distinguir explícitamente los tres horizontes empleados por el
@@ -921,18 +1031,18 @@ limitación del estudio.
 	$\Delta_1$ es el \emph{lookahead de demanda} usado en el numerador de
 	$Z_t$ para estimar cuántas órdenes estarán pronto listas; y $\Delta_2$
 	es el \emph{lookahead de oferta} usado en el denominador de $Z_t$ para
-	estimar cuántos couriers estarán pronto disponibles.  Para que el
+	estimar cuántos repartidores estarán pronto disponibles.  Para que el
 	algoritmo tenga carácter anticipatorio, \citet{Reyes2018} recomiendan
 	$f < \Delta_u \leq \Delta_1$ y $f < \Delta_u \leq \Delta_2$.  En la
 	implementación de este trabajo (Sección~3.1,
 	Tabla~\ref{tab:config_params}) los tres horizontes se fijan en
 	20~minutos junto con $f = 5$~min, que corresponde a la variante~7 de la
 	malla de parámetros evaluada por \citet{Reyes2018}; la igualdad de
-	valores no implica equivalencia conceptual entre los horizontes.  Cuando $Z_t < 1$, hay más couriers que
+	valores no implica equivalencia conceptual entre los horizontes.  Cuando $Z_t < 1$, hay más repartidores que
 	órdenes y el comportamiento converge hacia asignaciones individuales;
 	cuando $Z_t \gg 1$, el sistema está saturado y se favorecen
 	agrupamientos más grandes para maximizar la capacidad de entrega.  Si
-	no hay couriers disponibles antes de $t + \Delta_2$, se asigna un
+	no hay repartidores disponibles antes de $t + \Delta_2$, se asigna un
 	valor por defecto.
 
 	\subsection{Generación de agrupamientos}
@@ -946,20 +1056,19 @@ limitación del estudio.
 	\begin{enumerate}
 		\item \textbf{Inicialización:} Se crean $m_r = \max\!\bigl(k^r_t,\;
 		      \lceil |U_{t,r}| / Z_t \rceil\bigr)$ agrupamientos vacíos, donde
-		      $k^r_t$ es el número de couriers disponibles en el restaurante~$r$.
+		      $k^r_t$ es el número de repartidores disponibles en el restaurante~$r$.
 		      Las órdenes se ordenan por $e_o$ ascendente.%
 		      \footnote{La implementación (Sección~3.5) utiliza
-		      $m_r = \min(\lceil n/Z_t\rceil,\, |\mathcal{C}_{disp}|)$,
-		      acotando el número de agrupamientos a los couriers disponibles
-		      para evitar agrupamientos sin courier posible.}
+		      $m_r = \min(\lceil |U_{t,r}|/Z_t\rceil,\, |\mathcal{C}_{disp}(t)|)$,
+		      acotando el número de agrupamientos a los repartidores disponibles
+		      para evitar agrupamientos sin repartidor posible.}
 
 		\item \textbf{Inserción:} Cada orden se inserta en la posición del
 		      agrupamiento que minimiza el costo de inserción:
 		      \begin{equation}
-		          \text{costo}(s, o, p) = \sum_{(i,j)\in s} T(i,j) +
-		          \beta \sum_{i \in s} \text{ServiceDelay}(i),
+		          \text{costo}(B, o, p) = \sum_{(i,j)\in B \oplus_p o} T(i,j) + \beta \sum_{i \in B \oplus_p o} \text{ServiceDelay}(i),
 		      \end{equation}
-		      donde $T(i,j)$ es el tiempo de viaje entre ubicaciones consecutivas
+		      donde $B \oplus_p o$ es el agrupamiento $B$ con la orden $o$ insertada en la posición $p$, $T(i,j)$ es el tiempo de viaje entre ubicaciones consecutivas
 		      de la ruta y $\beta > 0$ pondera la pérdida de frescura.  El
 		      valor concreto $\beta = 0{.}1$ adoptado en la implementación
 		      (Sección~3.1) está dentro del intervalo $[0, 1]$ que
@@ -996,55 +1105,56 @@ limitación del estudio.
 
 	La asignación se resuelve secuencialmente por grupo
 	(i~$\to$~ii~$\to$~iii), garantizando que los agrupamientos más urgentes
-	obtengan los couriers más cercanos antes de que estos sean consumidos por
+	obtengan los repartidores más cercanos antes de que estos sean consumidos por
 	órdenes menos críticas.
 
 	\subsection{Modelo de asignación lineal}
 
-	En cada grupo de prioridad, la asignación de agrupamientos a couriers se
+	En cada grupo de prioridad, la asignación de agrupamientos a repartidores se
 	formula como un problema de asignación lineal (\textit{linear
-	assignment problem}).  Sea $S$ el conjunto de agrupamientos del grupo
-	actual y $\mathcal{D}$ el subconjunto de couriers disponibles.  Para cada
-	par $(s, d) \in S \times \mathcal{D}$ se define el peso:
+	assignment problem}).  Sea $\mathcal{B}_g$ el conjunto de agrupamientos del grupo actual y
+	$\mathcal{C}_{disp}(t)$ el subconjunto de repartidores disponibles.  Para cada
+	par $(c, B) \in \mathcal{C}_{disp}(t) \times \mathcal{B}_g$ se define el peso:
 
 	\begin{equation}
-		w_{s,d} = \frac{N_s}{\max_{o \in s}\{\delta^s_{o,d}\} - e_d}
-		        - \theta\!\left(\pi_{s,d} - \max_{o \in s}\{e_o\}\right),
+		w_{c,B} = \frac{|B|}{\max_{o \in B}\{t_{delivery,o}(c,B)\} - e^{avail}_c}
+		        - \theta\!\left(t_{pickup}(c,B) - e_B\right),
 		\label{eq:matching_theory}
 	\end{equation}
 
-	\noindent donde $N_s$ es el número de órdenes en el agrupamiento $s$,
-	$\delta^s_{o,d}$ es el instante en que la orden $o \in s$ sería
+	\noindent donde $|B|$ es el número de órdenes en el agrupamiento $B$,
+	$t_{delivery,o}(c,B)$ es el instante en que la orden $o \in B$ sería
 	entregada al cliente bajo la ruta inducida al asignar el agrupamiento
-	$s$ al courier $d$ (es decir, el tiempo de finalización de la entrega
-	dentro de la secuencia restaurante $\to$ entregas), $e_d$ es el
-	momento en que $d$ queda disponible,
-	$\pi_{s,d}$ es el tiempo de recolección del agrupamiento, y $\theta > 0$
+	$B$ al repartidor $c$ (es decir, el tiempo de finalización de la entrega
+	dentro de la secuencia restaurante $\to$ entregas), $e^{avail}_c$ es el
+	momento en que $c$ queda disponible,
+	$t_{pickup}(c,B)$ es el instante de recolección del agrupamiento,
+	$e_B = \max_{o \in B} e_o$ es su \textit{ready time}, y $\theta > 0$
 	penaliza el retraso en la recolección respecto al \textit{ready time}.
 	El primer término captura la eficiencia (órdenes por unidad de
 	tiempo); el segundo, la frescura (demora en el pickup).
 
 	El problema se formula como:
 	\begin{align}
-		\max_{x} \quad & \sum_{d \in \mathcal{D}} \sum_{s \in S} w_{s,d}\, x_{s,d}
+		\max_{x} \quad & \sum_{c \in \mathcal{C}_{disp}(t)} \sum_{B \in \mathcal{B}_g} w_{c,B}\, x_{c,B}
 		\label{eq:lap_obj} \\
 		\text{s.a.} \quad
-		& \sum_{s \in S} x_{s,d} \leq 1, \quad \forall\, d \in \mathcal{D}
+		& \sum_{B \in \mathcal{B}_g} x_{c,B} \leq 1, \quad \forall\, c \in \mathcal{C}_{disp}(t)
 		\label{eq:lap_courier} \\
-		& \sum_{d \in \mathcal{D} \cup \{0\}} x_{s,d} = 1, \quad \forall\, s \in S
+		& \sum_{c \in \mathcal{C}_{disp}(t) \cup \{0\}} x_{c,B} = 1, \quad \forall\, B \in \mathcal{B}_g
 		\label{eq:lap_bundle} \\
-		& x_{s,d} \in \{0, 1\}
+		& x_{c,B} \in \{0, 1\}
 		\label{eq:lap_binary}
 	\end{align}
 
-	La restricción~\eqref{eq:lap_courier} garantiza que cada courier reciba a
+	La restricción~\eqref{eq:lap_courier} garantiza que cada repartidor reciba a
 	lo más un agrupamiento; la restricción~\eqref{eq:lap_bundle} asegura que
-	cada agrupamiento sea asignado a exactamente un courier (posiblemente
-	artificial, $d=0$, para absorber exceso de demanda).  Al tratarse de un
+	cada agrupamiento sea asignado a exactamente un repartidor (posiblemente
+	artificial, $c=0$, para absorber exceso de demanda).  Al tratarse de un
 	problema de asignación lineal, puede resolverse de forma exacta en tiempo
 	polinomial mediante el \textit{Algoritmo Húngaro} \citep{Kuhn1955}, cuyas
 	implementaciones modernas tienen complejidad $O(n^3)$, lo que garantiza tiempos de
-	ejecución despreciables incluso para instancias con cientos de couriers y
+	ejecución despreciables incluso para instancias con cientos de repartidores y
 	agrupamientos.
 
 	\citet{Reyes2018} exploran también formulaciones de mayor complejidad
@@ -1056,32 +1166,32 @@ limitación del estudio.
 	\subsection{Estrategia de compromiso en dos etapas}
 
 	Tras resolver la asignación, no todas las decisiones se comunican de
-	forma inmediata a los couriers.  La estrategia de compromiso
+	forma inmediata a los repartidores.  La estrategia de compromiso
 	aditivo en dos etapas (\textit{two-stage additive commitment})
-	\citep{Reyes2018} descompone cada asignación tentativa $(s, d)$ en:
+	\citep{Reyes2018} descompone cada asignación tentativa $(c, B)$ en:
 
 	\begin{enumerate}
-		\item \textbf{Compromiso final:} Si $d$ puede alcanzar el restaurante
-		      $r_s$ antes de $t + f$ y todas las órdenes de $s$ estarán listas
-		      antes de $t + f$, se instruye a $d$ para recoger y entregar las
-		      órdenes de~$s$.
+		\item \textbf{Compromiso final:} Si $c$ puede alcanzar el restaurante
+		      $r_B$ antes de $t + f$ y todas las órdenes de $B$ estarán listas
+		      antes de $t + f$, se instruye a $c$ para recoger y entregar las
+		      órdenes de~$B$.
 
-		\item \textbf{Compromiso parcial (\textit{inbound}):} Si $d$ no puede
-		      recoger $s$ antes de $t + f$, pero completa su asignación actual
+		\item \textbf{Compromiso parcial (\textit{inbound}):} Si $c$ no puede
+		      recoger $B$ antes de $t + f$, pero completa su asignación actual
 		      antes de $t + f$, se le instruye únicamente a desplazarse hacia
-		      $r_s$.  En la siguiente época, $d$ se reasigna con la garantía de
-		      que su agrupamiento incluirá al menos las órdenes de~$s$
+		      $r_B$.  En la siguiente época, $c$ se reasigna con la garantía de
+		      que su agrupamiento incluirá al menos las órdenes de~$B$
 		      (propiedad aditiva).
 
-		\item \textbf{Ignorar:} Si $d$ no puede iniciar una nueva asignación
+		\item \textbf{Ignorar:} Si $c$ no puede iniciar una nueva asignación
 		      antes de $t + f$, la decisión se pospone.
 
-		\item \textbf{Excepción de espera prolongada:} Si alguna orden de $s$
-		      lleva lista más de $x$~minutos, se fuerza un compromiso final
+		\item \textbf{Excepción de espera prolongada:} Si alguna orden de $B$
+		      lleva lista más de $\Delta_x$~minutos, se fuerza un compromiso final
 		      independientemente de las condiciones anteriores.
 	\end{enumerate}
 
-	El compromiso parcial actúa como \textit{preposicionamiento}: el courier
+	El compromiso parcial actúa como \textit{preposicionamiento}: el repartidor
 	se acerca al restaurante mientras las órdenes terminan de prepararse, y el
 	algoritmo retiene la flexibilidad de actualizar el agrupamiento cuando
 	nueva información se revela en la siguiente época.  Esta descomposición es
@@ -1090,7 +1200,7 @@ limitación del estudio.
 
 	La Sección~3.5 describe la implementación concreta de este algoritmo,
 	incluyendo los valores numéricos de los parámetros ($f$, $\Delta_u$,
-	$\Delta_1$, $\Delta_2$, $\beta$, $\theta$, $x$) y las adaptaciones
+	$\Delta_1$, $\Delta_2$, $\beta$, $\theta$, $\Delta_x$) y las adaptaciones
 	realizadas para la topología de La~Paz.
 
 	%% ================================================================
@@ -1135,8 +1245,8 @@ limitación del estudio.
 		      rutas de transporte público, etc.).
 	\end{itemize}
 
-	El grafo vial resultante $G = (V, E, c)$ tiene vértices $V$ correspondientes
-	a los nodos y aristas $E$ derivadas de las vías, con función de costo $c(e)$
+	El grafo vial resultante $G = (V, E, \omega)$ tiene vértices $V$ correspondientes
+	a los nodos y aristas $E$ derivadas de las vías, con función de costo $\omega(e)$
 	definida por la distancia geográfica del segmento y la velocidad
 	permitida.  Para la zona urbana de La~Paz, B.C.S., el extracto de
 	Geofabrik contiene aproximadamente $10^4$~nodos y $10^4$~aristas
@@ -1144,7 +1254,7 @@ limitación del estudio.
 
 	\subsection{\textit{Contraction Hierarchies}}
 
-	Dado un grafo vial $G = (V, E, c)$, el cálculo de caminos mínimos
+	Dado un grafo vial $G = (V, E, \omega)$, el cálculo de caminos mínimos
 	mediante el algoritmo de \citet{Dijkstra1959}, implementado con
 	montículos de Fibonacci (una mejora posterior al trabajo original), tiene complejidad
 	$O(|E| + |V| \log |V|)$, lo que resulta prohibitivo para consultas
@@ -1164,16 +1274,16 @@ limitación del estudio.
 		\item Para cada par de vecinos $(u, w)$ de $v$, si el camino mínimo
 		      $u \to v \to w$ es el único camino óptimo entre $u$ y $w$ en el
 		      grafo residual, insertar una arista atajo
-		      (\textit{shortcut}) $(u, w)$ con peso $c(u,v) + c(v,w)$.
+		      (\textit{shortcut}) $(u, w)$ con peso $\omega(u,v) + \omega(v,w)$.
 	\end{enumerate}
 	El resultado es un grafo aumentado $G^+ = (V, E \cup E_{sc})$ donde
 	$E_{sc}$ es el conjunto de atajos.  Cada nodo recibe un nivel jerárquico
 	igual a su orden de contracción.
 
 	\paragraph{Consulta.}
-	Para encontrar el camino mínimo de $s$ a $t$, se ejecuta una
-	búsqueda bidireccional en $G^+$: desde $s$ hacia arriba en la
-	jerarquía (solo aristas hacia nodos de mayor nivel) y desde $t$ hacia
+	Para encontrar el camino mínimo de $v_a$ a $v_b$, se ejecuta una
+	búsqueda bidireccional en $G^+$: desde $v_a$ hacia arriba en la
+	jerarquía (solo aristas hacia nodos de mayor nivel) y desde $v_b$ hacia
 	arriba.  El camino óptimo pasa por el nodo de encuentro que minimiza la
 	suma de distancias parciales.  En la red vial de Europa occidental, con
 	unos 18 millones de nodos, las consultas toman menos de 1~ms
@@ -1202,7 +1312,7 @@ limitación del estudio.
 	El desacople entre preprocesamiento (offline, una sola vez) y consulta
 	(online, por época) es esencial para el simulador: la fase de contracción
 	se ejecuta una vez sobre el extracto cartográfico, y cada época $t$ del
-	algoritmo rolling horizon emite $O(|\mathcal{C}| \cdot |S|)$ consultas al
+	algoritmo rolling horizon emite $O(|\mathcal{C}| \cdot |\mathcal{B}_t|)$ consultas al
 	servidor, que se resuelven individualmente en tiempo constante amortizado.
 
 	La sustitución de la distancia euclidiana por tiempos OSRM tiene tres
@@ -1329,7 +1439,7 @@ limitación del estudio.
 
 	La Sección~2.1 introdujo las métricas primarias del MDRP definidas por
 	\citet{Reyes2018}: Click-to-Door, Ready-to-Pickup, Ready-to-Door,
-	utilización del courier y costo por orden.  La importancia operativa
+	utilización del repartidor y costo por orden.  La importancia operativa
 	de la métrica Click-to-Door ha sido reforzada por trabajos como el de
 	\citet{Hildebrandt2021}, quienes, citando estudios previos de servicio
 	al cliente, señalan que la desviación respecto al tiempo de servicio
@@ -1337,14 +1447,15 @@ limitación del estudio.
 	real, por lo que importan tanto la rapidez de la entrega como la
 	precisión de su estimación (ETA).  Para una evaluación
 	cuantitativa rigurosa, estas métricas individuales (por orden o por
-	courier) se agregan en estadísticos de resumen y se organizan en cinco
+	repartidor) se agregan en estadísticos de resumen y se organizan en cinco
 	familias que cubren las perspectivas de los actores del sistema.
 
 	\paragraph{Estadísticos de agregación.}
 	Para cada métrica a nivel de orden (e.g., $\text{CtD}_o$), se calculan:
 	\begin{itemize}
-		\item \textbf{Media} $\bar{m} = \frac{1}{n}\sum_{o=1}^n m_o$, que
-		      resume el comportamiento central.
+		\item \textbf{Media} $\bar{m} = \frac{1}{|\mathcal{O}_{del}|}\sum_{o \in \mathcal{O}_{del}} m_o$,
+		      donde $\mathcal{O}_{del} \subseteq \mathcal{O}$ es el conjunto de órdenes
+		      entregadas; resume el comportamiento central.
 		\item \textbf{Percentiles} $P_{50}$, $P_{90}$, $P_{95}$: el
 		      percentil~90 es particularmente relevante porque captura la
 		      experiencia de los clientes en la cola de la distribución, donde
@@ -1357,14 +1468,16 @@ limitación del estudio.
 	\begin{enumerate}
 		\item \textbf{Calidad de servicio.}  CtD (media, $P_{50}$, $P_{90}$,
 		      $P_{95}$), RtP (media, $P_{90}$), RtD (media, $P_{90}$), tasa de
-		      cumplimiento SLA:
+		      cumplimiento del SLA (\textit{Service Level Agreement}), es decir,
+		      el porcentaje de órdenes entregadas dentro del objetivo $\tau$ de
+		      \textit{Click-to-Door}:
 		      \begin{equation}
-				\text{SLA} = \frac{|\{o : \text{CtD}_o \leq \tau\}|}{|\mathcal{O}_{del}|}
+				\text{SLA} = \frac{|\{o \in \mathcal{O}_{del} : \text{CtD}_o \leq \tau\}|}{|\mathcal{O}_{del}|}
 				\times 100\%
 				\label{eq:sla}
 		      \end{equation}
 		      y exceso promedio respecto al objetivo
-		      $\bar{\Delta} = \frac{1}{n}\sum_o \max(0, \text{CtD}_o - \tau)$.
+		      $\bar{E} = \frac{1}{|\mathcal{O}_{del}|}\sum_{o \in \mathcal{O}_{del}} \max(0, \text{CtD}_o - \tau)$.
 
 		\item \textbf{Cobertura.}  Fracción de órdenes no entregadas al cierre
 		      de la simulación.
@@ -1627,7 +1740,7 @@ services:
 	\texttt{main.py}                & Motor de simulación por épocas \\
 	\texttt{getrouteOSMR.py}        & Cliente HTTP para OSRM \\
 	\texttt{bundling.py}            & Generación de agrupamientos por restaurante \\
-	\texttt{asignaciontentativa.py} & Asignación courier-agrupamiento (Algoritmo Húngaro) \\
+	\texttt{asignaciontentativa.py} & Asignación repartidor-agrupamiento (Algoritmo Húngaro) \\
 	\bottomrule
 	\end{tabular}
 	\end{table}
@@ -1652,8 +1765,8 @@ services:
 	Penalización de frescura       & $\beta$       & 0.1    & Peso del retraso en asignación \\
 	Penalización de pickup         & $\theta$      & 0.1    & Peso del retraso en recolección \\
 	Ventana de ready time          & $\Delta_1$    & 20 min & Anticipación de órdenes listas \\
-	Ventana de disponibilidad      & $\Delta_2$    & 20 min & Anticipación de couriers libres \\
-	Compromiso forzado             & $x$           & 10 min & Forzado si orden espera $>x$ \\
+	Ventana de disponibilidad      & $\Delta_2$    & 20 min & Anticipación de repartidores libres \\
+	Compromiso forzado             & $\Delta_x$    & 10 min & Forzado si orden espera $>\Delta_x$ \\
 	Pago por orden                 & $p_1$         & \$10   & Compensación variable \\
 	Pago mínimo por hora           & $p_2$         & \$15/h & Compensación garantizada \\
 	\bottomrule
@@ -1671,7 +1784,7 @@ services:
 		completo: invoca al generador de instancias sintéticas (\texttt{make\_synth\_orders.py}) 
 		cuando se requieren múltiples semillas, ejecuta las simulaciones FCFS y \textit{Rolling Horizon},
 		calcula 21 KPIs comparativos y consolida los resultados. Define cuatro niveles de 
-		relación órdenes/courier (18:1, 26:1, 35:1 y 52:1), ejecuta ambas políticas en cada 
+		relación órdenes/repartidor (18:1, 26:1, 35:1 y 52:1), ejecuta ambas políticas en cada 
 		escenario, y genera tablas consolidadas (\texttt{experiment\_comparison.csv}, 
 		\texttt{experiment\_summary.csv}) así como metadatos de la ejecución del experimento
 		(\texttt{experiment\_metadata.json}). Adicionalmente, soporta la ejecución con múltiples 
@@ -1715,12 +1828,12 @@ services:
 	habituales en México (Sección~2.4.2).
 
 	El perfil de intensidad se discretiza en intervalos de un minuto sobre la ventana operativa de 
-	11 horas (08:00--19:00, $T = 660$ min). Aplicando la aproximación por discretización descrita 
+	11 horas (08:00--19:00, $H = 660$ min). Aplicando la aproximación por discretización descrita 
 	en §2.4.1, para cada minuto $t$ el número de órdenes generadas se muestrea de una distribución 
 	de Poisson con parámetro $\lambda(t)$:
 
 	\begin{equation}
-		N(t) \sim \text{Poisson}\!\left(\lambda(t)\right), \quad t = 0, 1, \ldots, T-1
+		N_t \sim \text{Poisson}\!\left(\lambda(t)\right), \quad t = 0, 1, \ldots, H-1
 	\end{equation}
 
 	El perfil se escala linealmente para que el total esperado de órdenes coincida con el objetivo 
@@ -1746,12 +1859,12 @@ services:
 	preparación irrealistamente cortos. El \textit{ready time} de cada orden se calcula como:
 
 	\begin{equation}
-		t_{ready} = t_{created} + T_{prep}
+		e_o = a_o + T_{prep}
 	\end{equation}
 
-	\noindent donde $t_{created} = a_o$ es el instante de colocación de la orden 
-	(\texttt{placement\_time}). Este ready time constituye una restricción dura en el modelo de simulación: ningún courier puede
-	recoger la orden antes de $t_{ready}$, conforme a la definición del MDRP en 
+	\noindent donde $a_o$ es el instante de colocación de la orden
+	(\texttt{placement\_time}) y $e_o$ su \textit{ready time}. Este ready time constituye una restricción dura en el modelo de simulación: ningún repartidor puede
+	recoger la orden antes de $e_o$, conforme a la definición del MDRP en 
 	\citet{Reyes2018}.
 
 	\subsection{Distribución geoespacial}
@@ -1805,34 +1918,35 @@ services:
 
 	El módulo \texttt{synth\_loader.py} transforma el CSV de órdenes generado en objetos de 
 	simulación (\texttt{Order}, \texttt{Courier}, \texttt{Restaurant}) y calcula automáticamente 
-	el tamaño de la flota de couriers. La fórmula de dimensionamiento es:
+	el tamaño de la flota de repartidores. La fórmula de dimensionamiento es:
 
 	\begin{equation}
-		n_{couriers} = \max\!\left(n_{min}, \; \left\lceil \frac{|\mathcal{O}|}{r} \right\rceil\right)
+		|\mathcal{C}| = \max\!\left(n_{\min}, \; \left\lceil \frac{|\mathcal{O}|}{\rho} \right\rceil\right)
 		\label{eq:fleet_sizing}
 	\end{equation}
 
-	\noindent donde $|\mathcal{O}|$ es el número total de órdenes, $r$ es el ratio objetivo de
-	órdenes por courier (\texttt{orders\_per\_courier}, por defecto $r = 18$), y $n_{min}$ es un
-	piso mínimo de flota (\texttt{min\_couriers}, $n_{min} = 10$ en los experimentos del
+	\noindent donde $|\mathcal{C}|$ es el tamaño de la flota, $|\mathcal{O}|$ el número total de
+	órdenes, $\rho$ el ratio objetivo de órdenes por repartidor
+	(\texttt{orders\_per\_courier}, por defecto $\rho = 18$), y $n_{\min}$ es un
+	piso mínimo de flota (\texttt{min\_couriers}, $n_{\min} = 10$ en los experimentos del
 	Capítulo~4; el valor por defecto del módulo \texttt{synth\_loader.py} es 15 y
 	se sobrescribe a 10 desde \texttt{run\_experiments.py}). Este mecanismo
-	permite variar el nivel de saturación de la flota: valores altos de $r$ producen
-	flotas más pequeñas y mayor carga por courier, mientras que valores bajos generan flotas 
+	permite variar el nivel de saturación de la flota: valores altos de $\rho$ producen
+	flotas más pequeñas y mayor carga por repartidor, mientras que valores bajos generan flotas 
 	holgadas con baja utilización.
 
 	\subsubsection{Configuración de turnos}
 
-	Todos los couriers comparten un turno uniforme que se calcula a partir de los datos:
+	Todos los repartidores comparten un turno uniforme que se calcula a partir de los datos:
 
 	\begin{itemize}
 		\item \textbf{Inicio del turno:} 15 minutos antes de la primera orden colocada, 
-		permitiendo que los couriers estén disponibles cuando arriben las primeras solicitudes.
+		permitiendo que los repartidores estén disponibles cuando arriben las primeras solicitudes.
 		
 		\item \textbf{Fin del turno:} 1 hora después del último \textit{ready time}, 
 		garantizando tiempo suficiente para completar las entregas finales.
 		
-		\item \textbf{Ubicación inicial:} Todos los couriers parten del centroide geográfico 
+		\item \textbf{Ubicación inicial:} Todos los repartidores parten del centroide geográfico 
 		de los restaurantes, representando un punto de espera central antes de la primera 
 		asignación.
 	\end{itemize}
@@ -1859,8 +1973,8 @@ services:
 	se ejecuta:
 
 	\begin{enumerate}
-		\item \textbf{Activación de couriers:} Se recorre la lista completa de couriers y se incorporan 
-		al conjunto de couriers activos $\mathcal{C}_{act}$ aquellos cuyo \textit{on-time} 
+		\item \textbf{Activación de repartidores:} Se recorre la lista completa de repartidores y se incorporan 
+		al conjunto de repartidores activos $\mathcal{C}_{act}$ aquellos cuyo \textit{on-time} 
 		$e_c \leq t$:
 		\begin{equation}
 			\mathcal{C}_{act}(t) = \{c \in \mathcal{C} \mid e_c \leq t\}
@@ -1877,24 +1991,24 @@ services:
 		de política se realiza en tiempo de ejecución, permitiendo ejecutar ambas sobre la misma 
 		instancia sin modificar código.
 
-		\item \textbf{Actualización de rutas:} Se verifica si algún courier ha completado su ruta 
+		\item \textbf{Actualización de rutas:} Se verifica si algún repartidor ha completado su ruta 
 		activa ($t \geq t_{completion}$). Para rutas finalizadas, se registran los tiempos de 
-		pickup y delivery de cada orden ---calculados con la temporización de la
-		Sección~\ref{sec:temporizacion}---, se actualiza la ubicación del courier al último waypoint, 
-		se acumulan distancia y tiempo de conducción, y se libera al courier para futuras 
+		pickup y delivery de cada orden (calculados con la temporización de la
+		Sección~\ref{sec:temporizacion}), se actualiza la ubicación del repartidor al último waypoint, 
+		se acumulan distancia y tiempo de conducción, y se libera al repartidor para futuras 
 		asignaciones.
 	\end{enumerate}
 
 	Finalmente, el reloj avanza $t \leftarrow t + f$ y el ciclo se repite. Al terminar la 
-	simulación, se calcula la compensación final de cada courier.
+	simulación, se calcula la compensación final de cada repartidor.
 
-	Como la actualización ocurre después de la asignación, un courier que termina su ruta en el
+	Como la actualización ocurre después de la asignación, un repartidor que termina su ruta en el
 	intervalo $(t - f, t]$ se libera en la actualización de la época $t$ y recibe su siguiente
 	ruta en la época $t + f$: entre el fin de una ruta y el inicio de la siguiente transcurren
 	entre 5 y 10~min.  Esta espera afecta más a la política que realiza más viajes; su efecto
 	sobre los resultados se discute en la Sección~\ref{sec:limitaciones_resultados}.
 
-	\subsection{Modelos de datos: órdenes, couriers y restaurantes}
+	\subsection{Modelos de datos: órdenes, repartidores y restaurantes}
 
 	El motor define tres clases que encapsulan el estado de las entidades durante la simulación:
 
@@ -1903,8 +2017,8 @@ services:
 		\texttt{dropoff\_loc}, el restaurante de origen, y campos mutables: \texttt{status} 
 		(\texttt{pending} $\to$ \texttt{ready} $\to$ \texttt{assigned} $\to$ \texttt{delivered}), 
 		\texttt{pickup\_time}, \texttt{delivery\_time}, \texttt{courier\_id} y \texttt{bundle\_size}. Expone métodos 
-		para calcular el Click-to-Door ($\text{CtD} = t_{delivery} - t_{placement}$) y el 
-		Ready-to-Pickup ($\text{RtP} = t_{pickup} - t_{ready}$).
+		para calcular el Click-to-Door ($\text{CtD}_o = t_{delivery,o} - a_o$) y el 
+		Ready-to-Pickup ($\text{RtP}_o = t_{pickup,o} - e_o$).
 
 		\item \textbf{Courier:} Almacena \texttt{on\_time}, \texttt{off\_time}, ubicación actual, 
 		ruta activa (\texttt{current\_route}) e historial de rutas completadas. Acumula métricas 
@@ -1912,10 +2026,11 @@ services:
 		tiempo de servicio (min) y agrupamientos recogidos. El método \texttt{final\_compensation()} implementa el modelo 
 		de pago dual:
 		\begin{equation}
-			\text{Compensación} = \max\!\left(p_1 \cdot n_{orders}, \;\; p_2 \cdot h_{shift}\right)
+			\text{Pago}(c) = \max\!\left(p_1 \cdot n_c, \;\; p_2 \cdot h_c\right)
 			\label{eq:compensation}
 		\end{equation}
-		donde $p_1 = \$10$/orden, $p_2 = \$15$/h, y $h_{shift}$ es la duración del turno en horas.
+		donde $n_c$ es el número de órdenes entregadas por el repartidor~$c$, $h_c$ la
+		duración de su turno en horas, $p_1 = \$10$/orden y $p_2 = \$15$/h.
 
 		\item \textbf{Restaurant:} Almacena identificador, ubicación $(lat, lon)$ y la lista 
 		de órdenes pendientes. Sirve como punto de agrupación para el módulo de 
@@ -1934,23 +2049,23 @@ services:
 		al sistema y está disponible para asignación. Se registra en la lista de órdenes 
 		pendientes de su restaurante.
 
-		\item \texttt{assigned}: La orden ha sido asignada a un courier y forma parte de su
+		\item \texttt{assigned}: La orden ha sido asignada a un repartidor y forma parte de su
 		ruta activa. En la política FCFS, esta transición ocurre de forma explícita al
-		seleccionar al courier más cercano. En la política \textit{Rolling Horizon}, la transición
+		seleccionar al repartidor más cercano. En la política \textit{Rolling Horizon}, la transición
 		ocurre cuando el agrupamiento recibe un compromiso final; a partir de ese momento la
 		orden ya no puede incluirse en otro agrupamiento.
 
-		\item \texttt{delivered}: Un courier ha completado la entrega. Se registran 
-		$t_{pickup}$ y $t_{delivery}$, y la orden se mueve a la lista de órdenes entregadas 
+		\item \texttt{delivered}: Un repartidor ha completado la entrega. Se registran 
+		$t_{pickup,o}$ y $t_{delivery,o}$, y la orden se mueve a la lista de órdenes entregadas 
 		para el cálculo posterior de KPIs.
 	\end{enumerate}
 
 	Las transiciones \texttt{pending} $\to$ \texttt{ready} ocurren en la fase de revelación
 	de cada época. La transición \texttt{ready} $\to$ \texttt{assigned} ocurre en la fase de
 	asignación, y la transición \texttt{assigned} $\to$ \texttt{delivered} ocurre en la fase de
-	actualización, cuando el courier completa su ruta.  Bajo la política \textit{Rolling Horizon}
+	actualización, cuando el repartidor completa su ruta.  Bajo la política \textit{Rolling Horizon}
 	con compromiso parcial (inbound, véase Sección~3.5.4), la orden permanece en
-	\texttt{ready} mientras el courier se desplaza al restaurante: solo transita a
+	\texttt{ready} mientras el repartidor se desplaza al restaurante: solo transita a
 	\texttt{assigned} cuando el compromiso final se concreta en una época posterior,
 	preservando así la flexibilidad de reoptimizar el agrupamiento.
 
@@ -1959,18 +2074,19 @@ services:
 
 	Ambas políticas calculan los instantes de recolección y entrega con las reglas de
 	\citet{Reyes2018} (Sección~2.1.3), implementadas en el módulo \texttt{schedule.py}.  Una ruta
-	final asignada en el instante $t$ recorre la ubicación del courier, el restaurante $r$ y los
-	clientes $\ell_{o_1}, \ldots, \ell_{o_n}$ del agrupamiento, en ese orden.  Sean $T_0$ la duración
-	OSRM del tramo courier $\to r$ y $T_k$ la del tramo que llega al cliente $k$.  Entonces:
+	final asignada al repartidor $c$ en el instante $t$ recorre la ubicación del repartidor, el
+	restaurante $r$ y los clientes $\ell_{o_1}, \ldots, \ell_{o_n}$ del agrupamiento $B$
+	($n = |B|$), en ese orden.  Sean $T_0$ la duración
+	OSRM del tramo repartidor $\to r$ y $T_k$ la del tramo que llega al cliente $k$.  Entonces:
 
 	\begin{align}
 		t_{arr,r}   &= t + T_0, \\
-		t_{pickup}  &= \max\!\Bigl(\max_{o \in B} e_o,\; t_{arr,r} + \tfrac{s_r}{2}\Bigr), \\
-		t_{del,o_1} &= t_{pickup} + \tfrac{s_r}{2} + T_1 + \tfrac{s_o}{2}, \\
-		t_{del,o_k} &= t_{del,o_{k-1}} + \tfrac{s_o}{2} + T_k + \tfrac{s_o}{2}, \quad k = 2, \ldots, n,
+		t_{pickup}(c,B) &= \max\!\Bigl(e_B,\; t_{arr,r} + \tfrac{s_r}{2}\Bigr), \\
+		t_{delivery,o_1} &= t_{pickup}(c,B) + \tfrac{s_r}{2} + T_1 + \tfrac{s_o}{2}, \\
+		t_{delivery,o_k} &= t_{delivery,o_{k-1}} + \tfrac{s_o}{2} + T_k + \tfrac{s_o}{2}, \quad k = 2, \ldots, n,
 	\end{align}
 
-	\noindent y el courier queda libre en $t_{del,o_n} + s_o/2$.  Si la comida no está lista
+	\noindent y el repartidor queda libre en $t_{delivery,o_n} + s_o/2$.  Si la comida no está lista
 	cuando el repartidor llega, este espera en el restaurante.  En consecuencia, ninguna orden se
 	recoge antes de su \textit{ready time} ni se entrega antes de recogerse, y cada orden de un
 	agrupamiento tiene su propio instante de entrega.  Las mismas expresiones alimentan el peso de
@@ -2003,51 +2119,51 @@ services:
 
 	La política \textit{First-Come, First-Served} (FCFS) sirve como línea base contra la cual se
 	evalúa el desempeño de la política \textit{Rolling Horizon}. Implementa una lógica de despacho reactiva 
-	sin agrupamiento ni optimización global: cada orden se asigna individualmente al courier 
+	sin agrupamiento ni optimización global: cada orden se asigna individualmente al repartidor 
 	disponible más cercano en el momento de la decisión.
 
 	\subsection{Lógica de asignación}
 
 	En cada época de asignación, la política FCFS toma todas las órdenes reveladas que aún no
-	tienen courier (estado \texttt{ready}), sin importar si la comida ya está lista, las ordena
+	tienen repartidor (estado \texttt{ready}), sin importar si la comida ya está lista, las ordena
 	por instante de colocación $a_o$ y ejecuta para cada una el siguiente procedimiento.  En
 	la práctica, cada orden se despacha en la primera época posterior a su colocación en la que
-	haya un courier libre:
+	haya un repartidor libre:
 
 	\begin{enumerate}
-		\item \textbf{Filtrar couriers disponibles:} Se construye el conjunto de couriers sin ruta 
+		\item \textbf{Filtrar repartidores disponibles:} Se construye el conjunto de repartidores sin ruta 
 		activa cuyo turno no haya expirado:
 		\begin{equation}
 			\mathcal{C}_{disp}(t) = \{c \in \mathcal{C}_{act}(t) \mid c.\textit{current\_route} = \varnothing 
 			\;\wedge\; l_c > t\}
 		\end{equation}
-		donde $l_c$ es el fin del turno del courier (\texttt{off\_time}).
+		donde $l_c$ es el fin del turno del repartidor (\texttt{off\_time}).
 
-		\item \textbf{Selección por proximidad:} Para cada courier disponible se calcula la distancia
+		\item \textbf{Selección por proximidad:} Para cada repartidor disponible se calcula la distancia
 		euclidiana a la ubicación del restaurante de la orden:
 		\begin{equation}
 			d(c, o) = \sqrt{(\phi_c - \phi_r)^2 + (\psi_c - \psi_r)^2}
 		\end{equation}
-		donde $(\phi_c, \psi_c)$ es la ubicación actual del courier y $(\phi_r, \psi_r)$ la del
+		donde $(\phi_c, \psi_c)$ es la ubicación actual del repartidor y $(\phi_r, \psi_r)$ la del
 		restaurante. Se selecciona $c^* = \arg\min_{c \in \mathcal{C}_{disp}} d(c, o)$.
 		Esta expresión opera en grados sobre la latitud y longitud y se usa
-		únicamente como ordenador para elegir al courier; el tiempo de viaje
+		únicamente como ordenador para elegir al repartidor; el tiempo de viaje
 		efectivo se obtiene a continuación con OSRM.
 
 		\item \textbf{Consulta de ruta:} Se solicita a OSRM la ruta completa 
-		$c^*.\textit{location} \to r_o \to \ell_o$, donde $r_o$ es la ubicación del restaurante 
+		$c^*.\textit{location} \to \ell_{r_o} \to \ell_o$, donde $\ell_{r_o}$ es la ubicación del restaurante 
 		y $\ell_o$ el punto de entrega del cliente.  Los instantes de recolección y entrega se
-		calculan con la temporización de la Sección~\ref{sec:temporizacion}: si el courier llega
+		calculan con la temporización de la Sección~\ref{sec:temporizacion}: si el repartidor llega
 		antes de que la comida esté lista, espera en el restaurante.
 
-		\item \textbf{Compromiso inmediato:} Se asigna la ruta al courier como compromiso 
+		\item \textbf{Compromiso inmediato:} Se asigna la ruta al repartidor como compromiso 
 		\texttt{final} (sin etapa parcial) y la orden pasa al estado \texttt{assigned}.  El
-		courier queda ocupado hasta salir del domicilio del cliente.
+		repartidor queda ocupado hasta salir del domicilio del cliente.
 	\end{enumerate}
 
 	Al procesarse en orden de colocación, las órdenes más antiguas obtienen primero los
-	couriers más cercanos, que es el criterio \textit{first-come, first-served}.  Las órdenes
-	que no encuentran courier libre permanecen en espera y se reintentan en la época siguiente.
+	repartidores más cercanos, que es el criterio \textit{first-come, first-served}.  Las órdenes
+	que no encuentran repartidor libre permanecen en espera y se reintentan en la época siguiente.
 
 	\subsection{Características y limitaciones}
 
@@ -2056,7 +2172,7 @@ services:
 
 	\begin{itemize}
 		\item \textbf{Sin agrupamiento:} Cada orden genera una ruta individual 
-		(\texttt{bundle\_size} = 1). El courier viaja al restaurante, recoge una sola orden 
+		(\texttt{bundle\_size} = 1). El repartidor viaja al restaurante, recoge una sola orden 
 		y la entrega antes de quedar disponible para la siguiente asignación.
 
 		\item \textbf{Sin optimización de matching:} La asignación se basa únicamente en 
@@ -2064,7 +2180,7 @@ services:
 		$\Delta_u$, la frescura de las órdenes, ni la carga futura del sistema.
 
 		\item \textbf{Compromiso directo:} No existe la etapa de compromiso parcial 
-		(\textit{tentative assignment}). El courier se compromete de inmediato con la ruta 
+		(\textit{tentative assignment}). El repartidor se compromete de inmediato con la ruta 
 		completa pickup $\to$ delivery.
 
 		\item \textbf{Activación:} La política se activa estableciendo la variable de entorno
@@ -2073,8 +2189,8 @@ services:
 	\end{itemize}
 
 	Estas simplificaciones hacen de FCFS una línea base reactiva.  Como RH difiere de FCFS en
-	varios mecanismos a la vez ---agrupamiento, asignación global, horizonte de anticipación,
-	compromiso en dos etapas y grupos de prioridad---, la comparación evalúa las políticas
+	varios mecanismos a la vez (agrupamiento, asignación global, horizonte de anticipación,
+	compromiso en dos etapas y grupos de prioridad), la comparación evalúa las políticas
 	completas y no atribuye la mejora a un mecanismo en particular.
 
 	\section{Política \textit{Rolling Horizon}}
@@ -2082,7 +2198,7 @@ services:
 	La política de \textit{Rolling Horizon} (RH) constituye la heurística central de este
 	trabajo, basada en el marco propuesto por \citet{Reyes2018}. A diferencia de FCFS, RH
 	agrupa órdenes del mismo restaurante en agrupamientos (\textit{bundles}), resuelve un
-	problema de asignación bipartita courier-agrupamiento mediante el Algoritmo Húngaro, y 
+	problema de asignación bipartita repartidor-agrupamiento mediante el Algoritmo Húngaro, y 
 	emplea un esquema de compromiso en dos etapas que permite reoptimizar asignaciones entre 
 	épocas. Esta sección describe los cuatro componentes secuenciales que se ejecutan en cada 
 	época de asignación.
@@ -2090,29 +2206,29 @@ services:
 	\subsection{Cálculo del tamaño objetivo de agrupamiento}
 
 	Al inicio de cada época, el sistema estima el tamaño objetivo de agrupamiento $Z_t$ como 
-	el ratio entre las órdenes próximas a estar listas y los couriers que estarán disponibles 
+	el ratio entre las órdenes próximas a estar listas y los repartidores que estarán disponibles 
 	en el horizonte inmediato \citep{Reyes2018}:
 
 	\begin{equation}
-		Z_t = \left\lceil \frac{|\{o \in \mathcal{O}(t) : t_{ready}(o) \leq t + \Delta_1\}|}
+		Z_t = \left\lceil \frac{|\{o \in \mathcal{O}_t : e_o \leq t + \Delta_1\}|}
 		{|\{c \in \mathcal{C}_{turno}(t) : e^{avail}_c \leq t + \Delta_2\}|} \right\rceil
 		\label{eq:target_bundle}
 	\end{equation}
 
-	\noindent donde $\mathcal{O}(t)$ es el conjunto de órdenes reveladas al tiempo $t$ 
-	(estado \texttt{ready}), $\mathcal{C}_{turno}(t)$ es el conjunto de couriers activos cuyo
-	turno se extiende al menos $\Delta_u$ más allá de $t$ ---libres u ocupados---,
-	$e^{avail}_c$ es el instante en que el courier~$c$ queda
+	\noindent donde $\mathcal{O}_t$ es el conjunto de órdenes reveladas al tiempo $t$ 
+	(estado \texttt{ready}), $\mathcal{C}_{turno}(t)$ es el conjunto de repartidores activos cuyo
+	turno se extiende al menos $\Delta_u$ más allá de $t$ (libres u ocupados),
+	$e^{avail}_c$ es el instante en que el repartidor~$c$ queda
 	libre (fin de ruta actual, o $t$ si está inactivo),
 	$\Delta_1 = 20$~min es el horizonte de anticipación para órdenes listas 
-	y $\Delta_2 = 20$~min es el horizonte para disponibilidad de couriers. El valor se acota 
+	y $\Delta_2 = 20$~min es el horizonte para disponibilidad de repartidores. El valor se acota 
 	superiormente por \texttt{MAX\_TARGET\_BUNDLE\_SIZE} $= 5$ para evitar agrupamientos 
-	irrealistamente grandes bajo picos de demanda. Si no hay couriers disponibles en el 
-	horizonte, se utiliza cualquier courier activo en turno como denominador de respaldo; si 
-	aun así no hay couriers, $Z_t = 1$.
+	irrealistamente grandes bajo picos de demanda. Si no hay repartidores disponibles en el 
+	horizonte, se utiliza cualquier repartidor activo en turno como denominador de respaldo; si 
+	aun así no hay repartidores, $Z_t = 1$.
 
 	Este indicador adapta dinámicamente la consolidación de órdenes al nivel de saturación 
-	instantáneo: cuando la demanda supera la oferta de couriers, $Z_t$ crece y se forman 
+	instantáneo: cuando la demanda supera la oferta de repartidores, $Z_t$ crece y se forman 
 	agrupamientos más grandes; cuando hay holgura, $Z_t \to 1$ y el comportamiento converge 
 	hacia asignaciones individuales similares a FCFS.
 
@@ -2125,15 +2241,16 @@ services:
 	\begin{enumerate}
 		\item \textbf{Filtrado:} Se seleccionan las órdenes del restaurante con estado 
 		\texttt{ready} cuyo \textit{ready time} cae dentro del horizonte de asignación 
-		($t_{ready} \leq t + \Delta_u$).
+		($e_o \leq t + \Delta_u$, es decir, $o \in U_t$).
 
-		\item \textbf{Inicialización:} Se ordenan las órdenes por $t_{ready}$ ascendente y se 
+		\item \textbf{Inicialización:} Se ordenan las órdenes por $e_o$ ascendente y se 
 		crean $m_r$ agrupamientos vacíos, donde:
 		\begin{equation}
-			m_r = \min\!\left(\left\lceil \frac{n_{orders}}{Z_t} \right\rceil, \; 
-			|\mathcal{C}_{disp}|\right)
+			m_r = \min\!\left(\left\lceil \frac{|U_{t,r}|}{Z_t} \right\rceil, \; 
+			|\mathcal{C}_{disp}(t)|\right)
 		\end{equation}
-		garantizando que no se generen más agrupamientos que couriers disponibles.
+		donde $U_{t,r}$ es el conjunto de órdenes filtradas del restaurante~$r$,
+		garantizando que no se generen más agrupamientos que repartidores disponibles.
 
 		\item \textbf{Inserción:} Para cada orden, se evalúan todas las posiciones de inserción 
 		en todos los agrupamientos existentes. El costo de cada inserción candidata se calcula 
@@ -2170,10 +2287,10 @@ services:
 		\item Grupo~i (urgente): El tiempo de entrega más temprano posible excede
 		$a_o + \tau$ para la orden más antigua del agrupamiento, donde $a_o$ es el
 		\textit{placement time} y $\tau = 40$~min es el objetivo de \textit{Click-to-Door}. Ningún
-		courier puede cumplir la meta de servicio.
+		repartidor puede cumplir la meta de servicio.
 
 		\item Grupo~ii (retrasado): El agrupamiento no pertenece al Grupo~i, pero
-		ningún courier puede llegar al restaurante antes del \textit{ready time} del
+		ningún repartidor puede llegar al restaurante antes del \textit{ready time} del
 		agrupamiento. Existe retraso en la recolección pero la meta de entrega aún es
 		alcanzable.
 
@@ -2182,33 +2299,35 @@ services:
 	\end{itemize}
 
 	La asignación se resuelve en tres rondas secuenciales (i $\to$ ii $\to$ iii),
-	priorizando los agrupamientos más urgentes. En cada ronda, se construye una matriz de 
-	costos $\mathbf{W} \in \mathbb{R}^{|\mathcal{C}_{disp}| \times |B_g|}$ donde cada 
+	priorizando los agrupamientos más urgentes. En cada ronda $g$, se construye una matriz de 
+	costos $\mathbf{W} \in \mathbb{R}^{|\mathcal{C}_{disp}(t)| \times |\mathcal{B}_g|}$, donde
+	$\mathcal{B}_g$ es el conjunto de agrupamientos del grupo, y cada
 	entrada es el peso de matching:
 
 	\begin{equation}
 	\begin{aligned}
-		w_{cj} ={} & \frac{|B_j|}{T_{delivery}(c, B_j)} \\
-		           & - \theta \cdot \bigl(t_{pickup}(c, B_j) - t_{ready}(B_j)\bigr) - P_g
+		w_{c,B} ={} & \frac{|B|}{T_{delivery}(c, B)} \\
+		           & - \theta \cdot \bigl(t_{pickup}(c, B) - e_B\bigr) - P_g
 	\end{aligned}
 	\label{eq:matching_weight}
 	\end{equation}
 
-	\noindent donde $|B_j|$ es el número de órdenes en el agrupamiento $j$, 
-	$T_{delivery}(c, B_j)$ es el tiempo total de entrega en horas, 
-	$t_{pickup}(c, B_j)$ es el tiempo estimado de recolección, $t_{ready}(B_j)$ es el 
+	\noindent donde $|B|$ es el número de órdenes en el agrupamiento $B \in \mathcal{B}_g$,
+	$T_{delivery}(c, B) = \max_{o \in B} t_{delivery,o}(c,B) - e^{avail}_c$ es el tiempo
+	total de entrega en horas (el denominador de la Ec.~\ref{eq:matching_theory}),
+	$t_{pickup}(c, B)$ es el instante estimado de recolección, $e_B$ es el
 	máximo \textit{ready time} del agrupamiento, $\theta = 0.1$ penaliza el retraso en 
 	la recolección, y $P_g$ es una penalización de prioridad que refuerza la separación
-	entre grupos: $P_g = 100$ si el par $(c, B_j)$ excede $\tau_{max}$,
+	entre grupos: $P_g = 100$ si el par $(c, B)$ excede $\tau_{max}$,
 	$P_g = 50$ si presenta retraso en la recolección, y $P_g = 0$ en caso contrario. Si un par 
-	courier-agrupamiento es infactible (sin ruta OSRM), se asigna un costo prohibitivo 
+	repartidor-agrupamiento es infactible (sin ruta OSRM), se asigna un costo prohibitivo 
 	($10^9$).
 
-	La matriz se convierte a costos ($c_{ij} = -w_{cj}$) y se resuelve mediante
+	La matriz se convierte a costos ($-\mathbf{W}$) y se resuelve mediante
 	\texttt{scipy.optimize.linear\_sum\_assignment} (SciPy 1.13), que resuelve el problema de
 	asignación de forma exacta con una variante del algoritmo de Jonker--Volgenant, de complejidad
 	$O(n^3)$.  Como el Algoritmo Húngaro \citep{Kuhn1955}, obtiene una asignación de costo mínimo;
-	por brevedad, en este documento se le llama Algoritmo Húngaro.  Los couriers asignados a celdas con costo prohibitivo se descartan.
+	por brevedad, en este documento se le llama Algoritmo Húngaro.  Los repartidores asignados a celdas con costo prohibitivo se descartan.
 
 	\subsection{Compromiso en dos etapas}
 
@@ -2218,23 +2337,22 @@ services:
 
 	\begin{enumerate}
 		\item \textbf{Excepción de espera prolongada:} Si alguna orden del agrupamiento lleva 
-		lista más de $x = 10$~min ($t - t_{ready}(o) > x$), se fuerza un compromiso 
+		lista más de $\Delta_x = 10$~min ($t - e_o > \Delta_x$), se fuerza un compromiso 
 		\texttt{final} independientemente de las demás condiciones. Esto evita que órdenes 
 		queden indefinidamente sin asignar.
 
-		\item \textbf{Compromiso final:} Si el courier puede llegar al restaurante dentro de 
+		\item \textbf{Compromiso final:} Si el repartidor puede llegar al restaurante dentro de 
 		la época actual ($t_{arr,r} \leq t + f$, con la duración OSRM del tramo
-		courier $\to$ restaurante) \textbf{y} todas las órdenes del 
-		agrupamiento estarán listas dentro de la época ($t_{ready}(o) \leq t + f, \;\forall 
-		o \in B$), se asigna la ruta completa: 
-		courier $\to$ restaurante $\to$ entrega$_1$ $\to \cdots \to$ entrega$_n$, con los
-		tiempos de la Sección~\ref{sec:temporizacion}. El courier queda comprometido hasta
+		repartidor $\to$ restaurante) \textbf{y} todas las órdenes del 
+		agrupamiento estarán listas dentro de la época ($e_o \leq t + f, \;\forall o \in B$), se asigna la ruta completa: 
+		repartidor $\to$ restaurante $\to$ entrega$_1$ $\to \cdots \to$ entrega$_n$, con los
+		tiempos de la Sección~\ref{sec:temporizacion}. El repartidor queda comprometido hasta
 		salir del domicilio del último cliente.
 
 		\item \textbf{Compromiso parcial:} Si no se cumplen las condiciones anteriores, se
-		asigna únicamente la ruta \textit{inbound} (courier $\to$ restaurante). El courier 
+		asigna únicamente la ruta \textit{inbound} (repartidor $\to$ restaurante). El repartidor 
 		comienza a desplazarse hacia el restaurante, pero en la siguiente época el sistema 
-		puede reoptimizar la asignación: actualizar el agrupamiento, cambiar de courier, o 
+		puede reoptimizar la asignación: actualizar el agrupamiento, cambiar de repartidor, o 
 		añadir/quitar órdenes.
 
 		\item \textbf{Ignorar:} Si no es posible calcular una ruta inbound 
@@ -2243,7 +2361,7 @@ services:
 	\end{enumerate}
 
 	Este mecanismo \textit{lazy} de compromiso evita fijar prematuramente rutas con 
-	información parcial. Un courier con compromiso parcial aparece como ocupado 
+	información parcial. Un repartidor con compromiso parcial aparece como ocupado 
 	(\texttt{current\_route} $\neq \varnothing$), pero al completar su tramo inbound en la 
 	fase de actualización, queda libre de nuevo, ubicado en el restaurante. En la práctica, esto proporciona una ventana 
 	de tiempo adicional para que más órdenes se revelen y puedan consolidarse en un 
@@ -2286,10 +2404,10 @@ services:
 
 	\subsection{Variable de tratamiento: saturación de flota}
 
-	La variable independiente es la \emph{razón de saturación} $r$, definida como el
-	número objetivo de pedidos por repartidor.  A partir de $r$ se dimensiona la flota
+	La variable independiente es la \emph{razón de saturación} $\rho$, definida como el
+	número objetivo de pedidos por repartidor.  A partir de $\rho$ se dimensiona la flota
 	según la Ecuación~\ref{eq:fleet_sizing}, manteniendo fijo el volumen de pedidos
-	$|\mathcal{O}|$.  Un valor alto de $r$ produce una flota reducida con alta carga
+	$|\mathcal{O}|$.  Un valor alto de $\rho$ produce una flota reducida con alta carga
 	individual, mientras que un valor bajo genera capacidad holgada.
 
 	\subsection{Escenarios}
@@ -2305,9 +2423,9 @@ services:
 		\label{tab:scenarios}
 		\begin{tabular}{clcrl}
 			\toprule
-			Escenario & Nivel    & $r$ & $|\mathcal{C}|$ & Descripción \\
+			Escenario & Nivel    & $\rho$ & $|\mathcal{C}|$ & Descripción \\
 			\midrule
-			S1 & Baja     & 18 & 58 & Línea base; $r$ igual al valor por defecto \\
+			S1 & Baja     & 18 & 58 & Línea base; $\rho$ igual al valor por defecto \\
 			S2 & Moderada & 26 & 40 & Reducción moderada de flota \\
 			S3 & Media    & 35 & 30 & Punto medio de saturación \\
 			S4 & Alta     & 52 & 20 & Carga elevada por repartidor \\
@@ -2317,7 +2435,7 @@ services:
 
 	Los valores de $|\mathcal{C}|$ de la Tabla~\ref{tab:scenarios} son nominales: como el
 	número de órdenes varía entre semillas (de 988 a 1\,047), la flota real de cada réplica
-	también varía: 55--59 couriers en S1, 38--41 en S2, 29--30 en S3 y 19--21 en S4.  El escenario S1 coincide con el valor por defecto de
+	también varía: 55--59 repartidores en S1, 38--41 en S2, 29--30 en S3 y 19--21 en S4.  El escenario S1 coincide con el valor por defecto de
 	\texttt{TARGET\_ORDERS\_PER\_COURIER} y sirve como referencia.  El escenario S4 estresa deliberadamente el sistema
 	para revelar los límites de cada política.
 
@@ -2326,7 +2444,7 @@ services:
 	Para cada combinación de escenario y semilla, ambas políticas se ejecutan sobre la
 	\emph{misma} instancia de pedidos y la \emph{misma} flota de repartidores.  La
 	simulación se invoca en proceso (\emph{in-process}): la función
-	\texttt{\_run\_policy} ajusta el parámetro $r$ del escenario y activa la política
+	\texttt{\_run\_policy} ajusta el parámetro $\rho$ del escenario y activa la política
 	correspondiente mediante la variable de entorno \texttt{FCFS\_POLICY} (presente
 	$\rightarrow$ FCFS; ausente $\rightarrow$ \textit{Rolling Horizon}).  Este diseño pareado
 	elimina la variabilidad inter-instancia y aísla el efecto de la política de
@@ -2340,8 +2458,8 @@ services:
 	genera un par observacional (FCFS, RH) sobre la misma instancia, por lo
 	que la unidad natural de análisis es la diferencia intra-semilla.  Para
 	evitar la pseudo-replicación \citep{Hurlbert1984} que resultaría de tratar
-	cada orden como observación independiente ---cuando todas las órdenes de
-	una corrida comparten la misma realización aleatoria--- cada métrica se
+	cada orden como observación independiente (cuando todas las órdenes de
+	una corrida comparten la misma realización aleatoria), cada métrica se
 	agrega al nivel de semilla antes de la inferencia.
 
 	Como prueba primaria se adopta el test de Wilcoxon signed-rank pareado
@@ -2381,8 +2499,8 @@ services:
 	\end{itemize}
 
 	El número total de ejecuciones de simulación es
-	$2 \times |S| \times |\mathit{Seeds}| \times |B|$, donde $|S|$ es el número de
-	escenarios, $|\mathit{Seeds}|$ las semillas y $|B|$ los valores de tamaño de
+	$2 \times n_{esc} \times n_{sem} \times n_{B}$, donde $n_{esc}$ es el número de
+	escenarios, $n_{sem}$ el de semillas y $n_{B}$ el de valores de tamaño de
 	agrupamiento evaluados; el factor 2 corresponde a las dos políticas.
 
 	\subsection{Almacenamiento de resultados}
@@ -2423,10 +2541,10 @@ services:
 	\begin{itemize}
 		\item \textit{Ready-to-Pickup} (RtP): tiempo desde que la orden está lista en
 		      el restaurante hasta que el repartidor la recoge
-		      ($\text{RtP}_o = t_{pickup,o} - t_{ready,o}$).
+		      ($\text{RtP}_o = t_{pickup,o} - e_o$).
 		      Se reportan la media y el percentil 90.
 		\item \textit{Ready-to-Door} (RtD): tiempo desde la disponibilidad del pedido
-		      hasta su entrega ($\text{RtD}_o = t_{delivery,o} - t_{ready,o}$).
+		      hasta su entrega ($\text{RtD}_o = t_{delivery,o} - e_o$).
 		      Se reportan la media y el percentil 90.
 		\item \textbf{Cumplimiento SLA}: porcentaje de órdenes entregadas con
 		      $\text{CtD}_o \leq \tau = 40$~min.  Como complemento se reporta el
@@ -2435,7 +2553,7 @@ services:
 		      más pedidos sin entregar.  Las diferencias entre políticas en métricas
 		      expresadas en porcentaje se reportan en puntos porcentuales (pp).
 		\item \textbf{CTD Overage}: exceso promedio respecto al objetivo,
-		      $\frac{1}{n}\sum \max(0, \text{CtD}_o - \tau)$.
+		      $\bar{E} = \frac{1}{|\mathcal{O}_{del}|}\sum_{o \in \mathcal{O}_{del}} \max(0, \text{CtD}_o - \tau)$.
 	\end{itemize}
 
 	\subsection{Cobertura}
@@ -2456,13 +2574,13 @@ services:
 
 	\begin{itemize}
 		\item \textbf{Pedidos por repartidor por hora}:
-		      $\sum n_{del,c}\,/\,\sum h_{shift,c}$.
+		      $\sum_c n_c\,/\,\sum_c h_c$.
 		\item \textbf{Agrupamientos por hora}:
-		      $\sum b_c\,/\,\sum h_{shift,c}$, donde $b_c$ son los agrupamientos
+		      $\sum_c b_c\,/\,\sum_c h_c$, donde $b_c$ son los agrupamientos
 		      recogidos por el repartidor $c$.
 		\item \textbf{Utilización} (\%): fracción del turno que el repartidor estuvo
 		      conduciendo o en servicio (recolección y entrega), sin contar las esperas
-		      \citep{Reyes2018}: $100 \cdot \sum (t_{drive,c} + t_{serv,c})\,/\,\sum h_{shift,c}$.
+		      \citep{Reyes2018}: $100 \cdot \sum_c (t_{drive,c} + t_{serv,c})\,/\,\sum_c h_c$.
 		\item \textbf{Distancia total} (km): suma de las distancias de ruta de
 		      todos los repartidores.
 		\item \textbf{Distancia por pedido} (km): distancia total dividida entre
@@ -2483,8 +2601,8 @@ services:
 
 	El modelo de compensación sigue el esquema dual descrito en la
 	Ecuación~\ref{eq:compensation}: cada repartidor recibe el máximo entre la
-	ganancia por entregas ($p_1 \cdot n_{orders}$) y el pago mínimo garantizado
-	($p_2 \cdot h_{shift}$).  A partir de este modelo se obtienen:
+	ganancia por entregas ($p_1 \cdot n_c$) y el pago mínimo garantizado
+	($p_2 \cdot h_c$).  A partir de este modelo se obtienen:
 
 	\begin{itemize}
 		\item \textbf{Compensación total} (\$): suma de las compensaciones
@@ -2555,16 +2673,16 @@ services:
 	genera una instancia sintética de La Paz, B.C.S. con entre 988 y 1\,047 órdenes
 	(véase Sección~3.2) y 25 restaurantes.  La variable de control es el parámetro
 	\texttt{orders\_per\_courier} ($\rho$), que determina el tamaño de la flota mediante
-	$|C| = \max(n_{min}, \lceil n / \rho \rceil)$, donde $n$ es el número de órdenes; por ello
+	$|\mathcal{C}| = \max(n_{\min}, \lceil |\mathcal{O}| / \rho \rceil)$, donde $|\mathcal{O}|$ es el número de órdenes; por ello
 	la flota real varía ligeramente entre semillas.
 
 	\begin{table}[htbp]
 	\centering
-	\caption{Escenarios de saturación de flota (rango de $|C|$ entre las diez semillas).}
+	\caption{Escenarios de saturación de flota (rango de $|\mathcal{C}|$ entre las diez semillas).}
 	\label{tab:escenarios}
 	\begin{tabular}{@{}clccc@{}}
 	\toprule
-	ID & Etiqueta & $\rho$ & $|C|$ & Saturación \\
+	ID & Etiqueta & $\rho$ & $|\mathcal{C}|$ & Saturación \\
 	\midrule
 	S1 & Baja     & 18 & 55--59 & Baja     \\
 	S2 & Moderada & 26 & 38--41 & Moderada \\
@@ -2578,7 +2696,7 @@ services:
 	(§3.1): frecuencia de optimización $f = 5$~min, horizonte $\Delta_u = 20$~min,
 	objetivo SLA $\tau = 40$~min, tiempos de servicio $s_r = s_o = 4$~min y tamaño máximo de
 	agrupamiento $B_{max} = 4$.  El enrutamiento se realizó con el binario oficial
-	\texttt{osrm-routed} v5.27.1 ---la misma versión de la imagen Docker de la Sección~3.1---
+	\texttt{osrm-routed} v5.27.1 (la misma versión de la imagen Docker de la Sección~3.1)
 	con el algoritmo \textit{Contraction Hierarchies} sobre los mismos archivos preprocesados
 	del grafo vial de La Paz.
 
@@ -2673,7 +2791,7 @@ services:
 
 	La Tabla~\ref{tab:res_rtp} muestra el indicador Ready-to-Pickup (RtP), que mide el
 	tiempo transcurrido entre el momento en que el pedido está listo y la llegada del
-	courier al restaurante, así como el CTD Overage (exceso promedio sobre el
+	repartidor al restaurante, así como el CTD Overage (exceso promedio sobre el
 	objetivo SLA).
 
 	\begin{table}[htbp]
@@ -2701,10 +2819,10 @@ services:
 	que RH recoge varios pedidos de un mismo restaurante en cada visita.
 
 	A medida que crece la saturación, el RtP bajo FCFS aumenta dramáticamente
-	(203.75~min en S4), reflejando largas colas de espera cuando los couriers no
+	(203.75~min en S4), reflejando largas colas de espera cuando los repartidores no
 	están disponibles.  En contraste, el RtP bajo RH crece moderadamente
 	(46.20~min en S4, $-77.3\%$ respecto a FCFS), gracias a la sincronización
-	entre la formación de agrupamientos y la disponibilidad de los couriers.
+	entre la formación de agrupamientos y la disponibilidad de los repartidores.
 
 	El CTD Overage evidencia un resultado notable: mientras que bajo FCFS el
 	exceso sobre el SLA crece rápidamente con la saturación (de 0.82 a
@@ -2737,8 +2855,8 @@ services:
 
 	\subsection{Productividad y utilización}
 
-	El indicador Orders/Courier/Hr mide la productividad individual ---cuántos
-	pedidos entrega en promedio cada repartidor por hora de turno---.  La
+	El indicador Orders/Courier/Hr mide la productividad individual, es decir,
+	cuántos pedidos entrega en promedio cada repartidor por hora de turno.  La
 	productividad es idéntica en S1--S2 (1.43 y 2.06) y bajo RH es superior en S3
 	($+12.7\%$) y S4 ($+66.0\%$).  Como ambas políticas operan con la misma flota y los
 	mismos turnos, esta métrica solo difiere cuando difiere el número de pedidos
@@ -2749,7 +2867,7 @@ services:
 	esperado bajo despacho greedy: bajo RH, la utilización es \emph{menor} que bajo
 	FCFS en S1--S3 ($-6.5$ a $-15.4$~pp) y similar en S4 (67.8 vs 67.3\%).  Esto se explica porque los
 	agrupamientos reducen la distancia recorrida por pedido y las visitas a restaurantes, de modo que cada
-	courier completa sus entregas en menos tiempo de conducción activa.  En S4, RH convierte esa
+	repartidor completa sus entregas en menos tiempo de conducción activa.  En S4, RH convierte esa
 	utilización en entregas efectivas, mientras que FCFS acumula pedidos sin atender.
 
 	\subsection{Distancia y enrutamiento}
@@ -2791,7 +2909,7 @@ services:
 
 	\subsection{Distribución de agrupamientos}
 
-	Bajo FCFS, cada courier recibe órdenes individuales ($\text{bundle\_size} = 1$),
+	Bajo FCFS, cada repartidor recibe órdenes individuales ($\text{bundle\_size} = 1$),
 	por lo que el tamaño promedio de agrupamiento es siempre 1.0.
 	Bajo RH, el módulo de \emph{bundling}
 	genera agrupamientos de hasta $B_{max} = 4$ órdenes por restaurante.  El tamaño promedio
@@ -2817,7 +2935,7 @@ services:
 	El modelo de compensación asigna $p_1 = \$10$ por pedido entregado con un piso de
 	$p_2 = \$15$/hora de turno.  El costo por pedido
 	($\text{Comp.\ total} / n_{\text{entregados}}$) refleja la eficiencia económica
-	de la operación.  Bajo condiciones de baja saturación (S1), muchos couriers no
+	de la operación.  Bajo condiciones de baja saturación (S1), muchos repartidores no
 	alcanzan el umbral variable y reciben el pago mínimo garantizado, elevando el
 	costo unitario a \$10.80 bajo FCFS y \$11.59 bajo RH; el costo es mayor bajo RH porque los
 	agrupamientos concentran las entregas en menos repartidores, mientras el resto sigue
@@ -2863,7 +2981,7 @@ services:
 	\label{tab:wilcoxon_seed}
 	\begin{tabular}{@{}ll rr l c r@{}}
 	\toprule
-	Esc. & Métrica & $\bar{x}_{\text{FCFS}}$ & $\bar{x}_{\text{RH}}$ & $\bar{\Delta}$ [CI 95\%] & $p$ Wilcoxon & $r$ pareado \\
+	Esc. & Métrica & $\bar{x}_{\text{FCFS}}$ & $\bar{x}_{\text{RH}}$ & $\bar{\Delta}$ [CI 95\%] & $p$ Wilcoxon & $r_{rb}$ pareado \\
 	\midrule
 	S1 & CtD (min) & 28.93  & 30.31 & $-1.38\ [-2.35,\ -0.41]$        & 0.0137 & $-0.85$ \\
 	S1 & SLA (\%)  & 84.6   & 83.4  & $\phantom{-}+1.1\ [-1.8,\ +4.1]$ & 0.2324 & $+0.45$ \\
@@ -2910,8 +3028,8 @@ services:
 	50.3\,pp.  En S4 la mejora alcanza el 67.3\,\% en CtD
 	($\bar{\Delta} = +151{.}24$~min) y 36.3\,pp en SLA, además de entregar
 	prácticamente todas las órdenes que FCFS deja sin entregar al cierre del
-	turno.  El rank-biserial pareado pasa de $r = -0{.}85$ en S1 (en
-	favor de FCFS) a $r = +1{.}00$ en S2--S4 (en favor de RH), reflejando
+	turno.  El rank-biserial pareado pasa de $r_{rb} = -0{.}85$ en S1 (en
+	favor de FCFS) a $r_{rb} = +1{.}00$ en S2--S4 (en favor de RH), reflejando
 	el cruce de regímenes detectado también gráficamente en la
 	Figura~\ref{fig:kpi_vs_ratio}.
 
@@ -2963,7 +3081,7 @@ services:
 	\end{itemize}
 
 	La Figura~\ref{fig:kpi_vs_ratio} resume la evolución de los KPIs principales
-	en función de la relación órdenes/courier.  Las curvas de CtD se cruzan entre
+	en función de la relación órdenes/repartidor.  Las curvas de CtD se cruzan entre
 	S1 y S2, marcando el punto de transición donde RH comienza a superar a FCFS.
 
 	\begin{figure}[htbp]
@@ -2987,8 +3105,9 @@ services:
 
 	\paragraph{Pregunta central.}  En las instancias evaluadas del centro urbano de La Paz,
 	coordinar los despachos no compensa cuando la flota es holgada, pero sí a partir de una
-	saturación moderada: con 18 pedidos por repartidor FCFS entrega 1.4~min antes que RH, y con 26
-	o más pedidos por repartidor RH reduce el tiempo de entrega y mejora el cumplimiento del
+	saturación moderada: con una flota dimensionada para 18 pedidos por repartidor en la jornada
+	(58 repartidores), FCFS entrega 1.4~min antes que RH, y con 26 o más pedidos por repartidor en
+	la jornada (40 repartidores o menos), RH reduce el tiempo de entrega y mejora el cumplimiento del
 	servicio en todas las semillas.  Usar distancias euclidianas en lugar de la red vial real
 	subestima los tiempos de entrega de ambas políticas y la ventaja de coordinar.
 
@@ -3004,8 +3123,8 @@ services:
 	escenarios; entre el 62 y el 84\,\% de esa diferencia se explica por la mayor longitud media de
 	los viajes y el resto por la estructura de la red (Sección~\ref{sec:comparacion_literatura}).
 
-	\paragraph{PI3 (reproducibilidad y recursos).}  Sí.  Toda la cadena ---OpenStreetMap, OSRM,
-	Python--- es de código abierto, las instancias se regeneran a partir de semillas fijas, cada
+	\paragraph{PI3 (reproducibilidad y recursos).}  Sí.  Toda la cadena (OpenStreetMap, OSRM,
+	Python) es de código abierto, las instancias se regeneran a partir de semillas fijas, cada
 	corrida pasa verificaciones automáticas de integridad, y simular un día de operación con RH
 	toma alrededor de un minuto en una computadora portátil, con menos de 250~MB de memoria
 	(Sección~\ref{sec:config_experimental}).
@@ -3014,9 +3133,9 @@ services:
 	\section{Verificación de objetivos}
 
 	\subsection{Objetivo general}
-	El objetivo general --- evaluar la eficiencia operativa de la política de despacho
+	El objetivo general, evaluar la eficiencia operativa de la política de despacho
 	\emph{Rolling Horizon} frente a FCFS mediante un entorno de simulación reproducible
-	con restricciones topológicas reales de La Paz, B.C.S. --- se cumple
+	con restricciones topológicas reales de La Paz, B.C.S., se cumple
 	satisfactoriamente.  Se ejecutaron 80~corridas de simulación válidas (4~escenarios
 	$\times$ 10~semillas $\times$ 2~políticas) sobre la red vial real, y se
 	cuantificaron las diferencias en 21~KPIs con pruebas estadísticas formales.
@@ -3051,14 +3170,14 @@ services:
 	\paragraph{OE\,4: Cuantificación estadística.}
 	Se aplicó la prueba de Wilcoxon \textit{signed-rank} pareado a nivel semilla
 	($n = 10$) sobre \textit{Click-to-Door} y SLA \textit{Compliance} en los cuatro escenarios,
-	obteniendo $p = 0{.}0020$ ---el valor mínimo alcanzable con $n = 10$ cuando
-	todas las diferencias comparten signo--- en las seis pruebas de S2--S4.  En S1, FCFS
+	obteniendo $p = 0{.}0020$ (el valor mínimo alcanzable con $n = 10$ cuando
+	todas las diferencias comparten signo) en las seis pruebas de S2--S4.  En S1, FCFS
 	obtiene un CtD 1.38~min menor ($p = 0{.}0137$) y la diferencia en SLA no es
 	significativa ($p = 0{.}23$).  Los
 	intervalos de confianza $t$-Student al 95\,\% de la diferencia de medias
 	por semilla no incluyen al cero en ninguna otra fila.  El tamaño de efecto
-	\textit{rank-biserial} pareado es $r = +1{.}00$ en S2--S4, en favor de RH,
-	y $r = -0{.}85$ en el CtD de S1, en favor de FCFS.  La prueba
+	\textit{rank-biserial} pareado es $r_{rb} = +1{.}00$ en S2--S4, en favor de RH,
+	y $r_{rb} = -0{.}85$ en el CtD de S1, en favor de FCFS.  La prueba
 	ómnibus de Friedman sobre la matriz $10 \times 4$ de $\Delta\text{CtD}$
 	($\chi^2_F = 30{.}0$, $p < 0{.}001$) confirma que la magnitud del efecto
 	varía significativamente entre regímenes de saturación.
@@ -3097,7 +3216,7 @@ services:
 	los pedidos que FCFS no alcanza a entregar.
 	La distancia por pedido se reduce en todos los escenarios
 	($-13.5\%$ a $-49.4\%$), y la utilización bajo RH es menor que bajo FCFS en
-	S1--S3, indicando que los couriers completan sus entregas con menor tiempo de
+	S1--S3, indicando que los repartidores completan sus entregas con menor tiempo de
 	conducción por la eficiencia de los agrupamientos.  Las magnitudes en S2--S4 deben leerse
 	como una cota superior de la ventaja de RH (Sección~\ref{sec:limitaciones_resultados}).
 
@@ -3123,7 +3242,7 @@ services:
 		      la red vial de La Paz, cuyos trayectos son un 38\% más largos que en
 		      línea recta ($\kappa = 1{.}38$).
 		\item \textbf{Arquitectura exclusivamente open-source.}  Toda la cadena
-		      --- OSRM, OSM, Python, Docker --- se basa en herramientas de código
+		      (OSRM, OSM, Python, Docker) se basa en herramientas de código
 		      abierto, demostrando la viabilidad de soluciones de optimización
 		      logística sin dependencia de software propietario.
 	\end{enumerate}

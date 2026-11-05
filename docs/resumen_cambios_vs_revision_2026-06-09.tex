@@ -1,0 +1,534 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[spanish,mexico]{babel}
+\usepackage[left=2cm,right=2cm,top=2.2cm,bottom=2.2cm]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{array,booktabs,longtable,tabularx}
+\usepackage{amsmath,amssymb}
+\usepackage{fancyhdr}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{cR}{RGB}{31,94,168}
+\definecolor{cM}{RGB}{46,125,50}
+\definecolor{cO}{RGB}{123,31,162}
+\definecolor{cC}{RGB}{176,84,0}
+\definecolor{caja}{RGB}{243,246,250}
+\definecolor{regla}{RGB}{200,200,200}
+
+\newcommand{\etiq}[2]{{\setlength{\fboxsep}{1.4pt}\colorbox{#1}{\textcolor{white}{\sffamily\bfseries\scriptsize #2}}}}
+\newcommand{\tR}{\etiq{cR}{RESULTADOS}}
+\newcommand{\tM}{\etiq{cM}{MÉTODO}}
+\newcommand{\tO}{\etiq{cO}{COMITÉ}}
+\newcommand{\tC}{\etiq{cC}{CITA}}
+\newcommand{\sep}{\\\arrayrulecolor{regla}\midrule\arrayrulecolor{black}}
+\newcommand{\ra}{$\to$}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\LTpre}{4pt}
+\setlength{\LTpost}{6pt}
+\renewcommand{\arraystretch}{1.15}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\footnotesize\sffamily Cambios respecto a la versión revisada (9 de junio de 2026)}
+\fancyfoot[R]{\footnotesize\sffamily \thepage}
+
+\makeatletter
+\renewcommand\section{\@startsection{section}{1}{\z@}{-14pt plus -2pt}{6pt}{\sffamily\large\bfseries}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}{-10pt plus -2pt}{4pt}{\sffamily\normalsize\bfseries}}
+\makeatother
+
+\begin{document}
+
+{\sffamily
+{\LARGE\bfseries Cambios en la tesis respecto a la versión revisada}\par\vspace{4pt}
+{\large Impresión revisada por el comité (9 de junio de 2026) frente a la versión actual (4 de noviembre de 2026)}\par\vspace{8pt}
+\small
+\textit{Logística de última milla en redes viales reales: un enfoque reproducible para el MDRP en La Paz, B.C.S.}\\
+Alan José Marcos Sánchez Martínez \quad·\quad Director: Dr.\ Marco Antonio Castro Liera\\
+Maestría en Sistemas Computacionales, Instituto Tecnológico de La Paz\par}
+
+\vspace{6pt}
+\noindent\colorbox{caja}{\parbox{\dimexpr\textwidth-2\fboxsep}{\vspace{4pt}
+\textbf{\sffamily En resumen}
+\begin{itemize}\setlength{\itemsep}{2pt}\setlength{\topsep}{2pt}
+\item Se encontraron y corrigieron errores en el simulador (Sección~2). de lo mas destacable: el instante de entrega
+  no incluía la espera de la comida en el restaurante ni los tiempos de servicio. Por eso se repeti la campaña
+  experimental completa.
+\item Con el simulador ya corregido, las diez semillas son válidas (antes, siete): la falla de tres semillas se debía
+  a un error del simulador, no a una interrupción de OSRM. ahora hay 80 corridas en lugar de 56.
+\item Los tiempos de entrega son mayores en ambas políticas y el punto de cruce se adelanta: RH supera a FCFS
+  desde el nivel de saturación S2 (antes, desde S3). En S1, FCFS entrega en promedio 1.4~min antes, pero la diferencia en el cumplimiento del SLA
+  (\textit{Service Level Agreement}; porcentaje de pedidos entregados en 40~min o menos) no es significativa.
+\item Dado que no se entendia bien la idea principal del trabajo de inicio, cambie el planteamiento del
+  problema (§1.2). reescribi el planteamiento con una pregunta central y tres preguntas de investigación, que se responden en
+  una sección nueva (§5.1) en la conclusion.
+\item Se agregó en la Sección~2 de la tesis una tabla de notación con todas las variables (§2.1.8), y se
+  unificó la notación de las fórmulas en toda la tesis.
+\item En el apartado 4.1 de la tesis («Configuración experimental») se agregan los tiempos de procesamiento del
+  simulador con la máquina actual (Apple M1 Pro con 16~GB de RAM).
+\item No cambian el título, los objetivos ni su contenido, el alcance ni la estructura de capítulos. Medido palabra
+  por palabra, el 22\,\% del texto es nuevo o modificado; la mayor parte está en los capítulos~4 (45\,\%) y 5
+  (41\,\%), donde están las cifras.
+\end{itemize}\vspace{2pt}}}
+
+% ─────────────────────────────────────────────────────────────
+\section{Criterio y motivos de los cambios}
+
+Para facilitar la nueva revisión se partió del texto revisado y solo se cambió lo que cumple al menos uno de
+cuatro motivos. En las secciones~4 y 5 cada cambio lleva la etiqueta de su motivo:
+
+\begin{tabular}{@{}l L{14.2cm}@{}}
+\tR & La cifra o la conclusión cambió con la nueva campaña experimental.\\
+\tM & La descripción del método debía coincidir con lo que hace el código corregido.\\
+\tO & Atiende la observación del comité sobre el planteamiento del problema.\\
+\tC & La fuente citada, el código o los datos no sostenían la afirmación.\\
+\end{tabular}
+
+Las mejoras de redacción y los análisis adicionales que no cumplen ninguno de estos motivos se dejaron fuera.
+Los análisis complementarios (control euclidiano, robustez y tiempo de cómputo) se incluyeron solo en la
+extensión necesaria para responder las preguntas de investigación: un párrafo en §4.5.4, una viñeta en §4.5.5
+y una oración en §4.1.
+
+Para ver cada cambio en su contexto, el archivo \texttt{tesis\_cambios\_vs\_revision\_2026-06-09.pdf} contiene
+la tesis actual con el texto nuevo o modificado resaltado y, en notas, el texto anterior.
+
+% ─────────────────────────────────────────────────────────────
+\section{Errores del simulador corregidos}
+
+Al preparar el artículo derivado de la tesis se contrastaron los resultados por semilla con el código. Se
+encontraron los errores siguientes; todos se corrigieron antes de la nueva campaña. Ahora cada corrida pasa
+verificaciones automáticas: ninguna orden se recoge antes de estar lista ni se entrega antes de recogerse,
+ninguna se entrega dos veces y todas las rutas provienen de OSRM.
+
+{\small
+\begin{longtable}{@{}L{0.35cm} L{5.1cm} L{5.45cm} L{5.4cm}@{}}
+\toprule
+\# & Error en la versión revisada & Efecto en los resultados revisados & Corrección (sección actual)\\
+\midrule
+\endhead
+1 & El instante de entrega era el fin del recorrido en OSRM: no incluía la espera de la comida en el
+  restaurante ni los 4~min de servicio en la recolección y en la entrega.
+  & Entre el 31 y el 70\,\% de las entregas FCFS, y cerca del 2\,\% de las de RH, ocurrían antes de que la
+  comida estuviera lista. El CtD medio de FCFS en S1 (10.1~min) era menor que el tiempo medio de preparación
+  (12~min).
+  & Temporización de Reyes et al.\ (2018): espera hasta que la comida esté lista y mitad del tiempo de servicio
+  antes y mitad después de cada recolección y entrega (§3.3.4, nueva).\sep
+2 & El despacho solo se ejecutaba cuando el reloj marcaba un minuto múltiplo de 5. El reloj arranca 15~min antes
+  de la primera orden, así que si esta llegaba después de las 8:00:59 nunca se despachaba.
+  & En las semillas 2027, 2033 y 2034 ninguna orden recibió repartidor. La tesis lo atribuía a una interrupción
+  de OSRM y trabajaba con 7 semillas.
+  & Despacho en cada época (§3.3.1). Las 10 semillas son válidas.\sep
+3 & En RH, el paso de remoción y reinserción reconstruía los agrupamientos a partir de una copia desactualizada:
+  una orden movida seguía también en su agrupamiento original.
+  & Cerca del 4\,\% de las entregas de RH se contaban dos veces. Esto inflaba el \textit{throughput} de RH
+  (su +4.9\,\% en S1 era exactamente $1\,089/1\,038$), la distancia y el costo por pedido.
+  & Se reescribió el paso: cada orden queda en un solo agrupamiento, y una entrega doble detiene la simulación
+  (§3.5.2).\sep
+4 & FCFS tomaba las órdenes cuya comida estaría lista en los siguientes 20~min (el horizonte de RH) y las
+  recorría agrupadas por restaurante, no por orden de llegada.
+  & La línea base no era la descrita en la tesis («asignación reactiva inmediata»); §3.4.1 reconocía un
+  «sesgo de orden de iteración».
+  & FCFS despacha cada orden en la primera época posterior a su colocación, en orden de colocación, al
+  repartidor libre más cercano (§1.6.2, §3.4.1).\sep
+5 & La utilización contaba solo el tiempo de conducción.
+  & La lectura «menor utilización, mayor eficiencia» no tenía sustento.
+  & Utilización = conducción + servicio, como en Reyes et al.\ (§2.4.3, §3.7.3).\sep
+6 & La inserción de órdenes en agrupamientos comparaba el costo absoluto de cada agrupamiento candidato y no el
+  incremento de costo.
+  & Las órdenes se repartían entre agrupamientos en vez de insertarse donde cuestan menos, a diferencia de
+  Reyes et al.\ y de lo descrito en §3.5.2.
+  & Se usa el incremento de costo (§3.5.2).\sep
+7 & El denominador de $Z_t$ solo incluía repartidores libres.
+  & $Z_t$ sobrestimado y agrupamientos más grandes que los definidos en §3.5.1.
+  & Repartidores en turno que quedarán libres dentro de $\Delta_2$ (§3.5.1).\sep
+8 & El peso de asignación sumaba dos veces el tramo repartidor\,\ra\,restaurante, y el compromiso final estimaba
+  la llegada al restaurante como la mitad de la ruta completa.
+  & Pesos de asignación y decisiones de compromiso final o parcial incorrectos.
+  & Ambos usan los tiempos de §3.3.4, con el tramo OSRM real (§3.5.4).\sep
+9 & Tras un compromiso parcial, el repartidor quedaba ubicado en el domicilio del último cliente y no en el
+  restaurante.
+  & Posición incorrecta del repartidor en las épocas siguientes.
+  & El repartidor queda en el restaurante (§3.5.4).\\
+\bottomrule
+\end{longtable}}
+
+Se corrigieron además dos errores que no afectaban las cifras de la tesis: la caché de rutas no distinguía
+entre OSRM y distancia euclidiana, y la opción de sensibilidad del tamaño máximo de agrupamiento no surtía efecto.
+
+Durante la revisión se identificó también una convención del ciclo de simulación que no es un error de
+implementación. Como la actualización de rutas ocurre después de la asignación, un repartidor espera entre 5 y
+10~min su siguiente ruta. Se mantuvo, se documenta en §3.3.1 y su efecto se evaluó repitiendo la campaña con el
+orden inverso (§4.5.5): los signos y el punto de cruce se mantienen, y las magnitudes en S2--S4 se reportan como
+cota superior.
+
+% ─────────────────────────────────────────────────────────────
+\section{Resultados: antes y ahora}
+
+\subsection{Cifras principales (promedio por escenario)}
+Cada celda muestra el valor de la versión revisada (7 semillas) \ra\ el de la versión actual (10 semillas).
+$\Delta$CtD es el cambio relativo de RH respecto a FCFS; el SLA es el porcentaje de pedidos entregados en
+40~min o menos.
+
+{\small
+\begin{longtable}{@{}l c c c c c c@{}}
+\toprule
+Esc. & $\rho$ & CtD FCFS (min) & CtD RH (min) & $\Delta$CtD & SLA FCFS (\%) & SLA RH (\%)\\
+\midrule
+S1 & 18 & 10.10 \ra\ 28.93  & 20.38 \ra\ 30.31 & $+101.8$ \ra\ $+4.8$\,\%  & 100.0 \ra\ 84.6 & 99.2 \ra\ 83.4\\
+S2 & 26 & 16.68 \ra\ 56.07  & 22.74 \ra\ 35.42 & $+36.3$ \ra\ $-36.8$\,\%  & 91.7 \ra\ 38.1  & 97.0 \ra\ 69.6\\
+S3 & 35 & 35.79 \ra\ 108.49 & 25.52 \ra\ 45.36 & $-28.7$ \ra\ $-58.2$\,\%  & 76.3 \ra\ 7.3   & 90.2 \ra\ 57.6\\
+S4 & 52 & 75.41 \ra\ 224.88 & 32.26 \ra\ 73.63 & $-57.2$ \ra\ $-67.3$\,\%  & 61.2 \ra\ 6.2   & 78.3 \ra\ 42.5\\
+\bottomrule
+\end{longtable}}
+
+\subsection{Conclusiones que cambiaron}
+{\small
+\begin{longtable}{@{}L{2.6cm} L{3.9cm} L{4.95cm} L{4.8cm}@{}}
+\toprule
+Aspecto & Versión revisada & Versión actual & Por qué cambió\\
+\midrule
+\endhead
+Corridas válidas & 7 semillas, 56 corridas & 10 semillas, 80 corridas & Error 2.\sep
+Nivel de los tiempos de entrega & CtD medio de 10 a 75~min & CtD medio de 29 a 225~min
+  & Error 1: el CtD incluye ahora la espera de la comida y los tiempos de servicio.\sep
+Punto de cruce en CtD & Entre S2 y S3 ($\rho = 26$--35) & Entre S1 y S2 ($\rho = 18$--26)
+  & Con la temporización correcta cada viaje ocupa más tiempo al repartidor. FCFS, con un viaje por pedido,
+  agota la flota antes; RH comparte la espera y la recolección entre los pedidos de un agrupamiento.\sep
+S1 & FCFS 10.3~min más rápido; SLA prácticamente igual
+  & FCFS 1.4~min más rápido ($p = 0.0137$); diferencia en SLA no significativa ($p = 0.23$) & Errores 1 a 4.\sep
+S2 & FCFS más rápido en CtD; RH mejor en SLA & RH mejor en ambos ($-36.8$\,\% en CtD; $+31.5$~pp en SLA)
+  & Errores 1 a 4.\sep
+S4 & CtD $-57.2$\,\%; P90 $-77.1$\,\% & CtD $-67.3$\,\%; P90 $-42.0$\,\% & Errores 1 a 4.\sep
+Pedidos sin entregar con FCFS & 11.5\,\% en S4 & 11.3\,\% en S3 y 39.9\,\% en S4 (RH: 0 y 0.2\,\%)
+  & Error 1. Como el CtD y el SLA se miden sobre pedidos entregados, se agrega el SLA sobre todas las órdenes
+  (FCFS 6.4 y 3.8\,\%; RH 57.6 y 42.4\,\%).\sep
+\textit{Throughput} & RH superior en todos los escenarios ($+3.4$ a $+17.7$\,\%)
+  & Igual en S1--S2; $+12.7$ y $+66.0$\,\% en S3--S4
+  & Error 3. Con la misma flota y los mismos turnos, solo difiere por los pedidos que FCFS no entrega.\sep
+Utilización & RH menor en S2--S4 & RH menor en S1--S3 y similar en S4 & Errores 1 y 5.\sep
+Distancia por pedido & RH mayor en S1 ($+5.3$\,\%) y menor en S2--S4 & RH menor en todos ($-13.5$ a $-49.4$\,\%)
+  & Errores 3 y 6.\sep
+Tamaño de agrupamiento (RH) & 1.77 a 3.07 & 2.54 a 3.30 por pedido; 1.93 a 2.80 por viaje
+  & Errores 6 y 7. Además se aclara que la Tabla~4.5 reporta la media ponderada por pedido.\sep
+Costo por pedido en S1 & RH menor (\$11.06 vs \$11.40) & RH mayor (\$11.59 vs \$10.80)
+  & Errores 1 y 3. RH concentra las entregas en menos repartidores y el resto cobra el pago mínimo.\sep
+Prueba de Wilcoxon & $p = 0.0156$ en las 8 pruebas & $p = 0.0020$ en las 6 pruebas de S2--S4; en S1,
+  $p = 0.0137$ (CtD) y $p = 0.23$ (SLA)
+  & Con $n = 10$ el $p$ mínimo posible es 0.0020 (con $n = 7$ era 0.0156).\sep
+Prueba de Friedman & $\chi^2_F = 21.0$ & $\chi^2_F = 30.0$ ($p < 0.001$) & $n = 10$.\sep
+Comparación con Reyes et al. & «Las mejoras superan el 10--25\,\% reportado por Reyes et al.» & Se elimina
+  & \tC\ Reyes et al.\ no publican una comparación contra FCFS.\sep
+Efecto de la red vial & «La topología de La Paz amplifica la ventaja», sin medición
+  & $\kappa = 1.38$ y control euclidiano: la ventaja de RH es mayor con la red real en los cuatro escenarios;
+  entre el 62 y el 84\,\% de la diferencia se explica por la mayor longitud media de los viajes
+  & \tO\ Responde a PI2 y aporta la evidencia del objetivo específico~2.\sep
+Robustez & --- & Las magnitudes en S2--S4 se leen como cota superior & Convención del ciclo (Sección~2).\\
+\bottomrule
+\end{longtable}}
+
+% ─────────────────────────────────────────────────────────────
+\section{Cambios por capítulo}
+Las secciones se numeran como en la versión actual. Las figuras 4.1, 4.2 y 4.3 se regeneraron con los datos
+nuevos.
+
+\subsection{Capítulo 1. Introducción}
+{\small
+\begin{longtable}{@{}L{1.75cm} L{8.15cm} L{6.6cm}@{}}
+\toprule
+Sección & Qué cambió & Por qué\\
+\midrule
+\endhead
+1.1.1 & El TSP es NP-duro porque no se conoce un algoritmo polinomial que lo resuelva; la cita a Lenstra y
+  Rinnooy Kan se coloca en esa afirmación.
+  & \tC\ Antes se explicaba la NP-dureza por el crecimiento factorial del tiempo, que es un error conceptual.\sep
+1.1.2 & Las variantes del VRP (recogida y entrega, entregas divididas) se citan con Cáceres-Cruz et al.; se
+  quita «tiempos de servicio variables».
+  & \tC\ Laporte (2009) no documenta esas variantes.\sep
+1.1.3 & Se quitan «el componente más costoso» y «entre el 30 y el 60\,\% del costo total»; se describe lo que
+  revisan Jazemi et al.
+  & \tC\ Esas cifras no aparecen en el artículo citado.\sep
+1.1.5 & Larsen (2000) se cita como tesis doctoral; se quitan las comillas y «taxonomía fundamental».
+  & \tC\ La referencia anterior («Jesper Larsen», artículo en \textit{Computers \& Operations Research}) no
+  existe, y el texto entre comillas no era una cita textual.\sep
+1.1.6 & Psaraftis (1980) resolvió con programación dinámica el caso de un solo vehículo. Cordeau y Laporte (2007)
+  revisan la literatura del DARP.
+  & \tC\ Antes se decía que Psaraftis asignaba pasajeros a vehículos y que Cordeau y Laporte «extendieron» su
+  trabajo con heurísticas; su artículo es una revisión.\sep
+1.1.7 & Ichoua et al.\ estudian el despacho de vehículos en tiempo real con clientes ficticios que representan
+  llegadas futuras; las reducciones son 3.4--29.0\,\% (clientes no servidos) y 2.0--16.0\,\% (viaje y retrasos).
+  & \tC\ Antes: «\textit{dial-a-ride} dinámico», «información de los próximos 20--30 minutos», «hasta 29\,\%» y
+  «4--16\,\%», que no coinciden con el artículo.\sep
+1.1.9 & «Cinco características» \ra\ «cuatro»; Reyes et al.\ «argumentan» (antes «evidenciaron»).
+  & \tC\ La lista tiene cuatro elementos; el artículo argumenta, no demuestra empíricamente.\sep
+1.1.11 & El factor de 1.2--1.4 entre distancia por red y en línea recta se atribuye a Cole y King, citado por
+  Boyacı et al. Se recoge su conclusión: sin ventanas de tiempo la aproximación euclidiana es aceptable, pero con
+  ventanas estrechas una ruta factible puede volverse infactible. De Pereira et al.\ queda solo el costo de
+  licencias.
+  & \tC\ Antes: «rutas entre 17 y 40\,\% más largas», «20~min que serían 30» y «frecuentemente infactibles»,
+  que Boyacı et al.\ no afirman. «Caja negra» y «auditoría» no están en Pereira et al.\sep
+1.2 & Reescrita. Antes tenía tres subsecciones (ineficacia de las aproximaciones tradicionales, hostilidad
+  topológica de La Paz, brecha en la eficiencia algorítmica). Ahora tiene cuatro: 1.2.1~el problema de decisión
+  (coordinar o reaccionar), 1.2.2~la brecha (ciudades medias y redes reales), 1.2.3~el caso de La Paz y
+  1.2.4~preguntas de investigación (pregunta central, PI1--PI3), enlazadas con los objetivos.
+  & \tO\ «No se identifica qué problema se ataca»: el texto anterior describía el contexto pero no formulaba el
+  problema ni una pregunta. \tC\ También contenía afirmaciones que se corrigen en otras filas: el 17--40\,\%
+  atribuido a Boyacı et al.\ y el «96\,\% del óptimo» de Reyes et al.\ (el óptimo de comparación es de Yildiz y
+  Savelsbergh, y la cifra es un CtD 4\,\% superior).\sep
+1.5.1 & Figliozzi (2007) se cita por lo que muestra (los kilómetros dependen de las restricciones de ruteo y de
+  la distancia al área de servicio). La frase de aporte se formula en términos de la pregunta central.
+  & \tC\ El artículo no trata sobre el error de las aproximaciones lineales. \tO\ Coherencia con §1.2.\sep
+1.6.1 & Los dos picos diarios provienen del perfil de recolección de paquetes de LaDe (9:00 y 17:00) y no
+  corresponden a los horarios de comida locales.
+  & \tC\ Antes: «adaptados a la zona horaria local». LaDe es un conjunto de datos de paquetería.\sep
+1.6.2 & FCFS asigna cada orden en el momento en que se coloca. El escenario de control ejecuta ambas políticas con
+  distancias en línea recta a la velocidad media de la red OSRM.
+  & \tM\ Error 4. El control descrito antes («FCFS sobre OSRM») es la propia línea base y no aísla el efecto del
+  mapa; se describe el control que se ejecutó.\sep
+1.6.4 & El tiempo de servicio se aplica con la convención de Reyes et al.\ (mitad antes y mitad después) y el
+  repartidor espera si la comida no está lista. La transferibilidad de los patrones de consumo se presenta como
+  limitación.
+  & \tM\ Error 1. \tC\ Muñoz-Villamizar et al.\ se citaban para afirmar que los patrones son «universales y
+  transferibles»; el artículo sostiene que el tipo de ciudad influye.\\
+\bottomrule
+\end{longtable}}
+
+\subsection{Capítulo 2. Marco teórico}
+{\small
+\begin{longtable}{@{}L{1.75cm} L{8.15cm} L{6.6cm}@{}}
+\toprule
+Sección & Qué cambió & Por qué\\
+\midrule
+\endhead
+2.1 & Se explica en qué difieren Yildiz y Savelsbergh (información perfecta) y Ulmer et al.\ (\textit{ready time}
+  incierto), y que el simulador no adopta esos elementos.
+  & \tC\ Antes se decía que el simulador incorporaba cotas duales y \textit{ready time} aleatorio; no calcula
+  cotas, y el despachador conoce el \textit{ready time} desde que se coloca la orden.\sep
+2.1.2 & La Ec.~2.1 se presenta como síntesis expositiva; Reyes et al.\ ajustan su algoritmo con un objetivo
+  jerárquico (primero entregar casi todas las órdenes, luego minimizar el CtD).
+  & \tC\ Reyes et al.\ no plantean una suma ponderada como función objetivo.\sep
+2.1.7 & Steever et al.\ estudian en simulación, inspirados en un servicio real, pedidos con platillos de varios
+  restaurantes (\textit{virtual food court}).
+  & \tC\ Antes: «operadores reales» que «confirman empíricamente».\sep
+2.2.1 & $f = 5$~min y horizontes de 20~min corresponden a la variante~7 de la malla de parámetros de Reyes et al.
+  & \tC\ Antes: «calibración empírica», un proceso que no se realizó ni se documenta.\sep
+2.2.2 & $\beta = 0.1$ está dentro del intervalo $[0, 1]$ que exploran Reyes et al.
+  & \tC\ Reyes et al.\ no publican un valor recomendado.\sep
+2.2.4 & El problema de asignación se resuelve de forma exacta en tiempo polinomial; las implementaciones modernas
+  del Algoritmo Húngaro tienen complejidad $O(n^3)$.
+  & \tC\ El algoritmo original de Kuhn no es $O(n^3)$.\sep
+2.2.5 & La referencia cruzada apunta a §2.1.6 (variantes del entorno).
+  & Antes decía «Sección 2.1.5», que es otra sección.\sep
+2.3 & Mismas correcciones de Boyacı et al.\ (factor de Cole y King) y Pereira et al.\ que en §1.1.11.
+  & \tC\ Ver §1.1.11.\sep
+2.3.2 & Dijkstra con montículos de Fibonacci se presenta como mejora posterior al trabajo original. En lugar de una
+  complejidad empírica se da el dato de Geisberger et al.: consultas de menos de 1~ms en la red de Europa
+  occidental (18~millones de nodos).
+  & \tC\ Los montículos de Fibonacci son posteriores a Dijkstra (1959); la complejidad
+  $O(\sqrt{|V|}\log|V|)$ no aparece en Geisberger et al.\sep
+2.4.2 & LaDe proviene de la operación de paquetería de Cainiao (jornada de 8:00 a 19:00, picos de recolección a las
+  9:00 y 17:00). Los centros del perfil se «fijan», no se «calibran», y no corresponden a los horarios de comida en
+  México (alrededor de 14:00 y 20:00).
+  & \tC\ Antes se presentaba como demanda de comida («almuerzo y cena») calibrada a horarios locales.\sep
+2.4.3 & Hildebrandt y Ulmer, citando estudios previos, señalan que la desviación respecto al tiempo esperado predice
+  mejor la satisfacción. La utilización incluye el tiempo de servicio.
+  & \tC\ Antes: «demuestran». \tM\ Error 5.\\
+\bottomrule
+\end{longtable}}
+
+\subsection{Capítulo 3. Desarrollo}
+{\small
+\begin{longtable}{@{}L{1.75cm} L{8.15cm} L{6.6cm}@{}}
+\toprule
+Sección & Qué cambió & Por qué\\
+\midrule
+\endhead
+Tabla 3.2 & Tiempo de servicio $s$ \ra\ $s_r$, $s_o$ (por recolección y por entrega).
+  & \tM\ Error 1: el código aplica cada uno por separado.\sep
+3.2.1 & La intensidad $\lambda(t)$ toma la forma diaria de LaDe; sus centros reproducen la ubicación de los picos de
+  paquetería y no los horarios de comida.
+  & \tC\ Ver §2.4.2.\sep
+3.2.2 & $\mu_{prep} = 12$ y $\sigma_{prep} = 3$ son un supuesto del generador, no calibrado.
+  & \tC\ Antes: «seleccionados a partir de rangos observados», sin verificación.\sep
+3.2.3 & El rango de 2 a 5~km entre restaurante y cliente es un supuesto del generador.
+  & \tC\ Antes: «replicando la distribución de LaDe»; LaDe no reporta distancias restaurante--cliente.\sep
+3.3.1 & El despacho ocurre en cada época, sin importar el minuto de inicio. Párrafo nuevo sobre la espera de 5 a
+  10~min entre rutas por el orden de las fases.
+  & \tM\ Error 2. La convención del ciclo se documenta y su efecto se evalúa en §4.5.5.\sep
+3.3.2--3.3.3 & El repartidor acumula tiempo de servicio. En RH la orden cambia de estado al recibir el
+  compromiso final.
+  & \tM\ Errores 3 y 5.\sep
+3.3.4 & Subsección nueva, «Temporización de rutas», con las ecuaciones de recolección y entrega.
+  & \tM\ Error 1: describe la corrección central.\sep
+3.4.1 & FCFS toma todas las órdenes reveladas sin repartidor, las ordena por instante de colocación y espera en el
+  restaurante si la comida no está lista. Se elimina el «sesgo de orden de iteración».
+  & \tM\ Error 4.\sep
+3.4.2 & «Cota inferior práctica» \ra\ «línea base reactiva». La comparación evalúa las políticas completas y no
+  atribuye la mejora a un mecanismo en particular.
+  & \tC\ RH difiere de FCFS en varios mecanismos a la vez; el diseño no permite atribuir la mejora a uno.\sep
+3.5.1 & El denominador de $Z_t$ es el conjunto de repartidores en turno, libres u ocupados.
+  & \tM\ Error 7.\sep
+3.5.2 & Se minimiza el incremento de costo; la reinserción mantiene cada orden en un solo agrupamiento.
+  & \tM\ Errores 3 y 6.\sep
+3.5.3 & SciPy 1.13 resuelve la asignación con una variante del algoritmo de Jonker--Volgenant; se aclara que en el
+  documento se le llama Algoritmo Húngaro.
+  & \tC\ Antes se afirmaba que SciPy implementa el Algoritmo Húngaro.\sep
+3.5.4 & El compromiso final usa la duración OSRM real del tramo repartidor\,\ra\,restaurante y los tiempos de
+  §3.3.4; tras un compromiso parcial el repartidor queda en el restaurante.
+  & \tM\ Errores 8 y 9.\sep
+3.6.2 & Rangos reales de flota por escenario (55--59, 38--41, 29--30 y 19--21 repartidores).
+  & \tM\ El número de órdenes varía entre semillas (988 a 1\,047), y con él la flota.\sep
+3.6.5 & Subsección nueva, «Escenario de control euclidiano»: distancia en línea recta a 651~m/min y una segunda
+  variante a 472~m/min.
+  & \tO\ Necesaria para responder PI2 (§4.5.4).\sep
+3.7.1 & Se agrega el SLA sobre todas las órdenes generadas; las diferencias de porcentajes se reportan en puntos
+  porcentuales.
+  & \tR\ El SLA sobre entregados favorece a la política que deja más pedidos sin entregar.\sep
+3.7.3, Tabla 3.4 & La utilización incluye el servicio. Los pedidos por repartidor por hora solo difieren por la
+  cobertura.
+  & \tM\ Error 5. \tC\ Ambas políticas usan la misma flota y los mismos turnos.\\
+\bottomrule
+\end{longtable}}
+
+\subsection{Capítulo 4. Resultados}
+{\small
+\begin{longtable}{@{}L{1.75cm} L{8.15cm} L{6.6cm}@{}}
+\toprule
+Sección & Qué cambió & Por qué\\
+\midrule
+\endhead
+Intro.\ & Diez semillas válidas; se elimina la explicación de la falla de OSRM; se indican las corridas de origen.
+  & \tR\ Error 2.\sep
+4.1, Tabla 4.1 & Cada semilla genera su propia instancia (988 a 1\,047 órdenes); la tabla muestra rangos de flota;
+  80 corridas. Las verificaciones de integridad sustituyen a «cada \texttt{order\_id} aparece una vez». Se indica
+  que se usó el binario oficial \texttt{osrm-routed} v5.27.1. Oración nueva sobre el tiempo de cómputo y la
+  memoria (FCFS 1.8--2.7~s y RH 57--80~s por día simulado; 194--221~MB).
+  & \tR\ \tM\ La verificación anterior no detectaba entregas dobles (error 3). \tO\ El tiempo de cómputo responde
+  a PI3.\sep
+4.2.1, Tabla 4.2, Fig.~4.1 & Cifras nuevas; columna de SLA en $\Delta$pp. S1: FCFS ligeramente mejor. S2: la
+  relación se invierte. Cobertura en S3--S4 y SLA sobre todas las órdenes.
+  & \tR\ Ver Sección~3.\sep
+4.2.2, Tabla 4.3 & RH tiene menor \textit{Ready-to-Pickup} también en S1. El exceso sobre el SLA crece
+  «rápidamente» (antes «exponencialmente»); las reducciones son cercanas al 80\,\% (antes, más del 90\,\%).
+  & \tR\ \tC\ No se ajustó ningún modelo exponencial.\sep
+4.3.1, Tabla 4.4 & \textit{Throughput} igual en S1--S2; la diferencia en S3--S4 refleja cobertura. Utilización
+  menor bajo RH en S1--S3 y similar en S4.
+  & \tR\ Errores 3 y 5.\sep
+4.3.2 & La distancia por pedido bajo RH es menor en todos los escenarios.
+  & \tR\sep
+4.4, Tabla 4.5, Fig.~4.2 & Tamaños de agrupamiento nuevos; el pie aclara que \textit{Avg Bundle} es la media
+  ponderada por pedido. En S1 el 25.4\,\% de los pedidos viaja solo (antes 54\,\%); en S4 el 80.9\,\% viaja en
+  agrupamientos de 3 o 4.
+  & \tR\sep
+4.4.2 & En S1 el costo por pedido es mayor bajo RH, con su explicación.
+  & \tR\sep
+4.5.1 & Los cálculos residen en \texttt{20261023\_233115\_osrm}.
+  & \tR\ La corrida anterior (\texttt{20260413\_182745}) queda invalidada.\sep
+4.5.2, Tabla 4.6 & Wilcoxon con $n = 10$; S1 con $p = 0.0137$ (CtD) y $p = 0.23$ (SLA); Friedman
+  $\chi^2_F = 30.0$.
+  & \tR\sep
+4.5.3 & Baja saturación = solo S1; RH supera a FCFS en S2--S4; el \textit{rank-biserial} pasa de $-0.85$ a $+1.00$.
+  & \tR\sep
+4.5.4 & Se elimina la comparación con el 10--25\,\% de Reyes et al. Párrafo nuevo sobre la red vial: $\kappa = 1.38$
+  (3.30~km por la red frente a 2.39~km en línea recta, sobre 10\,184 trayectos), resultados del control euclidiano
+  y fracción explicada por la escala (62--84\,\%).
+  & \tC\ Reyes et al.\ no comparan contra FCFS. \tO\ Responde a PI2; sustituye la afirmación sin medición sobre
+  «menor conectividad y mayor variabilidad».\sep
+4.5.5 & Se quita la viñeta de las tres semillas fallidas. Se agregan: la convención del ciclo y su prueba de
+  robustez (reducciones de CtD de 14.6, 41.4 y 63.0\,\% en S2--S4, que se leen como cota superior), el origen de
+  paquetería de los picos de LaDe y $s_r = s_o$.
+  & \tR\ Error 2 y convención del ciclo. \tC\ LaDe.\sep
+Fig.~4.3 & El cruce de las curvas de CtD ocurre entre $\rho = 18$ y 26 (antes, entre 26 y 35).
+  & \tR\\
+\bottomrule
+\end{longtable}}
+
+\subsection{Capítulo 5. Conclusiones}
+{\small
+\begin{longtable}{@{}L{1.75cm} L{8.15cm} L{6.6cm}@{}}
+\toprule
+Sección & Qué cambió & Por qué\\
+\midrule
+\endhead
+Intro.\ & El capítulo responde primero las preguntas de §1.2.4. & \tO\sep
+5.1 & Sección nueva, «Respuesta a las preguntas de investigación»: pregunta central, PI1, PI2 y PI3, cada una con
+  la sección del Cap.~4 que la sostiene.
+  & \tO\sep
+5.2.1 & 80 corridas (antes 56). & \tR\sep
+5.2.2 & OE1: puntos sobre el «área urbana» de La Paz (antes «estructura demográfica real»), 988 a 1\,047 órdenes,
+  todas las semillas válidas. OE2: se agregan $\kappa$ y los dos controles euclidianos. OE3: temporización de
+  Reyes et al.\ y verificaciones de integridad. OE4: $n = 10$ y valores $p$ nuevos.
+  & \tR\ \tM\ El generador no usa datos demográficos; muestrea puntos en el área urbana.\sep
+5.3 & Hipótesis: en S1 no se verifica (CtD menor bajo FCFS, SLA sin diferencia significativa, \textit{throughput}
+  igual); se verifica en S2--S3; máxima en S4. Nota de cota superior.
+  & \tR\ Antes el régimen de baja saturación abarcaba S1--S2 y el \textit{throughput} de RH era mayor por las
+  entregas dobles (error 3).\sep
+5.4 & Punto de cruce en $\rho \approx 18$--26 (antes 26--35 y «señal temprana en S2»). En S4, $-67.3$\,\% de CtD y
+  $-42.0$\,\% de P90. Se elimina «superando el 10--25\,\% de Reyes et al.». La topología se describe con
+  $\kappa = 1.38$.
+  & \tR\ \tC\ Ver §4.5.4.\sep
+5.5 & Se elimina «Robustez de la integración con OSRM». «Pesos ($\beta$, $\theta$)» en lugar de
+  «$w_1, \ldots, w_4$». El punto de cruce fino se busca entre $\rho = 18$ y 26.
+  & \tR\ La falla no era de OSRM (error 2). \tC\ La función de costo implementada tiene los pesos $\beta$ y
+  $\theta$; $w_1, \ldots, w_4$ no existen.\\
+\bottomrule
+\end{longtable}}
+
+% ─────────────────────────────────────────────────────────────
+\section{Bibliografía}
+{\small
+\begin{longtable}{@{}L{3.6cm} L{6.6cm} L{6.3cm}@{}}
+\toprule
+Referencia & Qué estaba mal & Corrección\\
+\midrule
+\endhead
+Larsen (2000) & Entrada inexistente: «Jesper Larsen», artículo de \textit{Computers \& Operations Research} con DOI
+  inválido & Tesis doctoral de Allan Larsen, Technical University of Denmark (IMM-PHD-2000-73)\sep
+Wu et al.\ (LaDe) & Autores, congreso, año y DOI incorrectos; el DOI apuntaba a otro artículo
+  & KDD '24, pp.~5991--6002, DOI 10.1145/3637528.3671548\sep
+Lenstra y Rinnooy Kan (1981) & El DOI correspondía a otro artículo & DOI 10.1002/net.3230110211\sep
+Reyes et al.\ (2018) & Registrado como artículo de la «revista» \textit{Optimization Online}, que es un repositorio
+  de preprints & Preprint\sep
+Hildebrandt y Ulmer & Año 2021 y sin volumen & 2022, vol.~56, núm.~4, pp.~1058--1084\sep
+Jazemi et al.\ (2023) & Número «2413015» & Vol.~13, núm.~24, art.~13015, con DOI\sep
+Lin et al.\ (2018) & Coautor «Zhaodong Xu» y DOI incorrecto & «Zhe Xu» y DOI correcto\sep
+Psaraftis (1980) & Título inexacto & Título original\sep
+Boeing & Volumen, páginas y año & Corregidos\sep
+Dantzig y Ramser (1959), Muñoz-Villamizar et al., Ichoua et al. & Sin DOI, número de artículo que no se imprimía,
+  guiones tipográficos & Corregidos\\
+\bottomrule
+\end{longtable}}
+
+% ─────────────────────────────────────────────────────────────
+\section{Numeración que cambió}
+\begin{itemize}\setlength{\itemsep}{1pt}
+\item §1.2: tres subsecciones (1.2.1--1.2.3) \ra\ cuatro (1.2.1--1.2.4), con títulos nuevos.
+\item §3.3.4 «Temporización de rutas» es nueva; «Integración con OSRM» pasa de 3.3.4 a 3.3.5. Las ecuaciones del
+  Cap.~3 posteriores a ella cambian de número.
+\item §3.6.5 «Escenario de control euclidiano» es nueva; «Replicación y análisis de sensibilidad» pasa a 3.6.6 y
+  «Almacenamiento de resultados» a 3.6.7.
+\item §5.1 «Respuesta a las preguntas de investigación» es nueva; las secciones 5.1--5.4 anteriores pasan a
+  5.2--5.5.
+\item §2.1.8 «Resumen de notación» es nueva y contiene la Tabla~2.1 (notación); las demás tablas y las figuras
+  conservan su número (11 tablas y 5 figuras). La tesis pasa de 85 a 94 páginas.
+\end{itemize}
+
+% ─────────────────────────────────────────────────────────────
+\section{Lo que se mantuvo sin cambios}
+\begin{itemize}\setlength{\itemsep}{1pt}
+\item Título, objetivo general y objetivos específicos: se conserva el texto registrado en el protocolo (en el
+  objetivo específico~1 solo se agregó la cita de LaDe). La hipótesis conserva lo que afirma; solo se precisó su
+  redacción técnica (véase «En resumen»). Su grado de cumplimiento con los resultados nuevos se discute en §5.2 y §5.3.
+\item Alcance y delimitación; justificación (§1.5.2--1.5.4 sin cambios y §1.5.1 solo en la cita de Figliozzi y la
+  frase de aporte).
+\item Estructura de capítulos, diseño experimental (cuatro escenarios, diez semillas, pruebas de Wilcoxon y
+  Friedman) y conjunto de métricas.
+\item Redacción de las contribuciones y del trabajo futuro, salvo los puntos señalados en la Sección~4.
+\end{itemize}
+
+\end{document}

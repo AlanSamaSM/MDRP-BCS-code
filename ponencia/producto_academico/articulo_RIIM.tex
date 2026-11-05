@@ -1,0 +1,768 @@
+% Artículo para la Revista Internacional de Investigación Multidisciplinaria (RIIM).
+% Compilar con XeLaTeX (dos pasadas):
+%   versión ciega para OJS:  xelatex articulo_RIIM.tex
+%   versión con autores:     xelatex -jobname=articulo_RIIM_autores "\def\conautores{}\input{articulo_RIIM}"
+\documentclass[10pt]{article}
+
+% ── Revisión doble ciega ────────────────────────────────────────────
+\newif\ifblind
+\ifdefined\conautores \blindfalse \else \blindtrue \fi
+
+% ── Página (plantilla RIIM: carta; márgenes 2.0 / 2.0 / 3.5 / 2.25 cm;
+%    encabezado y pie a 1.25 cm del borde) ──────────────────────────
+\usepackage[letterpaper, left=2cm, right=2cm, top=3.5cm, bottom=2.25cm,
+            headheight=1.45cm, headsep=0.8cm, footskip=0.62cm]{geometry}
+
+% ── Tipografía ──────────────────────────────────────────────────────
+\usepackage{fontspec}
+\setmainfont{Montserrat}[
+  Path=fonts/, Extension=.ttf,
+  UprightFont=*-Regular, ItalicFont=*-Italic,
+  BoldFont=*-SemiBold, BoldItalicFont=*-SemiBoldItalic]
+\newfontfamily\semibold{Montserrat}[
+  Path=fonts/, Extension=.ttf,
+  UprightFont=*-SemiBold, ItalicFont=*-SemiBoldItalic, Ligatures=TeX]
+\newfontfamily\arialfont{Arial}[Ligatures=TeX]
+\usepackage[spanish, mexico, es-tabla, es-nodecimaldot, es-noshorthands]{babel}
+\spanishplainpercent
+\usepackage{amsmath, amssymb}
+\usepackage{xcolor}
+\definecolor{riimazul}{HTML}{003D7C}
+\definecolor{cfcfs}{HTML}{1E88E5}
+\definecolor{crh}{HTML}{F59E0B}
+
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{float}
+\usepackage{flafter}
+% Permite que tablas y figuras compartan página con el texto en lugar de ir a páginas solo de flotantes.
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\bottomfraction}{0.7}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.8}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\setlength{\textfloatsep}{12pt plus 2pt minus 2pt}
+\setlength{\floatsep}{10pt plus 2pt minus 2pt}
+\setlength{\intextsep}{10pt plus 2pt minus 2pt}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, fit, backgrounds}
+\usepackage{fancyhdr}
+\usepackage{caption}
+\usepackage[hidelinks]{hyperref}
+
+% Cuerpo: Montserrat 10, interlineado sencillo, justificado, sin sangría, 8 pt después.
+\renewcommand{\normalsize}{\fontsize{10}{12.2}\selectfont}
+\normalsize
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{8pt plus 1pt}
+\setlength{\abovedisplayskip}{6pt}
+\setlength{\belowdisplayskip}{6pt}
+\setlength{\abovedisplayshortskip}{4pt}
+\setlength{\belowdisplayshortskip}{4pt}
+
+% Títulos de sección sin numerar: Montserrat SemiBold 12 pt azul; subtítulos SemiBold itálica 11 pt.
+\makeatletter
+\setcounter{secnumdepth}{0}
+\renewcommand{\section}{\@startsection{section}{1}{0pt}{8pt}{0.1pt}
+  {\semibold\fontsize{12}{14.6}\selectfont\color{riimazul}\raggedright}}
+\renewcommand{\subsection}{\@startsection{subsection}{2}{0pt}{8pt}{0.1pt}
+  {\semibold\itshape\fontsize{11}{13.4}\selectfont\addfontfeatures{LetterSpace=6.8}\raggedright}}
+\makeatother
+
+% Pies de figura y de tabla: 9 pt, centrados, "Figura N." / "Tabla N.".
+\captionsetup{font={footnotesize}, labelfont={footnotesize}, labelsep=period,
+  justification=centering, skip=4pt}
+\captionsetup[table]{position=top}
+\renewcommand{\footnotesize}{\fontsize{9}{11}\selectfont}
+
+% Encabezado: logotipo RIIM (imagen de la plantilla recortada al 59.3 % izquierdo, como en Word) a la izquierda y "RIIM, Vol 3, Num 2, 2026" (Arial 8) a la derecha.
+% Pie: número de página centrado; ISSN a la izquierda y URL a la derecha (9 pt).
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancyhead[C]{\makebox[\textwidth]{%
+  \raisebox{-0.5\height}{\includegraphics[trim=0 0 335.53bp 0, clip, width=7.37cm, height=1.40cm]{img/riim_header.png}}%
+  \hfill\raisebox{-0.5\height}{\arialfont\fontsize{8}{9.6}\selectfont RIIM, Vol 3, Num 2, 2026}}}
+\fancyfoot[C]{\parbox[t]{\textwidth}{\centering\fontsize{9}{11}\selectfont\thepage\\[1pt]
+  ISSN 3122-4806\hfill http://orizaba.tecnm.mx/revistaojs}}
+
+% Listas compactas.
+\makeatletter
+\renewcommand{\@listI}{\leftmargin=1.2em \topsep=0pt \partopsep=0pt \itemsep=2pt \parsep=0pt}
+\let\@listi\@listI
+\makeatother
+
+% Referencias IEEE (Arial 10, sangría francesa de 1.27 cm).
+\makeatletter
+\renewenvironment{thebibliography}[1]{%
+  \section{Referencias}
+  \list{\@biblabel{\@arabic\c@enumiv}}{%
+    \arialfont\fontsize{10}{12}\selectfont
+    \settowidth\labelwidth{\@biblabel{#1}}%
+    \leftmargin=1.27cm \labelwidth=1.27cm \labelsep=0pt \itemindent=0pt
+    \itemsep=0pt \parsep=0pt \topsep=0pt
+    \def\makelabel##1{##1\hfil}%
+    \usecounter{enumiv}\let\p@enumiv\@empty
+    \renewcommand\theenumiv{\@arabic\c@enumiv}}%
+  \sloppy\clubpenalty4000\widowpenalty4000\sfcode`\.\@m}
+  {\def\@noitemerr{\@latex@warning{Empty `thebibliography' environment}}\endlist}
+\makeatother
+
+\hypersetup{pdftitle={Logística de última milla en redes viales reales: MDRP reproducible en La Paz, B.C.S.},
+  pdfauthor={}, pdfsubject={RIIM}, pdfkeywords={enrutamiento dinámico, horizonte rodante, OpenStreetMap, simulación}}
+\ifblind\else\hypersetup{pdfauthor={Alan José Marcos Sánchez Martínez}}\fi
+
+% Notación.
+\newcommand{\CtD}{\text{CtD}}
+\newcommand{\Cdisp}{\mathcal{C}_{disp}(t)}
+
+% Diagrama de caja: \caja{x}{mín}{Q1}{mediana}{Q3}{máx}{color}
+\newcommand{\caja}[7]{%
+  \draw (#1,#2) -- (#1,#3) (#1,#5) -- (#1,#6);
+  \draw (#1-0.14,#2) -- (#1+0.14,#2) (#1-0.14,#6) -- (#1+0.14,#6);
+  \filldraw[fill=#7!75, draw=black!70] (#1-0.3,#3) rectangle (#1+0.3,#5);
+  \draw[line width=1pt] (#1-0.3,#4) -- (#1+0.3,#4);}
+
+\begin{document}
+
+% ── Título, autores y área ──────────────────────────────────────────
+\begin{center}
+  \setlength{\parskip}{0pt}
+  \vspace*{6pt}
+  {\semibold\fontsize{16}{19.5}\selectfont\addfontfeatures{LetterSpace=-3.1}%
+   LOGÍSTICA DE ÚLTIMA MILLA EN REDES VIALES REALES: MDRP REPRODUCIBLE EN LA PAZ, B.C.S.\par}
+  \vspace{18pt}
+  \ifblind\else
+  {\itshape\fontsize{9}{11}\selectfont
+   Sánchez Martínez, Alan José Marcos\textsuperscript{1*}\par
+   \textsuperscript{1}Tecnológico Nacional de México / Instituto Tecnológico de La Paz, alansama2906@gmail.com\par}
+  \fi
+  {\fontsize{9}{11}\selectfont Área de participación: Sistemas Computacionales\par}
+\end{center}
+
+\section{Resumen}
+Las plataformas de entrega de comida deciden, sin conocer los pedidos futuros, si asignan cada orden
+al repartidor libre más cercano o si esperan unos minutos para agrupar órdenes y coordinar la
+asignación. Este trabajo evalúa en qué condiciones conviene coordinar en una ciudad media mexicana,
+La Paz, B.C.S., y cuánto cambia la evaluación al usar la red vial real. Se construyó un simulador de
+código abierto que obtiene los tiempos de viaje de OSRM sobre OpenStreetMap y compara una política
+reactiva (FCFS) con una heurística de horizonte rodante (RH) en cuatro niveles de saturación de la
+flota, con diez instancias sintéticas por nivel. Con una flota holgada, FCFS entrega 1.4~min antes;
+con 26 o más pedidos por repartidor en la jornada, RH reduce el tiempo de entrega en todas las
+instancias, hasta en 67\,\%. Las distancias euclidianas subestiman los tiempos de entrega y el
+beneficio de coordinar.
+
+{\semibold\fontsize{12}{14.6}\selectfont\color{riimazul}Palabras clave}: \textit{enrutamiento dinámico, horizonte rodante, OpenStreetMap, simulación}
+
+\section{Abstract}
+\begin{otherlanguage}{english}\frenchspacing
+Food delivery platforms must decide, without knowing future orders, whether to assign each order to
+the nearest idle courier or to wait a few minutes, batch orders and coordinate the assignment. This
+work evaluates under which conditions coordination pays off in a mid-sized Mexican city, La Paz,
+B.C.S., and how much the evaluation changes when the real road network is used. An open-source
+simulator was built that obtains travel times from OSRM over OpenStreetMap and compares a reactive
+policy (FCFS) with a rolling-horizon heuristic (RH) at four fleet saturation levels, with ten
+synthetic instances per level. With a slack fleet, FCFS delivers 1.4~min earlier; with 26 or more
+orders per courier over the day, RH reduces delivery time in every instance, by up to 67\,\%.
+Euclidean distances underestimate both delivery times and the benefit of coordination.
+
+{\semibold\fontsize{12}{14.6}\selectfont\color{riimazul}Key words}: \textit{dynamic routing, rolling horizon, OpenStreetMap, simulation}
+\end{otherlanguage}
+
+\section{Introducción}
+La última milla, el tramo que va del punto de recolección al domicilio del cliente, es uno de los
+eslabones más costosos y difíciles de la logística urbana. En zonas residenciales concentra grandes
+volúmenes de entregas con horarios estrechos y condiciones que cambian durante el día
+\cite{Jazemi2023}. La entrega de comida a domicilio agrava estas exigencias: los pedidos llegan sin
+aviso, la comida pierde calidad con cada minuto de espera y el cliente espera recibirla en menos de
+una hora.
+
+En este contexto, una plataforma debe decidir de forma continua qué repartidor atiende cada orden y
+en qué momento. Este problema, formalizado como \textit{Meal Delivery Routing Problem} (MDRP) por
+Reyes \textit{et al.} \cite{Reyes2018}, admite dos estrategias básicas. La primera es reactiva: cada
+orden se asigna en cuanto aparece al repartidor libre más cercano (\textit{First-Come, First-Served},
+FCFS). La segunda es coordinada: el sistema espera unos minutos, agrupa órdenes del mismo restaurante
+y decide de manera conjunta qué repartidor atiende cada agrupamiento, como en la heurística de
+horizonte rodante (\textit{Rolling Horizon}, RH) propuesta en \cite{Reyes2018}. Coordinar tiene un
+costo, porque algunas órdenes esperan a que se forme el agrupamiento o a que se entreguen otras antes
+que ellas, y un beneficio, porque cada viaje atiende más pedidos. El balance entre ambos depende de
+cuántos repartidores hay frente a la demanda.
+
+La evidencia disponible sobre este balance proviene de entornos muy distintos a una ciudad media. RH
+se evaluó con instancias que reproducen áreas metropolitanas de Estados Unidos y con tiempos de viaje
+calculados como la distancia euclidiana multiplicada por un factor constante \cite{Reyes2018}. En
+instancias pequeñas resueltas a optimalidad, su \textit{Click-to-Door} promedio queda apenas un
+4\,\% por encima del óptimo \cite{Yildiz2019}, pero no se ha reportado cómo cambia su ventaja frente
+a una política reactiva conforme varía el tamaño de la flota. Otras formulaciones del problema
+incorporan la incertidumbre en los tiempos de preparación \cite{Ulmer2021} o la estimación del tiempo
+de llegada, cuya desviación respecto a lo prometido pesa en la satisfacción del cliente tanto como la
+rapidez misma \cite{Hildebrandt2022}.
+
+La forma de medir los tiempos de viaje añade una segunda fuente de error. Las distancias por la red
+vial suelen ser entre 1.2 y 1.4 veces mayores que en línea recta, y en problemas con ventanas de
+tiempo estrechas, como la entrega de comida, una ruta factible con distancias euclidianas puede
+resultar infactible sobre la red real \cite{Boyaci2021}. Una evaluación que ignore la red puede
+equivocarse no solo en los tiempos de entrega, sino también en la carga efectiva de la flota y, por
+lo tanto, en el beneficio de coordinar. Los servicios comerciales de rutas resuelven la precisión,
+pero su costo de licencia limita su uso en investigación \cite{Pereira2021} y su funcionamiento
+cerrado dificulta reproducir los experimentos.
+
+La Paz, B.C.S., ilustra esta brecha: es una ciudad media sin datos públicos de operaciones de entrega
+de comida, cuya red vial, condicionada por la costa y por pocas avenidas principales, obliga a
+recorridos más largos que la línea recta. De ahí surge la pregunta que guía este trabajo:
+\textit{en una ciudad media, ¿en qué condiciones de saturación de la flota conviene coordinar los
+despachos en lugar de asignar cada pedido al llegar, y cuánto cambia esa evaluación al usar la red
+vial real en lugar de distancias euclidianas?} La pregunta se divide en tres: cómo varía la ventaja
+de RH con la saturación y dónde se produce el cambio de régimen (PI1); cuánto más largos son los
+trayectos por la red y cuánto cambia la comparación al ignorarla (PI2); y si la evaluación puede
+hacerse de forma reproducible, con recursos modestos y solo con herramientas de código abierto (PI3).
+
+Las contribuciones corresponden a esas tres preguntas: (i)~una comparación pareada de FCFS y RH en
+cuatro niveles de saturación, con prueba estadística por instancia, que ubica el punto a partir del
+cual coordinar compensa; (ii)~la medición de la circuidad de la red urbana de La Paz y dos escenarios
+de control con distancias euclidianas que separan el efecto de la red del efecto de la política; y
+(iii)~un entorno de simulación reproducible, construido sobre OpenStreetMap y OSRM, que ejecuta un
+día de operación en alrededor de un minuto en una computadora portátil. El estudio no propone un
+algoritmo nuevo ni compara RH con políticas del estado del arte: su objetivo es caracterizar cuándo
+conviene coordinar en un entorno realista.
+
+\section{Metodología}
+
+\subsection{Formulación del problema y métricas}
+Se adopta la formulación del MDRP de \cite{Reyes2018}. Un conjunto $\mathcal{R}$ de restaurantes con
+ubicación fija recibe órdenes $o \in \mathcal{O}$, cada una con restaurante de origen $r_o$, instante
+de colocación $a_o$, instante en que la comida está lista $e_o \geq a_o$ y punto de entrega $\ell_o$.
+La orden solo se conoce a partir de $a_o$. Una flota $\mathcal{C}$ de repartidores, con turno
+$[e_c, l_c]$, recoge y entrega las órdenes. Órdenes del mismo restaurante pueden formar un
+agrupamiento $B$ que se recoge en una sola visita y se entrega en una ruta de varias paradas. Los
+tiempos de servicio son $s_r$ en el restaurante, una vez por agrupamiento, y $s_o$ con cada cliente.
+
+La métrica principal es el \textit{Click-to-Door} de cada orden,
+$\CtD_o = t_{delivery,o} - a_o$. A partir de ella se reportan su media y su percentil 90, y el
+cumplimiento del nivel de servicio (SLA, \textit{Service Level Agreement}), entendido como el
+porcentaje de órdenes entregadas dentro del objetivo $\tau$:
+\begin{equation}
+  \text{SLA} = \frac{|\{o \in \mathcal{O}_{del} : \CtD_o \leq \tau\}|}{|\mathcal{O}_{del}|} \times 100,
+  \label{eq:sla}
+\end{equation}
+donde $\mathcal{O}_{del}$ es el conjunto de órdenes entregadas. Como ambas métricas se calculan
+sobre órdenes entregadas, se reporta también el porcentaje de órdenes sin entregar al cierre. Se
+complementan con el tiempo de espera de la comida lista, $\text{RtP}_o = t_{pickup,o} - e_o$, la
+distancia recorrida por pedido, la utilización de la flota (fracción del turno en conducción o en
+servicio), el tamaño de agrupamiento y el costo por pedido, con un pago de $p_1$ por orden entregada
+y un mínimo garantizado de $p_2$ por hora de turno \cite{Reyes2018}.
+
+\subsection{Políticas de despacho}
+El simulador avanza en épocas de $f = 5$~min para ambas políticas: en cada época, FCFS asigna una por
+una las órdenes nuevas y RH resuelve su optimización. Las dos calculan los instantes de recolección y
+entrega con las mismas reglas. Un agrupamiento $B$ solo puede recogerse cuando ya está lista la
+última de sus órdenes, es decir, a partir del instante $e_B = \max_{o\in B} e_o$. El repartidor $c$
+llega al restaurante en el instante $t_{arr,r}$ y, como en \cite{Reyes2018}, cada tiempo de servicio
+se reparte mitad antes y mitad después del momento de recoger o de entregar. Si la comida ya está
+lista, la recolección ocurre al cumplirse la primera mitad del servicio en el restaurante; si no, el
+repartidor espera hasta que esté lista. Por eso el instante de recolección es
+$t_{pickup}(c,B) = \max\bigl(e_B,\; t_{arr,r} + s_r/2\bigr)$. Después, el repartidor sale del
+restaurante al terminar la segunda mitad del servicio, recorre el tramo hasta el primer cliente y le
+entrega al cumplirse la primera mitad del servicio con él; cada entrega siguiente se calcula igual a
+partir de la anterior.
+
+\textbf{FCFS (línea base reactiva).} En cada época, las órdenes reveladas sin repartidor se procesan
+por orden de colocación. Cada una se asigna al repartidor libre más cercano en línea recta al
+restaurante (esta distancia solo sirve para escoger al repartidor); la ruta repartidor $\to$ restaurante
+$\to$ cliente y sus tiempos se obtienen de OSRM, y el repartidor queda comprometido de inmediato. Cada
+viaje lleva una sola orden.
+
+\textbf{RH (política coordinada).} Sigue el esquema de \cite{Reyes2018} y en cada época $t$ ejecuta
+cinco pasos. Primero, delimita las órdenes que entran a la optimización: de las órdenes ya reveladas y
+aún no entregadas, $\mathcal{O}_t$, solo considera las que estarán listas dentro del horizonte de
+asignación $\Delta_u$, es decir, $U_t = \{o \in \mathcal{O}_t : e_o \leq t + \Delta_u\}$; planear
+órdenes cuya comida tardará mucho en estar lista sería poco útil en un entorno que cambia cada pocos
+minutos.
+
+Segundo, estima cuántas órdenes conviene juntar en cada viaje. El tamaño objetivo de agrupamiento
+$Z_t$ compara la demanda próxima con la oferta próxima: el numerador cuenta las órdenes que estarán
+listas en los siguientes $\Delta_1$ minutos, y el denominador, los repartidores en turno, libres u
+ocupados, que quedarán disponibles en los siguientes $\Delta_2$ minutos, donde $e^{avail}_c$ es el
+instante en que el repartidor $c$ termina su ruta actual:
+\begin{equation}
+  Z_t = \left\lceil \frac{|\{o \in \mathcal{O}_t : e_o \leq t + \Delta_1\}|}
+                        {|\{c \in \mathcal{C}_{turno}(t) : e^{avail}_c \leq t + \Delta_2\}|} \right\rceil.
+  \label{eq:zt}
+\end{equation}
+Si hay tantos repartidores como órdenes, $Z_t = 1$ y cada orden tiende a viajar sola; si la flota se
+satura, $Z_t$ crece y se forman agrupamientos más grandes. $Z_t$ se acota en 5, y ningún agrupamiento
+puede superar $B_{max} = 4$ órdenes.
+
+Tercero, forma los agrupamientos de cada restaurante $r$. Sus órdenes $U_{t,r}$ se reparten en
+\[
+  m_r = \min\bigl(\lceil |U_{t,r}|/Z_t \rceil,\; |\Cdisp|\bigr)
+\]
+agrupamientos, de modo que cada uno reciba alrededor de $Z_t$ órdenes sin crear más agrupamientos que
+repartidores disponibles. Las órdenes se toman por \textit{ready time}, y cada una se inserta en el
+agrupamiento y la posición de la ruta que menos incrementan el costo
+\begin{equation}
+  \text{costo}(B, o, p) = T_{ruta}(B \oplus_p o) + \beta\, T_{servicio}(B \oplus_p o),
+  \label{eq:costo}
+\end{equation}
+donde $B \oplus_p o$ es el agrupamiento con la orden $o$ insertada en la posición $p$, $T_{ruta}$ es
+la duración de la ruta según OSRM y $T_{servicio}$ el tiempo de servicio acumulado; con $\beta = 0.1$,
+la duración de la ruta domina el costo. Después, dos iteraciones de extracción y reinserción mueven
+cada orden al agrupamiento donde su costo es menor.
+
+Cuarto, asigna agrupamientos a repartidores. Los agrupamientos se clasifican en tres grupos de
+prioridad: urgentes, cuando ningún repartidor puede entregar su orden más antigua dentro del objetivo
+$\tau$; retrasados, cuando el objetivo aún es alcanzable pero ningún repartidor llega al restaurante
+antes de que la comida esté lista; y normales. Los grupos se resuelven en ese orden, para que los
+urgentes obtengan primero a los repartidores más cercanos. En cada grupo se resuelve un problema de
+asignación lineal, en el que cada repartidor recibe a lo más un agrupamiento, con el peso
+\begin{equation}
+  w_{c,B} = \frac{|B|}{T_{delivery}(c,B)} - \theta\,\bigl(t_{pickup}(c,B) - e_B\bigr) - P_g.
+  \label{eq:peso}
+\end{equation}
+El primer término mide la eficiencia del viaje en órdenes entregadas por hora, donde $T_{delivery}(c,B)$
+es el tiempo desde que $c$ queda libre hasta la última entrega de $B$. El segundo penaliza, con
+$\theta = 0.1$, los minutos que la comida espera lista en el restaurante, y $P_g$ resta 100 si el par
+excede el máximo absoluto $\tau_{max}$ y 50 si la recolección se retrasa. La asignación de máximo peso
+se obtiene de forma exacta con un algoritmo de tipo húngaro \cite{Kuhn1955}.
+
+Quinto, el compromiso en dos etapas de \cite{Reyes2018} decide qué parte de la asignación se
+ejecuta. Si el repartidor llega al restaurante y todas las órdenes estarán listas dentro de la época,
+o si alguna orden lleva más de $\Delta_x$ minutos lista, se fija la ruta completa. En otro caso, el
+repartidor solo se dirige al restaurante, como un preposicionamiento, y en la época siguiente el
+agrupamiento puede crecer o cambiar de repartidor con las órdenes que se hayan revelado.
+
+\subsection{Entorno de simulación reproducible}
+La Figura~\ref{fig:arquitectura} resume el entorno. El extracto de OpenStreetMap de Baja California
+Sur, modelo de datos viales abierto y de cobertura mundial \cite{Boeing2022}, se preprocesa con el
+algoritmo \textit{Contraction Hierarchies} \cite{Geisberger2008}, que permite resolver cada consulta
+de camino mínimo en milisegundos. El servidor OSRM \cite{LuxenVetter2011}, versión 5.27.1, atiende
+las consultas de ruta del simulador por HTTP; su imagen oficial de Docker permite reproducir el
+entorno en cualquier sistema operativo, y en este trabajo se ejecutó como binario nativo de la misma
+versión, que produce las mismas rutas. El simulador, escrito en Python, avanza por épocas, guarda en
+memoria las rutas ya consultadas y produce, para cada corrida, los registros por orden y por
+repartidor de los que se derivan los indicadores.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  font=\footnotesize,
+  caja/.style={draw=black!70, rounded corners=2pt, align=center, minimum height=1.05cm,
+               text width=#1, fill=white},
+  caja/.default=2.8cm,
+  flecha/.style={-{Stealth[length=5pt]}, thick, black!70},
+  capa/.style={draw=#1!70!black, rounded corners=4pt, fill=#1!8, inner xsep=7pt, inner ysep=7pt}]
+  \node[caja=2.8cm] (osm)   at (0,0)      {Extracto\\OpenStreetMap};
+  \node[caja=3.0cm] (ch)    at (3.55,0)    {Preprocesamiento\\\textit{Contraction}\\\textit{Hierarchies}};
+  \node[caja=2.8cm] (osrm)  at (7.1,0)    {Servidor OSRM\\(API de rutas)};
+  \node[caja=2.8cm] (gen)   at (0,-2.3)   {Generador de\\instancias (PPNH)};
+  \node[caja=2.8cm] (sim)   at (3.55,-2.3) {Simulador por\\épocas ($f = 5$ min)};
+  \node[caja=2.8cm] (pol)   at (7.1,-2.3) {Política\\FCFS o RH};
+  \node[caja=2.8cm] (kpi)   at (10.9,-2.3) {Registros por orden\\y 21 indicadores};
+  \node[caja=2.8cm] (est)   at (10.9,0)   {Análisis estadístico\\(Wilcoxon, Friedman)};
+  \draw[flecha] (osm) -- (ch);
+  \draw[flecha] (ch) -- (osrm);
+  \draw[flecha] (gen) -- (sim);
+  \draw[flecha, {Stealth[length=5pt]}-{Stealth[length=5pt]}] (sim) -- (pol);
+  \draw[flecha, dashed, {Stealth[length=5pt]}-{Stealth[length=5pt]}] (osrm) --
+     node[right, font=\scriptsize, align=left] {tiempos de\\viaje (HTTP)} (pol);
+  \draw[flecha] (pol) -- (kpi);
+  \draw[flecha] (kpi) -- (est);
+  \begin{scope}[on background layer]
+    \node[capa=blue, fit=(osm)(ch)(osrm)] {};
+    \node[capa=green, fit=(gen)(sim)(pol)] {};
+    \node[capa=orange, fit=(kpi)(est)] {};
+  \end{scope}
+\end{tikzpicture}
+\caption{Arquitectura del entorno: enrutamiento sobre la red vial (azul), simulación (verde) y
+análisis (naranja).}
+\label{fig:arquitectura}
+\end{figure}
+
+\subsection{Generación de instancias}
+Al no existir datos públicos de entregas de comida en La Paz, las instancias se generan de forma
+sintética. Las llegadas siguen un proceso de Poisson no homogéneo con intensidad bimodal
+\begin{equation}
+  \lambda(t) = \lambda_0
+  + A_m \exp\!\left(-\frac{(t-\mu_m)^2}{2\sigma^2}\right)
+  + A_e \exp\!\left(-\frac{(t-\mu_e)^2}{2\sigma^2}\right),
+  \label{eq:lambda}
+\end{equation}
+cuya forma diaria se toma del conjunto de datos público de entregas de última milla LaDe
+\cite{Wu2024}: ventana operativa de 08:00 a 19:00, picos en $\mu_m = $ 09:00 y $\mu_e = $ 17:00,
+$\lambda_0 = 0.6$ órdenes/min, $A_m = 2.4$, $A_e = 2.0$ y $\sigma = 45$~min. El perfil se escala para
+obtener alrededor de mil órdenes por día (entre 988 y 1\,047 según la semilla). El tiempo de
+preparación es $\max(5, \mathcal{N}(12, 3^2))$~min. Los 25 restaurantes y los clientes se ubican
+por muestreo uniforme dentro de un polígono de 8.4~km$^2$ del centro urbano, y cada cliente se asocia
+a un restaurante situado a entre 2 y 5~km en línea recta. Todos los repartidores comparten un turno
+que inicia 15~min antes del primer pedido y termina una hora después del último \textit{ready time},
+y parten del centroide de los restaurantes. La flota se dimensiona a partir de la razón de
+saturación $\rho$, el número objetivo de pedidos por repartidor en la jornada:
+\begin{equation}
+  |\mathcal{C}| = \max\!\left(n_{\min},\; \left\lceil |\mathcal{O}| / \rho \right\rceil\right),
+  \qquad n_{\min} = 10.
+  \label{eq:flota}
+\end{equation}
+Fijar $\rho$, y no el número de repartidores, mantiene la misma carga relativa en todas las semillas
+de un escenario aunque el número de órdenes varíe.
+
+\subsection{Diseño experimental}
+La Tabla~\ref{tab:parametros} reúne los parámetros, comunes a ambas políticas, y los cuatro
+escenarios de saturación. Cada semilla (2025 a 2034) genera una instancia, y sobre ella se ejecutan
+FCFS y RH con la misma flota; como el simulador no tiene componentes aleatorios propios, lo único que
+cambia dentro de cada par es la política. Esto da 80 corridas sobre la red vial. Para evitar la
+pseudorreplicación, cada métrica se promedia por semilla y la comparación se hace con la prueba de
+rangos con signo de Wilcoxon pareada \cite{Wilcoxon1945} sobre las diez diferencias de cada
+escenario, con intervalo de confianza $t$ al 95\,\% y la correlación biserial de rangos $r_{rb}$ como
+tamaño de efecto. La prueba de Friedman \cite{Friedman1937} sobre la matriz de diferencias
+$10 \times 4$ evalúa si el efecto cambia entre escenarios.
+
+\begin{table}[htbp]
+\centering
+\footnotesize
+\caption{Parámetros del simulador y escenarios de saturación.}
+\label{tab:parametros}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}l c c @{\hspace{0.8cm}} l c c@{}}
+\toprule
+Parámetro & Símbolo & Valor & Parámetro & Símbolo & Valor \\
+\midrule
+Frecuencia de optimización & $f$ & 5 min & Penalización de frescura & $\beta$ & 0.1 \\
+Horizonte de asignación & $\Delta_u$ & 20 min & Penalización por espera & $\theta$ & 0.1 \\
+Anticipación (demanda, oferta) & $\Delta_1$, $\Delta_2$ & 20 min & Espera para forzar compromiso & $\Delta_x$ & 10 min \\
+Objetivo de \textit{Click-to-Door} & $\tau$ & 40 min & Tamaño máximo de agrupamiento & $B_{max}$ & 4 \\
+Tiempos de servicio & $s_r$, $s_o$ & 4 min & Pago por orden / mínimo por hora & $p_1$, $p_2$ & \$10 / \$15 \\
+\midrule
+\multicolumn{6}{@{}l}{Escenarios: S1, $\rho = 18$ (55--59 repartidores); S2, $\rho = 26$ (38--41); S3, $\rho = 35$ (29--30); S4, $\rho = 52$ (19--21).} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Para medir el efecto de la red vial se calculó la circuidad $\kappa = d_{OSRM}/d_{recta}$ sobre todos
+los trayectos restaurante--cliente, y el experimento completo se repitió con dos controles en los que
+el tiempo de viaje es la distancia en línea recta (Haversine) a velocidad constante: la velocidad
+media que OSRM asigna a esos trayectos (651~m/min), que deja como única diferencia la geometría de
+las rutas, y esa velocidad dividida entre $\kappa$ (472~m/min), que iguala la duración media de los
+viajes. Cada control suma otras 80 corridas.
+
+\section{Resultados y discusión}
+
+\subsection{Calidad de servicio y cambio de régimen}
+La Tabla~\ref{tab:calidad} muestra los indicadores de calidad de servicio. Con la flota holgada de S1,
+FCFS entrega en promedio 1.4~min antes que RH: con repartidores de sobra, llevar cada pedido directo
+del restaurante al cliente es más rápido que esperar a formar un agrupamiento, y en un agrupamiento
+cada entrega espera a las anteriores. Aun así, el cumplimiento del SLA es prácticamente igual en ambas
+políticas. A partir de S2 la relación se invierte: RH reduce el \textit{Click-to-Door} medio en
+36.8\,\%, el percentil 90 en 46.0\,\% y eleva el cumplimiento del SLA en 31.5 puntos porcentuales. La
+ventaja crece en S3 y S4, donde FCFS deja sin entregar al cierre el 11.3\,\% y el 39.9\,\% de los
+pedidos, mientras que RH entrega prácticamente todos. Como el CtD y el SLA se calculan sobre órdenes
+entregadas, la tabla favorece a FCFS en esos escenarios: medido sobre todas las órdenes generadas, su
+cumplimiento cae a 6.4\,\% en S3 y 3.8\,\% en S4, frente a 57.6\,\% y 42.4\,\% bajo RH.
+
+\begin{table}[htbp]
+\centering
+\footnotesize
+\caption{Calidad de servicio, promedio de 10 semillas. $\Delta$ es el cambio de RH respecto a FCFS.}
+\label{tab:calidad}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}l rrr rrr rrr rr@{}}
+\toprule
+& \multicolumn{3}{c}{CtD medio (min)} & \multicolumn{3}{c}{CtD percentil 90 (min)} & \multicolumn{3}{c}{SLA (\%)} & \multicolumn{2}{c}{Sin entregar (\%)} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10} \cmidrule(l){11-12}
+Esc. & FCFS & RH & $\Delta$ (\%) & FCFS & RH & $\Delta$ (\%) & FCFS & RH & $\Delta$ (pp) & FCFS & RH \\
+\midrule
+S1 & 28.93  & 30.31 & $+4.8$  & 43.33  & 43.80  & $+1.1$  & 84.6 & 83.4 & $-1.1$  & 0.0  & 0.0 \\
+S2 & 56.07  & 35.42 & $-36.8$ & 97.91  & 52.87  & $-46.0$ & 38.1 & 69.6 & $+31.5$ & 0.1  & 0.0 \\
+S3 & 108.49 & 45.36 & $-58.2$ & 169.54 & 79.10  & $-53.3$ & 7.3  & 57.6 & $+50.3$ & 11.3 & 0.0 \\
+S4 & 224.88 & 73.63 & $-67.3$ & 321.10 & 186.18 & $-42.0$ & 6.2  & 42.5 & $+36.3$ & 39.9 & 0.2 \\
+\bottomrule
+\end{tabular*}
+\end{table}
+
+La Figura~\ref{fig:boxplot} muestra la distribución completa del \textit{Click-to-Door}. En S1 ambas
+cajas son casi idénticas y quedan por debajo del objetivo de 40~min; desde S2, la distribución de
+FCFS se alarga hacia valores de varias horas, mientras que la de RH se mantiene compacta y con la
+mediana cerca del objetivo.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[y=0.0100cm, x=1cm, font=\footnotesize]
+  \foreach \p/\esc in {0/S1 ($\rho=18$), 1/S2 ($\rho=26$), 2/S3 ($\rho=35$), 3/S4 ($\rho=52$)} {
+    \begin{scope}[xshift=\p*4.15cm]
+      \draw[black!60] (0,0) rectangle (3.6,390);
+      \foreach \y in {0,100,200,300} \draw[black!12] (0,\y) -- (3.6,\y);
+      \draw[red!70, dashed] (0,40) -- (3.6,40);
+      \node[above] at (1.8,390) {\esc};
+      \node[below] at (1.1,0) {FCFS};
+      \node[below] at (2.5,0) {RH};
+    \end{scope}}
+  \foreach \y in {0,100,200,300} \node[left] at (0,\y) {\y};
+  \node[rotate=90] at (-1.25,195) {\textit{Click-to-Door} (min)};
+  % S1
+  \caja{1.1}{10.9}{21.7}{26.4}{35.1}{55.1}{cfcfs}
+  \caja{2.5}{11.4}{22.8}{28.5}{36.1}{56.1}{crh}
+  % S2
+  \begin{scope}[xshift=4.15cm]
+  \caja{1.1}{11.9}{27.3}{54.3}{80.6}{121.7}{cfcfs}
+  \caja{2.5}{11.4}{24.5}{32.5}{42.2}{68.7}{crh}
+  \end{scope}
+  % S3
+  \begin{scope}[xshift=8.3cm]
+  \caja{1.1}{11.9}{72.1}{109.1}{148.2}{199.9}{cfcfs}
+  \caja{2.5}{11.4}{26.6}{36.5}{50.3}{85.8}{crh}
+  \end{scope}
+  % S4
+  \begin{scope}[xshift=12.45cm]
+  \caja{1.1}{14.9}{141.0}{266.0}{306.5}{367.5}{cfcfs}
+  \caja{2.5}{12.3}{31.1}{43.8}{79.3}{151.5}{crh}
+  \end{scope}
+\end{tikzpicture}
+\caption{Distribución del \textit{Click-to-Door} de las órdenes entregadas en las diez semillas
+(cajas: cuartiles; bigotes: 1.5 veces el rango intercuartílico). La línea discontinua marca el
+objetivo $\tau = 40$~min.}
+\label{fig:boxplot}
+\end{figure}
+
+La Tabla~\ref{tab:wilcoxon} confirma el cambio de régimen a nivel de instancia. En S2, S3 y S4, RH
+supera a FCFS en las diez semillas, tanto en CtD como en SLA, con $p = 0.0020$, el valor mínimo que
+admite la prueba con $n = 10$, y $|r_{rb}| = 1$. En S1 la ventaja de FCFS en CtD es significativa
+pero pequeña, y la diferencia en SLA no lo es. La prueba de Friedman confirma que la magnitud del
+efecto cambia con la saturación ($\chi^2_F = 30.0$, $p < 0.001$). La Figura~\ref{fig:saturacion}
+resume la respuesta a PI1: las curvas de CtD se cruzan entre $\rho = 18$ y $\rho = 26$, y por encima
+de ese punto la ventaja de coordinar crece con la carga.
+
+\begin{table}[htbp]
+\centering
+\footnotesize
+\caption{Wilcoxon pareada por semilla ($n = 10$), $\bar{\Delta} = \bar{x}_{FCFS} - \bar{x}_{RH}$: favorecen a RH
+$\bar{\Delta} > 0$ en CtD y $\bar{\Delta} < 0$ en SLA.}
+\label{tab:wilcoxon}
+\begin{tabular}{@{}ll rr l c r@{}}
+\toprule
+Esc. & Métrica & $\bar{x}_{FCFS}$ & $\bar{x}_{RH}$ & $\bar{\Delta}$ [IC 95\,\%] & $p$ & $r_{rb}$ \\
+\midrule
+S1 & CtD (min) & 28.93  & 30.31 & $-1.38$ [$-2.35$, $-0.41$]        & 0.0137 & $-0.85$ \\
+S1 & SLA (\%)  & 84.6   & 83.4  & $+1.1$ [$-1.8$, $+4.1$]           & 0.2324 & $+0.45$ \\
+S2 & CtD (min) & 56.07  & 35.42 & $+20.64$ [$+18.98$, $+22.31$]     & 0.0020 & $+1.00$ \\
+S2 & SLA (\%)  & 38.1   & 69.6  & $-31.5$ [$-33.7$, $-29.2$]        & 0.0020 & $-1.00$ \\
+S3 & CtD (min) & 108.49 & 45.36 & $+63.13$ [$+56.14$, $+70.13$]     & 0.0020 & $+1.00$ \\
+S3 & SLA (\%)  & 7.3    & 57.6  & $-50.3$ [$-52.6$, $-48.0$]        & 0.0020 & $-1.00$ \\
+S4 & CtD (min) & 224.88 & 73.63 & $+151.24$ [$+143.71$, $+158.78$]  & 0.0020 & $+1.00$ \\
+S4 & SLA (\%)  & 6.2    & 42.5  & $-36.3$ [$-37.2$, $-35.3$]        & 0.0020 & $-1.00$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[font=\footnotesize]
+  % Panel izquierdo: CtD medio
+  \begin{scope}[x=0.16cm, y=0.018cm]
+    \draw[black!60] (14,0) rectangle (56,240);
+    \foreach \y in {0,50,100,150,200} {\draw[black!12] (14,\y) -- (56,\y); \node[left] at (14,\y) {\y};}
+    \foreach \x in {18,26,35,52} {\draw[black!12] (\x,0) -- (\x,240); \node[below] at (\x,0) {\x};}
+    \draw[red!70, dashed] (14,40) -- (56,40);
+    \draw[cfcfs, very thick] (18,28.93) -- (26,56.07) -- (35,108.49) -- (52,224.88);
+    \foreach \x/\y in {18/28.93, 26/56.07, 35/108.49, 52/224.88} \fill[cfcfs] (\x,\y) circle (2pt);
+    \draw[crh, very thick] (18,30.31) -- (26,35.42) -- (35,45.36) -- (52,73.63);
+    \foreach \x/\y in {18/30.31, 26/35.42, 35/45.36, 52/73.63} \fill[crh] (\x-0.45,\y-4.5) rectangle (\x+0.45,\y+4.5);
+    \node[rotate=90] at (8.5,120) {CtD medio (min)};
+    \node at (35,-30) {Pedidos por repartidor en la jornada ($\rho$)};
+  \end{scope}
+  % Panel derecho: SLA
+  \begin{scope}[xshift=8.6cm, x=0.16cm, y=0.043cm]
+    \draw[black!60] (14,0) rectangle (56,100);
+    \foreach \y in {0,20,40,60,80,100} {\draw[black!12] (14,\y) -- (56,\y); \node[left] at (14,\y) {\y};}
+    \foreach \x in {18,26,35,52} {\draw[black!12] (\x,0) -- (\x,100); \node[below] at (\x,0) {\x};}
+    \draw[cfcfs, very thick] (18,84.6) -- (26,38.1) -- (35,7.3) -- (52,6.2);
+    \foreach \x/\y in {18/84.6, 26/38.1, 35/7.3, 52/6.2} \fill[cfcfs] (\x,\y) circle (2pt);
+    \draw[crh, very thick] (18,83.4) -- (26,69.6) -- (35,57.6) -- (52,42.5);
+    \foreach \x/\y in {18/83.4, 26/69.6, 35/57.6, 52/42.5} \fill[crh] (\x-0.45,\y-1.9) rectangle (\x+0.45,\y+1.9);
+    \node[rotate=90] at (8.5,50) {Cumplimiento del SLA (\%)};
+    \node at (35,-12.5) {Pedidos por repartidor en la jornada ($\rho$)};
+    % Leyenda
+    \draw[cfcfs, very thick] (34,93) -- (38,93); \fill[cfcfs] (36,93) circle (2pt); \node[right] at (38,93) {FCFS};
+    \draw[crh, very thick] (46,93) -- (50,93); \fill[crh] (47.55,91.1) rectangle (48.45,94.9); \node[right] at (50,93) {RH};
+  \end{scope}
+\end{tikzpicture}
+\caption{\textit{Click-to-Door} medio y cumplimiento del SLA según la saturación de la flota. La línea
+discontinua marca el objetivo $\tau = 40$~min.}
+\label{fig:saturacion}
+\end{figure}
+
+\subsection{Eficiencia operativa y agrupamiento}
+La Tabla~\ref{tab:eficiencia} explica el origen de la ventaja de RH. Aun en S1, RH reduce la espera
+de la comida lista en el restaurante, porque en los picos de demanda la flota se ocupa por completo y
+FCFS, con un pedido por viaje, acumula órdenes sin recoger, mientras que RH recoge varias en una sola
+visita. Al agrupar, RH recorre entre 13.5\,\% y 49.4\,\% menos distancia por pedido y mantiene una
+utilización de la flota menor que FCFS en S1--S3: con la misma flota, entrega lo mismo con menos
+tiempo de conducción y, en S4, convierte ese margen en pedidos entregados. El tamaño de agrupamiento
+crece con la saturación; en S1 una cuarta parte de los pedidos (25.4\,\%) viaja sola y en S4 el
+80.9\,\% viaja en agrupamientos de tres o cuatro. El costo por pedido solo difiere en S1, donde muchos
+repartidores reciben el pago mínimo y RH concentra las entregas en menos de ellos; desde S2 ambos
+convergen al pago por orden.
+
+\begin{table}[htbp]
+\centering
+\footnotesize
+\caption{Eficiencia operativa y tamaño del agrupamiento en que viaja cada pedido (promedio de 10 semillas).}
+\label{tab:eficiencia}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}l rr rr rr r rr@{}}
+\toprule
+& \multicolumn{2}{c}{RtP medio (min)} & \multicolumn{2}{c}{Distancia/pedido (km)} & \multicolumn{2}{c}{Utilización (\%)} & Agrupamiento & \multicolumn{2}{c}{Costo/pedido (\$)} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-8} \cmidrule(l){9-10}
+Esc. & FCFS & RH & FCFS & RH & FCFS & RH & RH & FCFS & RH \\
+\midrule
+S1 & 7.78   & 4.94  & 4.71 & 4.08 & 37.7 & 31.2 & 2.54 & 10.80 & 11.59 \\
+S2 & 34.92  & 9.33  & 4.88 & 3.60 & 55.2 & 41.4 & 2.80 & 10.00 & 10.03 \\
+S3 & 87.35  & 18.62 & 5.07 & 3.17 & 66.8 & 51.4 & 3.03 & 10.00 & 10.00 \\
+S4 & 203.75 & 46.20 & 5.20 & 2.63 & 67.3 & 67.8 & 3.30 & 10.00 & 10.00 \\
+\bottomrule
+\end{tabular*}
+\end{table}
+
+\subsection{Efecto de la red vial}
+Sobre los 10\,184 trayectos restaurante--cliente de las diez instancias, la distancia por la red es
+en promedio 3.30~km, frente a 2.39~km en línea recta: una circuidad $\kappa = 1.38$, dentro del rango
+de 1.2 a 1.4 que se reporta en la literatura \cite{Boyaci2021}. El dominio de 8.4~km$^2$ del centro
+urbano no incluye trayectos que rodeen la ensenada, por lo que este valor refleja la traza urbana y
+no la costa.
+
+En el control euclidiano a la misma velocidad media, la ventaja de RH en minutos es menor que con la
+red real en los cuatro escenarios ($p = 0.002$): en S1 la desventaja de RH sería de 4.5~min en lugar
+de 1.4, y en S3 su ventaja sería de 37.1~min en lugar de 63.1. La línea recta también subestima los
+tiempos de entrega de ambas políticas; en S2, el CtD de FCFS pasa de 41.8~min en el control a
+56.1~min con OSRM, y el de RH, de 30.3 a 35.4~min. En el control con velocidad dividida entre
+$\kappa$, que iguala la duración media de los viajes, el alargamiento de los trayectos explica entre
+el 62 y el 84\,\% de la diferencia en la ventaja de RH, y el resto se debe a la estructura de la red
+($p \leq 0.004$). Así, ignorar la red no solo hace parecer más rápidas a ambas políticas: también reduce el
+beneficio aparente de coordinar (PI2).
+
+\subsection{Reproducibilidad y costo de cómputo}
+Toda la cadena (OpenStreetMap, OSRM y Python) es de código abierto, las instancias se regeneran a
+partir de semillas fijas y cada corrida pasa verificaciones automáticas de integridad: ninguna orden
+se recoge antes de estar lista ni se entrega antes de recogerse, no hay entregas duplicadas y ninguna
+ruta recurrió a la estimación de respaldo en línea recta. Con 1\,038 órdenes, simular un día toma
+entre 1.8 y 2.7~s con FCFS y entre 57 y 80~s con RH, incluidas las consultas a OSRM, con menos de
+225~MB de memoria por proceso, en una computadora portátil con procesador Apple M1 Pro y 16~GB de
+RAM. Esto responde a PI3: la evaluación es reproducible y no requiere infraestructura especializada.
+
+\subsection{Limitaciones}
+El reloj del simulador avanza en épocas de 5~min y la actualización de rutas ocurre después de la
+asignación, de modo que un repartidor que termina su ruta espera entre 5 y 10~min la siguiente; esta
+espera afecta más a FCFS, que hace un viaje por pedido. Al repetir la campaña actualizando las rutas
+antes de asignar, RH sigue ganando en S2--S4 en todas las semillas y el cruce permanece entre S1 y
+S2, pero la reducción del CtD baja a 14.6\,\% en S2, 41.4\,\% en S3 y 63.0\,\% en S4; las
+magnitudes de la Tabla~\ref{tab:calidad} deben leerse como una cota superior. Además, la demanda es
+sintética: su forma proviene de la recolección de paquetes en LaDe y no de la demanda local de comida,
+cuyos picos ocurren alrededor de las 14:00 y las 20:00, y el tipo de ciudad influye en el
+comportamiento de la última milla \cite{MunozVillamizar2021}. Los tiempos de preparación y de
+servicio son homogéneos, la red se considera sin congestión y las ubicaciones se muestrean de forma
+uniforme dentro del dominio urbano.
+
+\section{Trabajo a futuro}
+Quedan pendientes cinco líneas de trabajo: calibrar la demanda, los tiempos de preparación y la
+ubicación de restaurantes y clientes con datos locales de una plataforma o de encuestas, en lugar
+del perfil de paquetería; explorar valores de $\rho$ entre 18 y 26 para ubicar con precisión el punto
+de cruce y evaluar políticas híbridas que activen la coordinación solo cuando la carga lo justifique;
+incorporar velocidades dependientes de la hora para representar la congestión; ampliar el dominio
+a toda la mancha urbana, incluidos los trayectos que rodean la ensenada; y comparar RH con
+políticas anticipatorias basadas en aprendizaje sobre el mismo entorno.
+
+\section{Conclusiones}
+En las instancias evaluadas del centro urbano de La Paz, coordinar los despachos no compensa cuando
+la flota es holgada, pero sí a partir de una saturación moderada. Con una flota dimensionada para 18
+pedidos por repartidor en la jornada, FCFS entrega 1.4~min antes que RH y el cumplimiento del SLA es
+equivalente. Con 26 o más pedidos por repartidor, RH reduce el tiempo de entrega y mejora el
+cumplimiento del servicio en todas las semillas, y cuando la flota es escasa entrega prácticamente
+todos los pedidos que FCFS deja pendientes. Para un operador, esto sugiere que la decisión de
+coordinar debe tomarse en función de la carga esperada por repartidor y no de forma fija.
+
+La red vial importa para esta decisión. Los trayectos reales son en promedio 38\,\% más largos que
+en línea recta, y un modelo euclidiano subestima tanto los tiempos de entrega como el beneficio de
+coordinar. Finalmente, toda la evaluación puede reproducirse con herramientas abiertas en una
+computadora portátil, lo que la hace accesible para operadores y desarrolladores de ciudades medias
+que no cuentan con servicios comerciales de rutas.
+
+\begin{thebibliography}{99}
+
+\bibitem{Jazemi2023}
+R. Jazemi, E. Alidadiani, K. Ahn y J. Jang, ``A review of literature on vehicle routing problems of
+last-mile delivery in urban areas,'' \textit{Applied Sciences}, vol.~13, no.~24, art.~13015, 2023,
+doi: 10.3390/app132413015.
+
+\bibitem{Reyes2018}
+D. Reyes, A. Erera, M. Savelsbergh, S. Sahasrabudhe y R. O'Neil, ``The meal delivery routing
+problem,'' preprint, \textit{Optimization Online}, 2018. [En línea]. Disponible:
+http://www.optimization-online.org/DB\_FILE/2018/03/6512.pdf
+
+\bibitem{Yildiz2019}
+B. Yıldız y M. Savelsbergh, ``Provably high-quality solutions for the meal delivery routing
+problem,'' \textit{Transportation Science}, vol.~53, no.~5, pp.~1372--1388, 2019,
+doi: 10.1287/trsc.2018.0887.
+
+\bibitem{Ulmer2021}
+M. W. Ulmer, B. W. Thomas, A. M. Campbell y N. Woyak, ``The restaurant meal delivery problem: Dynamic
+pickup and delivery with deadlines and random ready times,'' \textit{Transportation Science},
+vol.~55, no.~1, pp.~75--100, 2021, doi: 10.1287/trsc.2020.1000.
+
+\bibitem{Hildebrandt2022}
+F. D. Hildebrandt y M. W. Ulmer, ``Supervised learning for arrival time estimations in restaurant
+meal delivery,'' \textit{Transportation Science}, vol.~56, no.~4, pp.~1058--1084, 2022,
+doi: 10.1287/trsc.2021.1095.
+
+\bibitem{Boyaci2021}
+B. Boyacı, T. H. Dang y A. N. Letchford, ``Vehicle routing on road networks: How good is Euclidean
+approximation?,'' \textit{Computers \& Operations Research}, vol.~129, art.~105197, 2021,
+doi: 10.1016/j.cor.2020.105197.
+
+\bibitem{Pereira2021}
+R. H. M. Pereira, M. Saraiva, D. Herszenhut, C. K. V. Braga y M. W. Conway, ``r5r: Rapid realistic
+routing on multimodal transport networks with R5 in R,'' \textit{Findings}, 2021,
+doi: 10.32866/001c.21262.
+
+\bibitem{Kuhn1955}
+H. W. Kuhn, ``The Hungarian method for the assignment problem,'' \textit{Naval Research Logistics
+Quarterly}, vol.~2, no.~1--2, pp.~83--97, 1955, doi: 10.1002/nav.3800020109.
+
+\bibitem{Boeing2022}
+G. Boeing, ``Street network models and indicators for every urban area in the world,''
+\textit{Geographical Analysis}, vol.~54, no.~3, pp.~519--535, 2022, doi: 10.1111/gean.12281.
+
+\bibitem{Geisberger2008}
+R. Geisberger, P. Sanders, D. Schultes y D. Delling, ``Contraction hierarchies: Faster and simpler
+hierarchical routing in road networks,'' en \textit{Experimental Algorithms (WEA 2008)}, Lecture
+Notes in Computer Science, vol.~5038, Berlín: Springer, 2008, pp.~319--333,
+doi: 10.1007/978-3-540-68552-4\_24.
+
+\bibitem{LuxenVetter2011}
+D. Luxen y C. Vetter, ``Real-time routing with OpenStreetMap data,'' en \textit{Proc. 19th ACM
+SIGSPATIAL Int. Conf. Advances in Geographic Information Systems}, Chicago, IL, EE.~UU., 2011,
+pp.~513--516, doi: 10.1145/2093973.2094062.
+
+\bibitem{Wu2024}
+L. Wu \textit{et al.}, ``LaDe: The first comprehensive last-mile express dataset from industry,''
+en \textit{Proc. 30th ACM SIGKDD Conf. Knowledge Discovery and Data Mining}, 2024,
+pp.~5991--6002, doi: 10.1145/3637528.3671548.
+
+\bibitem{Wilcoxon1945}
+F. Wilcoxon, ``Individual comparisons by ranking methods,'' \textit{Biometrics Bulletin}, vol.~1,
+no.~6, pp.~80--83, 1945, doi: 10.2307/3001968.
+
+\bibitem{Friedman1937}
+M. Friedman, ``The use of ranks to avoid the assumption of normality implicit in the analysis of
+variance,'' \textit{Journal of the American Statistical Association}, vol.~32, no.~200,
+pp.~675--701, 1937, doi: 10.1080/01621459.1937.10503522.
+
+\bibitem{MunozVillamizar2021}
+A. Muñoz-Villamizar, E. L. Solano-Charris, L. Reyes-Rubiano y J. Faulin, ``Measuring disruptions in
+last-mile delivery operations,'' \textit{Logistics}, vol.~5, no.~1, art.~17, 2021,
+doi: 10.3390/logistics5010017.
+
+\end{thebibliography}
+
+\end{document}
