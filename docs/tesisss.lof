@@ -3,10 +3,10 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Arquitectura de tres capas del entorno de simulaci\'on MDRP-BCS.}}{36}{figure.3.1}%
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Flujo de la política \textit {Rolling Horizon} en cada época de asignación.}}{55}{figure.3.2}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Arquitectura de tres capas del entorno de simulaci\'on MDRP-BCS.}}{40}{figure.3.1}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Flujo de la política \textit {Rolling Horizon} en cada época de asignación.}}{59}{figure.3.2}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Distribución del \textit {Click-to-Door} por escenario y política. La línea roja punteada indica el objetivo SLA de $\tau = 40$~min.}}{65}{figure.4.1}%
-\contentsline {figure}{\numberline {4.2}{\ignorespaces Distribución del tamaño de agrupamiento bajo RH por escenario.}}{68}{figure.4.2}%
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Evolución de KPIs principales en función de la saturación. El cruce de las curvas de CtD entre los ratios 18 y 26 marca la transición de régimen.}}{72}{figure.4.3}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Distribución del \textit {Click-to-Door} por escenario y política. La línea roja punteada indica el objetivo SLA de $\tau = 40$~min.}}{69}{figure.4.1}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Distribución del tamaño de agrupamiento bajo RH por escenario.}}{72}{figure.4.2}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Evolución de KPIs principales en función de la saturación. El cruce de las curvas de CtD entre los ratios 18 y 26 marca la transición de régimen.}}{76}{figure.4.3}%
 \addvspace {10\p@ }

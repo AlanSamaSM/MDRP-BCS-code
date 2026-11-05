@@ -47,105 +47,106 @@
 \contentsline {subsection}{\numberline {2. 1.3}Suposiciones estructurales}{21}{subsection.2.1.3}%
 \contentsline {subsection}{\numberline {2. 1.4}Modelo de compensación}{21}{subsection.2.1.4}%
 \contentsline {subsection}{\numberline {2. 1.5}Métricas de desempeño}{22}{subsection.2.1.5}%
-\contentsline {subsection}{\numberline {2. 1.6}Variantes del entorno operativo}{22}{subsection.2.1.6}%
+\contentsline {subsection}{\numberline {2. 1.6}Variantes del entorno operativo}{23}{subsection.2.1.6}%
 \contentsline {subsection}{\numberline {2. 1.7}Clasificación del MDRP en la literatura}{23}{subsection.2.1.7}%
-\contentsline {section}{\numberline {2. 2}Heurística de horizonte rodante}{23}{section.2.2}%
-\contentsline {subsection}{\numberline {2. 2.1}Tamaño objetivo de agrupamiento}{24}{subsection.2.2.1}%
-\contentsline {subsection}{\numberline {2. 2.2}Generación de agrupamientos}{25}{subsection.2.2.2}%
-\contentsline {subsection}{\numberline {2. 2.3}Esquema de prioridad}{26}{subsection.2.2.3}%
-\contentsline {subsection}{\numberline {2. 2.4}Modelo de asignación lineal}{26}{subsection.2.2.4}%
-\contentsline {subsection}{\numberline {2. 2.5}Estrategia de compromiso en dos etapas}{27}{subsection.2.2.5}%
-\contentsline {section}{\numberline {2. 3}Enrutamiento sobre grafos viales}{28}{section.2.3}%
-\contentsline {subsection}{\numberline {2. 3.1}OpenStreetMap como modelo de datos geográficos}{28}{subsection.2.3.1}%
-\contentsline {subsection}{\numberline {2. 3.2}\textit {Contraction Hierarchies}}{29}{subsection.2.3.2}%
-\contentsline {paragraph}{Preprocesamiento.}{29}{section*.12}%
-\contentsline {paragraph}{Consulta.}{30}{section*.13}%
-\contentsline {subsection}{\numberline {2. 3.3}OSRM: motor de enrutamiento}{30}{subsection.2.3.3}%
-\contentsline {section}{\numberline {2. 4}Generación estocástica de demanda y métricas}{31}{section.2.4}%
-\contentsline {subsection}{\numberline {2. 4.1}Proceso de Poisson no homogéneo}{31}{subsection.2.4.1}%
-\contentsline {paragraph}{Propiedad de discretización.}{31}{section*.14}%
-\contentsline {subsection}{\numberline {2. 4.2}Función de intensidad bimodal}{32}{subsection.2.4.2}%
-\contentsline {subsection}{\numberline {2. 4.3}Métricas de desempeño: marco de evaluación}{33}{subsection.2.4.3}%
-\contentsline {paragraph}{Estadísticos de agregación.}{33}{section*.15}%
-\contentsline {paragraph}{Familias de indicadores.}{33}{section*.16}%
-\contentsline {chapter}{\numberline {3}Desarrollo}{35}{chapter.3}%
-\contentsline {section}{\numberline {3. 1}Arquitectura del sistema}{35}{section.3.1}%
-\contentsline {subsection}{\numberline {3. 1.1}Capa de enrutamiento: OSRM contenerizado}{35}{subsection.3.1.1}%
-\contentsline {subsubsection}{Preprocesamiento de la red vial}{35}{section*.17}%
-\contentsline {subsubsection}{Despliegue con Docker Compose}{37}{section*.18}%
-\contentsline {subsubsection}{API REST y protocolo de consulta}{38}{section*.19}%
-\contentsline {subsection}{\numberline {3. 1.2}Capa de simulación: estructura de módulos Python}{39}{subsection.3.1.2}%
-\contentsline {subsection}{\numberline {3. 1.3}Capa de análisis: generación de resultados}{41}{subsection.3.1.3}%
-\contentsline {section}{\numberline {3. 2}Generación de instancias sintéticas}{41}{section.3.2}%
-\contentsline {subsection}{\numberline {3. 2.1}Generacion temporal de órdenes}{42}{subsection.3.2.1}%
-\contentsline {subsection}{\numberline {3. 2.2}Tiempo de preparación}{42}{subsection.3.2.2}%
-\contentsline {subsection}{\numberline {3. 2.3}Distribución geoespacial}{43}{subsection.3.2.3}%
-\contentsline {subsubsection}{Asignación restaurante-cliente}{43}{section*.20}%
-\contentsline {subsubsection}{Fuente de datos de restaurantes}{44}{section*.21}%
-\contentsline {subsection}{\numberline {3. 2.4}Dimensionamiento automático de flota}{44}{subsection.3.2.4}%
-\contentsline {subsubsection}{Configuración de turnos}{44}{section*.22}%
-\contentsline {subsubsection}{Reproducibilidad}{45}{section*.23}%
-\contentsline {section}{\numberline {3. 3}Motor de simulación}{45}{section.3.3}%
-\contentsline {subsection}{\numberline {3. 3.1}Ciclo de simulación por épocas}{45}{subsection.3.3.1}%
-\contentsline {subsection}{\numberline {3. 3.2}Modelos de datos: órdenes, couriers y restaurantes}{46}{subsection.3.3.2}%
-\contentsline {subsection}{\numberline {3. 3.3}Máquina de estados de una orden}{47}{subsection.3.3.3}%
-\contentsline {subsection}{\numberline {3. 3.4}Temporización de rutas}{47}{subsection.3.3.4}%
-\contentsline {subsection}{\numberline {3. 3.5}Integración con OSRM}{48}{subsection.3.3.5}%
-\contentsline {section}{\numberline {3. 4}Política FCFS (\textit {baseline})}{49}{section.3.4}%
-\contentsline {subsection}{\numberline {3. 4.1}Lógica de asignación}{49}{subsection.3.4.1}%
-\contentsline {subsection}{\numberline {3. 4.2}Características y limitaciones}{50}{subsection.3.4.2}%
-\contentsline {section}{\numberline {3. 5}Política \textit {Rolling Horizon}}{51}{section.3.5}%
-\contentsline {subsection}{\numberline {3. 5.1}Cálculo del tamaño objetivo de agrupamiento}{51}{subsection.3.5.1}%
-\contentsline {subsection}{\numberline {3. 5.2}Generación de agrupamientos por restaurante}{51}{subsection.3.5.2}%
-\contentsline {subsection}{\numberline {3. 5.3}Clasificación por prioridad y asignación bipartita}{52}{subsection.3.5.3}%
-\contentsline {subsection}{\numberline {3. 5.4}Compromiso en dos etapas}{53}{subsection.3.5.4}%
-\contentsline {subsection}{\numberline {3. 5.5}Resumen del flujo RH por época}{54}{subsection.3.5.5}%
-\contentsline {section}{\numberline {3. 6}Diseño experimental}{54}{section.3.6}%
-\contentsline {subsection}{\numberline {3. 6.1}Variable de tratamiento: saturación de flota}{56}{subsection.3.6.1}%
-\contentsline {subsection}{\numberline {3. 6.2}Escenarios}{56}{subsection.3.6.2}%
-\contentsline {subsection}{\numberline {3. 6.3}Comparación pareada}{56}{subsection.3.6.3}%
-\contentsline {subsection}{\numberline {3. 6.4}Plan de análisis estadístico}{57}{subsection.3.6.4}%
-\contentsline {subsection}{\numberline {3. 6.5}Escenario de control euclidiano}{57}{subsection.3.6.5}%
-\contentsline {subsection}{\numberline {3. 6.6}Replicación y análisis de sensibilidad}{57}{subsection.3.6.6}%
-\contentsline {subsection}{\numberline {3. 6.7}Almacenamiento de resultados}{58}{subsection.3.6.7}%
-\contentsline {section}{\numberline {3. 7}Métricas de evaluación}{58}{section.3.7}%
-\contentsline {subsection}{\numberline {3. 7.1}Calidad de servicio}{59}{subsection.3.7.1}%
-\contentsline {subsection}{\numberline {3. 7.2}Cobertura}{59}{subsection.3.7.2}%
-\contentsline {subsection}{\numberline {3. 7.3}Eficiencia operativa}{59}{subsection.3.7.3}%
-\contentsline {subsection}{\numberline {3. 7.4}Eficiencia de agrupamiento}{60}{subsection.3.7.4}%
-\contentsline {subsection}{\numberline {3. 7.5}Costo}{60}{subsection.3.7.5}%
-\contentsline {subsection}{\numberline {3. 7.6}Resumen de indicadores}{61}{subsection.3.7.6}%
-\contentsline {chapter}{\numberline {4}Resultados}{62}{chapter.4}%
-\contentsline {section}{\numberline {4. 1}Configuración experimental}{62}{section.4.1}%
-\contentsline {section}{\numberline {4. 2}Calidad de servicio}{63}{section.4.2}%
-\contentsline {subsection}{\numberline {4. 2.1}Análisis del \textit {Click-to-Door}}{63}{subsection.4.2.1}%
-\contentsline {subsection}{\numberline {4. 2.2}\textit {Ready-to-Pickup} y tiempo de espera}{65}{subsection.4.2.2}%
-\contentsline {section}{\numberline {4. 3}Eficiencia operativa}{66}{section.4.3}%
-\contentsline {subsection}{\numberline {4. 3.1}Productividad y utilización}{66}{subsection.4.3.1}%
-\contentsline {subsection}{\numberline {4. 3.2}Distancia y enrutamiento}{67}{subsection.4.3.2}%
-\contentsline {section}{\numberline {4. 4}Agrupamiento y costos}{67}{section.4.4}%
-\contentsline {subsection}{\numberline {4. 4.1}Distribución de agrupamientos}{68}{subsection.4.4.1}%
-\contentsline {subsection}{\numberline {4. 4.2}Modelo de compensación}{68}{subsection.4.4.2}%
-\contentsline {section}{\numberline {4. 5}Análisis estadístico}{69}{section.4.5}%
-\contentsline {subsection}{\numberline {4. 5.1}Diseño inferencial}{69}{subsection.4.5.1}%
-\contentsline {subsection}{\numberline {4. 5.2}Resultados}{69}{subsection.4.5.2}%
-\contentsline {subsection}{\numberline {4. 5.3}Discusión por regímenes}{70}{subsection.4.5.3}%
-\contentsline {subsection}{\numberline {4. 5.4}Comparación con la literatura}{70}{subsection.4.5.4}%
-\contentsline {subsection}{\numberline {4. 5.5}Limitaciones de los resultados}{71}{subsection.4.5.5}%
-\contentsline {chapter}{\numberline {5}Conclusiones}{73}{chapter.5}%
-\contentsline {section}{\numberline {5. 1}Respuesta a las preguntas de investigación}{73}{section.5.1}%
-\contentsline {paragraph}{Pregunta central.}{73}{section*.24}%
-\contentsline {paragraph}{PI1 (saturación).}{73}{section*.25}%
-\contentsline {paragraph}{PI2 (red vial).}{73}{section*.26}%
-\contentsline {paragraph}{PI3 (reproducibilidad y recursos).}{74}{section*.27}%
-\contentsline {section}{\numberline {5. 2}Verificación de objetivos}{74}{section.5.2}%
-\contentsline {subsection}{\numberline {5. 2.1}Objetivo general}{74}{subsection.5.2.1}%
-\contentsline {subsection}{\numberline {5. 2.2}Objetivos específicos}{74}{subsection.5.2.2}%
-\contentsline {paragraph}{OE\,1: Generación de instancias sintéticas.}{74}{section*.28}%
-\contentsline {paragraph}{OE\,2: Integración OSRM--simulador.}{74}{section*.29}%
-\contentsline {paragraph}{OE\,3: Implementación de las políticas.}{75}{section*.30}%
-\contentsline {paragraph}{OE\,4: Cuantificación estadística.}{75}{section*.31}%
-\contentsline {section}{\numberline {5. 3}Verificación de la hipótesis}{75}{section.5.3}%
-\contentsline {section}{\numberline {5. 4}Contribuciones principales}{76}{section.5.4}%
-\contentsline {section}{\numberline {5. 5}Trabajo futuro}{77}{section.5.5}%
-\contentsline {chapter}{Bibliografía}{77}{section.5.5}%
+\contentsline {subsection}{\numberline {2. 1.8}Resumen de notación}{23}{subsection.2.1.8}%
+\contentsline {section}{\numberline {2. 2}Heurística de horizonte rodante}{27}{section.2.2}%
+\contentsline {subsection}{\numberline {2. 2.1}Tamaño objetivo de agrupamiento}{28}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2. 2.2}Generación de agrupamientos}{28}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2. 2.3}Esquema de prioridad}{29}{subsection.2.2.3}%
+\contentsline {subsection}{\numberline {2. 2.4}Modelo de asignación lineal}{30}{subsection.2.2.4}%
+\contentsline {subsection}{\numberline {2. 2.5}Estrategia de compromiso en dos etapas}{31}{subsection.2.2.5}%
+\contentsline {section}{\numberline {2. 3}Enrutamiento sobre grafos viales}{32}{section.2.3}%
+\contentsline {subsection}{\numberline {2. 3.1}OpenStreetMap como modelo de datos geográficos}{32}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2. 3.2}\textit {Contraction Hierarchies}}{33}{subsection.2.3.2}%
+\contentsline {paragraph}{Preprocesamiento.}{33}{section*.12}%
+\contentsline {paragraph}{Consulta.}{33}{section*.13}%
+\contentsline {subsection}{\numberline {2. 3.3}OSRM: motor de enrutamiento}{34}{subsection.2.3.3}%
+\contentsline {section}{\numberline {2. 4}Generación estocástica de demanda y métricas}{35}{section.2.4}%
+\contentsline {subsection}{\numberline {2. 4.1}Proceso de Poisson no homogéneo}{35}{subsection.2.4.1}%
+\contentsline {paragraph}{Propiedad de discretización.}{35}{section*.14}%
+\contentsline {subsection}{\numberline {2. 4.2}Función de intensidad bimodal}{35}{subsection.2.4.2}%
+\contentsline {subsection}{\numberline {2. 4.3}Métricas de desempeño: marco de evaluación}{36}{subsection.2.4.3}%
+\contentsline {paragraph}{Estadísticos de agregación.}{37}{section*.15}%
+\contentsline {paragraph}{Familias de indicadores.}{37}{section*.16}%
+\contentsline {chapter}{\numberline {3}Desarrollo}{39}{chapter.3}%
+\contentsline {section}{\numberline {3. 1}Arquitectura del sistema}{39}{section.3.1}%
+\contentsline {subsection}{\numberline {3. 1.1}Capa de enrutamiento: OSRM contenerizado}{39}{subsection.3.1.1}%
+\contentsline {subsubsection}{Preprocesamiento de la red vial}{39}{section*.17}%
+\contentsline {subsubsection}{Despliegue con Docker Compose}{41}{section*.18}%
+\contentsline {subsubsection}{API REST y protocolo de consulta}{42}{section*.19}%
+\contentsline {subsection}{\numberline {3. 1.2}Capa de simulación: estructura de módulos Python}{43}{subsection.3.1.2}%
+\contentsline {subsection}{\numberline {3. 1.3}Capa de análisis: generación de resultados}{45}{subsection.3.1.3}%
+\contentsline {section}{\numberline {3. 2}Generación de instancias sintéticas}{45}{section.3.2}%
+\contentsline {subsection}{\numberline {3. 2.1}Generacion temporal de órdenes}{46}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3. 2.2}Tiempo de preparación}{46}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3. 2.3}Distribución geoespacial}{47}{subsection.3.2.3}%
+\contentsline {subsubsection}{Asignación restaurante-cliente}{47}{section*.20}%
+\contentsline {subsubsection}{Fuente de datos de restaurantes}{48}{section*.21}%
+\contentsline {subsection}{\numberline {3. 2.4}Dimensionamiento automático de flota}{48}{subsection.3.2.4}%
+\contentsline {subsubsection}{Configuración de turnos}{48}{section*.22}%
+\contentsline {subsubsection}{Reproducibilidad}{49}{section*.23}%
+\contentsline {section}{\numberline {3. 3}Motor de simulación}{49}{section.3.3}%
+\contentsline {subsection}{\numberline {3. 3.1}Ciclo de simulación por épocas}{49}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3. 3.2}Modelos de datos: órdenes, repartidores y restaurantes}{50}{subsection.3.3.2}%
+\contentsline {subsection}{\numberline {3. 3.3}Máquina de estados de una orden}{51}{subsection.3.3.3}%
+\contentsline {subsection}{\numberline {3. 3.4}Temporización de rutas}{51}{subsection.3.3.4}%
+\contentsline {subsection}{\numberline {3. 3.5}Integración con OSRM}{52}{subsection.3.3.5}%
+\contentsline {section}{\numberline {3. 4}Política FCFS (\textit {baseline})}{53}{section.3.4}%
+\contentsline {subsection}{\numberline {3. 4.1}Lógica de asignación}{53}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3. 4.2}Características y limitaciones}{54}{subsection.3.4.2}%
+\contentsline {section}{\numberline {3. 5}Política \textit {Rolling Horizon}}{55}{section.3.5}%
+\contentsline {subsection}{\numberline {3. 5.1}Cálculo del tamaño objetivo de agrupamiento}{55}{subsection.3.5.1}%
+\contentsline {subsection}{\numberline {3. 5.2}Generación de agrupamientos por restaurante}{56}{subsection.3.5.2}%
+\contentsline {subsection}{\numberline {3. 5.3}Clasificación por prioridad y asignación bipartita}{57}{subsection.3.5.3}%
+\contentsline {subsection}{\numberline {3. 5.4}Compromiso en dos etapas}{58}{subsection.3.5.4}%
+\contentsline {subsection}{\numberline {3. 5.5}Resumen del flujo RH por época}{58}{subsection.3.5.5}%
+\contentsline {section}{\numberline {3. 6}Diseño experimental}{60}{section.3.6}%
+\contentsline {subsection}{\numberline {3. 6.1}Variable de tratamiento: saturación de flota}{60}{subsection.3.6.1}%
+\contentsline {subsection}{\numberline {3. 6.2}Escenarios}{60}{subsection.3.6.2}%
+\contentsline {subsection}{\numberline {3. 6.3}Comparación pareada}{61}{subsection.3.6.3}%
+\contentsline {subsection}{\numberline {3. 6.4}Plan de análisis estadístico}{61}{subsection.3.6.4}%
+\contentsline {subsection}{\numberline {3. 6.5}Escenario de control euclidiano}{61}{subsection.3.6.5}%
+\contentsline {subsection}{\numberline {3. 6.6}Replicación y análisis de sensibilidad}{62}{subsection.3.6.6}%
+\contentsline {subsection}{\numberline {3. 6.7}Almacenamiento de resultados}{62}{subsection.3.6.7}%
+\contentsline {section}{\numberline {3. 7}Métricas de evaluación}{62}{section.3.7}%
+\contentsline {subsection}{\numberline {3. 7.1}Calidad de servicio}{63}{subsection.3.7.1}%
+\contentsline {subsection}{\numberline {3. 7.2}Cobertura}{63}{subsection.3.7.2}%
+\contentsline {subsection}{\numberline {3. 7.3}Eficiencia operativa}{63}{subsection.3.7.3}%
+\contentsline {subsection}{\numberline {3. 7.4}Eficiencia de agrupamiento}{64}{subsection.3.7.4}%
+\contentsline {subsection}{\numberline {3. 7.5}Costo}{64}{subsection.3.7.5}%
+\contentsline {subsection}{\numberline {3. 7.6}Resumen de indicadores}{65}{subsection.3.7.6}%
+\contentsline {chapter}{\numberline {4}Resultados}{66}{chapter.4}%
+\contentsline {section}{\numberline {4. 1}Configuración experimental}{66}{section.4.1}%
+\contentsline {section}{\numberline {4. 2}Calidad de servicio}{67}{section.4.2}%
+\contentsline {subsection}{\numberline {4. 2.1}Análisis del \textit {Click-to-Door}}{67}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4. 2.2}\textit {Ready-to-Pickup} y tiempo de espera}{69}{subsection.4.2.2}%
+\contentsline {section}{\numberline {4. 3}Eficiencia operativa}{70}{section.4.3}%
+\contentsline {subsection}{\numberline {4. 3.1}Productividad y utilización}{70}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4. 3.2}Distancia y enrutamiento}{71}{subsection.4.3.2}%
+\contentsline {section}{\numberline {4. 4}Agrupamiento y costos}{71}{section.4.4}%
+\contentsline {subsection}{\numberline {4. 4.1}Distribución de agrupamientos}{72}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4. 4.2}Modelo de compensación}{72}{subsection.4.4.2}%
+\contentsline {section}{\numberline {4. 5}Análisis estadístico}{73}{section.4.5}%
+\contentsline {subsection}{\numberline {4. 5.1}Diseño inferencial}{73}{subsection.4.5.1}%
+\contentsline {subsection}{\numberline {4. 5.2}Resultados}{73}{subsection.4.5.2}%
+\contentsline {subsection}{\numberline {4. 5.3}Discusión por regímenes}{74}{subsection.4.5.3}%
+\contentsline {subsection}{\numberline {4. 5.4}Comparación con la literatura}{74}{subsection.4.5.4}%
+\contentsline {subsection}{\numberline {4. 5.5}Limitaciones de los resultados}{75}{subsection.4.5.5}%
+\contentsline {chapter}{\numberline {5}Conclusiones}{77}{chapter.5}%
+\contentsline {section}{\numberline {5. 1}Respuesta a las preguntas de investigación}{77}{section.5.1}%
+\contentsline {paragraph}{Pregunta central.}{77}{section*.24}%
+\contentsline {paragraph}{PI1 (saturación).}{77}{section*.25}%
+\contentsline {paragraph}{PI2 (red vial).}{78}{section*.26}%
+\contentsline {paragraph}{PI3 (reproducibilidad y recursos).}{78}{section*.27}%
+\contentsline {section}{\numberline {5. 2}Verificación de objetivos}{78}{section.5.2}%
+\contentsline {subsection}{\numberline {5. 2.1}Objetivo general}{78}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5. 2.2}Objetivos específicos}{78}{subsection.5.2.2}%
+\contentsline {paragraph}{OE\,1: Generación de instancias sintéticas.}{78}{section*.28}%
+\contentsline {paragraph}{OE\,2: Integración OSRM--simulador.}{78}{section*.29}%
+\contentsline {paragraph}{OE\,3: Implementación de las políticas.}{79}{section*.30}%
+\contentsline {paragraph}{OE\,4: Cuantificación estadística.}{79}{section*.31}%
+\contentsline {section}{\numberline {5. 3}Verificación de la hipótesis}{79}{section.5.3}%
+\contentsline {section}{\numberline {5. 4}Contribuciones principales}{80}{section.5.4}%
+\contentsline {section}{\numberline {5. 5}Trabajo futuro}{81}{section.5.5}%
+\contentsline {chapter}{Bibliografía}{81}{section.5.5}%
