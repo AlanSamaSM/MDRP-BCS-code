@@ -217,7 +217,7 @@ recorridos más largos que la línea recta. De ahí surge la pregunta que guía 
 \textit{en una ciudad media, ¿en qué condiciones de saturación de la flota conviene coordinar los
 despachos en lugar de asignar cada pedido al llegar, y cuánto cambia esa evaluación al usar la red
 vial real en lugar de distancias euclidianas?} La pregunta se divide en tres: cómo varía la ventaja
-de RH con la saturación y dónde se produce el cambio de régimen (PI1); cuánto más largos son los
+de RH con la saturación y a partir de qué nivel cambia la política más conveniente (PI1); cuánto más largos son los
 trayectos por la red y cuánto cambia la comparación al ignorarla (PI2); y si la evaluación puede
 hacerse de forma reproducible, con recursos modestos y solo con herramientas de código abierto (PI3).
 
@@ -251,7 +251,8 @@ porcentaje de órdenes entregadas dentro del objetivo $\tau$:
 \end{equation}
 donde $\mathcal{O}_{del}$ es el conjunto de órdenes entregadas. Como ambas métricas se calculan
 sobre órdenes entregadas, se reporta también el porcentaje de órdenes sin entregar al cierre. Se
-complementan con el tiempo de espera de la comida lista, $\text{RtP}_o = t_{pickup,o} - e_o$, la
+complementan con el tiempo que la comida lista espera a ser recogida (RtP, \textit{Ready-to-Pickup}),
+$\text{RtP}_o = t_{pickup,o} - e_o$, la
 distancia recorrida por pedido, la utilización de la flota (fracción del turno en conducción o en
 servicio), el tamaño de agrupamiento y el costo por pedido, con un pago de $p_1$ por orden entregada
 y un mínimo garantizado de $p_2$ por hora de turno \cite{Reyes2018}.
@@ -342,8 +343,7 @@ Sur, modelo de datos viales abierto y de cobertura mundial \cite{Boeing2022}, se
 algoritmo \textit{Contraction Hierarchies} \cite{Geisberger2008}, que permite resolver cada consulta
 de camino mínimo en milisegundos. El servidor OSRM \cite{LuxenVetter2011}, versión 5.27.1, atiende
 las consultas de ruta del simulador por HTTP; su imagen oficial de Docker permite reproducir el
-entorno en cualquier sistema operativo, y en este trabajo se ejecutó como binario nativo de la misma
-versión, que produce las mismas rutas. El simulador, escrito en Python, avanza por épocas, guarda en
+entorno en cualquier sistema operativo. El simulador, escrito en Python, avanza por épocas, guarda en
 memoria las rutas ya consultadas y produce, para cada corrida, los registros por orden y por
 repartidor de los que se derivan los indicadores.
 
@@ -392,9 +392,9 @@ sintética. Las llegadas siguen un proceso de Poisson no homogéneo con intensid
   + A_e \exp\!\left(-\frac{(t-\mu_e)^2}{2\sigma^2}\right),
   \label{eq:lambda}
 \end{equation}
-cuya forma diaria se toma del conjunto de datos público de entregas de última milla LaDe
-\cite{Wu2024}: ventana operativa de 08:00 a 19:00, picos en $\mu_m = $ 09:00 y $\mu_e = $ 17:00,
-$\lambda_0 = 0.6$ órdenes/min, $A_m = 2.4$, $A_e = 2.0$ y $\sigma = 45$~min. El perfil se escala para
+siguiendo el patrón bimodal observado en entregas de última milla \cite{Wu2024}. A falta de datos
+locales, los parámetros son supuestos: ventana operativa de 08:00 a 19:00, picos en $\mu_m = $ 09:00
+y $\mu_e = $ 17:00, $\lambda_0 = 0.6$ órdenes/min, $A_m = 2.4$, $A_e = 2.0$ y $\sigma = 45$~min. El perfil se escala para
 obtener alrededor de mil órdenes por día (entre 988 y 1\,047 según la semilla). El tiempo de
 preparación es $\max(5, \mathcal{N}(12, 3^2))$~min. Los 25 restaurantes y los clientes se ubican
 por muestreo uniforme dentro de un polígono de 8.4~km$^2$ del centro urbano, y cada cliente se asocia
@@ -427,14 +427,14 @@ $10 \times 4$ evalúa si el efecto cambia entre escenarios.
 \caption{Parámetros del simulador y escenarios de saturación.}
 \label{tab:parametros}
 \setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}l c c @{\hspace{0.8cm}} l c c@{}}
+\begin{tabular}{@{}l c c @{\hspace{0.4cm}} l c c@{}}
 \toprule
 Parámetro & Símbolo & Valor & Parámetro & Símbolo & Valor \\
 \midrule
 Frecuencia de optimización & $f$ & 5 min & Penalización de frescura & $\beta$ & 0.1 \\
 Horizonte de asignación & $\Delta_u$ & 20 min & Penalización por espera & $\theta$ & 0.1 \\
 Anticipación (demanda, oferta) & $\Delta_1$, $\Delta_2$ & 20 min & Espera para forzar compromiso & $\Delta_x$ & 10 min \\
-Objetivo de \textit{Click-to-Door} & $\tau$ & 40 min & Tamaño máximo de agrupamiento & $B_{max}$ & 4 \\
+CtD objetivo / máximo & $\tau$, $\tau_{max}$ & 40/90 min & Tamaño máximo de agrupamiento & $B_{max}$ & 4 \\
 Tiempos de servicio & $s_r$, $s_o$ & 4 min & Pago por orden / mínimo por hora & $p_1$, $p_2$ & \$10 / \$15 \\
 \midrule
 \multicolumn{6}{@{}l}{Escenarios: S1, $\rho = 18$ (55--59 repartidores); S2, $\rho = 26$ (38--41); S3, $\rho = 35$ (29--30); S4, $\rho = 52$ (19--21).} \\
@@ -451,7 +451,7 @@ viajes. Cada control suma otras 80 corridas.
 
 \section{Resultados y discusión}
 
-\subsection{Calidad de servicio y cambio de régimen}
+\subsection{Calidad de servicio y cambio de la política más conveniente}
 La Tabla~\ref{tab:calidad} muestra los indicadores de calidad de servicio. Con la flota holgada de S1,
 FCFS entrega en promedio 1.4~min antes que RH: con repartidores de sobra, llevar cada pedido directo
 del restaurante al cliente es más rápido que esperar a formar un agrupamiento, y en un agrupamiento
@@ -471,7 +471,7 @@ cumplimiento cae a 6.4\,\% en S3 y 3.8\,\% en S4, frente a 57.6\,\% y 42.4\,\% b
 \setlength{\tabcolsep}{3pt}
 \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}l rrr rrr rrr rr@{}}
 \toprule
-& \multicolumn{3}{c}{CtD medio (min)} & \multicolumn{3}{c}{CtD percentil 90 (min)} & \multicolumn{3}{c}{SLA (\%)} & \multicolumn{2}{c}{Sin entregar (\%)} \\
+& \multicolumn{3}{c}{CtD medio (minutos)} & \multicolumn{3}{c}{CtD percentil 90 (minutos)} & \multicolumn{3}{c}{SLA (\%)} & \multicolumn{2}{c}{Sin entregar (\%)} \\
 \cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10} \cmidrule(l){11-12}
 Esc. & FCFS & RH & $\Delta$ (\%) & FCFS & RH & $\Delta$ (\%) & FCFS & RH & $\Delta$ (pp) & FCFS & RH \\
 \midrule
@@ -501,7 +501,7 @@ mediana cerca del objetivo.
       \node[below] at (2.5,0) {RH};
     \end{scope}}
   \foreach \y in {0,100,200,300} \node[left] at (0,\y) {\y};
-  \node[rotate=90] at (-1.25,195) {\textit{Click-to-Door} (min)};
+  \node[rotate=90] at (-1.25,195) {\textit{Click-to-Door} (minutos)};
   % S1
   \caja{1.1}{10.9}{21.7}{26.4}{35.1}{55.1}{cfcfs}
   \caja{2.5}{11.4}{22.8}{28.5}{36.1}{56.1}{crh}
@@ -527,7 +527,7 @@ objetivo $\tau = 40$~min.}
 \label{fig:boxplot}
 \end{figure}
 
-La Tabla~\ref{tab:wilcoxon} confirma el cambio de régimen a nivel de instancia. En S2, S3 y S4, RH
+La Tabla~\ref{tab:wilcoxon} confirma, a nivel de instancia, el cambio de la política más conveniente. En S2, S3 y S4, RH
 supera a FCFS en las diez semillas, tanto en CtD como en SLA, con $p = 0.0020$, el valor mínimo que
 admite la prueba con $n = 10$, y $|r_{rb}| = 1$. En S1 la ventaja de FCFS en CtD es significativa
 pero pequeña, y la diferencia en SLA no lo es. La prueba de Friedman confirma que la magnitud del
@@ -545,13 +545,13 @@ $\bar{\Delta} > 0$ en CtD y $\bar{\Delta} < 0$ en SLA.}
 \toprule
 Esc. & Métrica & $\bar{x}_{FCFS}$ & $\bar{x}_{RH}$ & $\bar{\Delta}$ [IC 95\,\%] & $p$ & $r_{rb}$ \\
 \midrule
-S1 & CtD (min) & 28.93  & 30.31 & $-1.38$ [$-2.35$, $-0.41$]        & 0.0137 & $-0.85$ \\
+S1 & CtD (minutos) & 28.93  & 30.31 & $-1.38$ [$-2.35$, $-0.41$]        & 0.0137 & $-0.85$ \\
 S1 & SLA (\%)  & 84.6   & 83.4  & $+1.1$ [$-1.8$, $+4.1$]           & 0.2324 & $+0.45$ \\
-S2 & CtD (min) & 56.07  & 35.42 & $+20.64$ [$+18.98$, $+22.31$]     & 0.0020 & $+1.00$ \\
+S2 & CtD (minutos) & 56.07  & 35.42 & $+20.64$ [$+18.98$, $+22.31$]     & 0.0020 & $+1.00$ \\
 S2 & SLA (\%)  & 38.1   & 69.6  & $-31.5$ [$-33.7$, $-29.2$]        & 0.0020 & $-1.00$ \\
-S3 & CtD (min) & 108.49 & 45.36 & $+63.13$ [$+56.14$, $+70.13$]     & 0.0020 & $+1.00$ \\
+S3 & CtD (minutos) & 108.49 & 45.36 & $+63.13$ [$+56.14$, $+70.13$]     & 0.0020 & $+1.00$ \\
 S3 & SLA (\%)  & 7.3    & 57.6  & $-50.3$ [$-52.6$, $-48.0$]        & 0.0020 & $-1.00$ \\
-S4 & CtD (min) & 224.88 & 73.63 & $+151.24$ [$+143.71$, $+158.78$]  & 0.0020 & $+1.00$ \\
+S4 & CtD (minutos) & 224.88 & 73.63 & $+151.24$ [$+143.71$, $+158.78$]  & 0.0020 & $+1.00$ \\
 S4 & SLA (\%)  & 6.2    & 42.5  & $-36.3$ [$-37.2$, $-35.3$]        & 0.0020 & $-1.00$ \\
 \bottomrule
 \end{tabular}
@@ -570,7 +570,7 @@ S4 & SLA (\%)  & 6.2    & 42.5  & $-36.3$ [$-37.2$, $-35.3$]        & 0.0020 & $
     \foreach \x/\y in {18/28.93, 26/56.07, 35/108.49, 52/224.88} \fill[cfcfs] (\x,\y) circle (2pt);
     \draw[crh, very thick] (18,30.31) -- (26,35.42) -- (35,45.36) -- (52,73.63);
     \foreach \x/\y in {18/30.31, 26/35.42, 35/45.36, 52/73.63} \fill[crh] (\x-0.45,\y-4.5) rectangle (\x+0.45,\y+4.5);
-    \node[rotate=90] at (8.5,120) {CtD medio (min)};
+    \node[rotate=90] at (8.5,120) {CtD medio (minutos)};
     \node at (35,-30) {Pedidos por repartidor en la jornada ($\rho$)};
   \end{scope}
   % Panel derecho: SLA
@@ -596,7 +596,7 @@ discontinua marca el objetivo $\tau = 40$~min.}
 
 \subsection{Eficiencia operativa y agrupamiento}
 La Tabla~\ref{tab:eficiencia} explica el origen de la ventaja de RH. Aun en S1, RH reduce la espera
-de la comida lista en el restaurante, porque en los picos de demanda la flota se ocupa por completo y
+de la comida lista en el restaurante (RtP), porque en los picos de demanda la flota se ocupa por completo y
 FCFS, con un pedido por viaje, acumula órdenes sin recoger, mientras que RH recoge varias en una sola
 visita. Al agrupar, RH recorre entre 13.5\,\% y 49.4\,\% menos distancia por pedido y mantiene una
 utilización de la flota menor que FCFS en S1--S3: con la misma flota, entrega lo mismo con menos
@@ -614,7 +614,7 @@ convergen al pago por orden.
 \setlength{\tabcolsep}{3pt}
 \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}l rr rr rr r rr@{}}
 \toprule
-& \multicolumn{2}{c}{RtP medio (min)} & \multicolumn{2}{c}{Distancia/pedido (km)} & \multicolumn{2}{c}{Utilización (\%)} & Agrupamiento & \multicolumn{2}{c}{Costo/pedido (\$)} \\
+& \multicolumn{2}{c}{RtP medio (minutos)} & \multicolumn{2}{c}{Distancia/pedido (km)} & \multicolumn{2}{c}{Utilización (\%)} & Agrupamiento & \multicolumn{2}{c}{Costo/pedido (\$)} \\
 \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-8} \cmidrule(l){9-10}
 Esc. & FCFS & RH & FCFS & RH & FCFS & RH & RH & FCFS & RH \\
 \midrule
@@ -648,7 +648,7 @@ Toda la cadena (OpenStreetMap, OSRM y Python) es de código abierto, las instanc
 partir de semillas fijas y cada corrida pasa verificaciones automáticas de integridad: ninguna orden
 se recoge antes de estar lista ni se entrega antes de recogerse, no hay entregas duplicadas y ninguna
 ruta recurrió a la estimación de respaldo en línea recta. Con 1\,038 órdenes, simular un día toma
-entre 1.8 y 2.7~s con FCFS y entre 57 y 80~s con RH, incluidas las consultas a OSRM, con menos de
+entre 1.8 y 2.7~segundos con FCFS y entre 57 y 80~segundos con RH, incluidas las consultas a OSRM, con menos de
 225~MB de memoria por proceso, en una computadora portátil con procesador Apple M1 Pro y 16~GB de
 RAM. Esto responde a PI3: la evaluación es reproducible y no requiere infraestructura especializada.
 
@@ -659,8 +659,8 @@ espera afecta más a FCFS, que hace un viaje por pedido. Al repetir la campaña 
 antes de asignar, RH sigue ganando en S2--S4 en todas las semillas y el cruce permanece entre S1 y
 S2, pero la reducción del CtD baja a 14.6\,\% en S2, 41.4\,\% en S3 y 63.0\,\% en S4; las
 magnitudes de la Tabla~\ref{tab:calidad} deben leerse como una cota superior. Además, la demanda es
-sintética: su forma proviene de la recolección de paquetes en LaDe y no de la demanda local de comida,
-cuyos picos ocurren alrededor de las 14:00 y las 20:00, y el tipo de ciudad influye en el
+sintética: sigue el patrón bimodal de la recolección de paquetes en LaDe con parámetros supuestos, no
+calibrados con la demanda local de comida, cuyos picos ocurren alrededor de las 14:00 y las 20:00, y el tipo de ciudad influye en el
 comportamiento de la última milla \cite{MunozVillamizar2021}. Los tiempos de preparación y de
 servicio son homogéneos, la red se considera sin congestión y las ubicaciones se muestrean de forma
 uniforme dentro del dominio urbano.

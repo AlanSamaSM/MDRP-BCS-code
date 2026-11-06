@@ -112,6 +112,17 @@ Bar{\i}\c{s} Y{\i}ld{\i}z and Martin Savelsbergh.
   2019.
 \newblock \doi{10.1287/trsc.2018.0887}.
 
+\bibitem[Wu et~al.(2024)Wu, Wen, Hu, Mao, Xia, Shan, Zheng, Lou, Liang, Yang,
+  Zimmermann, Lin, and Wan]{Wu2023LaDe}
+Lixia Wu, Haomin Wen, Haoyuan Hu, Xiaowei Mao, Yutong Xia, Ergang Shan, Jianbin
+  Zheng, Junhong Lou, Yuxuan Liang, Liuqing Yang, Roger Zimmermann, Youfang
+  Lin, and Huaiyu Wan.
+\newblock {LaDe}: The first comprehensive last-mile express dataset from
+  industry.
+\newblock In \emph{Proceedings of the 30th ACM SIGKDD Conference on Knowledge
+  Discovery and Data Mining (KDD '24)}, pages 5991--6002, 2024.
+\newblock \doi{10.1145/3637528.3671548}.
+
 \bibitem[Figliozzi(2007)]{Figliozzi2007}
 Miguel~Andres Figliozzi.
 \newblock Analysis of the efficiency of urban commercial vehicle tours: Data
@@ -135,17 +146,6 @@ Kaixiang Lin, Renyu Zhao, Zhe Xu, and Jiayu Zhou.
 \newblock In \emph{Proceedings of the 24th ACM SIGKDD International Conference
   on Knowledge Discovery \& Data Mining (KDD '18)}, pages 1774--1783, 2018.
 \newblock \doi{10.1145/3219819.3219993}.
-
-\bibitem[Wu et~al.(2024)Wu, Wen, Hu, Mao, Xia, Shan, Zheng, Lou, Liang, Yang,
-  Zimmermann, Lin, and Wan]{Wu2023LaDe}
-Lixia Wu, Haomin Wen, Haoyuan Hu, Xiaowei Mao, Yutong Xia, Ergang Shan, Jianbin
-  Zheng, Junhong Lou, Yuxuan Liang, Liuqing Yang, Roger Zimmermann, Youfang
-  Lin, and Huaiyu Wan.
-\newblock {LaDe}: The first comprehensive last-mile express dataset from
-  industry.
-\newblock In \emph{Proceedings of the 30th ACM SIGKDD Conference on Knowledge
-  Discovery and Data Mining (KDD '24)}, pages 5991--6002, 2024.
-\newblock \doi{10.1145/3637528.3671548}.
 
 \bibitem[Muñoz-Villamizar et~al.(2021)Muñoz-Villamizar, Solano-Charris,
   Reyes-Rubiano, and Faulin]{MunozVillamizar2021}

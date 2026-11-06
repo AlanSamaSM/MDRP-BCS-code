@@ -462,8 +462,8 @@ restricciones topológicas reales de la ciudad de La Paz, B.C.S. y patrones de d
 
 \subsection{Objetivos específicos}
 \begin{itemize}
-	\item Generar un conjunto de instancias sintéticas calibradas que proyecten los patrones temporales
-	de demanda del conjunto de datos público de entregas de última milla LaDe \citep{Wu2023LaDe} sobre la estructura demográfica real de La Paz, garantizando la 
+	\item Generar un conjunto de instancias sintéticas parametrizadas que sigan el patrón bimodal
+	observado en entregas de última milla \citep{Wu2023LaDe} sobre la estructura demográfica real de La Paz, garantizando la
 	validez geoespacial de los puntos de entrega y recolección.
 	
 	\item Integrar un motor de simulación de eventos discretos con la infraestructura de enrutamiento OSRM sobre 
@@ -542,16 +542,16 @@ latencia mínima. Este servidor procesa el extracto en formato \texttt{.pbf} de
 OpenStreetMap correspondiente a la ciudad de La Paz.
 
 \subsubsection{Instancias de Demanda y Patrones Temporales}
-El alcance se limita a la generación de \textbf{instancias sintéticas calibradas}, construidas bajo 
+El alcance se limita a la generación de \textbf{instancias sintéticas parametrizadas}, construidas bajo
 los siguientes parámetros:
 
 \begin{itemize}
 	\item \textbf{Volumen:} Escenarios de aproximadamente 1,000 órdenes distribuidas en una ventana 
 	operativa de 11 horas (08:00 - 19:00).
 	
-	\item \textbf{Patrones Estocásticos:} Distribución de pedidos con dos picos diarios, tomados del perfil
-	de recolección de paquetes del dataset de referencia \textit{LaDe} \cite{Wu2023LaDe} (9:00 y 17:00); no
-	corresponden a los horarios de comida locales.
+	\item \textbf{Patrones Estocásticos:} Distribución de pedidos con dos picos diarios (9:00 y 17:00),
+	siguiendo el patrón bimodal observado en entregas de última milla \cite{Wu2023LaDe}; los parámetros
+	son supuestos y no corresponden a los horarios de comida locales.
 	
 \end{itemize}
 
@@ -651,8 +651,8 @@ La simulación asume condiciones de flujo ideal. Quedan fuera del alcance:
 \end{itemize}
 
 \subsubsection{Generalización de Patrones de Consumo}
-La forma diaria de la demanda se toma del dataset LaDe \cite{Wu2023LaDe} y se asume transferible al contexto
-de La Paz. Este supuesto no está respaldado por datos locales; el tipo de ciudad y su infraestructura influyen en
+La demanda sigue el patrón bimodal observado en entregas de última milla \cite{Wu2023LaDe}, con parámetros
+supuestos, y se asume transferible al contexto de La Paz. Este supuesto no está respaldado por datos locales; el tipo de ciudad y su infraestructura influyen en
 el comportamiento del transporte \citep{MunozVillamizar2021}, por lo que la transferibilidad del patrón es una
 limitación del estudio.
 	
@@ -965,7 +965,7 @@ limitación del estudio.
 	$\mathcal{P}$ & Polígono urbano de La~Paz donde se generan las ubicaciones \\
 	$\rho$ & Razón de saturación: órdenes objetivo por repartidor \\
 	$n_{\min}$ & Tamaño mínimo de la flota \\
-	$\kappa$ & Índice de circuidad, $d_{OSRM} / d_{Haversine}$ \\
+	$\kappa$ & Índice de circuidad, $d_{OSRM} / d_{recta}$ \\
 	$\Delta\text{CtD}$ & Diferencia de \textit{Click-to-Door} entre políticas, $\text{CtD}_{\text{FCFS}} - \text{CtD}_{\text{RH}}$ \\
 	$\bar{x}$, $\bar{\Delta}$ & Media de una métrica por política; diferencia media pareada FCFS $-$ RH \\
 	$r_{rb}$ & Correlación \textit{rank-biserial} pareada (tamaño de efecto) \\
@@ -1388,9 +1388,9 @@ limitación del estudio.
 
 	La demanda de los servicios de entrega de comida suele concentrarse en
 	dos picos diarios (almuerzo y cena).  Como no se dispone de datos de
-	entrega de comida para La~Paz, este trabajo toma la forma del perfil
-	diario del dataset LaDe \citep{Wu2023LaDe}, que proviene de la
-	operación de paquetería de última milla de Cainiao: en Shanghai, la
+	entrega de comida para La~Paz, este trabajo sigue el patrón bimodal
+	observado en entregas de última milla en el dataset LaDe \citep{Wu2023LaDe},
+	que proviene de la operación de paquetería de Cainiao: en Shanghai, la
 	jornada de los repartidores va de 8:00 a 19:00 y la recolección de
 	paquetes presenta picos a las 9:00 y a las 17:00.  Una representación parsimoniosa de esta estructura
 	bimodal es la superposición de una intensidad base constante y dos
@@ -1406,8 +1406,8 @@ limitación del estudio.
 	\noindent donde $\lambda_0$ es la intensidad base, $\mu_m$ y $\mu_e$
 	son los centros temporales de los picos matutino y vespertino,
 	$A_m$ y $A_e$ las amplitudes respectivas, y $\sigma$ la dispersión
-	temporal compartida.  Los centros y la ventana operativa se fijan a
-	partir del perfil de LaDe \citep{Wu2023LaDe}; la Sección~3.2 detalla
+	temporal compartida.  Los centros y la ventana operativa siguen el
+	patrón de LaDe \citep{Wu2023LaDe}, y los demás parámetros son supuestos; la Sección~3.2 detalla
 	los valores adoptados y el procedimiento de muestreo implementado para La~Paz.
 
 	La elección del PPNH con perfil gaussiano bimodal se justifica por tres
@@ -1810,7 +1810,7 @@ services:
 	\section{Generación de instancias sintéticas}
 
 	Dado que no se dispone de registros históricos de operaciones de entrega de comida en La Paz, B.C.S., 
-	el sistema genera instancias sintéticas calibradas que replican los patrones temporales y 
+	el sistema genera instancias sintéticas parametrizadas que siguen los patrones temporales y
 	geoespaciales documentados en la literatura. El proceso se divide en dos etapas: 
 	(1)~la generación de órdenes (\texttt{make\_synth\_orders.py}) y 
 	(2)~la carga y dimensionamiento de flota (\texttt{synth\_loader.py}).
@@ -1818,10 +1818,10 @@ services:
 	\subsection{Generacion temporal de órdenes}
 
 	La llegada de ordenes se modela mediante un \textbf{proceso de Poisson no homogeneo} 
-	\citep{Ross2014} con tasa variable $\lambda(t)$, con la forma diaria del dataset 
-	LaDe \citep{Wu2023LaDe}. Se adopta la función de intensidad bimodal definida en la 
-	Ec.~\eqref{eq:intensity_theory} (§2.4.2), con los siguientes parámetros, que 
-	reproducen los picos de recolección de paquetes documentados en LaDe \citep{Wu2023LaDe}: 
+	\citep{Ross2014} con tasa variable $\lambda(t)$, siguiendo el patrón bimodal observado en
+	entregas de última milla \citep{Wu2023LaDe}. Se adopta la función de intensidad bimodal definida en la
+	Ec.~\eqref{eq:intensity_theory} (§2.4.2), con los siguientes parámetros supuestos, cuyos
+	centros siguen la ubicación de los picos de recolección de paquetes de LaDe:
 	$\lambda_0 = 0.6$ órdenes/minuto, $\mu_m = \text{09:00}$, $\mu_e = \text{17:00}$, 
 	$A_m = 2.4$, $A_e = 2.0$, y $\sigma = 45$~min.  Los centros $\mu_m$ y $\mu_e$ reproducen la
 	ubicación de los picos de LaDe dentro de la ventana operativa y no los horarios de comida
@@ -2479,7 +2479,7 @@ services:
 	completo se repite sustituyendo OSRM por la distancia en línea recta (Haversine), recorrida
 	a la velocidad media que OSRM asigna a los trayectos restaurante--cliente (651~m/min), de modo
 	que ambos escenarios difieren solo en la geometría de las rutas.  Un segundo control usa la
-	velocidad reducida en el índice de circuidad $\kappa = d_{OSRM} / d_{Haversine}$
+	velocidad reducida en el índice de circuidad $\kappa = d_{OSRM} / d_{recta}$
 	($651/\kappa \approx 472$~m/min), de modo que los trayectos en línea recta duran en promedio
 	lo mismo que por la red.
 
@@ -3143,8 +3143,8 @@ services:
 	\subsection{Objetivos específicos}
 
 	\paragraph{OE\,1: Generación de instancias sintéticas.}
-	Se implementó un generador estocástico que proyecta patrones temporales de la
-	literatura (LaDe) sobre el área urbana de La Paz
+	Se implementó un generador estocástico que sigue el patrón bimodal observado en la
+	literatura (LaDe), con parámetros supuestos, sobre el área urbana de La Paz
 	(\texttt{make\_synth\_orders.py}). Las diez semillas ($s \in \{2025, \ldots, 2034\}$)
 	producen instancias reproducibles de 988 a 1\,047~órdenes distribuidas en
 	25~restaurantes; todas generaron resultados válidos.
