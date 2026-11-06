@@ -139,16 +139,16 @@
   \ifblind\else
   {\itshape\fontsize{9}{11}\selectfont
    Sánchez Martínez, Alan José Marcos\textsuperscript{1*}\par
-   \textsuperscript{1}Tecnológico Nacional de México / Instituto Tecnológico de La Paz, alansama2906@gmail.com\par}
+   \textsuperscript{1}Tecnológico Nacional de México / Instituto Tecnológico de La Paz, m16310322@lapaz.tecnm.mx\par}
   \fi
   {\fontsize{9}{11}\selectfont Área de participación: Sistemas Computacionales\par}
 \end{center}
 
 \section{Resumen}
-Las plataformas de entrega de comida deciden, sin conocer los pedidos futuros, si asignan cada orden
+Las plataformas de entrega de comida deciden sin conocer los pedidos futuros, si asignan cada orden
 al repartidor libre más cercano o si esperan unos minutos para agrupar órdenes y coordinar la
 asignación. Este trabajo evalúa en qué condiciones conviene coordinar en una ciudad media mexicana,
-La Paz, B.C.S., y cuánto cambia la evaluación al usar la red vial real. Se construyó un simulador de
+La Paz, B.C.S., y cuanto cambia la evaluación al usar la red vial real. Se construyó un simulador de
 código abierto que obtiene los tiempos de viaje de OSRM sobre OpenStreetMap y compara una política
 reactiva (FCFS) con una heurística de horizonte rodante (RH) en cuatro niveles de saturación de la
 flota, con diez instancias sintéticas por nivel. Con una flota holgada, FCFS entrega 1.4~min antes;
@@ -175,7 +175,7 @@ Euclidean distances underestimate both delivery times and the benefit of coordin
 
 \section{Introducción}
 La última milla, el tramo que va del punto de recolección al domicilio del cliente, es uno de los
-eslabones más costosos y difíciles de la logística urbana. En zonas residenciales concentra grandes
+eslabones mas costosos y difíciles de la logística urbana. En zonas residenciales concentra grandes
 volúmenes de entregas con horarios estrechos y condiciones que cambian durante el día
 \cite{Jazemi2023}. La entrega de comida a domicilio agrava estas exigencias: los pedidos llegan sin
 aviso, la comida pierde calidad con cada minuto de espera y el cliente espera recibirla en menos de
@@ -258,7 +258,7 @@ servicio), el tamaño de agrupamiento y el costo por pedido, con un pago de $p_1
 y un mínimo garantizado de $p_2$ por hora de turno \cite{Reyes2018}.
 
 \subsection{Políticas de despacho}
-El simulador avanza en épocas de $f = 5$~min para ambas políticas: en cada época, FCFS asigna una por
+El simulador avanza en epocas de $f = 5$~min para ambas políticas: en cada época, FCFS asigna una por
 una las órdenes nuevas y RH resuelve su optimización. Las dos calculan los instantes de recolección y
 entrega con las mismas reglas. Un agrupamiento $B$ solo puede recogerse cuando ya está lista la
 última de sus órdenes, es decir, a partir del instante $e_B = \max_{o\in B} e_o$. El repartidor $c$
@@ -294,7 +294,7 @@ instante en que el repartidor $c$ termina su ruta actual:
                         {|\{c \in \mathcal{C}_{turno}(t) : e^{avail}_c \leq t + \Delta_2\}|} \right\rceil.
   \label{eq:zt}
 \end{equation}
-Si hay tantos repartidores como órdenes, $Z_t = 1$ y cada orden tiende a viajar sola; si la flota se
+Si hay tantos repartidores como ordenes, $Z_t = 1$ y cada orden tiende a viajar sola; si la flota se
 satura, $Z_t$ crece y se forman agrupamientos más grandes. $Z_t$ se acota en 5, y ningún agrupamiento
 puede superar $B_{max} = 4$ órdenes.
 
@@ -628,51 +628,54 @@ S4 & 203.75 & 46.20 & 5.20 & 2.63 & 67.3 & 67.8 & 3.30 & 10.00 & 10.00 \\
 
 \subsection{Efecto de la red vial}
 Sobre los 10\,184 trayectos restaurante--cliente de las diez instancias, la distancia por la red es
-en promedio 3.30~km, frente a 2.39~km en línea recta: una circuidad $\kappa = 1.38$, dentro del rango
-de 1.2 a 1.4 que se reporta en la literatura \cite{Boyaci2021}. El dominio de 8.4~km$^2$ del centro
-urbano no incluye trayectos que rodeen la ensenada, por lo que este valor refleja la traza urbana y
-no la costa.
+en promedio 3.30~km y en línea recta 2.39~km: los trayectos reales son 38\,\% más largos (circuidad
+$\kappa = 1.38$), dentro del rango de 1.2 a 1.4 que reporta la literatura \cite{Boyaci2021}.
 
-En el control euclidiano a la misma velocidad media, la ventaja de RH en minutos es menor que con la
-red real en los cuatro escenarios ($p = 0.002$): en S1 la desventaja de RH sería de 4.5~min en lugar
-de 1.4, y en S3 su ventaja sería de 37.1~min en lugar de 63.1. La línea recta también subestima los
-tiempos de entrega de ambas políticas; en S2, el CtD de FCFS pasa de 41.8~min en el control a
-56.1~min con OSRM, y el de RH, de 30.3 a 35.4~min. En el control con velocidad dividida entre
-$\kappa$, que iguala la duración media de los viajes, el alargamiento de los trayectos explica entre
-el 62 y el 84\,\% de la diferencia en la ventaja de RH, y el resto se debe a la estructura de la red
-($p \leq 0.004$). Así, ignorar la red no solo hace parecer más rápidas a ambas políticas: también reduce el
-beneficio aparente de coordinar (PI2).
+Para medir cuánto cambia la comparación, se repitió el experimento con tiempos de viaje en línea
+recta. A la velocidad media de la red (651~m/min, primer control), ambas políticas parecen más
+rápidas: en S2, el CtD de FCFS baja de 56.1 a 41.8~min y el de RH, de 35.4 a 30.3~min. Como FCFS
+mejora más, la ventaja de RH se reduce en los cuatro escenarios ($p = 0.002$); en S3, por ejemplo,
+pasa de 63.1 a 37.1~min. El segundo control baja la velocidad hasta que los viajes en línea recta
+duran en promedio lo mismo que por la red ($651/1.38 \approx 472$~m/min); con él desaparece entre el
+62 y el 84\,\% de esa reducción. La mayor parte del efecto se debe, por tanto, a que los trayectos
+reales son más largos y cargan más a la flota, y el resto, a la forma de la red ($p \leq 0.004$).
+Ignorar la red hace parecer más rápidas a ambas políticas y subestima el beneficio de coordinar, lo
+que responde a la pregunta PI2.
 
 \subsection{Reproducibilidad y costo de cómputo}
 Toda la cadena (OpenStreetMap, OSRM y Python) es de código abierto, las instancias se regeneran a
 partir de semillas fijas y cada corrida pasa verificaciones automáticas de integridad: ninguna orden
 se recoge antes de estar lista ni se entrega antes de recogerse, no hay entregas duplicadas y ninguna
-ruta recurrió a la estimación de respaldo en línea recta. Con 1\,038 órdenes, simular un día toma
+ruta recurrió a la estimación de respaldo en línea recta (de haber fallado OSRM). Con 1\,038 órdenes, simular un día toma
 entre 1.8 y 2.7~segundos con FCFS y entre 57 y 80~segundos con RH, incluidas las consultas a OSRM, con menos de
 225~MB de memoria por proceso, en una computadora portátil con procesador Apple M1 Pro y 16~GB de
 RAM. Esto responde a PI3: la evaluación es reproducible y no requiere infraestructura especializada.
 
 \subsection{Limitaciones}
-El reloj del simulador avanza en épocas de 5~min y la actualización de rutas ocurre después de la
-asignación, de modo que un repartidor que termina su ruta espera entre 5 y 10~min la siguiente; esta
-espera afecta más a FCFS, que hace un viaje por pedido. Al repetir la campaña actualizando las rutas
-antes de asignar, RH sigue ganando en S2--S4 en todas las semillas y el cruce permanece entre S1 y
-S2, pero la reducción del CtD baja a 14.6\,\% en S2, 41.4\,\% en S3 y 63.0\,\% en S4; las
-magnitudes de la Tabla~\ref{tab:calidad} deben leerse como una cota superior. Además, la demanda es
+El reloj del simulador avanza en épocas de 5~min. En cada época primero se asignan los pedidos y
+después se registran las rutas terminadas, de modo que un repartidor que termina a mitad de una época
+queda libre hasta la siguiente y espera entre 5 y 10~min su nuevo viaje. Como esta espera ocurre una
+vez por viaje, perjudica más a FCFS, que hace un viaje por pedido. Para comprobar que no determina el
+resultado, se repitieron las 80 corridas sobre la red vial con el orden inverso (primero se registran
+las rutas terminadas y luego se asigna): FCFS sigue ganando en S1 y RH en S2--S4 en todas las
+semillas, y el cruce permanece entre S1 y S2. La reducción del CtD baja a 14.6\,\% en S2, 41.4\,\% en
+S3 y 63.0\,\% en S4, por lo que las magnitudes dependen de este detalle de implementación, pero las
+conclusiones se mantienen. Además, la demanda es
 sintética: sigue el patrón bimodal de la recolección de paquetes en LaDe con parámetros supuestos, no
-calibrados con la demanda local de comida, cuyos picos ocurren alrededor de las 14:00 y las 20:00, y el tipo de ciudad influye en el
+calibrados con la demanda local de comida, y el tipo de ciudad influye en el
 comportamiento de la última milla \cite{MunozVillamizar2021}. Los tiempos de preparación y de
 servicio son homogéneos, la red se considera sin congestión y las ubicaciones se muestrean de forma
 uniforme dentro del dominio urbano.
 
 \section{Trabajo a futuro}
-Quedan pendientes cinco líneas de trabajo: calibrar la demanda, los tiempos de preparación y la
-ubicación de restaurantes y clientes con datos locales de una plataforma o de encuestas, en lugar
-del perfil de paquetería; explorar valores de $\rho$ entre 18 y 26 para ubicar con precisión el punto
-de cruce y evaluar políticas híbridas que activen la coordinación solo cuando la carga lo justifique;
-incorporar velocidades dependientes de la hora para representar la congestión; ampliar el dominio
-a toda la mancha urbana, incluidos los trayectos que rodean la ensenada; y comparar RH con
-políticas anticipatorias basadas en aprendizaje sobre el mismo entorno.
+Quedan pendientes seis líneas de trabajo: calibrar la demanda, los tiempos de preparación y la
+ubicación de restaurantes y clientes con datos locales de una plataforma de entregas o de encuestas;
+explorar valores de $\rho$ entre 18 y 26 para ubicar con precisión el punto de cruce y evaluar
+políticas híbridas que activen la coordinación solo cuando la carga lo justifique; incorporar
+velocidades dependientes de la hora para representar la congestión; ampliar el dominio a toda la
+mancha urbana, incluidos los trayectos que rodean la ensenada de La Paz; comparar RH con políticas
+anticipatorias basadas en aprendizaje automático sobre el mismo entorno; y evaluar la escalabilidad
+del simulador con instancias de mayor tamaño.
 
 \section{Conclusiones}
 En las instancias evaluadas del centro urbano de La Paz, coordinar los despachos no compensa cuando
@@ -699,7 +702,7 @@ doi: 10.3390/app132413015.
 \bibitem{Reyes2018}
 D. Reyes, A. Erera, M. Savelsbergh, S. Sahasrabudhe y R. O'Neil, ``The meal delivery routing
 problem,'' preprint, \textit{Optimization Online}, 2018. [En línea]. Disponible:
-http://www.optimization-online.org/DB\_FILE/2018/03/6512.pdf
+https://optimization-online.org/2018/04/6571/
 
 \bibitem{Yildiz2019}
 B. Yıldız y M. Savelsbergh, ``Provably high-quality solutions for the meal delivery routing
